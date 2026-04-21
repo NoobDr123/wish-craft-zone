@@ -7,12 +7,8 @@ import {
   CheckCircle2,
   ChevronDown,
   ChevronUp,
-  CreditCard,
-  Clock,
   Lock,
   ShieldCheck,
-  Star,
-  Truck,
 } from "lucide-react";
 
 export const Route = createFileRoute("/checkout")({
@@ -23,24 +19,6 @@ export const Route = createFileRoute("/checkout")({
 });
 
 const emailRe = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
-
-const TRUST = [
-  {
-    name: "Sarah M.",
-    quote:
-      "Most meaningful gift my mom received during treatment. Worth every cent.",
-  },
-  {
-    name: "David R.",
-    quote: "Played it at my wife's last chemo session. The room was in tears.",
-  },
-];
-
-const HAPPY_AVATARS = [
-  "https://images.unsplash.com/photo-1494790108377-be9c29b29330?w=64&h=64&fit=crop&crop=faces",
-  "https://images.unsplash.com/photo-1500648767791-00dcc994a43e?w=64&h=64&fit=crop&crop=faces",
-  "https://images.unsplash.com/photo-1438761681033-6461ffad8d80?w=64&h=64&fit=crop&crop=faces",
-];
 
 function CheckoutPage() {
   const navigate = useNavigate();
@@ -217,21 +195,6 @@ function CheckoutPage() {
         />
         <Legal compact />
       </div>
-    </div>
-  );
-}
-
-function StarRow({ compact }: { compact?: boolean }) {
-  return (
-    <div
-      className={`flex items-center justify-center gap-2 ${compact ? "mb-2" : "mb-3"}`}
-    >
-      <div className="flex items-center gap-0.5 text-success">
-        {Array.from({ length: 5 }).map((_, i) => (
-          <Star key={i} className="h-4 w-4 fill-current" />
-        ))}
-      </div>
-      <span className="text-sm font-bold text-foreground">1,000+</span>
     </div>
   );
 }
