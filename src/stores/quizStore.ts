@@ -65,9 +65,9 @@ export type VoiceKey = "Female Voice" | "Male Voice" | "Duet" | "No Preference";
 export interface QuizState {
   // Step 1 — Who is this for
   relationship?: RelationshipKey;
+  relationship_other: string;
   recipient_name: string;
   pronunciation: string;
-  pronouns: string;
   age_range: string;
 
   // Step 2 — Their fight
@@ -116,8 +116,8 @@ export interface QuizState {
 
 const initial = {
   recipient_name: "",
+  relationship_other: "",
   pronunciation: "",
-  pronouns: "",
   age_range: "",
   fighting_for: "",
   signature_strength: "",
