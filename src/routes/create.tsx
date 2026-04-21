@@ -339,7 +339,7 @@ function CreatePage() {
       render: () => (
         <Question label="The thing only you two get (optional)">
           <TextArea
-            placeholder={"\"Don't make me come down there.\" Calling me Bug since I was 4. The way she answers the phone with \"talk to me, sweet pea.\"…"}
+            placeholder="The nickname only they call you. The phrase your family always says. A running joke that still makes you laugh…"
             value={q.inside_joke}
             onChange={(e) => q.set("inside_joke", e.target.value)}
             maxLength={400}
