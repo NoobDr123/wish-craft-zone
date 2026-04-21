@@ -30,18 +30,13 @@ export function QuizShell({
   nextLabel = "Continue",
   optional = false,
 }: QuizShellProps) {
-  const percentage = Math.round((current / total) * 100);
-
   return (
     <div className="min-h-screen bg-background">
-      <ProgressBar percentage={percentage} />
+      <ProgressBar current={current} total={total} />
 
-      <header className="px-6 pb-2 pt-8">
+      <header className="px-6 pb-2 pt-20">
         <div className="mx-auto flex max-w-3xl items-center justify-between">
           <Logo />
-          <p className="text-sm text-muted-foreground">
-            Question {current} of {total}
-          </p>
         </div>
       </header>
 
