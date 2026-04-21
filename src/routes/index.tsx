@@ -318,8 +318,8 @@ function LandingPage() {
             Their spirit, captured in music.
           </h2>
           <p className="mx-auto mt-6 max-w-xl text-lg text-muted-foreground">
-            A card feels too small. A generic gift feels empty. Give them
-            something only you could give.
+            On the chemo days, the scan days, the milestone days — and the days
+            we miss them most. Give them something only you could give.
           </p>
           <Link
             to="/create"
@@ -329,7 +329,8 @@ function LandingPage() {
             <ArrowRight className="h-4 w-4" />
           </Link>
           <p className="mt-4 text-xs text-muted-foreground">
-            Includes lyrics, full audio, and a beautiful share page.
+            Includes original lyrics, full studio-quality audio, and a private
+            share page they'll keep forever.
           </p>
         </div>
       </section>
