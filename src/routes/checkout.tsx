@@ -5,75 +5,78 @@ import { useQuizStore } from "@/stores/quizStore";
 import {
   ArrowLeft,
   CheckCircle2,
-  ChevronDown,
-  ChevronUp,
-  Lock,
+  Gift,
+  Music2,
+  Pencil,
+  Play,
   ShieldCheck,
+  Star,
 } from "lucide-react";
 
 export const Route = createFileRoute("/checkout")({
   component: CheckoutPage,
   head: () => ({
-    meta: [{ title: "Checkout · RibbonSong" }],
+    meta: [{ title: "Almost There · RibbonSong" }],
   }),
 });
 
 const emailRe = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
 
+const SAMPLES = [
+  {
+    title: "Sent to Me from God",
+    by: "Pamela S.",
+    quote:
+      "Absolutely beautiful, you captured such special moments… we both were crying.",
+  },
+  {
+    title: "Saving Grace",
+    by: "Wendy B.",
+    quote:
+      "This is absolutely breathtaking. I can't believe it… I am going to have a hard time keeping this a secret until Sunday.",
+  },
+  {
+    title: "Stronger Now",
+    by: "Markeeta B.",
+    quote: "Very very wonderful song. I absolutely loved it and so did Dave!",
+  },
+];
+
+function formatDeliveryDate() {
+  const d = new Date();
+  d.setDate(d.getDate() + 7);
+  return d.toLocaleDateString("en-US", { month: "short", day: "numeric" });
+}
+
 function CheckoutPage() {
   const navigate = useNavigate();
   const q = useQuizStore();
-  const [processing, setProcessing] = useState(false);
-  const [summaryOpen, setSummaryOpen] = useState(false);
-
-  // Prefill from quiz store
   const [email, setEmail] = useState(q.buyer_email || "");
-  const [name, setName] = useState(q.buyer_name || "");
-  const [card, setCard] = useState("");
-  const [exp, setExp] = useState("");
-  const [cvc, setCvc] = useState("");
+  const [processing, setProcessing] = useState(false);
 
   useEffect(() => {
     if (!q.recipient_name) navigate({ to: "/create" });
   }, [q.recipient_name, navigate]);
 
-  const cardClean = card.replace(/\s/g, "");
-  const cardValid = cardClean.length >= 13 && /^\d+$/.test(cardClean);
-  const expValid = /^\d{2}\s*\/\s*\d{2}$/.test(exp);
-  const cvcValid = /^\d{3,4}$/.test(cvc);
   const emailValid = emailRe.test(email);
-  const nameValid = name.trim().length > 1;
-
-  const canPay =
-    cardValid && expValid && cvcValid && emailValid && nameValid && !processing;
-
-  const total = useMemo(() => 39, []);
-
-  const formatCard = (v: string) =>
-    v
-      .replace(/\D/g, "")
-      .slice(0, 19)
-      .replace(/(\d{4})(?=\d)/g, "$1 ");
-  const formatExp = (v: string) => {
-    const d = v.replace(/\D/g, "").slice(0, 4);
-    return d.length > 2 ? `${d.slice(0, 2)} / ${d.slice(2)}` : d;
-  };
+  const canPay = emailValid && !processing;
+  const deliveryDate = useMemo(() => formatDeliveryDate(), []);
+  const recipient = q.recipient_name || "your loved one";
 
   const handlePay = () => {
     if (!canPay) return;
     setProcessing(true);
-    q.set("buyer_name", name);
     q.set("buyer_email", email);
     setTimeout(() => {
       q.set("orderId", crypto.randomUUID());
       navigate({ to: "/upsell-1" });
-    }, 1200);
+    }, 1100);
   };
 
   return (
-    <div className="min-h-screen bg-background pb-32 lg:pb-0">
+    <div className="min-h-screen bg-gradient-warm pb-32 lg:pb-16">
       {/* Header */}
-      <header className="border-b border-border/60 bg-card">
+      <header className="border-b border-peach/60 bg-background/60 backdrop-blur">
         <div className="mx-auto flex max-w-2xl items-center justify-between px-5 py-4">
           <Link
             to="/almost-there"
@@ -83,286 +86,289 @@ function CheckoutPage() {
           </Link>
           <Logo />
           <span className="inline-flex items-center gap-1.5 text-xs text-muted-foreground">
-            <Lock className="h-3.5 w-3.5" /> Secure
+            <ShieldCheck className="h-3.5 w-3.5" /> Secure
           </span>
         </div>
       </header>
 
-      {/* Collapsible Order summary — collapsed by default */}
-      <div className="border-b border-border/60 bg-muted/40">
-        <div className="mx-auto max-w-2xl px-5">
-          <button
-            onClick={() => setSummaryOpen((o) => !o)}
-            className="flex w-full items-center justify-between py-4 text-sm"
-          >
-            <span className="flex items-center gap-2 font-medium text-foreground">
-              {summaryOpen ? "Hide order summary" : "Show order summary"}
-              {summaryOpen ? (
-                <ChevronUp className="h-4 w-4 text-muted-foreground" />
-              ) : (
-                <ChevronDown className="h-4 w-4 text-muted-foreground" />
-              )}
-            </span>
-            <span className="font-display text-2xl font-semibold text-foreground">
-              ${total}.00
-            </span>
-          </button>
-          {summaryOpen && (
-            <div className="pb-5">
-              <OrderSummary total={total} q={q} />
-            </div>
-          )}
-        </div>
-      </div>
-
-      <main className="mx-auto max-w-2xl px-5 py-8">
-        <h1 className="font-display text-3xl font-semibold text-foreground">
-          Checkout
-        </h1>
-
-        {/* Single combined form card */}
-        <div className="mt-6 space-y-3">
-          <Field
-            label="Email"
-            type="email"
-            value={email}
-            onChange={setEmail}
-            placeholder="you@example.com"
-            valid={email.length === 0 || emailValid}
-          />
-          <Field
-            label="Full name"
-            value={name}
-            onChange={setName}
-            placeholder="Jane Doe"
-            valid={name.length === 0 || nameValid}
-          />
-          <Field
-            label="Card number"
-            value={card}
-            onChange={(v) => setCard(formatCard(v))}
-            placeholder="1234 1234 1234 1234"
-            inputMode="numeric"
-            valid={card.length === 0 || cardValid}
-          />
-          <div className="grid grid-cols-2 gap-3">
-            <Field
-              label="Expires"
-              value={exp}
-              onChange={(v) => setExp(formatExp(v))}
-              placeholder="MM / YY"
-              inputMode="numeric"
-              valid={exp.length === 0 || expValid}
-            />
-            <Field
-              label="CVC"
-              value={cvc}
-              onChange={(v) => setCvc(v.replace(/\D/g, "").slice(0, 4))}
-              placeholder="123"
-              inputMode="numeric"
-              valid={cvc.length === 0 || cvcValid}
-            />
+      <main className="mx-auto max-w-2xl px-5 py-10">
+        {/* HERO — Almost There */}
+        <section className="text-center">
+          <h1 className="text-balance font-display text-4xl font-bold leading-[1.05] text-foreground md:text-5xl">
+            Almost There! Complete Your Order
+          </h1>
+          <p className="mx-auto mt-5 max-w-xl text-balance text-base leading-relaxed text-muted-foreground md:text-lg">
+            You're just one click away from creating a beautiful, personalized
+            song for{" "}
+            <span className="font-semibold text-ribbon">{recipient}</span>.
+          </p>
+          <div className="mt-6 inline-flex items-center gap-2 rounded-full bg-ribbon px-5 py-2.5 text-sm font-semibold text-ribbon-foreground shadow-soft">
+            Expected song delivery date:{" "}
+            <span className="font-bold">{deliveryDate}</span>
           </div>
-        </div>
+        </section>
 
-        {/* Desktop CTA */}
-        <div className="mt-7 hidden lg:block">
-          <CompleteButton
-            processing={processing}
-            canPay={canPay}
+        {/* Email + CTA card */}
+        <section className="mt-8 rounded-3xl border border-peach/70 bg-card p-6 shadow-card md:p-8">
+          <label className="block">
+            <span className="mb-2 block text-sm font-semibold text-foreground">
+              Your Email Address
+            </span>
+            <input
+              type="email"
+              value={email}
+              onChange={(e) => setEmail(e.target.value)}
+              placeholder="you@email.com"
+              className="w-full rounded-2xl border-2 border-peach bg-background px-5 py-4 text-[15px] text-foreground placeholder:text-muted-foreground/60 focus:border-ribbon focus:outline-none focus:ring-4 focus:ring-ribbon/15"
+            />
+          </label>
+
+          <button
             onClick={handlePay}
-          />
-          <Legal />
-        </div>
+            disabled={!canPay}
+            className="mt-5 flex w-full items-center justify-center gap-2.5 rounded-2xl bg-ribbon px-6 py-5 text-base font-bold text-ribbon-foreground shadow-glow transition-all hover:brightness-95 active:scale-[0.99] disabled:cursor-not-allowed disabled:opacity-60 disabled:shadow-none md:text-lg"
+          >
+            {processing ? (
+              <>
+                <span className="h-5 w-5 animate-spin rounded-full border-2 border-ribbon-foreground/30 border-t-ribbon-foreground" />
+                Processing…
+              </>
+            ) : (
+              <>
+                <Gift className="h-5 w-5" /> Create My Song
+              </>
+            )}
+          </button>
 
-        {/* Compact trust row */}
-        <div className="mt-6 flex items-center justify-center gap-4 text-xs text-muted-foreground">
-          <span className="inline-flex items-center gap-1.5">
-            <ShieldCheck className="h-3.5 w-3.5 text-success" /> 30-day refund
-          </span>
-          <span className="inline-flex items-center gap-1.5">
-            <Lock className="h-3.5 w-3.5" /> SSL encrypted
-          </span>
-        </div>
+          <p className="mt-4 flex items-center justify-center gap-1.5 text-sm font-semibold text-success">
+            <CheckCircle2 className="h-4 w-4" /> 30-Day Money Back Guarantee
+          </p>
+        </section>
+
+        {/* Order summary */}
+        <section className="mt-6 rounded-3xl border border-peach/70 bg-card p-6 shadow-soft md:p-7">
+          <h2 className="flex items-center gap-2 font-display text-2xl font-bold text-foreground">
+            <Music2 className="h-5 w-5 text-ribbon" /> Your Custom Song Order
+          </h2>
+
+          <dl className="mt-5 space-y-2.5 text-[15px]">
+            <div className="flex justify-between">
+              <dt className="text-muted-foreground">Song for:</dt>
+              <dd className="font-semibold text-ribbon">{recipient}</dd>
+            </div>
+            <div className="flex justify-between">
+              <dt className="text-muted-foreground">Delivery:</dt>
+              <dd className="font-semibold text-foreground">{deliveryDate}</dd>
+            </div>
+          </dl>
+
+          <div className="my-5 border-t border-dashed border-peach" />
+
+          <h3 className="font-display text-2xl font-semibold text-foreground">
+            Custom Song
+          </h3>
+          <div className="mt-3 flex flex-wrap items-center justify-between gap-3">
+            <span className="rounded-full border-2 border-ribbon/40 bg-ribbon/5 px-3 py-1 text-xs font-bold tracking-wider text-ribbon">
+              50% OFF
+            </span>
+            <p className="flex items-baseline gap-2">
+              <span className="text-base font-medium text-muted-foreground line-through">
+                $199
+              </span>
+              <span className="font-display text-3xl font-bold text-ribbon">
+                $99
+              </span>
+              <span className="text-sm font-semibold text-muted-foreground">
+                USD
+              </span>
+            </p>
+          </div>
+
+          <button
+            onClick={() => navigate({ to: "/create" })}
+            className="mt-4 flex w-full items-center justify-center gap-2 rounded-xl border-2 border-dashed border-ribbon/40 bg-ribbon/5 px-4 py-3 text-sm font-semibold text-ribbon transition-colors hover:bg-ribbon/10"
+          >
+            <Pencil className="h-4 w-4" /> Review or Edit Survey
+          </button>
+        </section>
+
+        {/* Limited time offer */}
+        <section className="mt-6 rounded-3xl border-2 border-ribbon/30 bg-ribbon/5 p-6 md:p-7">
+          <h3 className="flex items-center gap-2 font-display text-2xl font-bold text-ribbon">
+            🎁 Limited Time Offer
+          </h3>
+          <p className="mt-3 text-[15px] leading-relaxed text-foreground">
+            Our songs typically cost{" "}
+            <span className="font-semibold line-through">$199</span>, but for a
+            limited time, you can get the same professional quality for just{" "}
+            <span className="font-bold text-ribbon">$99 USD</span>.
+          </p>
+        </section>
+
+        {/* Samples */}
+        <section className="mt-6 rounded-3xl border border-peach/70 bg-card p-6 shadow-soft md:p-7">
+          <h2 className="flex items-center gap-2 font-display text-2xl font-bold text-foreground">
+            <Music2 className="h-5 w-5 text-ribbon" /> Hear Other RibbonSongs We
+            Made
+          </h2>
+          <div className="mt-5 space-y-4">
+            {SAMPLES.map((s) => (
+              <article
+                key={s.title}
+                className="rounded-2xl border border-peach/60 bg-background/60 p-4"
+              >
+                <div className="flex items-center gap-3">
+                  <button
+                    aria-label={`Play ${s.title}`}
+                    className="flex h-12 w-12 shrink-0 items-center justify-center rounded-full bg-ribbon text-ribbon-foreground transition-transform hover:scale-105"
+                  >
+                    <Play className="ml-0.5 h-5 w-5 fill-current" />
+                  </button>
+                  <div className="min-w-0 flex-1">
+                    <p className="truncate font-semibold text-foreground">
+                      {s.title}
+                    </p>
+                    <p className="truncate text-xs text-muted-foreground">
+                      Ordered by {s.by}
+                    </p>
+                  </div>
+                  <span className="text-xs tabular-nums text-muted-foreground">
+                    0:00
+                  </span>
+                </div>
+                <p className="mt-3 text-sm italic leading-relaxed text-foreground/80">
+                  &ldquo;{s.quote}&rdquo; — {s.by}
+                </p>
+              </article>
+            ))}
+          </div>
+        </section>
+
+        {/* Money-back guarantee */}
+        <section className="mt-6 rounded-3xl border border-peach/70 bg-card p-6 shadow-soft md:p-7">
+          <h3 className="flex items-center gap-2 font-display text-2xl font-bold text-foreground">
+            <CheckCircle2 className="h-5 w-5 text-success" /> 100% Money Back
+            Guarantee
+          </h3>
+          <ul className="mt-5 space-y-4">
+            {[
+              {
+                t: "Not satisfied? Get a full refund",
+                d: "No questions asked, no hassle",
+              },
+              {
+                t: "30-day guarantee",
+                d: "Plenty of time to listen and decide",
+              },
+              {
+                t: "Risk-free purchase",
+                d: "Your satisfaction is our priority",
+              },
+            ].map((item) => (
+              <li key={item.t} className="flex gap-3">
+                <span className="mt-2 h-2 w-2 shrink-0 rounded-full bg-success" />
+                <div>
+                  <p className="font-semibold text-foreground">{item.t}</p>
+                  <p className="text-sm text-muted-foreground">{item.d}</p>
+                </div>
+              </li>
+            ))}
+          </ul>
+        </section>
+
+        {/* Secondary CTA */}
+        <section className="mt-6 rounded-3xl border border-peach/70 bg-card p-6 shadow-soft md:p-7">
+          <button
+            onClick={handlePay}
+            disabled={!canPay}
+            className="flex w-full items-center justify-center gap-2.5 rounded-2xl bg-ribbon px-6 py-5 text-base font-bold text-ribbon-foreground shadow-glow transition-all hover:brightness-95 active:scale-[0.99] disabled:cursor-not-allowed disabled:opacity-60 disabled:shadow-none md:text-lg"
+          >
+            <Gift className="h-5 w-5" /> Create My Song
+          </button>
+          <p className="mt-3 text-center text-sm text-muted-foreground">
+            Ready to create something special for{" "}
+            <span className="font-semibold text-foreground">{recipient}</span>?
+          </p>
+        </section>
+
+        {/* What you'll get */}
+        <section className="mt-6 rounded-3xl border border-peach/70 bg-card p-6 shadow-soft md:p-7">
+          <h3 className="flex items-center gap-2 font-display text-2xl font-bold text-foreground">
+            <Gift className="h-5 w-5 text-ribbon" /> What You'll Get
+          </h3>
+          <ul className="mt-5 space-y-4">
+            {[
+              {
+                t: "Radio-Quality Song",
+                d: "Studio-quality RibbonSong, ready to share",
+              },
+              {
+                t: "Personalized Lyrics",
+                d: `Custom written just for ${recipient}`,
+              },
+              {
+                t: "7-Day Delivery",
+                d: "Perfect for last-minute gifts",
+              },
+            ].map((item) => (
+              <li key={item.t} className="flex gap-3">
+                <span className="mt-2 h-2 w-2 shrink-0 rounded-full bg-ribbon" />
+                <div>
+                  <p className="font-semibold text-foreground">{item.t}</p>
+                  <p className="text-sm text-muted-foreground">{item.d}</p>
+                </div>
+              </li>
+            ))}
+          </ul>
+        </section>
+
+        {/* Why choose */}
+        <section className="mt-6 rounded-3xl border border-peach/70 bg-card p-6 shadow-soft md:p-7">
+          <h3 className="flex items-center gap-2 font-display text-2xl font-bold text-foreground">
+            <Star className="h-5 w-5 fill-ribbon text-ribbon" /> Why Choose
+            RibbonSong?
+          </h3>
+          <ul className="mt-5 space-y-3">
+            {[
+              "Over 1,000 satisfied families",
+              "100% satisfaction guarantee",
+              "Secure payment processing",
+              "Delivered in just 7 days",
+            ].map((t) => (
+              <li
+                key={t}
+                className="flex items-center gap-3 text-[15px] text-foreground"
+              >
+                <CheckCircle2 className="h-5 w-5 shrink-0 text-success" />
+                {t}
+              </li>
+            ))}
+          </ul>
+        </section>
       </main>
 
       {/* Mobile sticky CTA */}
-      <div className="fixed inset-x-0 bottom-0 z-40 border-t border-border bg-card/95 px-5 py-3 backdrop-blur lg:hidden">
-        <CompleteButton
-          processing={processing}
-          canPay={canPay}
+      <div className="fixed inset-x-0 bottom-0 z-40 border-t border-peach/70 bg-background/95 px-5 py-3 backdrop-blur lg:hidden">
+        <button
           onClick={handlePay}
-        />
-        <Legal compact />
-      </div>
-    </div>
-  );
-}
-
-function CompleteButton({
-  processing,
-  canPay,
-  onClick,
-}: {
-  processing: boolean;
-  canPay: boolean;
-  onClick: () => void;
-}) {
-  return (
-    <button
-      onClick={onClick}
-      disabled={!canPay}
-      className="flex w-full items-center justify-center gap-2 rounded-xl bg-success px-8 py-4 text-base font-bold text-success-foreground shadow-soft transition-all hover:brightness-95 active:scale-[0.99] disabled:cursor-not-allowed disabled:opacity-50 disabled:shadow-none"
-    >
-      {processing ? (
-        <>
-          <span className="h-4 w-4 animate-spin rounded-full border-2 border-success-foreground/30 border-t-success-foreground" />
-          Processing…
-        </>
-      ) : (
-        <>Complete my order</>
-      )}
-    </button>
-  );
-}
-
-function Legal({ compact }: { compact?: boolean }) {
-  return (
-    <p
-      className={`text-center text-muted-foreground ${compact ? "mt-2 text-[10px]" : "mt-3 text-xs"}`}
-    >
-      By clicking complete order, you agree to our{" "}
-      <a className="underline hover:text-foreground" href="#">
-        Terms of Service
-      </a>{" "}
-      and{" "}
-      <a className="underline hover:text-foreground" href="#">
-        Privacy Policy
-      </a>
-      .
-    </p>
-  );
-}
-
-function Brand({ children }: { children: React.ReactNode }) {
-  return (
-    <span className="rounded border border-border bg-background px-1.5 py-0.5 text-[10px] font-semibold tracking-wider text-foreground/70">
-      {children}
-    </span>
-  );
-}
-
-type QuizState = ReturnType<typeof useQuizStore.getState>;
-
-function OrderSummary({ total, q }: { total: number; q: QuizState }) {
-  return (
-    <div className="rounded-2xl border border-border bg-card p-5 shadow-soft">
-      <div className="flex gap-4">
-        <div className="flex h-16 w-16 shrink-0 items-center justify-center rounded-xl bg-gradient-ribbon text-2xl">
-          🎵
-        </div>
-        <div className="flex-1">
-          <p className="font-medium text-foreground">Personalized RibbonSong</p>
-          {q.recipient_name && (
-            <p className="text-sm text-muted-foreground">
-              For {q.recipient_name}
-              {q.relationship && ` · ${q.relationship}`}
-            </p>
+          disabled={!canPay}
+          className="flex w-full items-center justify-center gap-2 rounded-2xl bg-ribbon px-6 py-4 text-base font-bold text-ribbon-foreground shadow-glow transition-all active:scale-[0.99] disabled:cursor-not-allowed disabled:opacity-60 disabled:shadow-none"
+        >
+          {processing ? (
+            <>
+              <span className="h-4 w-4 animate-spin rounded-full border-2 border-ribbon-foreground/30 border-t-ribbon-foreground" />
+              Processing…
+            </>
+          ) : (
+            <>
+              <Gift className="h-5 w-5" /> Create My Song · $99
+            </>
           )}
-          {q.genre && (
-            <p className="mt-0.5 text-xs text-muted-foreground">
-              {q.genre} · {q.tempo} · {q.voice}
-            </p>
-          )}
-        </div>
-        <p className="font-medium text-foreground">${total}.00</p>
-      </div>
-
-      <ul className="mt-4 space-y-2 text-sm text-foreground">
-        {[
-          "Studio-quality custom song",
-          "Full lyrics & MP3 download",
-          "Delivered in 24–48 hours",
-        ].map((f) => (
-          <li key={f} className="flex items-start gap-2">
-            <CheckCircle2 className="mt-0.5 h-4 w-4 shrink-0 text-success" />
-            {f}
-          </li>
-        ))}
-      </ul>
-
-      <div className="my-4 border-t border-dashed border-peach" />
-
-      <div className="space-y-1.5 text-sm">
-        <Row label="Subtotal" value={`$${total}.00`} />
-        <Row label="Taxes" value="Included" muted />
-        <Row label="Delivery" value="Digital · email" muted />
-      </div>
-
-      <div className="mt-4 flex items-baseline justify-between border-t border-border pt-3">
-        <span className="font-display text-base text-foreground">Total</span>
-        <div className="text-right">
-          <p className="font-display text-2xl font-semibold text-foreground">
-            ${total}.00
-          </p>
-          <p className="text-[11px] text-muted-foreground">USD · one-time</p>
-        </div>
+        </button>
+        <p className="mt-1.5 text-center text-[10px] text-muted-foreground">
+          30-day money back · Secure checkout
+        </p>
       </div>
     </div>
-  );
-}
-
-function Row({
-  label,
-  value,
-  muted,
-}: {
-  label: string;
-  value: string;
-  muted?: boolean;
-}) {
-  return (
-    <div className="flex justify-between">
-      <span className="text-muted-foreground">{label}</span>
-      <span className={muted ? "text-muted-foreground" : "text-foreground"}>
-        {value}
-      </span>
-    </div>
-  );
-}
-
-function Field({
-  label,
-  value,
-  onChange,
-  placeholder,
-  type = "text",
-  inputMode,
-  valid = true,
-}: {
-  label: string;
-  value: string;
-  onChange: (v: string) => void;
-  placeholder?: string;
-  type?: string;
-  inputMode?: "text" | "numeric" | "email";
-  valid?: boolean;
-}) {
-  return (
-    <label className="block">
-      <span className="mb-1.5 block text-xs font-medium text-muted-foreground">
-        {label}
-      </span>
-      <input
-        type={type}
-        inputMode={inputMode}
-        value={value}
-        onChange={(e) => onChange(e.target.value)}
-        placeholder={placeholder}
-        className={`w-full rounded-xl border bg-background px-4 py-3 text-[15px] text-foreground placeholder:text-muted-foreground/60 focus:outline-none focus:ring-2 focus:ring-primary/30 ${
-          valid ? "border-border" : "border-destructive"
-        }`}
-      />
-    </label>
   );
 }
