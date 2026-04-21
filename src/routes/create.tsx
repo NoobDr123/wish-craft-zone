@@ -63,7 +63,7 @@ const CANCER_TYPES = [
 const MESSAGES = [
   "You are not alone",
   "I'm so proud of your strength",
-  "Keep fighting — we're with you",
+  "Keep fighting, we're with you",
   "Thank you for everything",
   "It's okay to rest now",
   "Your love lives on in us",
@@ -112,12 +112,34 @@ function CreatePage() {
       subtitle: "Your relationship helps us write in the right voice.",
       isValid: (s) => !!s.relationship,
       render: () => (
-        <Question label="They are my…">
+        <Question label="They are my...">
           <PillSelect
             options={RELATIONSHIPS}
             value={q.relationship}
             onChange={(v) => q.set("relationship", v)}
             columns={3}
+          />
+        </Question>
+      ),
+    },
+    {
+      chapter: "Who they are",
+      title: "Tell us a little more about who they are.",
+      subtitle:
+        "A few words about your relationship helps us write the song in the right voice.",
+      // Only show this step when relationship is "Other".
+      isValid: (s) => s.relationship_other.trim().length > 1,
+      render: () => (
+        <Question
+          label="Who are they to you?"
+          helper="e.g. my godmother, my best friend since kindergarten, my mother-in-law"
+        >
+          <TextInput
+            placeholder="My..."
+            value={q.relationship_other}
+            onChange={(e) => q.set("relationship_other", e.target.value)}
+            maxLength={120}
+            autoFocus
           />
         </Question>
       ),
@@ -155,37 +177,23 @@ function CreatePage() {
     },
     {
       chapter: "Who they are",
-      title: "A little about them.",
-      subtitle: "Just enough so the song feels like it was written for them.",
+      title: "About how old are they?",
+      subtitle: "Helps us pick the right tone and references.",
       optional: true,
       isValid: () => true,
       render: () => (
-        <div className="space-y-6">
-          <Question label="Pronouns (optional)">
-            <PillSelect
-              options={["she / her", "he / him", "they / them", "Other"] as const}
-              value={
-                (["she / her", "he / him", "they / them", "Other"] as const).find(
-                  (p) => p === q.pronouns,
-                ) ?? undefined
-              }
-              onChange={(v) => q.set("pronouns", v)}
-              columns={4}
-            />
-          </Question>
-          <Question label="Age range (optional)">
-            <PillSelect
-              options={["Child", "Teen", "20s–30s", "40s–50s", "60s–70s", "80+"] as const}
-              value={
-                (["Child", "Teen", "20s–30s", "40s–50s", "60s–70s", "80+"] as const).find(
-                  (p) => p === q.age_range,
-                ) ?? undefined
-              }
-              onChange={(v) => q.set("age_range", v)}
-              columns={3}
-            />
-          </Question>
-        </div>
+        <Question label="Age range (optional)">
+          <PillSelect
+            options={["Child", "Teen", "20s, 30s", "40s, 50s", "60s, 70s", "80+"] as const}
+            value={
+              (["Child", "Teen", "20s, 30s", "40s, 50s", "60s, 70s", "80+"] as const).find(
+                (p) => p === q.age_range,
+              ) ?? undefined
+            }
+            onChange={(v) => q.set("age_range", v)}
+            columns={3}
+          />
+        </Question>
       ),
     },
 

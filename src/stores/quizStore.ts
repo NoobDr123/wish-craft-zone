@@ -45,7 +45,7 @@ export type ToneKey =
 export type CoreMessage =
   | "You are not alone"
   | "I'm so proud of your strength"
-  | "Keep fighting — we're with you"
+  | "Keep fighting, we're with you"
   | "Thank you for everything"
   | "It's okay to rest now"
   | "Your love lives on in us"
