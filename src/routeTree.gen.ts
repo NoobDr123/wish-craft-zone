@@ -16,6 +16,7 @@ import { Route as ProcessingRouteImport } from './routes/processing'
 import { Route as DashboardRouteImport } from './routes/dashboard'
 import { Route as CreateRouteImport } from './routes/create'
 import { Route as CheckoutRouteImport } from './routes/checkout'
+import { Route as AlmostThereRouteImport } from './routes/almost-there'
 import { Route as IndexRouteImport } from './routes/index'
 import { Route as ListenIdRouteImport } from './routes/listen.$id'
 
@@ -54,6 +55,11 @@ const CheckoutRoute = CheckoutRouteImport.update({
   path: '/checkout',
   getParentRoute: () => rootRouteImport,
 } as any)
+const AlmostThereRoute = AlmostThereRouteImport.update({
+  id: '/almost-there',
+  path: '/almost-there',
+  getParentRoute: () => rootRouteImport,
+} as any)
 const IndexRoute = IndexRouteImport.update({
   id: '/',
   path: '/',
@@ -67,6 +73,7 @@ const ListenIdRoute = ListenIdRouteImport.update({
 
 export interface FileRoutesByFullPath {
   '/': typeof IndexRoute
+  '/almost-there': typeof AlmostThereRoute
   '/checkout': typeof CheckoutRoute
   '/create': typeof CreateRoute
   '/dashboard': typeof DashboardRoute
@@ -78,6 +85,7 @@ export interface FileRoutesByFullPath {
 }
 export interface FileRoutesByTo {
   '/': typeof IndexRoute
+  '/almost-there': typeof AlmostThereRoute
   '/checkout': typeof CheckoutRoute
   '/create': typeof CreateRoute
   '/dashboard': typeof DashboardRoute
@@ -90,6 +98,7 @@ export interface FileRoutesByTo {
 export interface FileRoutesById {
   __root__: typeof rootRouteImport
   '/': typeof IndexRoute
+  '/almost-there': typeof AlmostThereRoute
   '/checkout': typeof CheckoutRoute
   '/create': typeof CreateRoute
   '/dashboard': typeof DashboardRoute
@@ -103,6 +112,7 @@ export interface FileRouteTypes {
   fileRoutesByFullPath: FileRoutesByFullPath
   fullPaths:
     | '/'
+    | '/almost-there'
     | '/checkout'
     | '/create'
     | '/dashboard'
@@ -114,6 +124,7 @@ export interface FileRouteTypes {
   fileRoutesByTo: FileRoutesByTo
   to:
     | '/'
+    | '/almost-there'
     | '/checkout'
     | '/create'
     | '/dashboard'
@@ -125,6 +136,7 @@ export interface FileRouteTypes {
   id:
     | '__root__'
     | '/'
+    | '/almost-there'
     | '/checkout'
     | '/create'
     | '/dashboard'
@@ -137,6 +149,7 @@ export interface FileRouteTypes {
 }
 export interface RootRouteChildren {
   IndexRoute: typeof IndexRoute
+  AlmostThereRoute: typeof AlmostThereRoute
   CheckoutRoute: typeof CheckoutRoute
   CreateRoute: typeof CreateRoute
   DashboardRoute: typeof DashboardRoute
@@ -198,6 +211,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof CheckoutRouteImport
       parentRoute: typeof rootRouteImport
     }
+    '/almost-there': {
+      id: '/almost-there'
+      path: '/almost-there'
+      fullPath: '/almost-there'
+      preLoaderRoute: typeof AlmostThereRouteImport
+      parentRoute: typeof rootRouteImport
+    }
     '/': {
       id: '/'
       path: '/'
@@ -217,6 +237,7 @@ declare module '@tanstack/react-router' {
 
 const rootRouteChildren: RootRouteChildren = {
   IndexRoute: IndexRoute,
+  AlmostThereRoute: AlmostThereRoute,
   CheckoutRoute: CheckoutRoute,
   CreateRoute: CreateRoute,
   DashboardRoute: DashboardRoute,
@@ -229,3 +250,12 @@ const rootRouteChildren: RootRouteChildren = {
 export const routeTree = rootRouteImport
   ._addFileChildren(rootRouteChildren)
   ._addFileTypes<FileRouteTypes>()
+
+import type { getRouter } from './router.tsx'
+import type { createStart } from '@tanstack/react-start'
+declare module '@tanstack/react-start' {
+  interface Register {
+    ssr: true
+    router: Awaited<ReturnType<typeof getRouter>>
+  }
+}
