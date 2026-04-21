@@ -12,6 +12,7 @@ import { Route as rootRouteImport } from './routes/__root'
 import { Route as Upsell3RouteImport } from './routes/upsell-3'
 import { Route as Upsell2RouteImport } from './routes/upsell-2'
 import { Route as Upsell1RouteImport } from './routes/upsell-1'
+import { Route as ScratchRouteImport } from './routes/scratch'
 import { Route as ProcessingRouteImport } from './routes/processing'
 import { Route as DashboardRouteImport } from './routes/dashboard'
 import { Route as CreateRouteImport } from './routes/create'
@@ -33,6 +34,11 @@ const Upsell2Route = Upsell2RouteImport.update({
 const Upsell1Route = Upsell1RouteImport.update({
   id: '/upsell-1',
   path: '/upsell-1',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const ScratchRoute = ScratchRouteImport.update({
+  id: '/scratch',
+  path: '/scratch',
   getParentRoute: () => rootRouteImport,
 } as any)
 const ProcessingRoute = ProcessingRouteImport.update({
@@ -78,6 +84,7 @@ export interface FileRoutesByFullPath {
   '/create': typeof CreateRoute
   '/dashboard': typeof DashboardRoute
   '/processing': typeof ProcessingRoute
+  '/scratch': typeof ScratchRoute
   '/upsell-1': typeof Upsell1Route
   '/upsell-2': typeof Upsell2Route
   '/upsell-3': typeof Upsell3Route
@@ -90,6 +97,7 @@ export interface FileRoutesByTo {
   '/create': typeof CreateRoute
   '/dashboard': typeof DashboardRoute
   '/processing': typeof ProcessingRoute
+  '/scratch': typeof ScratchRoute
   '/upsell-1': typeof Upsell1Route
   '/upsell-2': typeof Upsell2Route
   '/upsell-3': typeof Upsell3Route
@@ -103,6 +111,7 @@ export interface FileRoutesById {
   '/create': typeof CreateRoute
   '/dashboard': typeof DashboardRoute
   '/processing': typeof ProcessingRoute
+  '/scratch': typeof ScratchRoute
   '/upsell-1': typeof Upsell1Route
   '/upsell-2': typeof Upsell2Route
   '/upsell-3': typeof Upsell3Route
@@ -117,6 +126,7 @@ export interface FileRouteTypes {
     | '/create'
     | '/dashboard'
     | '/processing'
+    | '/scratch'
     | '/upsell-1'
     | '/upsell-2'
     | '/upsell-3'
@@ -129,6 +139,7 @@ export interface FileRouteTypes {
     | '/create'
     | '/dashboard'
     | '/processing'
+    | '/scratch'
     | '/upsell-1'
     | '/upsell-2'
     | '/upsell-3'
@@ -141,6 +152,7 @@ export interface FileRouteTypes {
     | '/create'
     | '/dashboard'
     | '/processing'
+    | '/scratch'
     | '/upsell-1'
     | '/upsell-2'
     | '/upsell-3'
@@ -154,6 +166,7 @@ export interface RootRouteChildren {
   CreateRoute: typeof CreateRoute
   DashboardRoute: typeof DashboardRoute
   ProcessingRoute: typeof ProcessingRoute
+  ScratchRoute: typeof ScratchRoute
   Upsell1Route: typeof Upsell1Route
   Upsell2Route: typeof Upsell2Route
   Upsell3Route: typeof Upsell3Route
@@ -181,6 +194,13 @@ declare module '@tanstack/react-router' {
       path: '/upsell-1'
       fullPath: '/upsell-1'
       preLoaderRoute: typeof Upsell1RouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/scratch': {
+      id: '/scratch'
+      path: '/scratch'
+      fullPath: '/scratch'
+      preLoaderRoute: typeof ScratchRouteImport
       parentRoute: typeof rootRouteImport
     }
     '/processing': {
@@ -242,6 +262,7 @@ const rootRouteChildren: RootRouteChildren = {
   CreateRoute: CreateRoute,
   DashboardRoute: DashboardRoute,
   ProcessingRoute: ProcessingRoute,
+  ScratchRoute: ScratchRoute,
   Upsell1Route: Upsell1Route,
   Upsell2Route: Upsell2Route,
   Upsell3Route: Upsell3Route,
