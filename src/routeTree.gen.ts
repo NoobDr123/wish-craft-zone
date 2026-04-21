@@ -14,12 +14,15 @@ import { Route as Upsell2RouteImport } from './routes/upsell-2'
 import { Route as Upsell1RouteImport } from './routes/upsell-1'
 import { Route as ScratchRouteImport } from './routes/scratch'
 import { Route as ProcessingRouteImport } from './routes/processing'
+import { Route as LoginRouteImport } from './routes/login'
 import { Route as DashboardRouteImport } from './routes/dashboard'
 import { Route as CreateRouteImport } from './routes/create'
 import { Route as CheckoutRouteImport } from './routes/checkout'
 import { Route as AlmostThereRouteImport } from './routes/almost-there'
+import { Route as AccountRouteImport } from './routes/account'
 import { Route as IndexRouteImport } from './routes/index'
 import { Route as ListenIdRouteImport } from './routes/listen.$id'
+import { Route as AuthCallbackRouteImport } from './routes/auth.callback'
 
 const Upsell3Route = Upsell3RouteImport.update({
   id: '/upsell-3',
@@ -46,6 +49,11 @@ const ProcessingRoute = ProcessingRouteImport.update({
   path: '/processing',
   getParentRoute: () => rootRouteImport,
 } as any)
+const LoginRoute = LoginRouteImport.update({
+  id: '/login',
+  path: '/login',
+  getParentRoute: () => rootRouteImport,
+} as any)
 const DashboardRoute = DashboardRouteImport.update({
   id: '/dashboard',
   path: '/dashboard',
@@ -66,6 +74,11 @@ const AlmostThereRoute = AlmostThereRouteImport.update({
   path: '/almost-there',
   getParentRoute: () => rootRouteImport,
 } as any)
+const AccountRoute = AccountRouteImport.update({
+  id: '/account',
+  path: '/account',
+  getParentRoute: () => rootRouteImport,
+} as any)
 const IndexRoute = IndexRouteImport.update({
   id: '/',
   path: '/',
@@ -76,100 +89,126 @@ const ListenIdRoute = ListenIdRouteImport.update({
   path: '/listen/$id',
   getParentRoute: () => rootRouteImport,
 } as any)
+const AuthCallbackRoute = AuthCallbackRouteImport.update({
+  id: '/auth/callback',
+  path: '/auth/callback',
+  getParentRoute: () => rootRouteImport,
+} as any)
 
 export interface FileRoutesByFullPath {
   '/': typeof IndexRoute
+  '/account': typeof AccountRoute
   '/almost-there': typeof AlmostThereRoute
   '/checkout': typeof CheckoutRoute
   '/create': typeof CreateRoute
   '/dashboard': typeof DashboardRoute
+  '/login': typeof LoginRoute
   '/processing': typeof ProcessingRoute
   '/scratch': typeof ScratchRoute
   '/upsell-1': typeof Upsell1Route
   '/upsell-2': typeof Upsell2Route
   '/upsell-3': typeof Upsell3Route
+  '/auth/callback': typeof AuthCallbackRoute
   '/listen/$id': typeof ListenIdRoute
 }
 export interface FileRoutesByTo {
   '/': typeof IndexRoute
+  '/account': typeof AccountRoute
   '/almost-there': typeof AlmostThereRoute
   '/checkout': typeof CheckoutRoute
   '/create': typeof CreateRoute
   '/dashboard': typeof DashboardRoute
+  '/login': typeof LoginRoute
   '/processing': typeof ProcessingRoute
   '/scratch': typeof ScratchRoute
   '/upsell-1': typeof Upsell1Route
   '/upsell-2': typeof Upsell2Route
   '/upsell-3': typeof Upsell3Route
+  '/auth/callback': typeof AuthCallbackRoute
   '/listen/$id': typeof ListenIdRoute
 }
 export interface FileRoutesById {
   __root__: typeof rootRouteImport
   '/': typeof IndexRoute
+  '/account': typeof AccountRoute
   '/almost-there': typeof AlmostThereRoute
   '/checkout': typeof CheckoutRoute
   '/create': typeof CreateRoute
   '/dashboard': typeof DashboardRoute
+  '/login': typeof LoginRoute
   '/processing': typeof ProcessingRoute
   '/scratch': typeof ScratchRoute
   '/upsell-1': typeof Upsell1Route
   '/upsell-2': typeof Upsell2Route
   '/upsell-3': typeof Upsell3Route
+  '/auth/callback': typeof AuthCallbackRoute
   '/listen/$id': typeof ListenIdRoute
 }
 export interface FileRouteTypes {
   fileRoutesByFullPath: FileRoutesByFullPath
   fullPaths:
     | '/'
+    | '/account'
     | '/almost-there'
     | '/checkout'
     | '/create'
     | '/dashboard'
+    | '/login'
     | '/processing'
     | '/scratch'
     | '/upsell-1'
     | '/upsell-2'
     | '/upsell-3'
+    | '/auth/callback'
     | '/listen/$id'
   fileRoutesByTo: FileRoutesByTo
   to:
     | '/'
+    | '/account'
     | '/almost-there'
     | '/checkout'
     | '/create'
     | '/dashboard'
+    | '/login'
     | '/processing'
     | '/scratch'
     | '/upsell-1'
     | '/upsell-2'
     | '/upsell-3'
+    | '/auth/callback'
     | '/listen/$id'
   id:
     | '__root__'
     | '/'
+    | '/account'
     | '/almost-there'
     | '/checkout'
     | '/create'
     | '/dashboard'
+    | '/login'
     | '/processing'
     | '/scratch'
     | '/upsell-1'
     | '/upsell-2'
     | '/upsell-3'
+    | '/auth/callback'
     | '/listen/$id'
   fileRoutesById: FileRoutesById
 }
 export interface RootRouteChildren {
   IndexRoute: typeof IndexRoute
+  AccountRoute: typeof AccountRoute
   AlmostThereRoute: typeof AlmostThereRoute
   CheckoutRoute: typeof CheckoutRoute
   CreateRoute: typeof CreateRoute
   DashboardRoute: typeof DashboardRoute
+  LoginRoute: typeof LoginRoute
   ProcessingRoute: typeof ProcessingRoute
   ScratchRoute: typeof ScratchRoute
   Upsell1Route: typeof Upsell1Route
   Upsell2Route: typeof Upsell2Route
   Upsell3Route: typeof Upsell3Route
+  AuthCallbackRoute: typeof AuthCallbackRoute
   ListenIdRoute: typeof ListenIdRoute
 }
 
@@ -210,6 +249,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof ProcessingRouteImport
       parentRoute: typeof rootRouteImport
     }
+    '/login': {
+      id: '/login'
+      path: '/login'
+      fullPath: '/login'
+      preLoaderRoute: typeof LoginRouteImport
+      parentRoute: typeof rootRouteImport
+    }
     '/dashboard': {
       id: '/dashboard'
       path: '/dashboard'
@@ -238,6 +284,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof AlmostThereRouteImport
       parentRoute: typeof rootRouteImport
     }
+    '/account': {
+      id: '/account'
+      path: '/account'
+      fullPath: '/account'
+      preLoaderRoute: typeof AccountRouteImport
+      parentRoute: typeof rootRouteImport
+    }
     '/': {
       id: '/'
       path: '/'
@@ -252,20 +305,30 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof ListenIdRouteImport
       parentRoute: typeof rootRouteImport
     }
+    '/auth/callback': {
+      id: '/auth/callback'
+      path: '/auth/callback'
+      fullPath: '/auth/callback'
+      preLoaderRoute: typeof AuthCallbackRouteImport
+      parentRoute: typeof rootRouteImport
+    }
   }
 }
 
 const rootRouteChildren: RootRouteChildren = {
   IndexRoute: IndexRoute,
+  AccountRoute: AccountRoute,
   AlmostThereRoute: AlmostThereRoute,
   CheckoutRoute: CheckoutRoute,
   CreateRoute: CreateRoute,
   DashboardRoute: DashboardRoute,
+  LoginRoute: LoginRoute,
   ProcessingRoute: ProcessingRoute,
   ScratchRoute: ScratchRoute,
   Upsell1Route: Upsell1Route,
   Upsell2Route: Upsell2Route,
   Upsell3Route: Upsell3Route,
+  AuthCallbackRoute: AuthCallbackRoute,
   ListenIdRoute: ListenIdRoute,
 }
 export const routeTree = rootRouteImport
