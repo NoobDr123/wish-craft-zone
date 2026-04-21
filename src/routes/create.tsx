@@ -169,34 +169,41 @@ function CreatePage() {
       ),
     },
 
-    // 4. Qualities + memory together
+    // 4a. Qualities
     {
       chapter: "Their soul",
-      title: "What makes them, them?",
-      subtitle: "The qualities you love and a moment you will never forget.",
-      isValid: (s) =>
-        s.qualities.trim().length > 2 && s.shared_memory.trim().length > 2,
+      title: "What do you love most about them?",
+      subtitle: "The qualities that make them, them.",
+      isValid: (s) => s.qualities.trim().length > 2,
       render: () => (
-        <div className="space-y-6">
-          <Question label="The qualities you love most">
-            <TextArea
-              placeholder="Wickedly funny. Patient. Stubborn in the best way…"
-              value={q.qualities}
-              onChange={(e) => q.set("qualities", e.target.value)}
-              maxLength={500}
-              rows={3}
-            />
-          </Question>
-          <Question label="A memory you will never forget">
-            <TextArea
-              placeholder="Dancing in the kitchen on Christmas morning. The day she taught me to ride a bike…"
-              value={q.shared_memory}
-              onChange={(e) => q.set("shared_memory", e.target.value)}
-              maxLength={600}
-              rows={4}
-            />
-          </Question>
-        </div>
+        <Question label="The qualities you love most">
+          <TextArea
+            placeholder="Wickedly funny. Patient. Stubborn in the best way…"
+            value={q.qualities}
+            onChange={(e) => q.set("qualities", e.target.value)}
+            maxLength={500}
+            rows={4}
+          />
+        </Question>
+      ),
+    },
+
+    // 4b. Memory
+    {
+      chapter: "Their soul",
+      title: "Share a memory you'll never forget.",
+      subtitle: "One moment with them that always stays with you.",
+      isValid: (s) => s.shared_memory.trim().length > 2,
+      render: () => (
+        <Question label="A memory you will never forget">
+          <TextArea
+            placeholder="Dancing in the kitchen on Christmas morning. The day she taught me to ride a bike…"
+            value={q.shared_memory}
+            onChange={(e) => q.set("shared_memory", e.target.value)}
+            maxLength={600}
+            rows={5}
+          />
+        </Question>
       ),
     },
 
