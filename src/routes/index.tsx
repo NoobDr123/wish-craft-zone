@@ -9,17 +9,20 @@ export const Route = createFileRoute("/")({
   component: LandingPage,
   head: () => ({
     meta: [
-      { title: "RibbonSong — Turn your love into a song" },
+      { title: "RibbonSong — A song for the one fighting cancer" },
       {
         name: "description",
         content:
-          "A deeply personal, AI-crafted song for the bravest fighter in your life. Because sometimes words aren't enough.",
+          "When someone you love is facing cancer, a card feels too small. RibbonSong turns your memories, prayers, and love into a personal song that lasts forever.",
       },
-      { property: "og:title", content: "RibbonSong — Turn your love into a song" },
+      {
+        property: "og:title",
+        content: "RibbonSong — A song for the one fighting cancer",
+      },
       {
         property: "og:description",
         content:
-          "Personalized songs that turn your memories and prayers into a lasting gift for someone facing cancer.",
+          "Personalized songs for cancer fighters, survivors, and those we've loved and lost. Because sometimes words aren't enough.",
       },
       { property: "og:image", content: heroImg },
       { name: "twitter:image", content: heroImg },
@@ -29,22 +32,22 @@ export const Route = createFileRoute("/")({
 
 const samples = [
   {
-    title: "For My Mother",
+    title: "For My Mother — Through Chemo",
     artist: "Acoustic Folk · Female Voice",
     src: "https://cdn.pixabay.com/audio/2022/10/30/audio_347111d654.mp3",
   },
   {
     title: "Stronger Than the Storm",
-    artist: "Uplifting Pop · Male Voice",
+    artist: "Uplifting Pop · For a survivor",
     src: "https://cdn.pixabay.com/audio/2024/02/15/audio_03ca069cf8.mp3",
   },
   {
-    title: "Quiet Light",
+    title: "Quiet Light — In Loving Memory",
     artist: "Cinematic · Strings",
     src: "https://cdn.pixabay.com/audio/2022/03/15/audio_c8c8a73467.mp3",
   },
   {
-    title: "The Promise",
+    title: "The Promise — For Dad",
     artist: "Country · Male Voice",
     src: "https://cdn.pixabay.com/audio/2023/06/10/audio_6c7c89a60a.mp3",
   },
@@ -54,17 +57,17 @@ const steps = [
   {
     icon: Heart,
     title: "Tell their story",
-    body: "Share their name, qualities, and a favorite memory through our gentle, emotional quiz.",
+    body: "A gentle, guided conversation about who they are, what they're fighting for, and the moments you'll never forget.",
   },
   {
     icon: Music,
     title: "Choose their sound",
-    body: "Pick a genre, tempo and voice — from acoustic folk to uplifting pop or worship.",
+    body: "Pick a genre, tempo, and voice — from acoustic folk to country, gospel, or uplifting pop.",
   },
   {
     icon: Sparkles,
     title: "Give the gift of music",
-    body: "We craft the lyrics, compose the track, and deliver a beautiful keepsake they can play forever.",
+    body: "Within seven days, you'll receive a beautifully produced song and a private share page they can keep forever.",
   },
 ];
 
@@ -73,19 +76,38 @@ const stories = [
     quote:
       "I sent it to my mom on the morning of her last chemo session. She listened on the drive home and we both cried the whole way. It captured her exactly.",
     name: "Rachel L.",
-    role: "Daughter · for her mother",
+    role: "Daughter · for her mother in treatment",
   },
   {
     quote:
       "We played it at his bedside the night before he passed. The chorus said the things we couldn't. It is the most precious thing our family owns.",
     name: "Marcus D.",
-    role: "Brother · in memory",
+    role: "Brother · in loving memory",
   },
   {
     quote:
       "Two years cancer-free and this song still plays at every birthday. It became our family's anthem.",
     name: "Priya & Sam",
-    role: "For their daughter",
+    role: "For their daughter, survivor",
+  },
+];
+
+const forWho = [
+  {
+    title: "For the newly diagnosed",
+    body: "When the world has just changed and the right words don't exist yet.",
+  },
+  {
+    title: "For someone in treatment",
+    body: "A reminder, on the hardest days, of who they are and who's standing with them.",
+  },
+  {
+    title: "For a survivor",
+    body: "A celebration of every scan, every milestone, every breath of remission.",
+  },
+  {
+    title: "In loving memory",
+    body: "A keepsake that holds their voice in your life — for memorials, anniversaries, and quiet nights.",
   },
 ];
 
@@ -100,15 +122,16 @@ function LandingPage() {
           <div className="space-y-8">
             <span className="inline-flex items-center gap-2 rounded-full border border-border bg-card px-4 py-1.5 text-xs font-medium uppercase tracking-wider text-muted-foreground">
               <span className="h-1.5 w-1.5 rounded-full bg-primary" />
-              A gift unlike any other
+              For the bravest fighters and the families who love them
             </span>
             <h1 className="font-display text-5xl font-semibold leading-[1.05] tracking-tight text-foreground text-balance md:text-6xl lg:text-7xl">
-              Turn your love and prayers into a{" "}
-              <span className="italic text-primary">beautiful song.</span>
+              When cancer takes the words away,{" "}
+              <span className="italic text-primary">give them a song.</span>
             </h1>
             <p className="max-w-xl text-lg leading-relaxed text-muted-foreground md:text-xl">
-              A deeply personal, AI-crafted song for the fighter in your life.
-              Because sometimes words aren&rsquo;t enough.
+              A card feels too small. A bouquet wilts. RibbonSong turns your
+              memories, prayers, and love into a personal song — a keepsake for
+              the one fighting, surviving, or remembered.
             </p>
             <div className="flex flex-wrap items-center gap-4">
               <Link
@@ -188,8 +211,44 @@ function LandingPage() {
         </div>
       </section>
 
+      {/* Who it's for */}
+      <section id="for-who" className="py-24">
+        <div className="mx-auto max-w-6xl px-6">
+          <div className="mb-12 max-w-2xl">
+            <p className="text-sm font-medium uppercase tracking-wider text-primary">
+              Who it's for
+            </p>
+            <h2 className="mt-3 font-display text-4xl font-semibold text-foreground md:text-5xl">
+              Wherever they are in the fight, we'll meet them there.
+            </h2>
+            <p className="mt-4 text-lg text-muted-foreground">
+              Cancer touches every family differently. A RibbonSong is shaped to
+              honor exactly where your loved one is right now.
+            </p>
+          </div>
+          <div className="grid gap-6 md:grid-cols-2 lg:grid-cols-4">
+            {forWho.map((item) => (
+              <div
+                key={item.title}
+                className="rounded-3xl border border-border bg-card p-6 shadow-soft"
+              >
+                <div className="mb-4 inline-flex h-10 w-10 items-center justify-center rounded-full bg-ribbon/15">
+                  <Heart className="h-5 w-5 text-ribbon" />
+                </div>
+                <h3 className="font-display text-xl font-semibold text-foreground">
+                  {item.title}
+                </h3>
+                <p className="mt-2 text-sm leading-relaxed text-muted-foreground">
+                  {item.body}
+                </p>
+              </div>
+            ))}
+          </div>
+        </div>
+      </section>
+
       {/* How it works */}
-      <section id="how-it-works" className="py-24">
+      <section id="how-it-works" className="bg-card/50 py-24">
         <div className="mx-auto max-w-6xl px-6">
           <div className="mb-16 max-w-2xl">
             <p className="text-sm font-medium uppercase tracking-wider text-primary">
@@ -259,8 +318,8 @@ function LandingPage() {
             Their spirit, captured in music.
           </h2>
           <p className="mx-auto mt-6 max-w-xl text-lg text-muted-foreground">
-            A card feels too small. A generic gift feels empty. Give them
-            something only you could give.
+            On the chemo days, the scan days, the milestone days — and the days
+            we miss them most. Give them something only you could give.
           </p>
           <Link
             to="/create"
@@ -270,7 +329,8 @@ function LandingPage() {
             <ArrowRight className="h-4 w-4" />
           </Link>
           <p className="mt-4 text-xs text-muted-foreground">
-            Includes lyrics, full audio, and a beautiful share page.
+            Includes original lyrics, full studio-quality audio, and a private
+            share page they'll keep forever.
           </p>
         </div>
       </section>
