@@ -132,6 +132,7 @@ function CreatePage() {
       subtitle:
         "A few words about your relationship helps us write the song in the right voice.",
       // Only show this step when relationship is "Other".
+      when: (s) => s.relationship === "Other",
       isValid: (s) => s.relationship_other.trim().length > 1,
       render: () => (
         <Question
@@ -643,8 +644,11 @@ function CreatePage() {
     },
   ];
 
-  const total = steps.length;
-  const step = steps[index];
+  // Filter out steps that are gated off (e.g. "Other" follow-up).
+  const visibleSteps = steps.filter((s) => !s.when || s.when(q));
+  const total = visibleSteps.length;
+  const safeIndex = Math.min(index, total - 1);
+  const step = visibleSteps[safeIndex];
   const valid = step.isValid(q);
 
   const next = () => {
