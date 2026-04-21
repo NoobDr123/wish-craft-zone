@@ -149,6 +149,6 @@ export const useQuizStore = create<QuizState>()(
       set: (key, value) => set({ [key]: value } as Partial<QuizState>),
       reset: () => set({ ...initial, orderId: undefined }),
     }),
-    { name: "ribbonsong-quiz" },
+    { name: "ribbonsong-quiz-v2" },
   ),
 );
