@@ -54,21 +54,43 @@ function CheckoutPage() {
   const navigate = useNavigate();
   const q = useQuizStore();
   const [email, setEmail] = useState(q.buyer_email || "");
+  const [name, setName] = useState(q.buyer_name || "");
+  const [card, setCard] = useState("");
+  const [exp, setExp] = useState("");
+  const [cvc, setCvc] = useState("");
   const [processing, setProcessing] = useState(false);
 
   useEffect(() => {
     if (!q.recipient_name) navigate({ to: "/create" });
   }, [q.recipient_name, navigate]);
 
+  const cardClean = card.replace(/\s/g, "");
   const emailValid = emailRe.test(email);
-  const canPay = emailValid && !processing;
+  const nameValid = name.trim().length > 1;
+  const cardValid = cardClean.length >= 13 && /^\d+$/.test(cardClean);
+  const expValid = /^\d{2}\s*\/\s*\d{2}$/.test(exp);
+  const cvcValid = /^\d{3,4}$/.test(cvc);
+
+  const canPay =
+    emailValid && nameValid && cardValid && expValid && cvcValid && !processing;
   const deliveryDate = useMemo(() => formatDeliveryDate(), []);
   const recipient = q.recipient_name || "your loved one";
+
+  const formatCard = (v: string) =>
+    v
+      .replace(/\D/g, "")
+      .slice(0, 19)
+      .replace(/(\d{4})(?=\d)/g, "$1 ");
+  const formatExp = (v: string) => {
+    const d = v.replace(/\D/g, "").slice(0, 4);
+    return d.length > 2 ? `${d.slice(0, 2)} / ${d.slice(2)}` : d;
+  };
 
   const handlePay = () => {
     if (!canPay) return;
     setProcessing(true);
     q.set("buyer_email", email);
+    q.set("buyer_name", name);
     setTimeout(() => {
       q.set("orderId", crypto.randomUUID());
       navigate({ to: "/upsell-1" });
