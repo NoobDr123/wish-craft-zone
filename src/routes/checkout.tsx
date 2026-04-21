@@ -68,7 +68,7 @@ function CheckoutPage() {
                 </div>
               </div>
               <p className="mt-3 text-xs text-muted-foreground">
-                Demo checkout — Stripe wiring is added in a follow-up step.
+                Demo checkout. Stripe wiring is added in a follow-up step.
               </p>
             </div>
 

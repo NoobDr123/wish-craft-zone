@@ -63,7 +63,7 @@ const CANCER_TYPES = [
 const MESSAGES = [
   "You are not alone",
   "I'm so proud of your strength",
-  "Keep fighting — we're with you",
+  "Keep fighting, we're with you",
   "Thank you for everything",
   "It's okay to rest now",
   "Your love lives on in us",
@@ -84,15 +84,19 @@ const VOICES = ["Female Voice", "Male Voice", "Duet", "No Preference"] as const;
 
 // Single source of truth for the quiz flow.
 // Each entry = one screen.
+type QuizSnapshot = ReturnType<typeof useQuizStore.getState>;
+
 type Step = {
   chapter: string;
   title: string;
   subtitle?: string;
   optional?: boolean;
   // returns true when the user can advance
-  isValid: (q: ReturnType<typeof useQuizStore.getState>) => boolean;
+  isValid: (q: QuizSnapshot) => boolean;
   render: () => React.ReactNode;
   nextLabel?: string;
+  // optional gate: only include the step when this returns true
+  when?: (q: QuizSnapshot) => boolean;
 };
 
 const emailRe = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
@@ -112,12 +116,35 @@ function CreatePage() {
       subtitle: "Your relationship helps us write in the right voice.",
       isValid: (s) => !!s.relationship,
       render: () => (
-        <Question label="They are my…">
+        <Question label="They are my...">
           <PillSelect
             options={RELATIONSHIPS}
             value={q.relationship}
             onChange={(v) => q.set("relationship", v)}
             columns={3}
+          />
+        </Question>
+      ),
+    },
+    {
+      chapter: "Who they are",
+      title: "Tell us a little more about who they are.",
+      subtitle:
+        "A few words about your relationship helps us write the song in the right voice.",
+      // Only show this step when relationship is "Other".
+      when: (s) => s.relationship === "Other",
+      isValid: (s) => s.relationship_other.trim().length > 1,
+      render: () => (
+        <Question
+          label="Who are they to you?"
+          helper="e.g. my godmother, my best friend since kindergarten, my mother-in-law"
+        >
+          <TextInput
+            placeholder="My..."
+            value={q.relationship_other}
+            onChange={(e) => q.set("relationship_other", e.target.value)}
+            maxLength={120}
+            autoFocus
           />
         </Question>
       ),
@@ -155,37 +182,23 @@ function CreatePage() {
     },
     {
       chapter: "Who they are",
-      title: "A little about them.",
-      subtitle: "Just enough so the song feels like it was written for them.",
+      title: "About how old are they?",
+      subtitle: "Helps us pick the right tone and references.",
       optional: true,
       isValid: () => true,
       render: () => (
-        <div className="space-y-6">
-          <Question label="Pronouns (optional)">
-            <PillSelect
-              options={["she / her", "he / him", "they / them", "Other"] as const}
-              value={
-                (["she / her", "he / him", "they / them", "Other"] as const).find(
-                  (p) => p === q.pronouns,
-                ) ?? undefined
-              }
-              onChange={(v) => q.set("pronouns", v)}
-              columns={4}
-            />
-          </Question>
-          <Question label="Age range (optional)">
-            <PillSelect
-              options={["Child", "Teen", "20s–30s", "40s–50s", "60s–70s", "80+"] as const}
-              value={
-                (["Child", "Teen", "20s–30s", "40s–50s", "60s–70s", "80+"] as const).find(
-                  (p) => p === q.age_range,
-                ) ?? undefined
-              }
-              onChange={(v) => q.set("age_range", v)}
-              columns={3}
-            />
-          </Question>
-        </div>
+        <Question label="Age range (optional)">
+          <PillSelect
+            options={["Child", "Teen", "20s, 30s", "40s, 50s", "60s, 70s", "80+"] as const}
+            value={
+              (["Child", "Teen", "20s, 30s", "40s, 50s", "60s, 70s", "80+"] as const).find(
+                (p) => p === q.age_range,
+              ) ?? undefined
+            }
+            onChange={(v) => q.set("age_range", v)}
+            columns={3}
+          />
+        </Question>
       ),
     },
 
@@ -209,7 +222,7 @@ function CreatePage() {
       chapter: "Their fight",
       title: "What kind of cancer are they facing?",
       subtitle:
-        "We never name it in the song unless you ask — this just helps us understand.",
+        "We never name it in the song unless you ask. This just helps us understand.",
       optional: true,
       isValid: () => true,
       render: () => (
@@ -224,7 +237,7 @@ function CreatePage() {
     },
     {
       chapter: "Their fight",
-      title: `Who — or what — is ${name} fighting for?`,
+      title: `Who or what is ${name} fighting for?`,
       subtitle:
         "The people, dreams, or moments that pull them forward on the hardest days.",
       isValid: (s) => s.fighting_for.trim().length > 4,
@@ -244,7 +257,7 @@ function CreatePage() {
       chapter: "Their fight",
       title: "How do they show their strength?",
       subtitle:
-        "Strength looks different for everyone — quiet, fierce, gentle, stubborn. How does theirs show up?",
+        "Strength looks different for everyone. Quiet, fierce, gentle, stubborn. How does theirs show up?",
       isValid: (s) => s.signature_strength.trim().length > 10,
       render: () => (
         <Question label="Their kind of brave">
@@ -316,7 +329,7 @@ function CreatePage() {
       chapter: "Their soul",
       title: "Tell us a memory you'll never forget.",
       subtitle:
-        "A specific moment — the more detail, the more the song will feel like them.",
+        "A specific moment. The more detail, the more the song will feel like them.",
       isValid: (s) => s.shared_memory.trim().length > 20,
       render: () => (
         <Question label="The memory">
@@ -357,7 +370,7 @@ function CreatePage() {
       render: () => (
         <Question label="Little things (optional)">
           <TextArea
-            placeholder="The gap in his front teeth when he laughs. Her perfume — Estée Lauder. The way Dad hums while he reads…"
+            placeholder="The gap in his front teeth when he laughs. Her perfume (Estée Lauder). The way Dad hums while he reads…"
             value={q.little_things}
             onChange={(e) => q.set("little_things", e.target.value)}
             maxLength={500}
@@ -409,7 +422,7 @@ function CreatePage() {
       render: () => (
         <Question label="Your words to them">
           <TextArea
-            placeholder="Mom, I don't say this enough — you are the bravest person I've ever known. Every time I hear you laugh in the next room, I remember…"
+            placeholder="Mom, I don't say this enough. you are the bravest person I've ever known. Every time I hear you laugh in the next room, I remember…"
             value={q.personal_words}
             onChange={(e) => q.set("personal_words", e.target.value)}
             maxLength={1200}
@@ -456,7 +469,7 @@ function CreatePage() {
                 "Bittersweet & honoring",
               ] as const
             }
-            // Reuse song_title_idea slot? No — store tone in personal_note? we'll just skip persistence for tone
+            // Reuse song_title_idea slot? No. Store tone in personal_note? we will just skip persistence for tone
             value={undefined}
             onChange={() => {}}
             columns={2}
@@ -513,7 +526,7 @@ function CreatePage() {
     {
       chapter: "Their sound",
       title: "Got a song title in mind?",
-      subtitle: "We'll riff on it — or come up with one for you.",
+      subtitle: "We will riff on it, or come up with one for you.",
       optional: true,
       isValid: () => true,
       render: () => (
@@ -548,7 +561,7 @@ function CreatePage() {
     {
       chapter: "Delivery",
       title: "Where should we send the song?",
-      subtitle: "We'll email you when it's ready — usually within 7 days.",
+      subtitle: "We will email you when it is ready, usually within 7 days.",
       isValid: (s) => emailRe.test(s.buyer_email),
       render: () => (
         <Question label="Your email">
@@ -631,28 +644,31 @@ function CreatePage() {
     },
   ];
 
-  const total = steps.length;
-  const step = steps[index];
+  // Filter out steps that are gated off (e.g. "Other" follow-up).
+  const visibleSteps = steps.filter((s) => !s.when || s.when(q));
+  const total = visibleSteps.length;
+  const safeIndex = Math.min(index, total - 1);
+  const step = visibleSteps[safeIndex];
   const valid = step.isValid(q);
 
   const next = () => {
-    if (index < total - 1) setIndex((i) => i + 1);
+    if (safeIndex < total - 1) setIndex(safeIndex + 1);
     else navigate({ to: "/checkout" });
   };
-  const back = () => setIndex((i) => Math.max(0, i - 1));
+  const back = () => setIndex(Math.max(0, safeIndex - 1));
 
   return (
     <QuizShell
-      current={index + 1}
+      current={safeIndex + 1}
       total={total}
       chapter={step.chapter}
       title={step.title}
       subtitle={step.subtitle}
       onNext={next}
-      onBack={index > 0 ? back : undefined}
+      onBack={safeIndex > 0 ? back : undefined}
       isValid={valid}
       nextLabel={
-        step.nextLabel ?? (index === total - 1 ? "Finish" : "Continue")
+        step.nextLabel ?? (safeIndex === total - 1 ? "Finish" : "Continue")
       }
       optional={step.optional}
     >
