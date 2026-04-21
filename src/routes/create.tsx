@@ -84,15 +84,19 @@ const VOICES = ["Female Voice", "Male Voice", "Duet", "No Preference"] as const;
 
 // Single source of truth for the quiz flow.
 // Each entry = one screen.
+type QuizSnapshot = ReturnType<typeof useQuizStore.getState>;
+
 type Step = {
   chapter: string;
   title: string;
   subtitle?: string;
   optional?: boolean;
   // returns true when the user can advance
-  isValid: (q: ReturnType<typeof useQuizStore.getState>) => boolean;
+  isValid: (q: QuizSnapshot) => boolean;
   render: () => React.ReactNode;
   nextLabel?: string;
+  // optional gate: only include the step when this returns true
+  when?: (q: QuizSnapshot) => boolean;
 };
 
 const emailRe = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
