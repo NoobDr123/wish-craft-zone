@@ -5,7 +5,9 @@ import { useQuizStore } from "@/stores/quizStore";
 import {
   ArrowLeft,
   CheckCircle2,
+  CreditCard,
   Gift,
+  Lock,
   Music2,
   Pencil,
   Play,
@@ -52,21 +54,43 @@ function CheckoutPage() {
   const navigate = useNavigate();
   const q = useQuizStore();
   const [email, setEmail] = useState(q.buyer_email || "");
+  const [name, setName] = useState(q.buyer_name || "");
+  const [card, setCard] = useState("");
+  const [exp, setExp] = useState("");
+  const [cvc, setCvc] = useState("");
   const [processing, setProcessing] = useState(false);
 
   useEffect(() => {
     if (!q.recipient_name) navigate({ to: "/create" });
   }, [q.recipient_name, navigate]);
 
+  const cardClean = card.replace(/\s/g, "");
   const emailValid = emailRe.test(email);
-  const canPay = emailValid && !processing;
+  const nameValid = name.trim().length > 1;
+  const cardValid = cardClean.length >= 13 && /^\d+$/.test(cardClean);
+  const expValid = /^\d{2}\s*\/\s*\d{2}$/.test(exp);
+  const cvcValid = /^\d{3,4}$/.test(cvc);
+
+  const canPay =
+    emailValid && nameValid && cardValid && expValid && cvcValid && !processing;
   const deliveryDate = useMemo(() => formatDeliveryDate(), []);
   const recipient = q.recipient_name || "your loved one";
+
+  const formatCard = (v: string) =>
+    v
+      .replace(/\D/g, "")
+      .slice(0, 19)
+      .replace(/(\d{4})(?=\d)/g, "$1 ");
+  const formatExp = (v: string) => {
+    const d = v.replace(/\D/g, "").slice(0, 4);
+    return d.length > 2 ? `${d.slice(0, 2)} / ${d.slice(2)}` : d;
+  };
 
   const handlePay = () => {
     if (!canPay) return;
     setProcessing(true);
     q.set("buyer_email", email);
+    q.set("buyer_name", name);
     setTimeout(() => {
       q.set("orderId", crypto.randomUUID());
       navigate({ to: "/upsell-1" });
@@ -108,25 +132,72 @@ function CheckoutPage() {
           </div>
         </section>
 
-        {/* Email + CTA card */}
+        {/* Contact + Payment card */}
         <section className="mt-8 rounded-3xl border border-peach/70 bg-card p-6 shadow-card md:p-8">
-          <label className="block">
-            <span className="mb-2 block text-sm font-semibold text-foreground">
-              Your Email Address
-            </span>
-            <input
+          <h2 className="font-display text-xl font-bold text-foreground">
+            Contact
+          </h2>
+          <div className="mt-4 space-y-3">
+            <Field
+              label="Email Address"
               type="email"
               value={email}
-              onChange={(e) => setEmail(e.target.value)}
+              onChange={setEmail}
               placeholder="you@email.com"
-              className="w-full rounded-2xl border-2 border-peach bg-background px-5 py-4 text-[15px] text-foreground placeholder:text-muted-foreground/60 focus:border-ribbon focus:outline-none focus:ring-4 focus:ring-ribbon/15"
+              valid={email.length === 0 || emailValid}
             />
-          </label>
+            <Field
+              label="Full Name"
+              value={name}
+              onChange={setName}
+              placeholder="Jane Doe"
+              valid={name.length === 0 || nameValid}
+            />
+          </div>
+
+          <div className="my-6 border-t border-dashed border-peach" />
+
+          <div className="flex items-center justify-between">
+            <h2 className="flex items-center gap-2 font-display text-xl font-bold text-foreground">
+              <CreditCard className="h-5 w-5 text-ribbon" /> Payment
+            </h2>
+            <span className="inline-flex items-center gap-1 text-xs font-medium text-muted-foreground">
+              <Lock className="h-3 w-3" /> Encrypted
+            </span>
+          </div>
+          <div className="mt-4 space-y-3">
+            <Field
+              label="Card Number"
+              value={card}
+              onChange={(v) => setCard(formatCard(v))}
+              placeholder="1234 1234 1234 1234"
+              inputMode="numeric"
+              valid={card.length === 0 || cardValid}
+            />
+            <div className="grid grid-cols-2 gap-3">
+              <Field
+                label="Expires"
+                value={exp}
+                onChange={(v) => setExp(formatExp(v))}
+                placeholder="MM / YY"
+                inputMode="numeric"
+                valid={exp.length === 0 || expValid}
+              />
+              <Field
+                label="CVC"
+                value={cvc}
+                onChange={(v) => setCvc(v.replace(/\D/g, "").slice(0, 4))}
+                placeholder="123"
+                inputMode="numeric"
+                valid={cvc.length === 0 || cvcValid}
+              />
+            </div>
+          </div>
 
           <button
             onClick={handlePay}
             disabled={!canPay}
-            className="mt-5 flex w-full items-center justify-center gap-2.5 rounded-2xl bg-ribbon px-6 py-5 text-base font-bold text-ribbon-foreground shadow-glow transition-all hover:brightness-95 active:scale-[0.99] disabled:cursor-not-allowed disabled:opacity-60 disabled:shadow-none md:text-lg"
+            className="mt-6 flex w-full items-center justify-center gap-2.5 rounded-2xl bg-ribbon px-6 py-5 text-base font-bold text-ribbon-foreground shadow-glow transition-all hover:brightness-95 active:scale-[0.99] disabled:cursor-not-allowed disabled:opacity-60 disabled:shadow-none md:text-lg"
           >
             {processing ? (
               <>
@@ -135,7 +206,7 @@ function CheckoutPage() {
               </>
             ) : (
               <>
-                <Gift className="h-5 w-5" /> Create My Song
+                <Gift className="h-5 w-5" /> Create My Song · $99
               </>
             )}
           </button>
@@ -370,5 +441,43 @@ function CheckoutPage() {
         </p>
       </div>
     </div>
+  );
+}
+
+function Field({
+  label,
+  value,
+  onChange,
+  placeholder,
+  type = "text",
+  inputMode,
+  valid = true,
+}: {
+  label: string;
+  value: string;
+  onChange: (v: string) => void;
+  placeholder?: string;
+  type?: string;
+  inputMode?: "text" | "numeric" | "email";
+  valid?: boolean;
+}) {
+  return (
+    <label className="block">
+      <span className="mb-1.5 block text-xs font-semibold text-foreground">
+        {label}
+      </span>
+      <input
+        type={type}
+        inputMode={inputMode}
+        value={value}
+        onChange={(e) => onChange(e.target.value)}
+        placeholder={placeholder}
+        className={`w-full rounded-2xl border-2 bg-background px-4 py-3.5 text-[15px] text-foreground placeholder:text-muted-foreground/60 focus:outline-none focus:ring-4 focus:ring-ribbon/15 ${
+          valid
+            ? "border-peach focus:border-ribbon"
+            : "border-destructive focus:border-destructive"
+        }`}
+      />
+    </label>
   );
 }
