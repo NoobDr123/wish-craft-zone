@@ -211,8 +211,44 @@ function LandingPage() {
         </div>
       </section>
 
+      {/* Who it's for */}
+      <section id="for-who" className="py-24">
+        <div className="mx-auto max-w-6xl px-6">
+          <div className="mb-12 max-w-2xl">
+            <p className="text-sm font-medium uppercase tracking-wider text-primary">
+              Who it's for
+            </p>
+            <h2 className="mt-3 font-display text-4xl font-semibold text-foreground md:text-5xl">
+              Wherever they are in the fight, we'll meet them there.
+            </h2>
+            <p className="mt-4 text-lg text-muted-foreground">
+              Cancer touches every family differently. A RibbonSong is shaped to
+              honor exactly where your loved one is right now.
+            </p>
+          </div>
+          <div className="grid gap-6 md:grid-cols-2 lg:grid-cols-4">
+            {forWho.map((item) => (
+              <div
+                key={item.title}
+                className="rounded-3xl border border-border bg-card p-6 shadow-soft"
+              >
+                <div className="mb-4 inline-flex h-10 w-10 items-center justify-center rounded-full bg-ribbon/15">
+                  <Heart className="h-5 w-5 text-ribbon" />
+                </div>
+                <h3 className="font-display text-xl font-semibold text-foreground">
+                  {item.title}
+                </h3>
+                <p className="mt-2 text-sm leading-relaxed text-muted-foreground">
+                  {item.body}
+                </p>
+              </div>
+            ))}
+          </div>
+        </div>
+      </section>
+
       {/* How it works */}
-      <section id="how-it-works" className="py-24">
+      <section id="how-it-works" className="bg-card/50 py-24">
         <div className="mx-auto max-w-6xl px-6">
           <div className="mb-16 max-w-2xl">
             <p className="text-sm font-medium uppercase tracking-wider text-primary">
