@@ -35,7 +35,7 @@ function Upsell2() {
         </>
       }
       highlights={[
-        "Front of the queue , we start within the hour",
+        "Front of the queue, we start within the hour",
         "Personally reviewed by our team before delivery",
         "Email the moment it's ready",
       ]}

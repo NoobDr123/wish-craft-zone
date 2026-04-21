@@ -62,7 +62,7 @@ const steps = [
   {
     icon: Music,
     title: "Choose their sound",
-    body: "Pick a genre, tempo, and voice , from acoustic folk to country, gospel, or uplifting pop.",
+    body: "Pick a genre, tempo, and voice. From acoustic folk to country, gospel, or uplifting pop.",
   },
   {
     icon: Sparkles,
@@ -107,7 +107,7 @@ const forWho = [
   },
   {
     title: "In loving memory",
-    body: "A keepsake that holds their voice in your life , for memorials, anniversaries, and quiet nights.",
+    body: "A keepsake that holds their voice in your life. For memorials, anniversaries, and quiet nights.",
   },
 ];
 
@@ -130,7 +130,7 @@ function LandingPage() {
             </h1>
             <p className="max-w-xl text-lg leading-relaxed text-muted-foreground md:text-xl">
               A card feels too small. A bouquet wilts. RibbonSong turns your
-              memories, prayers, and love into a personal song , a keepsake for
+              memories, prayers, and love into a personal song. A keepsake for
               the one fighting, surviving, or remembered.
             </p>
             <div className="flex flex-wrap items-center gap-4">
@@ -318,7 +318,7 @@ function LandingPage() {
             Their spirit, captured in music.
           </h2>
           <p className="mx-auto mt-6 max-w-xl text-lg text-muted-foreground">
-            On the chemo days, the scan days, the milestone days , and the days
+            On the chemo days, the scan days, the milestone days, and on the days
             we miss them most. Give them something only you could give.
           </p>
           <Link

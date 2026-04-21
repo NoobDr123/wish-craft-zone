@@ -365,7 +365,7 @@ function CreatePage() {
       render: () => (
         <Question label="Little things (optional)">
           <TextArea
-            placeholder="The gap in his front teeth when he laughs. Her perfume , Estée Lauder. The way Dad hums while he reads…"
+            placeholder="The gap in his front teeth when he laughs. Her perfume (Estée Lauder). The way Dad hums while he reads…"
             value={q.little_things}
             onChange={(e) => q.set("little_things", e.target.value)}
             maxLength={500}
@@ -417,7 +417,7 @@ function CreatePage() {
       render: () => (
         <Question label="Your words to them">
           <TextArea
-            placeholder="Mom, I don't say this enough , you are the bravest person I've ever known. Every time I hear you laugh in the next room, I remember…"
+            placeholder="Mom, I don't say this enough. you are the bravest person I've ever known. Every time I hear you laugh in the next room, I remember…"
             value={q.personal_words}
             onChange={(e) => q.set("personal_words", e.target.value)}
             maxLength={1200}
@@ -464,7 +464,7 @@ function CreatePage() {
                 "Bittersweet & honoring",
               ] as const
             }
-            // Reuse song_title_idea slot? No , store tone in personal_note? we'll just skip persistence for tone
+            // Reuse song_title_idea slot? No. Store tone in personal_note? we will just skip persistence for tone
             value={undefined}
             onChange={() => {}}
             columns={2}

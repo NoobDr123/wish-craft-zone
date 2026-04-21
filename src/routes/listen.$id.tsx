@@ -63,7 +63,7 @@ function ListenPage() {
             held. I love you.&rdquo;
           </blockquote>
           <figcaption className="mt-4 text-sm text-muted-foreground">
-            , With all my love
+            With all my love
           </figcaption>
         </figure>
 
