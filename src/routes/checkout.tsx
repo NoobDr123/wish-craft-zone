@@ -443,3 +443,41 @@ function CheckoutPage() {
     </div>
   );
 }
+
+function Field({
+  label,
+  value,
+  onChange,
+  placeholder,
+  type = "text",
+  inputMode,
+  valid = true,
+}: {
+  label: string;
+  value: string;
+  onChange: (v: string) => void;
+  placeholder?: string;
+  type?: string;
+  inputMode?: "text" | "numeric" | "email";
+  valid?: boolean;
+}) {
+  return (
+    <label className="block">
+      <span className="mb-1.5 block text-xs font-semibold text-foreground">
+        {label}
+      </span>
+      <input
+        type={type}
+        inputMode={inputMode}
+        value={value}
+        onChange={(e) => onChange(e.target.value)}
+        placeholder={placeholder}
+        className={`w-full rounded-2xl border-2 bg-background px-4 py-3.5 text-[15px] text-foreground placeholder:text-muted-foreground/60 focus:outline-none focus:ring-4 focus:ring-ribbon/15 ${
+          valid
+            ? "border-peach focus:border-ribbon"
+            : "border-destructive focus:border-destructive"
+        }`}
+      />
+    </label>
+  );
+}
