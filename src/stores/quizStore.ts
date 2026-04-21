@@ -6,50 +6,98 @@ export type RelationshipKey =
   | "Wife"
   | "Mother"
   | "Father"
-  | "Child"
+  | "Son"
+  | "Daughter"
   | "Sibling"
+  | "Grandparent"
   | "Friend"
   | "Other";
 
 export type StageKey =
   | "Just diagnosed"
   | "In treatment"
-  | "Remission"
-  | "Finding peace"
-  | "Memorial";
+  | "Between treatments"
+  | "In remission / survivor"
+  | "In hospice / final chapter"
+  | "In loving memory";
+
+export type CancerTypeKey =
+  | "Breast"
+  | "Lung"
+  | "Colon / Colorectal"
+  | "Prostate"
+  | "Blood (Leukemia / Lymphoma)"
+  | "Brain"
+  | "Pancreatic"
+  | "Ovarian"
+  | "Childhood cancer"
+  | "Another type"
+  | "Prefer not to say";
+
+export type ToneKey =
+  | "Comforting & gentle"
+  | "Uplifting & hopeful"
+  | "Strong & defiant"
+  | "Joyful & celebratory"
+  | "Reverent & prayerful"
+  | "Bittersweet & honoring";
 
 export type CoreMessage =
   | "You are not alone"
   | "I'm so proud of your strength"
-  | "Keep fighting"
+  | "Keep fighting — we're with you"
   | "Thank you for everything"
-  | "It's okay to rest now";
+  | "It's okay to rest now"
+  | "Your love lives on in us"
+  | "We will carry you through this";
 
 export type GenreKey =
   | "Acoustic Folk"
   | "Pop"
   | "Country"
-  | "R&B"
-  | "Gospel/Worship"
-  | "Cinematic";
+  | "R&B / Soul"
+  | "Gospel / Worship"
+  | "Cinematic / Orchestral";
 
 export type TempoKey = "Slow & Tender" | "Mid-tempo" | "Upbeat & Triumphant";
-export type VoiceKey = "Female Voice" | "Male Voice" | "No Preference";
+export type VoiceKey = "Female Voice" | "Male Voice" | "Duet" | "No Preference";
 
 export interface QuizState {
-  // Step 1
+  // Step 1 — Who is this for
   relationship?: RelationshipKey;
   recipient_name: string;
+  pronunciation: string;
+  pronouns: string;
+  age_range: string;
+
+  // Step 2 — Their fight
   stage?: StageKey;
-  // Step 2
+  cancer_type?: CancerTypeKey;
+  fighting_for: string; // who/what they're fighting for
+  signature_strength: string; // how they show strength
+  hardest_moment: string; // optional, the hard thing
+  what_helps_most: string; // what brings them comfort
+
+  // Step 3 — Who they are
   qualities: string;
-  memory: string;
+  inside_joke: string;
+  shared_memory: string;
+  little_things: string; // small details — laugh, smell, phrase
+  faith_or_beliefs: string;
+
+  // Step 4 — The message
   message?: CoreMessage;
-  // Step 3
+  personal_words: string; // free-form letter to them
+  hope_for_them: string;
+
+  // Step 5 — Sound
   genre?: GenreKey;
   tempo?: TempoKey;
   voice?: VoiceKey;
-  // Step 4
+  song_title_idea: string;
+
+  // Step 6 — Delivery
+  buyer_name: string;
   buyer_email: string;
   is_gift: boolean;
   recipient_email: string;
@@ -68,8 +116,22 @@ export interface QuizState {
 
 const initial = {
   recipient_name: "",
+  pronunciation: "",
+  pronouns: "",
+  age_range: "",
+  fighting_for: "",
+  signature_strength: "",
+  hardest_moment: "",
+  what_helps_most: "",
   qualities: "",
-  memory: "",
+  inside_joke: "",
+  shared_memory: "",
+  little_things: "",
+  faith_or_beliefs: "",
+  personal_words: "",
+  hope_for_them: "",
+  song_title_idea: "",
+  buyer_name: "",
   buyer_email: "",
   is_gift: false,
   recipient_email: "",
