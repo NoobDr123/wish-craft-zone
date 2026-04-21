@@ -178,12 +178,6 @@ function LandingPage() {
                 className="h-full w-full object-cover"
               />
             </div>
-            <div className="absolute -bottom-6 left-6 right-6 rounded-2xl border border-border bg-card/95 p-4 shadow-card backdrop-blur md:-bottom-8 md:left-auto md:right-8 md:w-72">
-              <p className="font-display text-sm italic text-foreground">
-                &ldquo;The most personal gift for the bravest fighter.&rdquo;
-              </p>
-              <p className="mt-1 text-xs text-muted-foreground">, Our promise</p>
-            </div>
           </div>
         </div>
       </section>
