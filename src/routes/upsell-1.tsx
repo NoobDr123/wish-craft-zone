@@ -38,7 +38,7 @@ function Upsell1() {
     <UpsellShell
       step={1}
       badge="Make it unforgettable"
-      headline="Wait — make it even more emotional."
+      headline="Wait, make it even more emotional."
       description={
         <>
           Your song comes with two beautiful verses. For just{" "}

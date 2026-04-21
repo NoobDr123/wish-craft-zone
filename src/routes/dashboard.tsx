@@ -191,10 +191,10 @@ function Dashboard() {
                 Order details
               </h2>
               <dl className="mt-4 space-y-3 text-sm">
-                <Row label="For" value={q.recipient_name || "—"} />
-                <Row label="Relationship" value={q.relationship ?? "—"} />
-                <Row label="Genre" value={q.genre ?? "—"} />
-                <Row label="Tempo" value={q.tempo ?? "—"} />
+                <Row label="For" value={q.recipient_name || "Not set"} />
+                <Row label="Relationship" value={q.relationship ?? "Not set"} />
+                <Row label="Genre" value={q.genre ?? "Not set"} />
+                <Row label="Tempo" value={q.tempo ?? "Not set"} />
                 <Row
                   label="Add-ons"
                   value={
