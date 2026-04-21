@@ -226,8 +226,8 @@ function LandingPage() {
                 key={item.title}
                 className="rounded-3xl border border-border bg-card p-6 shadow-soft"
               >
-                <div className="mb-4 inline-flex h-10 w-10 items-center justify-center rounded-full bg-ribbon/15">
-                  <Heart className="h-5 w-5 text-ribbon" />
+                <div className="mb-4 inline-flex h-10 w-10 items-center justify-center rounded-full bg-primary/15">
+                  <Heart className="h-5 w-5 text-primary" />
                 </div>
                 <h3 className="font-display text-xl font-semibold text-foreground">
                   {item.title}
