@@ -122,15 +122,16 @@ function LandingPage() {
           <div className="space-y-8">
             <span className="inline-flex items-center gap-2 rounded-full border border-border bg-card px-4 py-1.5 text-xs font-medium uppercase tracking-wider text-muted-foreground">
               <span className="h-1.5 w-1.5 rounded-full bg-primary" />
-              A gift unlike any other
+              For the bravest fighters and the families who love them
             </span>
             <h1 className="font-display text-5xl font-semibold leading-[1.05] tracking-tight text-foreground text-balance md:text-6xl lg:text-7xl">
-              Turn your love and prayers into a{" "}
-              <span className="italic text-primary">beautiful song.</span>
+              When cancer takes the words away,{" "}
+              <span className="italic text-primary">give them a song.</span>
             </h1>
             <p className="max-w-xl text-lg leading-relaxed text-muted-foreground md:text-xl">
-              A deeply personal, AI-crafted song for the fighter in your life.
-              Because sometimes words aren&rsquo;t enough.
+              A card feels too small. A bouquet wilts. RibbonSong turns your
+              memories, prayers, and love into a personal song — a keepsake for
+              the one fighting, surviving, or remembered.
             </p>
             <div className="flex flex-wrap items-center gap-4">
               <Link
