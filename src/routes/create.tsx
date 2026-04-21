@@ -200,31 +200,40 @@ function CreatePage() {
       ),
     },
 
-    // 5. Core message + personal words
+    // 5a. Core message
     {
       chapter: "The message",
       title: `What do you want ${name} to hear?`,
-      subtitle: "Pick the heart of the song, then write to them in your own words.",
-      isValid: (s) => !!s.message && s.personal_words.trim().length > 5,
+      subtitle: "Pick the heart of the song.",
+      isValid: (s) => !!s.message,
       render: () => (
-        <div className="space-y-6">
-          <Question label="The heart of the song">
-            <ListSelect
-              options={MESSAGES}
-              value={q.message}
-              onChange={(v) => q.set("message", v)}
-            />
-          </Question>
-          <Question label="Your words to them">
-            <TextArea
-              placeholder={`${name === "them" ? "Mom" : name}, I do not say this enough...`}
-              value={q.personal_words}
-              onChange={(e) => q.set("personal_words", e.target.value)}
-              maxLength={1000}
-              rows={5}
-            />
-          </Question>
-        </div>
+        <Question label="The heart of the song">
+          <ListSelect
+            options={MESSAGES}
+            value={q.message}
+            onChange={(v) => q.set("message", v)}
+          />
+        </Question>
+      ),
+    },
+
+    // 5b. Personal words
+    {
+      chapter: "The message",
+      title: `What do you wish you could say to ${name}?`,
+      subtitle: "Write to them like a letter. We will weave your words into the lyrics.",
+      isValid: (s) => s.personal_words.trim().length > 2,
+      render: () => (
+        <Question label="Your words to them">
+          <TextArea
+            placeholder={`${name === "them" ? "Mom" : name}, I do not say this enough...`}
+            value={q.personal_words}
+            onChange={(e) => q.set("personal_words", e.target.value)}
+            maxLength={1000}
+            rows={5}
+            autoFocus
+          />
+        </Question>
       ),
     },
 
