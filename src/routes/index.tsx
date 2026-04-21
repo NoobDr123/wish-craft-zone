@@ -150,7 +150,7 @@ function LandingPage() {
             </div>
             <div className="flex items-center gap-6 pt-4 text-sm text-muted-foreground">
               <div className="flex -space-x-2">
-                {["bg-peach", "bg-ribbon/40", "bg-primary/30", "bg-success/40"].map(
+                {["bg-primary/60", "bg-primary/40", "bg-primary/30", "bg-primary/20"].map(
                   (c) => (
                     <div
                       key={c}
