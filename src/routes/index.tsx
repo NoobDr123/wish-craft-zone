@@ -258,7 +258,7 @@ function LandingPage() {
                 key={step.title}
                 className="relative rounded-3xl border border-border bg-card p-8 shadow-soft"
               >
-                <div className="absolute -top-4 left-8 inline-flex h-8 items-center justify-center rounded-full bg-ribbon px-3 font-display text-sm text-ribbon-foreground">
+                <div className="absolute -top-4 left-8 inline-flex h-8 items-center justify-center rounded-full bg-primary px-3 font-display text-sm text-primary-foreground">
                   Step {i + 1}
                 </div>
                 <step.icon className="h-8 w-8 text-primary" />
