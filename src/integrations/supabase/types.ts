@@ -14,7 +14,84 @@ export type Database = {
   }
   public: {
     Tables: {
-      [_ in never]: never
+      orders: {
+        Row: {
+          amount_cents: number
+          buyer_email: string
+          buyer_name: string | null
+          created_at: string
+          currency: string
+          delivery_date: string | null
+          genre: string | null
+          has_3rd_verse: boolean
+          has_unlimited_edits: boolean
+          id: string
+          is_gift: boolean
+          is_rush: boolean
+          personal_note: string | null
+          quiz_payload: Json | null
+          recipient_email: string | null
+          recipient_name: string
+          relationship: string | null
+          song_title_idea: string | null
+          status: string
+          tempo: string | null
+          updated_at: string
+          user_id: string | null
+          voice: string | null
+        }
+        Insert: {
+          amount_cents?: number
+          buyer_email: string
+          buyer_name?: string | null
+          created_at?: string
+          currency?: string
+          delivery_date?: string | null
+          genre?: string | null
+          has_3rd_verse?: boolean
+          has_unlimited_edits?: boolean
+          id?: string
+          is_gift?: boolean
+          is_rush?: boolean
+          personal_note?: string | null
+          quiz_payload?: Json | null
+          recipient_email?: string | null
+          recipient_name: string
+          relationship?: string | null
+          song_title_idea?: string | null
+          status?: string
+          tempo?: string | null
+          updated_at?: string
+          user_id?: string | null
+          voice?: string | null
+        }
+        Update: {
+          amount_cents?: number
+          buyer_email?: string
+          buyer_name?: string | null
+          created_at?: string
+          currency?: string
+          delivery_date?: string | null
+          genre?: string | null
+          has_3rd_verse?: boolean
+          has_unlimited_edits?: boolean
+          id?: string
+          is_gift?: boolean
+          is_rush?: boolean
+          personal_note?: string | null
+          quiz_payload?: Json | null
+          recipient_email?: string | null
+          recipient_name?: string
+          relationship?: string | null
+          song_title_idea?: string | null
+          status?: string
+          tempo?: string | null
+          updated_at?: string
+          user_id?: string | null
+          voice?: string | null
+        }
+        Relationships: []
+      }
     }
     Views: {
       [_ in never]: never
