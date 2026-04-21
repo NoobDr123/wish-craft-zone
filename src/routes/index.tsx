@@ -167,7 +167,7 @@ function LandingPage() {
           </div>
 
           <div className="relative">
-            <div className="absolute -left-6 -top-6 h-32 w-32 rounded-full bg-ribbon/20 blur-3xl" />
+            <div className="absolute -left-6 -top-6 h-32 w-32 rounded-full bg-primary/30 blur-3xl" />
             <div className="absolute -bottom-8 -right-6 h-40 w-40 rounded-full bg-primary/20 blur-3xl" />
             <div className="relative overflow-hidden rounded-[2.5rem] border border-border bg-card shadow-card">
               <img
