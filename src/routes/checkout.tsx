@@ -124,9 +124,9 @@ function CheckoutPage() {
           <p className="mx-auto mt-5 max-w-xl text-balance text-base leading-relaxed text-muted-foreground md:text-lg">
             You're just one click away from creating a beautiful, personalized
             song for{" "}
-            <span className="font-semibold text-ribbon">{recipient}</span>.
+            <span className="font-semibold text-primary">{recipient}</span>.
           </p>
-          <div className="mt-6 inline-flex items-center gap-2 rounded-full bg-ribbon px-5 py-2.5 text-sm font-semibold text-ribbon-foreground shadow-soft">
+          <div className="mt-6 inline-flex items-center gap-2 rounded-full bg-primary px-5 py-2.5 text-sm font-semibold text-primary-foreground shadow-soft">
             Expected song delivery date:{" "}
             <span className="font-bold">{deliveryDate}</span>
           </div>
@@ -159,7 +159,7 @@ function CheckoutPage() {
 
           <div className="flex items-center justify-between">
             <h2 className="flex items-center gap-2 font-display text-xl font-bold text-foreground">
-              <CreditCard className="h-5 w-5 text-ribbon" /> Payment
+              <CreditCard className="h-5 w-5 text-primary" /> Payment
             </h2>
             <span className="inline-flex items-center gap-1 text-xs font-medium text-muted-foreground">
               <Lock className="h-3 w-3" /> Encrypted
@@ -197,11 +197,11 @@ function CheckoutPage() {
           <button
             onClick={handlePay}
             disabled={!canPay}
-            className="mt-6 flex w-full items-center justify-center gap-2.5 rounded-2xl bg-ribbon px-6 py-5 text-base font-bold text-ribbon-foreground shadow-glow transition-all hover:brightness-95 active:scale-[0.99] disabled:cursor-not-allowed disabled:opacity-60 disabled:shadow-none md:text-lg"
+            className="mt-6 flex w-full items-center justify-center gap-2.5 rounded-2xl bg-primary px-6 py-5 text-base font-bold text-primary-foreground shadow-glow transition-all hover:brightness-95 active:scale-[0.99] disabled:cursor-not-allowed disabled:opacity-60 disabled:shadow-none md:text-lg"
           >
             {processing ? (
               <>
-                <span className="h-5 w-5 animate-spin rounded-full border-2 border-ribbon-foreground/30 border-t-ribbon-foreground" />
+                <span className="h-5 w-5 animate-spin rounded-full border-2 border-primary-foreground/30 border-t-ribbon-foreground" />
                 Processing…
               </>
             ) : (
@@ -219,13 +219,13 @@ function CheckoutPage() {
         {/* Order summary */}
         <section className="mt-6 rounded-3xl border border-peach/70 bg-card p-6 shadow-soft md:p-7">
           <h2 className="flex items-center gap-2 font-display text-2xl font-bold text-foreground">
-            <Music2 className="h-5 w-5 text-ribbon" /> Your Custom Song Order
+            <Music2 className="h-5 w-5 text-primary" /> Your Custom Song Order
           </h2>
 
           <dl className="mt-5 space-y-2.5 text-[15px]">
             <div className="flex justify-between">
               <dt className="text-muted-foreground">Song for:</dt>
-              <dd className="font-semibold text-ribbon">{recipient}</dd>
+              <dd className="font-semibold text-primary">{recipient}</dd>
             </div>
             <div className="flex justify-between">
               <dt className="text-muted-foreground">Delivery:</dt>
@@ -239,14 +239,14 @@ function CheckoutPage() {
             Custom Song
           </h3>
           <div className="mt-3 flex flex-wrap items-center justify-between gap-3">
-            <span className="rounded-full border-2 border-ribbon/40 bg-ribbon/5 px-3 py-1 text-xs font-bold tracking-wider text-ribbon">
+            <span className="rounded-full border-2 border-primary/40 bg-primary/5 px-3 py-1 text-xs font-bold tracking-wider text-primary">
               50% OFF
             </span>
             <p className="flex items-baseline gap-2">
               <span className="text-base font-medium text-muted-foreground line-through">
                 $199
               </span>
-              <span className="font-display text-3xl font-bold text-ribbon">
+              <span className="font-display text-3xl font-bold text-primary">
                 $99
               </span>
               <span className="text-sm font-semibold text-muted-foreground">
@@ -257,29 +257,29 @@ function CheckoutPage() {
 
           <button
             onClick={() => navigate({ to: "/create" })}
-            className="mt-4 flex w-full items-center justify-center gap-2 rounded-xl border-2 border-dashed border-ribbon/40 bg-ribbon/5 px-4 py-3 text-sm font-semibold text-ribbon transition-colors hover:bg-ribbon/10"
+            className="mt-4 flex w-full items-center justify-center gap-2 rounded-xl border-2 border-dashed border-primary/40 bg-primary/5 px-4 py-3 text-sm font-semibold text-primary transition-colors hover:bg-primary/10"
           >
             <Pencil className="h-4 w-4" /> Review or Edit Survey
           </button>
         </section>
 
         {/* Limited time offer */}
-        <section className="mt-6 rounded-3xl border-2 border-ribbon/30 bg-ribbon/5 p-6 md:p-7">
-          <h3 className="flex items-center gap-2 font-display text-2xl font-bold text-ribbon">
+        <section className="mt-6 rounded-3xl border-2 border-primary/30 bg-primary/5 p-6 md:p-7">
+          <h3 className="flex items-center gap-2 font-display text-2xl font-bold text-primary">
             🎁 Limited Time Offer
           </h3>
           <p className="mt-3 text-[15px] leading-relaxed text-foreground">
             Our songs typically cost{" "}
             <span className="font-semibold line-through">$199</span>, but for a
             limited time, you can get the same professional quality for just{" "}
-            <span className="font-bold text-ribbon">$99 USD</span>.
+            <span className="font-bold text-primary">$99 USD</span>.
           </p>
         </section>
 
         {/* Samples */}
         <section className="mt-6 rounded-3xl border border-peach/70 bg-card p-6 shadow-soft md:p-7">
           <h2 className="flex items-center gap-2 font-display text-2xl font-bold text-foreground">
-            <Music2 className="h-5 w-5 text-ribbon" /> Hear Other RibbonSongs We
+            <Music2 className="h-5 w-5 text-primary" /> Hear Other RibbonSongs We
             Made
           </h2>
           <div className="mt-5 space-y-4">
@@ -291,7 +291,7 @@ function CheckoutPage() {
                 <div className="flex items-center gap-3">
                   <button
                     aria-label={`Play ${s.title}`}
-                    className="flex h-12 w-12 shrink-0 items-center justify-center rounded-full bg-ribbon text-ribbon-foreground transition-transform hover:scale-105"
+                    className="flex h-12 w-12 shrink-0 items-center justify-center rounded-full bg-primary text-primary-foreground transition-transform hover:scale-105"
                   >
                     <Play className="ml-0.5 h-5 w-5 fill-current" />
                   </button>
@@ -352,7 +352,7 @@ function CheckoutPage() {
           <button
             onClick={handlePay}
             disabled={!canPay}
-            className="flex w-full items-center justify-center gap-2.5 rounded-2xl bg-ribbon px-6 py-5 text-base font-bold text-ribbon-foreground shadow-glow transition-all hover:brightness-95 active:scale-[0.99] disabled:cursor-not-allowed disabled:opacity-60 disabled:shadow-none md:text-lg"
+            className="flex w-full items-center justify-center gap-2.5 rounded-2xl bg-primary px-6 py-5 text-base font-bold text-primary-foreground shadow-glow transition-all hover:brightness-95 active:scale-[0.99] disabled:cursor-not-allowed disabled:opacity-60 disabled:shadow-none md:text-lg"
           >
             <Gift className="h-5 w-5" /> Create My Song
           </button>
@@ -365,7 +365,7 @@ function CheckoutPage() {
         {/* What you'll get */}
         <section className="mt-6 rounded-3xl border border-peach/70 bg-card p-6 shadow-soft md:p-7">
           <h3 className="flex items-center gap-2 font-display text-2xl font-bold text-foreground">
-            <Gift className="h-5 w-5 text-ribbon" /> What You'll Get
+            <Gift className="h-5 w-5 text-primary" /> What You'll Get
           </h3>
           <ul className="mt-5 space-y-4">
             {[
@@ -383,7 +383,7 @@ function CheckoutPage() {
               },
             ].map((item) => (
               <li key={item.t} className="flex gap-3">
-                <span className="mt-2 h-2 w-2 shrink-0 rounded-full bg-ribbon" />
+                <span className="mt-2 h-2 w-2 shrink-0 rounded-full bg-primary" />
                 <div>
                   <p className="font-semibold text-foreground">{item.t}</p>
                   <p className="text-sm text-muted-foreground">{item.d}</p>
@@ -396,7 +396,7 @@ function CheckoutPage() {
         {/* Why choose */}
         <section className="mt-6 rounded-3xl border border-peach/70 bg-card p-6 shadow-soft md:p-7">
           <h3 className="flex items-center gap-2 font-display text-2xl font-bold text-foreground">
-            <Star className="h-5 w-5 fill-ribbon text-ribbon" /> Why Choose
+            <Star className="h-5 w-5 fill-ribbon text-primary" /> Why Choose
             RibbonSong?
           </h3>
           <ul className="mt-5 space-y-3">
@@ -423,11 +423,11 @@ function CheckoutPage() {
         <button
           onClick={handlePay}
           disabled={!canPay}
-          className="flex w-full items-center justify-center gap-2 rounded-2xl bg-ribbon px-6 py-4 text-base font-bold text-ribbon-foreground shadow-glow transition-all active:scale-[0.99] disabled:cursor-not-allowed disabled:opacity-60 disabled:shadow-none"
+          className="flex w-full items-center justify-center gap-2 rounded-2xl bg-primary px-6 py-4 text-base font-bold text-primary-foreground shadow-glow transition-all active:scale-[0.99] disabled:cursor-not-allowed disabled:opacity-60 disabled:shadow-none"
         >
           {processing ? (
             <>
-              <span className="h-4 w-4 animate-spin rounded-full border-2 border-ribbon-foreground/30 border-t-ribbon-foreground" />
+              <span className="h-4 w-4 animate-spin rounded-full border-2 border-primary-foreground/30 border-t-ribbon-foreground" />
               Processing…
             </>
           ) : (
@@ -472,9 +472,9 @@ function Field({
         value={value}
         onChange={(e) => onChange(e.target.value)}
         placeholder={placeholder}
-        className={`w-full rounded-2xl border-2 bg-background px-4 py-3.5 text-[15px] text-foreground placeholder:text-muted-foreground/60 focus:outline-none focus:ring-4 focus:ring-ribbon/15 ${
+        className={`w-full rounded-2xl border-2 bg-background px-4 py-3.5 text-[15px] text-foreground placeholder:text-muted-foreground/60 focus:outline-none focus:ring-4 focus:ring-primary/15 ${
           valid
-            ? "border-peach focus:border-ribbon"
+            ? "border-peach focus:border-primary"
             : "border-destructive focus:border-destructive"
         }`}
       />
