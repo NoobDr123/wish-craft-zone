@@ -345,13 +345,9 @@ function Brand({ children }: { children: React.ReactNode }) {
   );
 }
 
-function OrderSummary({
-  total,
-  q,
-}: {
-  total: number;
-  q: ReturnType<typeof useQuizStore>;
-}) {
+type QuizState = ReturnType<typeof useQuizStore.getState>;
+
+function OrderSummary({ total, q }: { total: number; q: QuizState }) {
   return (
     <div className="rounded-2xl border border-border bg-card p-5 shadow-soft md:p-6">
       <p className="text-xs font-semibold uppercase tracking-wider text-primary">
