@@ -132,25 +132,72 @@ function CheckoutPage() {
           </div>
         </section>
 
-        {/* Email + CTA card */}
+        {/* Contact + Payment card */}
         <section className="mt-8 rounded-3xl border border-peach/70 bg-card p-6 shadow-card md:p-8">
-          <label className="block">
-            <span className="mb-2 block text-sm font-semibold text-foreground">
-              Your Email Address
-            </span>
-            <input
+          <h2 className="font-display text-xl font-bold text-foreground">
+            Contact
+          </h2>
+          <div className="mt-4 space-y-3">
+            <Field
+              label="Email Address"
               type="email"
               value={email}
-              onChange={(e) => setEmail(e.target.value)}
+              onChange={setEmail}
               placeholder="you@email.com"
-              className="w-full rounded-2xl border-2 border-peach bg-background px-5 py-4 text-[15px] text-foreground placeholder:text-muted-foreground/60 focus:border-ribbon focus:outline-none focus:ring-4 focus:ring-ribbon/15"
+              valid={email.length === 0 || emailValid}
             />
-          </label>
+            <Field
+              label="Full Name"
+              value={name}
+              onChange={setName}
+              placeholder="Jane Doe"
+              valid={name.length === 0 || nameValid}
+            />
+          </div>
+
+          <div className="my-6 border-t border-dashed border-peach" />
+
+          <div className="flex items-center justify-between">
+            <h2 className="flex items-center gap-2 font-display text-xl font-bold text-foreground">
+              <CreditCard className="h-5 w-5 text-ribbon" /> Payment
+            </h2>
+            <span className="inline-flex items-center gap-1 text-xs font-medium text-muted-foreground">
+              <Lock className="h-3 w-3" /> Encrypted
+            </span>
+          </div>
+          <div className="mt-4 space-y-3">
+            <Field
+              label="Card Number"
+              value={card}
+              onChange={(v) => setCard(formatCard(v))}
+              placeholder="1234 1234 1234 1234"
+              inputMode="numeric"
+              valid={card.length === 0 || cardValid}
+            />
+            <div className="grid grid-cols-2 gap-3">
+              <Field
+                label="Expires"
+                value={exp}
+                onChange={(v) => setExp(formatExp(v))}
+                placeholder="MM / YY"
+                inputMode="numeric"
+                valid={exp.length === 0 || expValid}
+              />
+              <Field
+                label="CVC"
+                value={cvc}
+                onChange={(v) => setCvc(v.replace(/\D/g, "").slice(0, 4))}
+                placeholder="123"
+                inputMode="numeric"
+                valid={cvc.length === 0 || cvcValid}
+              />
+            </div>
+          </div>
 
           <button
             onClick={handlePay}
             disabled={!canPay}
-            className="mt-5 flex w-full items-center justify-center gap-2.5 rounded-2xl bg-ribbon px-6 py-5 text-base font-bold text-ribbon-foreground shadow-glow transition-all hover:brightness-95 active:scale-[0.99] disabled:cursor-not-allowed disabled:opacity-60 disabled:shadow-none md:text-lg"
+            className="mt-6 flex w-full items-center justify-center gap-2.5 rounded-2xl bg-ribbon px-6 py-5 text-base font-bold text-ribbon-foreground shadow-glow transition-all hover:brightness-95 active:scale-[0.99] disabled:cursor-not-allowed disabled:opacity-60 disabled:shadow-none md:text-lg"
           >
             {processing ? (
               <>
@@ -159,7 +206,7 @@ function CheckoutPage() {
               </>
             ) : (
               <>
-                <Gift className="h-5 w-5" /> Create My Song
+                <Gift className="h-5 w-5" /> Create My Song · $99
               </>
             )}
           </button>
