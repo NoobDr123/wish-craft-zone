@@ -291,7 +291,7 @@ function LandingPage() {
                 key={s.name}
                 className="flex h-full flex-col justify-between rounded-3xl border border-border bg-card p-8 shadow-soft"
               >
-                <Quote className="h-7 w-7 text-ribbon" />
+                <Quote className="h-7 w-7 text-primary" />
                 <blockquote className="mt-4 font-display text-lg leading-relaxed text-foreground">
                   &ldquo;{s.quote}&rdquo;
                 </blockquote>
