@@ -90,13 +90,14 @@ function CreatePage() {
   const name = q.recipient_name.trim() || "them";
 
   const steps: Step[] = [
-    // 1. Relationship (with inline "Other" reveal)
+    // 1. Relationship + name (with inline "Other" reveal)
     {
       chapter: "Who they are",
       title: "Who is this song for?",
-      subtitle: "Your relationship helps us write the song in the right voice.",
+      subtitle: "Their name and your relationship help us write in the right voice.",
       isValid: (s) =>
         !!s.relationship &&
+        s.recipient_name.trim().length > 0 &&
         (s.relationship !== "Other" || s.relationship_other.trim().length > 1),
       render: () => (
         <div className="space-y-6">
@@ -109,12 +110,9 @@ function CreatePage() {
             />
           </Question>
           {q.relationship === "Other" && (
-            <Question
-              label="Who are they to you?"
-              helper="e.g. my godmother, my best friend since kindergarten, my mother-in-law"
-            >
+            <Question label="Who are they to you?">
               <TextInput
-                placeholder="My..."
+                placeholder="My godmother, my best friend…"
                 value={q.relationship_other}
                 onChange={(e) => q.set("relationship_other", e.target.value)}
                 maxLength={120}
@@ -122,30 +120,19 @@ function CreatePage() {
               />
             </Question>
           )}
+          <Question label="Their first name">
+            <TextInput
+              placeholder="e.g. Maria"
+              value={q.recipient_name}
+              onChange={(e) => q.set("recipient_name", e.target.value)}
+              maxLength={80}
+            />
+          </Question>
         </div>
       ),
     },
 
-    // 2. Their name
-    {
-      chapter: "Who they are",
-      title: "What is their first name?",
-      subtitle: "We will weave their name through the song.",
-      isValid: (s) => s.recipient_name.trim().length > 0,
-      render: () => (
-        <Question label="Their first name">
-          <TextInput
-            placeholder="e.g. Maria"
-            value={q.recipient_name}
-            onChange={(e) => q.set("recipient_name", e.target.value)}
-            maxLength={80}
-            autoFocus
-          />
-        </Question>
-      ),
-    },
-
-    // 3. Stage
+    // 2. Stage
     {
       chapter: "Their fight",
       title: `Where is ${name} in their journey?`,
@@ -162,38 +149,18 @@ function CreatePage() {
       ),
     },
 
-    // 4. Fighting for
+    // 3. Fighting for
     {
       chapter: "Their fight",
       title: `Who or what is ${name} fighting for?`,
-      subtitle:
-        "The people, dreams, or moments that pull them forward on the hardest days.",
-      isValid: (s) => s.fighting_for.trim().length > 4,
+      subtitle: "The people, dreams, or moments that pull them forward.",
+      isValid: (s) => s.fighting_for.trim().length > 2,
       render: () => (
         <Question label="They are fighting for...">
           <TextArea
-            placeholder="Their grandkids. Walking their daughter down the aisle. One more summer at the lake. The novel they are still writing…"
+            placeholder="Their grandkids. Walking their daughter down the aisle. One more summer at the lake…"
             value={q.fighting_for}
             onChange={(e) => q.set("fighting_for", e.target.value)}
-            maxLength={500}
-            autoFocus
-          />
-        </Question>
-      ),
-    },
-
-    // 5. Qualities
-    {
-      chapter: "Their soul",
-      title: "What makes them, them?",
-      subtitle: "The qualities you love most about them.",
-      isValid: (s) => s.qualities.trim().length > 10,
-      render: () => (
-        <Question label="The qualities you love most">
-          <TextArea
-            placeholder="Wickedly funny. The most patient person I know. Stubborn in the best way. Generous to a fault…"
-            value={q.qualities}
-            onChange={(e) => q.set("qualities", e.target.value)}
             maxLength={500}
             rows={4}
             autoFocus
@@ -202,158 +169,136 @@ function CreatePage() {
       ),
     },
 
-    // 6. Memory
+    // 4. Qualities + memory together
     {
       chapter: "Their soul",
-      title: "A memory you will never forget.",
-      subtitle: "The more specific, the more the song will sound like them.",
-      isValid: (s) => s.shared_memory.trim().length > 15,
+      title: "What makes them, them?",
+      subtitle: "The qualities you love and a moment you will never forget.",
+      isValid: (s) =>
+        s.qualities.trim().length > 2 && s.shared_memory.trim().length > 2,
       render: () => (
-        <Question label="A moment with them">
-          <TextArea
-            placeholder="The summer we got lost driving to the coast. Dancing in the kitchen on Christmas morning. The day she taught me to ride a bike…"
-            value={q.shared_memory}
-            onChange={(e) => q.set("shared_memory", e.target.value)}
-            maxLength={600}
-            rows={5}
-            autoFocus
-          />
-        </Question>
+        <div className="space-y-6">
+          <Question label="The qualities you love most">
+            <TextArea
+              placeholder="Wickedly funny. Patient. Stubborn in the best way…"
+              value={q.qualities}
+              onChange={(e) => q.set("qualities", e.target.value)}
+              maxLength={500}
+              rows={3}
+            />
+          </Question>
+          <Question label="A memory you will never forget">
+            <TextArea
+              placeholder="Dancing in the kitchen on Christmas morning. The day she taught me to ride a bike…"
+              value={q.shared_memory}
+              onChange={(e) => q.set("shared_memory", e.target.value)}
+              maxLength={600}
+              rows={4}
+            />
+          </Question>
+        </div>
       ),
     },
 
-    // 7. Core message
+    // 5. Core message + personal words
     {
       chapter: "The message",
-      title: "What is the heart of this song?",
-      subtitle: "Choose the feeling you most want them to hear.",
-      isValid: (s) => !!s.message,
+      title: `What do you want ${name} to hear?`,
+      subtitle: "Pick the heart of the song, then write to them in your own words.",
+      isValid: (s) => !!s.message && s.personal_words.trim().length > 5,
       render: () => (
-        <Question label="The message">
-          <ListSelect
-            options={MESSAGES}
-            value={q.message}
-            onChange={(v) => q.set("message", v)}
-          />
-        </Question>
+        <div className="space-y-6">
+          <Question label="The heart of the song">
+            <ListSelect
+              options={MESSAGES}
+              value={q.message}
+              onChange={(v) => q.set("message", v)}
+            />
+          </Question>
+          <Question label="Your words to them">
+            <TextArea
+              placeholder={`${name === "them" ? "Mom" : name}, I do not say this enough...`}
+              value={q.personal_words}
+              onChange={(e) => q.set("personal_words", e.target.value)}
+              maxLength={1000}
+              rows={5}
+            />
+          </Question>
+        </div>
       ),
     },
 
-    // 8. Personal words
-    {
-      chapter: "The message",
-      title: `What do you wish you could say to ${name}?`,
-      subtitle: "Write to them like a letter. We will weave your words into the lyrics.",
-      isValid: (s) => s.personal_words.trim().length > 25,
-      render: () => (
-        <Question label="Your words to them">
-          <TextArea
-            placeholder={`${name === "them" ? "Mom" : name}, I do not say this enough. You are the bravest person I have ever known...`}
-            value={q.personal_words}
-            onChange={(e) => q.set("personal_words", e.target.value)}
-            maxLength={1000}
-            rows={7}
-            autoFocus
-          />
-        </Question>
-      ),
-    },
-
-    // 9. Genre
+    // 6. Sound — genre + tempo + voice
     {
       chapter: "Their sound",
-      title: "What genre feels most like them?",
-      isValid: (s) => !!s.genre,
+      title: "What should the song sound like?",
+      subtitle: "Genre, pace, and voice all on one screen.",
+      isValid: (s) => !!s.genre && !!s.tempo && !!s.voice,
       render: () => (
-        <Question label="Genre">
-          <PillSelect
-            options={GENRES}
-            value={q.genre}
-            onChange={(v) => q.set("genre", v)}
-            columns={2}
-          />
-        </Question>
+        <div className="space-y-6">
+          <Question label="Genre">
+            <PillSelect
+              options={GENRES}
+              value={q.genre}
+              onChange={(v) => q.set("genre", v)}
+              columns={2}
+            />
+          </Question>
+          <Question label="Tempo and energy">
+            <PillSelect
+              options={TEMPOS}
+              value={q.tempo}
+              onChange={(v) => q.set("tempo", v)}
+              columns={3}
+            />
+          </Question>
+          <Question label="Voice">
+            <PillSelect
+              options={VOICES}
+              value={q.voice}
+              onChange={(v) => q.set("voice", v)}
+              columns={2}
+            />
+          </Question>
+        </div>
       ),
     },
 
-    // 10. Tempo
-    {
-      chapter: "Their sound",
-      title: "What pace fits the feeling?",
-      isValid: (s) => !!s.tempo,
-      render: () => (
-        <Question label="Tempo and energy">
-          <PillSelect
-            options={TEMPOS}
-            value={q.tempo}
-            onChange={(v) => q.set("tempo", v)}
-            columns={3}
-          />
-        </Question>
-      ),
-    },
-
-    // 11. Voice
-    {
-      chapter: "Their sound",
-      title: "Whose voice should sing it?",
-      isValid: (s) => !!s.voice,
-      render: () => (
-        <Question label="Voice">
-          <PillSelect
-            options={VOICES}
-            value={q.voice}
-            onChange={(v) => q.set("voice", v)}
-            columns={2}
-          />
-        </Question>
-      ),
-    },
-
-    // 12. Buyer name
+    // 7. Buyer name + email
     {
       chapter: "Delivery",
-      title: "What is your name?",
-      subtitle: "So we can sign the gift from you.",
-      isValid: (s) => s.buyer_name.trim().length > 0,
-      render: () => (
-        <Question label="Your name">
-          <TextInput
-            placeholder="Your full name"
-            value={q.buyer_name}
-            onChange={(e) => q.set("buyer_name", e.target.value)}
-            maxLength={80}
-            autoFocus
-          />
-        </Question>
-      ),
-    },
-
-    // 13. Buyer email
-    {
-      chapter: "Delivery",
-      title: "Where should we send the song?",
+      title: "Where should we send it?",
       subtitle: "We will email you when it is ready, usually within 7 days.",
-      isValid: (s) => emailRe.test(s.buyer_email),
+      isValid: (s) =>
+        s.buyer_name.trim().length > 0 && emailRe.test(s.buyer_email),
       render: () => (
-        <Question label="Your email">
-          <TextInput
-            type="email"
-            placeholder="you@example.com"
-            value={q.buyer_email}
-            onChange={(e) => q.set("buyer_email", e.target.value)}
-            maxLength={120}
-            autoFocus
-          />
-        </Question>
+        <div className="space-y-6">
+          <Question label="Your name">
+            <TextInput
+              placeholder="Your full name"
+              value={q.buyer_name}
+              onChange={(e) => q.set("buyer_name", e.target.value)}
+              maxLength={80}
+            />
+          </Question>
+          <Question label="Your email">
+            <TextInput
+              type="email"
+              placeholder="you@example.com"
+              value={q.buyer_email}
+              onChange={(e) => q.set("buyer_email", e.target.value)}
+              maxLength={120}
+            />
+          </Question>
+        </div>
       ),
     },
 
-    // 14. Gift toggle (+ inline gift details)
+    // 8. Gift toggle
     {
       chapter: "Delivery",
-      title: "Send it directly to them as a gift?",
-      subtitle: "Or keep it private and share it on your own.",
+      title: "Send it directly to them?",
+      subtitle: "Or keep it private and share it your own way.",
       isValid: (s) =>
         !s.is_gift || s.recipient_email === "" || emailRe.test(s.recipient_email),
       render: () => (
