@@ -7,12 +7,8 @@ import {
   CheckCircle2,
   ChevronDown,
   ChevronUp,
-  CreditCard,
-  Clock,
   Lock,
   ShieldCheck,
-  Star,
-  Truck,
 } from "lucide-react";
 
 export const Route = createFileRoute("/checkout")({
@@ -24,29 +20,11 @@ export const Route = createFileRoute("/checkout")({
 
 const emailRe = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
 
-const TRUST = [
-  {
-    name: "Sarah M.",
-    quote:
-      "Most meaningful gift my mom received during treatment. Worth every cent.",
-  },
-  {
-    name: "David R.",
-    quote: "Played it at my wife's last chemo session. The room was in tears.",
-  },
-];
-
-const HAPPY_AVATARS = [
-  "https://images.unsplash.com/photo-1494790108377-be9c29b29330?w=64&h=64&fit=crop&crop=faces",
-  "https://images.unsplash.com/photo-1500648767791-00dcc994a43e?w=64&h=64&fit=crop&crop=faces",
-  "https://images.unsplash.com/photo-1438761681033-6461ffad8d80?w=64&h=64&fit=crop&crop=faces",
-];
-
 function CheckoutPage() {
   const navigate = useNavigate();
   const q = useQuizStore();
   const [processing, setProcessing] = useState(false);
-  const [summaryOpen, setSummaryOpen] = useState(true);
+  const [summaryOpen, setSummaryOpen] = useState(false);
 
   // Prefill from quiz store
   const [email, setEmail] = useState(q.buyer_email || "");
@@ -94,60 +72,31 @@ function CheckoutPage() {
 
   return (
     <div className="min-h-screen bg-background pb-32 lg:pb-0">
-      {/* Header with trust strip */}
+      {/* Header */}
       <header className="border-b border-border/60 bg-card">
-        <div className="mx-auto max-w-5xl px-5 py-4">
-          <div className="flex items-center justify-between">
-            <Logo />
-            <Link
-              to="/almost-there"
-              className="inline-flex items-center gap-1.5 text-xs text-muted-foreground transition-colors hover:text-foreground"
-            >
-              <ArrowLeft className="h-3.5 w-3.5" /> Back
-            </Link>
-          </div>
-
-          {/* Happy customers strip */}
-          <div className="mt-3 flex items-center justify-center gap-2 rounded-full bg-peach/40 px-3 py-1.5">
-            <div className="flex -space-x-1.5">
-              {HAPPY_AVATARS.map((src, i) => (
-                <img
-                  key={i}
-                  src={src}
-                  alt=""
-                  className="h-5 w-5 rounded-full border border-card object-cover"
-                />
-              ))}
-            </div>
-            <p className="text-xs font-bold tracking-wide text-foreground">
-              1,000+ HAPPY FAMILIES
-            </p>
-          </div>
-
-          {/* Trust badges */}
-          <div className="mt-3 flex items-center justify-center gap-4 text-[11px] text-muted-foreground sm:gap-6 sm:text-xs">
-            <span className="inline-flex items-center gap-1.5">
-              <Clock className="h-3.5 w-3.5" /> 24–48h delivery
-            </span>
-            <span className="inline-flex items-center gap-1.5">
-              <ShieldCheck className="h-3.5 w-3.5" /> 30-day guarantee
-            </span>
-            <span className="inline-flex items-center gap-1.5">
-              <Lock className="h-3.5 w-3.5" /> Secure checkout
-            </span>
-          </div>
+        <div className="mx-auto flex max-w-2xl items-center justify-between px-5 py-4">
+          <Link
+            to="/almost-there"
+            className="inline-flex items-center gap-1.5 text-sm text-muted-foreground transition-colors hover:text-foreground"
+          >
+            <ArrowLeft className="h-4 w-4" /> Back
+          </Link>
+          <Logo />
+          <span className="inline-flex items-center gap-1.5 text-xs text-muted-foreground">
+            <Lock className="h-3.5 w-3.5" /> Secure
+          </span>
         </div>
       </header>
 
-      {/* Collapsible Order summary — at the START, above the form */}
+      {/* Collapsible Order summary — collapsed by default */}
       <div className="border-b border-border/60 bg-muted/40">
-        <div className="mx-auto max-w-5xl px-5">
+        <div className="mx-auto max-w-2xl px-5">
           <button
             onClick={() => setSummaryOpen((o) => !o)}
             className="flex w-full items-center justify-between py-4 text-sm"
           >
             <span className="flex items-center gap-2 font-medium text-foreground">
-              Order summary
+              {summaryOpen ? "Hide order summary" : "Show order summary"}
               {summaryOpen ? (
                 <ChevronUp className="h-4 w-4 text-muted-foreground" />
               ) : (
@@ -166,97 +115,58 @@ function CheckoutPage() {
         </div>
       </div>
 
-      <main className="mx-auto max-w-2xl px-5 py-8 lg:py-10">
-        <h1 className="font-display text-3xl font-semibold text-foreground md:text-4xl">
+      <main className="mx-auto max-w-2xl px-5 py-8">
+        <h1 className="font-display text-3xl font-semibold text-foreground">
           Checkout
         </h1>
-        <p className="mt-1.5 text-sm text-muted-foreground">
-          Almost done. Your song starts the moment you order.
-        </p>
 
-        {/* Contact */}
-        <section className="mt-7">
-          <h2 className="font-display text-lg font-semibold text-foreground">
-            1. Contact
-          </h2>
-          <p className="text-xs text-muted-foreground">
-            We'll send your song to this email.
-          </p>
-          <div className="mt-4 space-y-3">
+        {/* Single combined form card */}
+        <div className="mt-6 space-y-3">
+          <Field
+            label="Email"
+            type="email"
+            value={email}
+            onChange={setEmail}
+            placeholder="you@example.com"
+            valid={email.length === 0 || emailValid}
+          />
+          <Field
+            label="Full name"
+            value={name}
+            onChange={setName}
+            placeholder="Jane Doe"
+            valid={name.length === 0 || nameValid}
+          />
+          <Field
+            label="Card number"
+            value={card}
+            onChange={(v) => setCard(formatCard(v))}
+            placeholder="1234 1234 1234 1234"
+            inputMode="numeric"
+            valid={card.length === 0 || cardValid}
+          />
+          <div className="grid grid-cols-2 gap-3">
             <Field
-              label="Email"
-              type="email"
-              value={email}
-              onChange={setEmail}
-              placeholder="you@example.com"
-              valid={email.length === 0 || emailValid}
+              label="Expires"
+              value={exp}
+              onChange={(v) => setExp(formatExp(v))}
+              placeholder="MM / YY"
+              inputMode="numeric"
+              valid={exp.length === 0 || expValid}
             />
             <Field
-              label="Full name"
-              value={name}
-              onChange={setName}
-              placeholder="Jane Doe"
-              valid={name.length === 0 || nameValid}
+              label="CVC"
+              value={cvc}
+              onChange={(v) => setCvc(v.replace(/\D/g, "").slice(0, 4))}
+              placeholder="123"
+              inputMode="numeric"
+              valid={cvc.length === 0 || cvcValid}
             />
           </div>
-        </section>
+        </div>
 
-        {/* Payment */}
-        <section className="mt-9">
-          <div className="flex items-center justify-between">
-            <h2 className="font-display text-lg font-semibold text-foreground">
-              2. Payment
-            </h2>
-            <div className="flex items-center gap-1.5 text-xs text-muted-foreground">
-              <Lock className="h-3 w-3" /> Encrypted
-            </div>
-          </div>
-
-          <div className="mt-4 overflow-hidden rounded-2xl border border-border bg-card shadow-soft">
-            <div className="flex items-center justify-between border-b border-border bg-peach/40 px-4 py-3">
-              <span className="flex items-center gap-2 text-sm font-medium text-foreground">
-                <CreditCard className="h-4 w-4" /> Credit / Debit card
-              </span>
-              <div className="flex items-center gap-1 text-[10px] font-semibold tracking-wider text-muted-foreground">
-                <Brand>VISA</Brand>
-                <Brand>MC</Brand>
-                <Brand>AMEX</Brand>
-              </div>
-            </div>
-            <div className="space-y-3 p-4">
-              <Field
-                label="Card number"
-                value={card}
-                onChange={(v) => setCard(formatCard(v))}
-                placeholder="1234 1234 1234 1234"
-                inputMode="numeric"
-                valid={card.length === 0 || cardValid}
-              />
-              <div className="grid grid-cols-2 gap-3">
-                <Field
-                  label="Expires"
-                  value={exp}
-                  onChange={(v) => setExp(formatExp(v))}
-                  placeholder="MM / YY"
-                  inputMode="numeric"
-                  valid={exp.length === 0 || expValid}
-                />
-                <Field
-                  label="CVC"
-                  value={cvc}
-                  onChange={(v) => setCvc(v.replace(/\D/g, "").slice(0, 4))}
-                  placeholder="123"
-                  inputMode="numeric"
-                  valid={cvc.length === 0 || cvcValid}
-                />
-              </div>
-            </div>
-          </div>
-        </section>
-
-        {/* Stars + CTA (desktop) */}
-        <div className="mt-8 hidden lg:block">
-          <StarRow />
+        {/* Desktop CTA */}
+        <div className="mt-7 hidden lg:block">
           <CompleteButton
             processing={processing}
             canPay={canPay}
@@ -265,76 +175,19 @@ function CheckoutPage() {
           <Legal />
         </div>
 
-        {/* Guaranteed safe & secure card */}
-        <div className="mt-8 rounded-2xl border border-border bg-card p-5 shadow-soft">
-          <div className="flex items-center gap-3">
-            <Lock className="h-5 w-5 shrink-0 text-foreground" />
-            <p className="text-sm font-medium text-foreground">
-              Guaranteed <span className="font-bold">safe & secure</span>{" "}
-              checkout
-            </p>
-          </div>
-          <div className="mt-3 border-t border-border pt-3">
-            <div className="flex flex-wrap items-center gap-1.5">
-              {["VISA", "MASTERCARD", "AMEX", "DISCOVER", "APPLE PAY"].map(
-                (b) => (
-                  <Brand key={b}>{b}</Brand>
-                ),
-              )}
-            </div>
-          </div>
-        </div>
-
-        {/* Inline social proof */}
-        <div className="mt-8 space-y-3">
-          <p className="text-xs font-semibold uppercase tracking-wider text-muted-foreground">
-            Why families trust us
-          </p>
-          {TRUST.map((t) => (
-            <figure
-              key={t.name}
-              className="rounded-2xl border border-border bg-card p-4 shadow-soft"
-            >
-              <div className="flex items-center gap-1 text-ribbon">
-                {Array.from({ length: 5 }).map((_, i) => (
-                  <Star key={i} className="h-3.5 w-3.5 fill-current" />
-                ))}
-              </div>
-              <blockquote className="mt-2 text-sm leading-relaxed text-foreground">
-                &ldquo;{t.quote}&rdquo;
-              </blockquote>
-              <figcaption className="mt-2 flex items-center gap-2 text-xs text-muted-foreground">
-                <span className="font-medium text-foreground">{t.name}</span>
-                <span className="inline-flex items-center gap-1 text-success">
-                  <ShieldCheck className="h-3 w-3" /> Verified buyer
-                </span>
-              </figcaption>
-            </figure>
-          ))}
-        </div>
-
-        {/* Guarantee */}
-        <div className="mt-6 flex items-start gap-3 rounded-2xl border border-success/30 bg-success/5 p-4">
-          <ShieldCheck className="mt-0.5 h-5 w-5 shrink-0 text-success" />
-          <div>
-            <p className="text-sm font-semibold text-foreground">
-              30-day money-back guarantee
-            </p>
-            <p className="text-xs text-muted-foreground">
-              Don't love it? Email us for a full refund. No questions asked.
-            </p>
-          </div>
-        </div>
-
-        {/* Delivery note */}
-        <div className="mt-4 flex items-center justify-center gap-2 text-xs text-muted-foreground">
-          <Truck className="h-3.5 w-3.5" /> Digital delivery · No shipping fees
+        {/* Compact trust row */}
+        <div className="mt-6 flex items-center justify-center gap-4 text-xs text-muted-foreground">
+          <span className="inline-flex items-center gap-1.5">
+            <ShieldCheck className="h-3.5 w-3.5 text-success" /> 30-day refund
+          </span>
+          <span className="inline-flex items-center gap-1.5">
+            <Lock className="h-3.5 w-3.5" /> SSL encrypted
+          </span>
         </div>
       </main>
 
       {/* Mobile sticky CTA */}
       <div className="fixed inset-x-0 bottom-0 z-40 border-t border-border bg-card/95 px-5 py-3 backdrop-blur lg:hidden">
-        <StarRow compact />
         <CompleteButton
           processing={processing}
           canPay={canPay}
@@ -342,21 +195,6 @@ function CheckoutPage() {
         />
         <Legal compact />
       </div>
-    </div>
-  );
-}
-
-function StarRow({ compact }: { compact?: boolean }) {
-  return (
-    <div
-      className={`flex items-center justify-center gap-2 ${compact ? "mb-2" : "mb-3"}`}
-    >
-      <div className="flex items-center gap-0.5 text-success">
-        {Array.from({ length: 5 }).map((_, i) => (
-          <Star key={i} className="h-4 w-4 fill-current" />
-        ))}
-      </div>
-      <span className="text-sm font-bold text-foreground">1,000+</span>
     </div>
   );
 }
