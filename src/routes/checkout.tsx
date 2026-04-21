@@ -5,7 +5,9 @@ import { useQuizStore } from "@/stores/quizStore";
 import {
   ArrowLeft,
   CheckCircle2,
+  CreditCard,
   Gift,
+  Lock,
   Music2,
   Pencil,
   Play,
