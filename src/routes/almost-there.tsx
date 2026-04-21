@@ -119,10 +119,10 @@ function AlmostTherePage() {
 
         {/* CTA */}
         <button
-          onClick={() => navigate({ to: "/checkout" })}
+          onClick={() => navigate({ to: "/scratch" })}
           className="mt-8 flex w-full items-center justify-center gap-2 rounded-full bg-primary px-8 py-4 text-base font-semibold text-primary-foreground shadow-glow transition-all hover:bg-primary-hover"
         >
-          Continue to checkout <ArrowRight className="h-5 w-5" />
+          Continue <ArrowRight className="h-5 w-5" />
         </button>
         <p className="mt-3 text-center text-xs text-muted-foreground">
           Secure checkout · One-time payment · No subscription
