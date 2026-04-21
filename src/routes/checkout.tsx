@@ -2,6 +2,7 @@ import { createFileRoute, useNavigate, Link } from "@tanstack/react-router";
 import { useEffect, useMemo, useState } from "react";
 import { Logo } from "@/components/Logo";
 import { useQuizStore } from "@/stores/quizStore";
+import { supabase } from "@/integrations/supabase/client";
 import {
   ArrowLeft,
   CheckCircle2,
@@ -86,15 +87,70 @@ function CheckoutPage() {
     return d.length > 2 ? `${d.slice(0, 2)} / ${d.slice(2)}` : d;
   };
 
-  const handlePay = () => {
+  const handlePay = async () => {
     if (!canPay) return;
     setProcessing(true);
     q.set("buyer_email", email);
     q.set("buyer_name", name);
-    setTimeout(() => {
+
+    // Persist the order to Lovable Cloud. Links to current user if signed in;
+    // otherwise the row is unowned and gets auto-claimed when the user signs
+    // in later with the same email.
+    const { data: authData } = await supabase.auth.getUser();
+    const userId = authData.user?.id ?? null;
+
+    const { data: order, error } = await supabase
+      .from("orders")
+      .insert({
+        user_id: userId,
+        buyer_email: email.trim().toLowerCase(),
+        buyer_name: name,
+        recipient_name: q.recipient_name,
+        relationship: q.relationship ?? null,
+        genre: q.genre ?? null,
+        tempo: q.tempo ?? null,
+        voice: q.voice ?? null,
+        song_title_idea: q.song_title_idea || null,
+        is_gift: q.is_gift,
+        recipient_email: q.recipient_email || null,
+        delivery_date: q.delivery_date || null,
+        personal_note: q.personal_note || null,
+        has_3rd_verse: q.has_3rd_verse,
+        is_rush: q.is_rush,
+        has_unlimited_edits: q.has_unlimited_edits,
+        amount_cents: 9900,
+        currency: "USD",
+        status: "paid",
+        quiz_payload: {
+          stage: q.stage,
+          cancer_type: q.cancer_type,
+          message: q.message,
+          fighting_for: q.fighting_for,
+          signature_strength: q.signature_strength,
+          hardest_moment: q.hardest_moment,
+          what_helps_most: q.what_helps_most,
+          qualities: q.qualities,
+          inside_joke: q.inside_joke,
+          shared_memory: q.shared_memory,
+          little_things: q.little_things,
+          faith_or_beliefs: q.faith_or_beliefs,
+          personal_words: q.personal_words,
+          hope_for_them: q.hope_for_them,
+        },
+      })
+      .select("id")
+      .single();
+
+    if (error || !order) {
+      console.error("Order insert failed:", error);
+      // Still let the customer continue with a local id rather than blocking them
       q.set("orderId", crypto.randomUUID());
-      navigate({ to: "/upsell-1" });
-    }, 1100);
+    } else {
+      q.set("orderId", order.id);
+    }
+
+    setProcessing(false);
+    navigate({ to: "/upsell-1" });
   };
 
   return (
