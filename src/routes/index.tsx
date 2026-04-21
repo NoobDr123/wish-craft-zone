@@ -150,7 +150,7 @@ function LandingPage() {
             </div>
             <div className="flex items-center gap-6 pt-4 text-sm text-muted-foreground">
               <div className="flex -space-x-2">
-                {["bg-peach", "bg-ribbon/40", "bg-primary/30", "bg-success/40"].map(
+                {["bg-primary/60", "bg-primary/40", "bg-primary/30", "bg-primary/20"].map(
                   (c) => (
                     <div
                       key={c}
@@ -167,7 +167,7 @@ function LandingPage() {
           </div>
 
           <div className="relative">
-            <div className="absolute -left-6 -top-6 h-32 w-32 rounded-full bg-ribbon/20 blur-3xl" />
+            <div className="absolute -left-6 -top-6 h-32 w-32 rounded-full bg-primary/30 blur-3xl" />
             <div className="absolute -bottom-8 -right-6 h-40 w-40 rounded-full bg-primary/20 blur-3xl" />
             <div className="relative overflow-hidden rounded-[2.5rem] border border-border bg-card shadow-card">
               <img
@@ -226,8 +226,8 @@ function LandingPage() {
                 key={item.title}
                 className="rounded-3xl border border-border bg-card p-6 shadow-soft"
               >
-                <div className="mb-4 inline-flex h-10 w-10 items-center justify-center rounded-full bg-ribbon/15">
-                  <Heart className="h-5 w-5 text-ribbon" />
+                <div className="mb-4 inline-flex h-10 w-10 items-center justify-center rounded-full bg-primary/15">
+                  <Heart className="h-5 w-5 text-primary" />
                 </div>
                 <h3 className="font-display text-xl font-semibold text-foreground">
                   {item.title}
@@ -258,7 +258,7 @@ function LandingPage() {
                 key={step.title}
                 className="relative rounded-3xl border border-border bg-card p-8 shadow-soft"
               >
-                <div className="absolute -top-4 left-8 inline-flex h-8 items-center justify-center rounded-full bg-ribbon px-3 font-display text-sm text-ribbon-foreground">
+                <div className="absolute -top-4 left-8 inline-flex h-8 items-center justify-center rounded-full bg-primary px-3 font-display text-sm text-primary-foreground">
                   Step {i + 1}
                 </div>
                 <step.icon className="h-8 w-8 text-primary" />
@@ -291,7 +291,7 @@ function LandingPage() {
                 key={s.name}
                 className="flex h-full flex-col justify-between rounded-3xl border border-border bg-card p-8 shadow-soft"
               >
-                <Quote className="h-7 w-7 text-ribbon" />
+                <Quote className="h-7 w-7 text-primary" />
                 <blockquote className="mt-4 font-display text-lg leading-relaxed text-foreground">
                   &ldquo;{s.quote}&rdquo;
                 </blockquote>
