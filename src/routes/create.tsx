@@ -217,7 +217,7 @@ function CreatePage() {
       chapter: "Their fight",
       title: "What kind of cancer are they facing?",
       subtitle:
-        "We never name it in the song unless you ask , this just helps us understand.",
+        "We never name it in the song unless you ask. This just helps us understand.",
       optional: true,
       isValid: () => true,
       render: () => (
@@ -232,7 +232,7 @@ function CreatePage() {
     },
     {
       chapter: "Their fight",
-      title: `Who , or what , is ${name} fighting for?`,
+      title: `Who or what is ${name} fighting for?`,
       subtitle:
         "The people, dreams, or moments that pull them forward on the hardest days.",
       isValid: (s) => s.fighting_for.trim().length > 4,
@@ -252,7 +252,7 @@ function CreatePage() {
       chapter: "Their fight",
       title: "How do they show their strength?",
       subtitle:
-        "Strength looks different for everyone , quiet, fierce, gentle, stubborn. How does theirs show up?",
+        "Strength looks different for everyone. Quiet, fierce, gentle, stubborn. How does theirs show up?",
       isValid: (s) => s.signature_strength.trim().length > 10,
       render: () => (
         <Question label="Their kind of brave">
@@ -324,7 +324,7 @@ function CreatePage() {
       chapter: "Their soul",
       title: "Tell us a memory you'll never forget.",
       subtitle:
-        "A specific moment , the more detail, the more the song will feel like them.",
+        "A specific moment. The more detail, the more the song will feel like them.",
       isValid: (s) => s.shared_memory.trim().length > 20,
       render: () => (
         <Question label="The memory">
@@ -521,7 +521,7 @@ function CreatePage() {
     {
       chapter: "Their sound",
       title: "Got a song title in mind?",
-      subtitle: "We'll riff on it , or come up with one for you.",
+      subtitle: "We will riff on it, or come up with one for you.",
       optional: true,
       isValid: () => true,
       render: () => (
@@ -556,7 +556,7 @@ function CreatePage() {
     {
       chapter: "Delivery",
       title: "Where should we send the song?",
-      subtitle: "We'll email you when it's ready , usually within 7 days.",
+      subtitle: "We will email you when it is ready, usually within 7 days.",
       isValid: (s) => emailRe.test(s.buyer_email),
       render: () => (
         <Question label="Your email">

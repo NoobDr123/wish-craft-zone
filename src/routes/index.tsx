@@ -9,7 +9,7 @@ export const Route = createFileRoute("/")({
   component: LandingPage,
   head: () => ({
     meta: [
-      { title: "RibbonSong , A song for the one fighting cancer" },
+      { title: "RibbonSong: A song for the one fighting cancer" },
       {
         name: "description",
         content:
@@ -17,7 +17,7 @@ export const Route = createFileRoute("/")({
       },
       {
         property: "og:title",
-        content: "RibbonSong , A song for the one fighting cancer",
+        content: "RibbonSong: A song for the one fighting cancer",
       },
       {
         property: "og:description",
@@ -32,7 +32,7 @@ export const Route = createFileRoute("/")({
 
 const samples = [
   {
-    title: "For My Mother , Through Chemo",
+    title: "For My Mother (Through Chemo)",
     artist: "Acoustic Folk · Female Voice",
     src: "https://cdn.pixabay.com/audio/2022/10/30/audio_347111d654.mp3",
   },
@@ -42,12 +42,12 @@ const samples = [
     src: "https://cdn.pixabay.com/audio/2024/02/15/audio_03ca069cf8.mp3",
   },
   {
-    title: "Quiet Light , In Loving Memory",
+    title: "Quiet Light (In Loving Memory)",
     artist: "Cinematic · Strings",
     src: "https://cdn.pixabay.com/audio/2022/03/15/audio_c8c8a73467.mp3",
   },
   {
-    title: "The Promise , For Dad",
+    title: "The Promise (For Dad)",
     artist: "Country · Male Voice",
     src: "https://cdn.pixabay.com/audio/2023/06/10/audio_6c7c89a60a.mp3",
   },
