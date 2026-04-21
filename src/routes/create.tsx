@@ -652,23 +652,23 @@ function CreatePage() {
   const valid = step.isValid(q);
 
   const next = () => {
-    if (index < total - 1) setIndex((i) => i + 1);
+    if (safeIndex < total - 1) setIndex(safeIndex + 1);
     else navigate({ to: "/checkout" });
   };
-  const back = () => setIndex((i) => Math.max(0, i - 1));
+  const back = () => setIndex(Math.max(0, safeIndex - 1));
 
   return (
     <QuizShell
-      current={index + 1}
+      current={safeIndex + 1}
       total={total}
       chapter={step.chapter}
       title={step.title}
       subtitle={step.subtitle}
       onNext={next}
-      onBack={index > 0 ? back : undefined}
+      onBack={safeIndex > 0 ? back : undefined}
       isValid={valid}
       nextLabel={
-        step.nextLabel ?? (index === total - 1 ? "Finish" : "Continue")
+        step.nextLabel ?? (safeIndex === total - 1 ? "Finish" : "Continue")
       }
       optional={step.optional}
     >
