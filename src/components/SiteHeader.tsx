@@ -7,6 +7,9 @@ export function SiteHeader() {
       <div className="mx-auto flex h-16 max-w-6xl items-center justify-between px-6">
         <Logo />
         <nav className="hidden items-center gap-8 text-sm text-muted-foreground md:flex">
+          <a href="/#for-who" className="transition-colors hover:text-foreground">
+            Who it's for
+          </a>
           <a href="/#how-it-works" className="transition-colors hover:text-foreground">
             How it works
           </a>
