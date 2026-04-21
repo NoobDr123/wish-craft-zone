@@ -9,38 +9,195 @@
 // Additionally, you should also exclude this file from your linter and/or formatter to prevent it from being checked or modified.
 
 import { Route as rootRouteImport } from './routes/__root'
+import { Route as Upsell3RouteImport } from './routes/upsell-3'
+import { Route as Upsell2RouteImport } from './routes/upsell-2'
+import { Route as Upsell1RouteImport } from './routes/upsell-1'
+import { Route as ProcessingRouteImport } from './routes/processing'
+import { Route as DashboardRouteImport } from './routes/dashboard'
+import { Route as CreateRouteImport } from './routes/create'
+import { Route as CheckoutRouteImport } from './routes/checkout'
 import { Route as IndexRouteImport } from './routes/index'
+import { Route as ListenIdRouteImport } from './routes/listen.$id'
 
+const Upsell3Route = Upsell3RouteImport.update({
+  id: '/upsell-3',
+  path: '/upsell-3',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const Upsell2Route = Upsell2RouteImport.update({
+  id: '/upsell-2',
+  path: '/upsell-2',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const Upsell1Route = Upsell1RouteImport.update({
+  id: '/upsell-1',
+  path: '/upsell-1',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const ProcessingRoute = ProcessingRouteImport.update({
+  id: '/processing',
+  path: '/processing',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const DashboardRoute = DashboardRouteImport.update({
+  id: '/dashboard',
+  path: '/dashboard',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const CreateRoute = CreateRouteImport.update({
+  id: '/create',
+  path: '/create',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const CheckoutRoute = CheckoutRouteImport.update({
+  id: '/checkout',
+  path: '/checkout',
+  getParentRoute: () => rootRouteImport,
+} as any)
 const IndexRoute = IndexRouteImport.update({
   id: '/',
   path: '/',
   getParentRoute: () => rootRouteImport,
 } as any)
+const ListenIdRoute = ListenIdRouteImport.update({
+  id: '/listen/$id',
+  path: '/listen/$id',
+  getParentRoute: () => rootRouteImport,
+} as any)
 
 export interface FileRoutesByFullPath {
   '/': typeof IndexRoute
+  '/checkout': typeof CheckoutRoute
+  '/create': typeof CreateRoute
+  '/dashboard': typeof DashboardRoute
+  '/processing': typeof ProcessingRoute
+  '/upsell-1': typeof Upsell1Route
+  '/upsell-2': typeof Upsell2Route
+  '/upsell-3': typeof Upsell3Route
+  '/listen/$id': typeof ListenIdRoute
 }
 export interface FileRoutesByTo {
   '/': typeof IndexRoute
+  '/checkout': typeof CheckoutRoute
+  '/create': typeof CreateRoute
+  '/dashboard': typeof DashboardRoute
+  '/processing': typeof ProcessingRoute
+  '/upsell-1': typeof Upsell1Route
+  '/upsell-2': typeof Upsell2Route
+  '/upsell-3': typeof Upsell3Route
+  '/listen/$id': typeof ListenIdRoute
 }
 export interface FileRoutesById {
   __root__: typeof rootRouteImport
   '/': typeof IndexRoute
+  '/checkout': typeof CheckoutRoute
+  '/create': typeof CreateRoute
+  '/dashboard': typeof DashboardRoute
+  '/processing': typeof ProcessingRoute
+  '/upsell-1': typeof Upsell1Route
+  '/upsell-2': typeof Upsell2Route
+  '/upsell-3': typeof Upsell3Route
+  '/listen/$id': typeof ListenIdRoute
 }
 export interface FileRouteTypes {
   fileRoutesByFullPath: FileRoutesByFullPath
-  fullPaths: '/'
+  fullPaths:
+    | '/'
+    | '/checkout'
+    | '/create'
+    | '/dashboard'
+    | '/processing'
+    | '/upsell-1'
+    | '/upsell-2'
+    | '/upsell-3'
+    | '/listen/$id'
   fileRoutesByTo: FileRoutesByTo
-  to: '/'
-  id: '__root__' | '/'
+  to:
+    | '/'
+    | '/checkout'
+    | '/create'
+    | '/dashboard'
+    | '/processing'
+    | '/upsell-1'
+    | '/upsell-2'
+    | '/upsell-3'
+    | '/listen/$id'
+  id:
+    | '__root__'
+    | '/'
+    | '/checkout'
+    | '/create'
+    | '/dashboard'
+    | '/processing'
+    | '/upsell-1'
+    | '/upsell-2'
+    | '/upsell-3'
+    | '/listen/$id'
   fileRoutesById: FileRoutesById
 }
 export interface RootRouteChildren {
   IndexRoute: typeof IndexRoute
+  CheckoutRoute: typeof CheckoutRoute
+  CreateRoute: typeof CreateRoute
+  DashboardRoute: typeof DashboardRoute
+  ProcessingRoute: typeof ProcessingRoute
+  Upsell1Route: typeof Upsell1Route
+  Upsell2Route: typeof Upsell2Route
+  Upsell3Route: typeof Upsell3Route
+  ListenIdRoute: typeof ListenIdRoute
 }
 
 declare module '@tanstack/react-router' {
   interface FileRoutesByPath {
+    '/upsell-3': {
+      id: '/upsell-3'
+      path: '/upsell-3'
+      fullPath: '/upsell-3'
+      preLoaderRoute: typeof Upsell3RouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/upsell-2': {
+      id: '/upsell-2'
+      path: '/upsell-2'
+      fullPath: '/upsell-2'
+      preLoaderRoute: typeof Upsell2RouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/upsell-1': {
+      id: '/upsell-1'
+      path: '/upsell-1'
+      fullPath: '/upsell-1'
+      preLoaderRoute: typeof Upsell1RouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/processing': {
+      id: '/processing'
+      path: '/processing'
+      fullPath: '/processing'
+      preLoaderRoute: typeof ProcessingRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/dashboard': {
+      id: '/dashboard'
+      path: '/dashboard'
+      fullPath: '/dashboard'
+      preLoaderRoute: typeof DashboardRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/create': {
+      id: '/create'
+      path: '/create'
+      fullPath: '/create'
+      preLoaderRoute: typeof CreateRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/checkout': {
+      id: '/checkout'
+      path: '/checkout'
+      fullPath: '/checkout'
+      preLoaderRoute: typeof CheckoutRouteImport
+      parentRoute: typeof rootRouteImport
+    }
     '/': {
       id: '/'
       path: '/'
@@ -48,21 +205,27 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof IndexRouteImport
       parentRoute: typeof rootRouteImport
     }
+    '/listen/$id': {
+      id: '/listen/$id'
+      path: '/listen/$id'
+      fullPath: '/listen/$id'
+      preLoaderRoute: typeof ListenIdRouteImport
+      parentRoute: typeof rootRouteImport
+    }
   }
 }
 
 const rootRouteChildren: RootRouteChildren = {
   IndexRoute: IndexRoute,
+  CheckoutRoute: CheckoutRoute,
+  CreateRoute: CreateRoute,
+  DashboardRoute: DashboardRoute,
+  ProcessingRoute: ProcessingRoute,
+  Upsell1Route: Upsell1Route,
+  Upsell2Route: Upsell2Route,
+  Upsell3Route: Upsell3Route,
+  ListenIdRoute: ListenIdRoute,
 }
 export const routeTree = rootRouteImport
   ._addFileChildren(rootRouteChildren)
   ._addFileTypes<FileRouteTypes>()
-
-import type { getRouter } from './router.tsx'
-import type { createStart } from '@tanstack/react-start'
-declare module '@tanstack/react-start' {
-  interface Register {
-    ssr: true
-    router: Awaited<ReturnType<typeof getRouter>>
-  }
-}
