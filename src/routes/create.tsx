@@ -367,7 +367,7 @@ function CreatePage() {
           )}
         </div>
       ),
-      nextLabel: "Proceed to checkout · $39",
+      nextLabel: "Review my order",
     },
   ];
 
@@ -378,7 +378,7 @@ function CreatePage() {
 
   const next = () => {
     if (safeIndex < total - 1) setIndex(safeIndex + 1);
-    else navigate({ to: "/checkout" });
+    else navigate({ to: "/almost-there" });
   };
   const back = () => setIndex(Math.max(0, safeIndex - 1));
 
