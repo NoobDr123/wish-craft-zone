@@ -217,7 +217,7 @@ function CreatePage() {
       chapter: "Their fight",
       title: "What kind of cancer are they facing?",
       subtitle:
-        "We never name it in the song unless you ask — this just helps us understand.",
+        "We never name it in the song unless you ask , this just helps us understand.",
       optional: true,
       isValid: () => true,
       render: () => (
@@ -232,7 +232,7 @@ function CreatePage() {
     },
     {
       chapter: "Their fight",
-      title: `Who — or what — is ${name} fighting for?`,
+      title: `Who , or what , is ${name} fighting for?`,
       subtitle:
         "The people, dreams, or moments that pull them forward on the hardest days.",
       isValid: (s) => s.fighting_for.trim().length > 4,
@@ -252,7 +252,7 @@ function CreatePage() {
       chapter: "Their fight",
       title: "How do they show their strength?",
       subtitle:
-        "Strength looks different for everyone — quiet, fierce, gentle, stubborn. How does theirs show up?",
+        "Strength looks different for everyone , quiet, fierce, gentle, stubborn. How does theirs show up?",
       isValid: (s) => s.signature_strength.trim().length > 10,
       render: () => (
         <Question label="Their kind of brave">
@@ -324,7 +324,7 @@ function CreatePage() {
       chapter: "Their soul",
       title: "Tell us a memory you'll never forget.",
       subtitle:
-        "A specific moment — the more detail, the more the song will feel like them.",
+        "A specific moment , the more detail, the more the song will feel like them.",
       isValid: (s) => s.shared_memory.trim().length > 20,
       render: () => (
         <Question label="The memory">
@@ -365,7 +365,7 @@ function CreatePage() {
       render: () => (
         <Question label="Little things (optional)">
           <TextArea
-            placeholder="The gap in his front teeth when he laughs. Her perfume — Estée Lauder. The way Dad hums while he reads…"
+            placeholder="The gap in his front teeth when he laughs. Her perfume , Estée Lauder. The way Dad hums while he reads…"
             value={q.little_things}
             onChange={(e) => q.set("little_things", e.target.value)}
             maxLength={500}
@@ -417,7 +417,7 @@ function CreatePage() {
       render: () => (
         <Question label="Your words to them">
           <TextArea
-            placeholder="Mom, I don't say this enough — you are the bravest person I've ever known. Every time I hear you laugh in the next room, I remember…"
+            placeholder="Mom, I don't say this enough , you are the bravest person I've ever known. Every time I hear you laugh in the next room, I remember…"
             value={q.personal_words}
             onChange={(e) => q.set("personal_words", e.target.value)}
             maxLength={1200}
@@ -464,7 +464,7 @@ function CreatePage() {
                 "Bittersweet & honoring",
               ] as const
             }
-            // Reuse song_title_idea slot? No — store tone in personal_note? we'll just skip persistence for tone
+            // Reuse song_title_idea slot? No , store tone in personal_note? we'll just skip persistence for tone
             value={undefined}
             onChange={() => {}}
             columns={2}
@@ -521,7 +521,7 @@ function CreatePage() {
     {
       chapter: "Their sound",
       title: "Got a song title in mind?",
-      subtitle: "We'll riff on it — or come up with one for you.",
+      subtitle: "We'll riff on it , or come up with one for you.",
       optional: true,
       isValid: () => true,
       render: () => (
@@ -556,7 +556,7 @@ function CreatePage() {
     {
       chapter: "Delivery",
       title: "Where should we send the song?",
-      subtitle: "We'll email you when it's ready — usually within 7 days.",
+      subtitle: "We'll email you when it's ready , usually within 7 days.",
       isValid: (s) => emailRe.test(s.buyer_email),
       render: () => (
         <Question label="Your email">

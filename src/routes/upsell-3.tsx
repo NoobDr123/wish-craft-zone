@@ -37,7 +37,7 @@ function Upsell3() {
       highlights={[
         "Unlimited lyric and tone refinements",
         "Try a different genre or voice anytime",
-        "14 days from delivery — no rush",
+        "14 days from delivery , no rush",
       ]}
       acceptLabel="Yes, add unlimited edits · $32.99"
       declineLabel="No thanks, I trust the song you'll create"

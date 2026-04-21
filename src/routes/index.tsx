@@ -9,7 +9,7 @@ export const Route = createFileRoute("/")({
   component: LandingPage,
   head: () => ({
     meta: [
-      { title: "RibbonSong — A song for the one fighting cancer" },
+      { title: "RibbonSong , A song for the one fighting cancer" },
       {
         name: "description",
         content:
@@ -17,7 +17,7 @@ export const Route = createFileRoute("/")({
       },
       {
         property: "og:title",
-        content: "RibbonSong — A song for the one fighting cancer",
+        content: "RibbonSong , A song for the one fighting cancer",
       },
       {
         property: "og:description",
@@ -32,7 +32,7 @@ export const Route = createFileRoute("/")({
 
 const samples = [
   {
-    title: "For My Mother — Through Chemo",
+    title: "For My Mother , Through Chemo",
     artist: "Acoustic Folk · Female Voice",
     src: "https://cdn.pixabay.com/audio/2022/10/30/audio_347111d654.mp3",
   },
@@ -42,12 +42,12 @@ const samples = [
     src: "https://cdn.pixabay.com/audio/2024/02/15/audio_03ca069cf8.mp3",
   },
   {
-    title: "Quiet Light — In Loving Memory",
+    title: "Quiet Light , In Loving Memory",
     artist: "Cinematic · Strings",
     src: "https://cdn.pixabay.com/audio/2022/03/15/audio_c8c8a73467.mp3",
   },
   {
-    title: "The Promise — For Dad",
+    title: "The Promise , For Dad",
     artist: "Country · Male Voice",
     src: "https://cdn.pixabay.com/audio/2023/06/10/audio_6c7c89a60a.mp3",
   },
@@ -62,7 +62,7 @@ const steps = [
   {
     icon: Music,
     title: "Choose their sound",
-    body: "Pick a genre, tempo, and voice — from acoustic folk to country, gospel, or uplifting pop.",
+    body: "Pick a genre, tempo, and voice , from acoustic folk to country, gospel, or uplifting pop.",
   },
   {
     icon: Sparkles,
@@ -107,7 +107,7 @@ const forWho = [
   },
   {
     title: "In loving memory",
-    body: "A keepsake that holds their voice in your life — for memorials, anniversaries, and quiet nights.",
+    body: "A keepsake that holds their voice in your life , for memorials, anniversaries, and quiet nights.",
   },
 ];
 
@@ -130,7 +130,7 @@ function LandingPage() {
             </h1>
             <p className="max-w-xl text-lg leading-relaxed text-muted-foreground md:text-xl">
               A card feels too small. A bouquet wilts. RibbonSong turns your
-              memories, prayers, and love into a personal song — a keepsake for
+              memories, prayers, and love into a personal song , a keepsake for
               the one fighting, surviving, or remembered.
             </p>
             <div className="flex flex-wrap items-center gap-4">
@@ -182,7 +182,7 @@ function LandingPage() {
               <p className="font-display text-sm italic text-foreground">
                 &ldquo;The most personal gift for the bravest fighter.&rdquo;
               </p>
-              <p className="mt-1 text-xs text-muted-foreground">— Our promise</p>
+              <p className="mt-1 text-xs text-muted-foreground">, Our promise</p>
             </div>
           </div>
         </div>
@@ -318,7 +318,7 @@ function LandingPage() {
             Their spirit, captured in music.
           </h2>
           <p className="mx-auto mt-6 max-w-xl text-lg text-muted-foreground">
-            On the chemo days, the scan days, the milestone days — and the days
+            On the chemo days, the scan days, the milestone days , and the days
             we miss them most. Give them something only you could give.
           </p>
           <Link

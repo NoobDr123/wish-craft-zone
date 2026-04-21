@@ -29,14 +29,14 @@ export const Route = createRootRoute({
     meta: [
       { charSet: "utf-8" },
       { name: "viewport", content: "width=device-width, initial-scale=1" },
-      { title: "RibbonSong — Turn your love into a song" },
+      { title: "RibbonSong , Turn your love into a song" },
       {
         name: "description",
         content:
           "A deeply personal, AI-crafted song for the fighter in your life. Because sometimes words aren't enough.",
       },
       { name: "author", content: "RibbonSong" },
-      { property: "og:title", content: "RibbonSong — Turn your love into a song" },
+      { property: "og:title", content: "RibbonSong , Turn your love into a song" },
       {
         property: "og:description",
         content:
