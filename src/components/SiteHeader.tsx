@@ -17,10 +17,13 @@ export function SiteHeader() {
       />
 
       {/* Promo bar */}
-      <div className="bg-[#1F1B16] px-5 py-[11px] text-center text-[13px] font-medium tracking-[0.01em] text-[#F6F0E6]">
+      <div className="bg-[#1F1B16] px-4 py-[10px] text-center text-[12px] font-medium tracking-[0.01em] text-[#F6F0E6] sm:px-5 sm:py-[11px] sm:text-[13px]">
         <span className="mr-1.5 text-[#E5D9EF]">🎗️</span>
-        For every fighter, every survivor, every loved one. Delivered with care
-        in seven days.
+        <span className="hidden sm:inline">
+          For every fighter, every survivor, every loved one. Delivered with
+          care in seven days.
+        </span>
+        <span className="sm:hidden">Delivered with care in 7 days.</span>
         <Link
           to="/create"
           className="ml-2 border-b border-current text-[#C9A85A]"
@@ -30,60 +33,33 @@ export function SiteHeader() {
       </div>
 
       {/* Nav */}
-      <header className="sticky top-0 z-50 border-b border-[#D9CEB9] bg-[rgba(246,240,230,0.92)] py-[18px] backdrop-blur-md">
-        <div className="mx-auto flex max-w-[1200px] items-center justify-between px-6">
+      <header className="sticky top-0 z-50 border-b border-[#D9CEB9] bg-[rgba(246,240,230,0.92)] py-3 backdrop-blur-md sm:py-[18px]">
+        <div className="mx-auto flex max-w-[1200px] items-center justify-between gap-3 px-4 sm:px-6">
           <Logo />
           <nav className="hidden items-center gap-8 text-[14.5px] font-medium text-[#5A5148] md:flex">
-            <a
-              href="/#listen"
-              className="transition-colors hover:text-[#8D6FAF]"
-            >
-              Listen
-            </a>
-            <a
-              href="/#who"
-              className="transition-colors hover:text-[#8D6FAF]"
-            >
-              Who it's for
-            </a>
-            <a
-              href="/#how"
-              className="transition-colors hover:text-[#8D6FAF]"
-            >
-              How it works
-            </a>
-            <a
-              href="/#stories"
-              className="transition-colors hover:text-[#8D6FAF]"
-            >
-              Stories
-            </a>
-            <a href="/#faq" className="transition-colors hover:text-[#8D6FAF]">
-              FAQ
-            </a>
+            <a href="/#listen" className="transition-colors hover:text-[#8D6FAF]">Listen</a>
+            <a href="/#who" className="transition-colors hover:text-[#8D6FAF]">Who it's for</a>
+            <a href="/#how" className="transition-colors hover:text-[#8D6FAF]">How it works</a>
+            <a href="/#stories" className="transition-colors hover:text-[#8D6FAF]">Stories</a>
+            <a href="/#faq" className="transition-colors hover:text-[#8D6FAF]">FAQ</a>
           </nav>
-          <div className="flex items-center gap-5 text-[14.5px]">
+          <div className="flex items-center gap-3 text-[14.5px] sm:gap-5">
             {!loading &&
               (user ? (
-                <Link
-                  to="/account"
-                  className="hidden text-[#5A5148] transition-colors hover:text-[#1F1B16] sm:inline"
-                >
+                <Link to="/account" className="hidden text-[#5A5148] transition-colors hover:text-[#1F1B16] sm:inline">
                   My account
                 </Link>
               ) : (
-                <Link
-                  to="/login"
-                  className="hidden text-[#5A5148] transition-colors hover:text-[#1F1B16] sm:inline"
-                >
+                <Link to="/login" className="hidden text-[#5A5148] transition-colors hover:text-[#1F1B16] sm:inline">
                   Sign in
                 </Link>
               ))}
             <Link
               to="/create"
-              className="inline-flex items-center gap-2.5 rounded-full bg-[#8D6FAF] px-[26px] py-[14px] text-[15px] font-semibold text-[#FFF7EE] shadow-[0_6px_16px_rgba(141,111,175,0.28)] transition-all hover:-translate-y-px hover:bg-[#6B4F8A] hover:shadow-[0_10px_24px_rgba(141,111,175,0.35)]"
+              className="inline-flex shrink-0 items-center gap-2 rounded-full bg-[#8D6FAF] px-4 py-[10px] text-[13px] font-semibold text-[#FFF7EE] shadow-[0_6px_16px_rgba(141,111,175,0.28)] transition-all hover:-translate-y-px hover:bg-[#6B4F8A] hover:shadow-[0_10px_24px_rgba(141,111,175,0.35)] sm:gap-2.5 sm:px-[26px] sm:py-[14px] sm:text-[15px]"
             >
-              Start their song
+              <span className="hidden sm:inline">Start their song</span>
+              <span className="sm:hidden">Start</span>
             </Link>
           </div>
         </div>
