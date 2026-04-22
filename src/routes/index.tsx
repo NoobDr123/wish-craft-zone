@@ -1,6 +1,10 @@
 import { createFileRoute, Link } from "@tanstack/react-router";
+import { useEffect, useState } from "react";
 import { SiteHeader } from "@/components/SiteHeader";
 import { SiteFooter } from "@/components/SiteFooter";
+import { supabase } from "@/integrations/supabase/client";
+import { AudioPlayer } from "@/components/AudioPlayer";
+import { Dialog, DialogContent, DialogTitle } from "@/components/ui/dialog";
 import heroImg from "@/assets/hero-ribbon.jpg";
 import whoNewlyDiagnosed from "@/assets/who-newly-diagnosed.png";
 import whoInTreatment from "@/assets/who-in-treatment.png";
@@ -37,50 +41,74 @@ export const Route = createFileRoute("/")({
   }),
 });
 
-const samples = [
+interface FeaturedSample {
+  id: string;
+  title: string;
+  quote: string | null;
+  for_text: string | null;
+  genre_label: string;
+  cover_image_url: string | null;
+  audio_url: string | null;
+  lyrics: string | null;
+}
+
+// Fallback display data when no samples are published yet
+const fallbackSamples: Array<{
+  title: string;
+  quote: string;
+  for_text: string;
+  genre_label: string;
+  cover_image_url: string;
+}> = [
   {
     title: "For My Mother (Through Chemo)",
     quote:
       '"She used to sing us to sleep. I wanted something she could play when she\'s scared."',
-    forText: "Written for Diane, 58. Breast cancer, in treatment.",
-    genre: "Acoustic Folk · Female Voice",
-    img: "https://images.unsplash.com/photo-1508214751196-bcfd4ca60f91?auto=format&fit=crop&w=600&q=80",
+    for_text: "Written for Diane, 58. Breast cancer, in treatment.",
+    genre_label: "Acoustic Folk · Female Voice",
+    cover_image_url:
+      "https://images.unsplash.com/photo-1508214751196-bcfd4ca60f91?auto=format&fit=crop&w=600&q=80",
   },
   {
     title: "Stronger Than the Storm",
     quote: '"My son asks for it every time we get a clear scan."',
-    forText: "Written for James, 12. Leukemia, in remission.",
-    genre: "Uplifting Pop · Male Voice",
-    img: "https://images.unsplash.com/photo-1503454537195-1dcabb73ffb9?auto=format&fit=crop&w=600&q=80",
+    for_text: "Written for James, 12. Leukemia, in remission.",
+    genre_label: "Uplifting Pop · Male Voice",
+    cover_image_url:
+      "https://images.unsplash.com/photo-1503454537195-1dcabb73ffb9?auto=format&fit=crop&w=600&q=80",
   },
   {
     title: "Quiet Light (In Loving Memory)",
     quote: '"We played it at her memorial instead of a hymn. It was her."',
-    forText: "Written for Eleanor, 71. Ovarian cancer, in loving memory.",
-    genre: "Cinematic · Strings",
-    img: "https://images.unsplash.com/photo-1544005313-94ddf0286df2?auto=format&fit=crop&w=600&q=80",
+    for_text: "Written for Eleanor, 71. Ovarian cancer, in loving memory.",
+    genre_label: "Cinematic · Strings",
+    cover_image_url:
+      "https://images.unsplash.com/photo-1544005313-94ddf0286df2?auto=format&fit=crop&w=600&q=80",
   },
   {
     title: "The Promise (For Dad)",
     quote: '"I gave it to him in hospice. He played it three times in a row."',
-    forText: "Written for Tom, 64. Stage IV pancreatic.",
-    genre: "Country · Male Voice",
-    img: "https://images.unsplash.com/photo-1507003211169-0a1dd7228f2d?auto=format&fit=crop&w=600&q=80",
+    for_text: "Written for Tom, 64. Stage IV pancreatic.",
+    genre_label: "Country · Male Voice",
+    cover_image_url:
+      "https://images.unsplash.com/photo-1507003211169-0a1dd7228f2d?auto=format&fit=crop&w=600&q=80",
   },
   {
     title: "Rachel's Anthem",
     quote: '"Two years free of cancer. We play it at every birthday now."',
-    forText: "Written for Rachel, 34. Breast cancer, survivor.",
-    genre: "Gospel · Female Voice",
-    img: "https://images.unsplash.com/photo-1531123897727-8f129e1688ce?auto=format&fit=crop&w=600&q=80",
+    for_text: "Written for Rachel, 34. Breast cancer, survivor.",
+    genre_label: "Gospel · Female Voice",
+    cover_image_url:
+      "https://images.unsplash.com/photo-1531123897727-8f129e1688ce?auto=format&fit=crop&w=600&q=80",
   },
   {
     title: "Carry Me Home",
     quote:
       '"My husband\'s prayer set to music. The choir at his service sang it."',
-    forText: "Written for David, 52. Glioblastoma, in loving memory.",
-    genre: "Worship · Duet",
-    img: "https://images.unsplash.com/photo-1518976024611-28bf4b48222e?auto=format&fit=crop&w=600&q=80",
+    for_text: "Written for David, 52. Glioblastoma, in loving memory.",
+    genre_label: "Worship · Duet",
+    cover_image_url:
+      "https://images.unsplash.com/photo-1518976024611-28bf4b48222e?auto=format&fit=crop&w=600&q=80",
   },
 ];
 
@@ -312,6 +340,41 @@ function Eyebrow({
 }
 
 function LandingPage() {
+  const [samples, setSamples] = useState<FeaturedSample[]>([]);
+  const [activeSample, setActiveSample] = useState<FeaturedSample | null>(null);
+
+  useEffect(() => {
+    let mounted = true;
+    supabase
+      .from("featured_samples")
+      .select("id,title,quote,for_text,genre_label,cover_image_url,audio_url,lyrics")
+      .eq("published", true)
+      .not("audio_url", "is", null)
+      .order("sort_order", { ascending: true })
+      .limit(6)
+      .then(({ data }) => {
+        if (mounted && data) setSamples(data as FeaturedSample[]);
+      });
+    return () => {
+      mounted = false;
+    };
+  }, []);
+
+  // Choose displayed list — real samples if available, otherwise the fallback set
+  const displaySamples =
+    samples.length > 0
+      ? samples
+      : (fallbackSamples.map((s, i) => ({
+          id: `fallback-${i}`,
+          title: s.title,
+          quote: s.quote,
+          for_text: s.for_text,
+          genre_label: s.genre_label,
+          cover_image_url: s.cover_image_url,
+          audio_url: null,
+          lyrics: null,
+        })) satisfies FeaturedSample[]);
+
   return (
     <div className="overflow-x-hidden bg-[#F6F0E6] font-sans text-[#1F1B16]">
       <SiteHeader />
@@ -440,77 +503,91 @@ function LandingPage() {
             <span className="font-display text-[17px] font-semibold tracking-[-0.01em] text-[#5A5148] opacity-70 transition-opacity hover:opacity-100 md:text-[20px]">
               People
             </span>
-            <span className="font-sans text-[13px] font-bold uppercase tracking-[0.12em] text-[#5A5148] opacity-70 transition-opacity hover:opacity-100 md:text-[15px]">
-              FOX
-            </span>
-            <span className="font-display text-[17px] font-semibold tracking-[-0.01em] text-[#5A5148] opacity-70 transition-opacity hover:opacity-100 md:text-[20px]">
+            <span className="font-display text-[16px] italic font-medium tracking-[-0.005em] text-[#5A5148] opacity-70 transition-opacity hover:opacity-100 md:text-[18px]">
               Good Morning America
             </span>
-            <span className="font-sans text-[13px] font-bold uppercase tracking-[0.12em] text-[#5A5148] opacity-70 transition-opacity hover:opacity-100 md:text-[15px]">
-              Survivornet
+            <span className="font-sans text-[12.5px] font-bold uppercase tracking-[0.18em] text-[#5A5148] opacity-70 transition-opacity hover:opacity-100 md:text-[14px]">
+              TODAY
             </span>
-            <span className="font-display text-[17px] font-semibold tracking-[-0.01em] text-[#5A5148] opacity-70 transition-opacity hover:opacity-100 md:text-[20px]">
-              Yahoo Life
+            <span className="font-display text-[16px] italic font-medium tracking-[-0.005em] text-[#5A5148] opacity-70 transition-opacity hover:opacity-100 md:text-[18px]">
+              The Cut
             </span>
           </div>
         </div>
       </div>
 
-      {/* LISTEN */}
+      {/* LISTEN SECTION */}
       <section id="listen" className="px-0 py-[64px] md:py-[100px]">
         <div className="mx-auto max-w-[1200px] px-5 sm:px-6">
           <div className="mx-auto mb-10 max-w-[720px] text-center md:mb-14">
-            <Eyebrow center>Listen</Eyebrow>
+            <Eyebrow center>Listen first</Eyebrow>
             <h2 className="mb-3.5 font-display text-[clamp(28px,7vw,48px)] font-medium leading-[1.1] tracking-[-0.022em] text-[#1F1B16]">
-              <em className="italic text-[#8D6FAF]">real families.</em>
+              Real songs, written for{" "}
+              <em className="italic text-[#8D6FAF]">real people.</em>
             </h2>
             <p className="mx-auto mt-3.5 max-w-[560px] text-[17px] leading-[1.55] text-[#5A5148]">
-              Every song below was written for one real person, fighting one
-              real cancer, by their family. No templates. No two alike.
+              Press play on a few. Some are anthems. Some are lullabies. Some
+              are goodbyes. Each one was someone's love put to music.
             </p>
           </div>
 
-          <div className="grid grid-cols-1 gap-5 md:grid-cols-2 lg:grid-cols-3">
-            {samples.map((s) => (
-              <div
-                key={s.title}
-                className="group cursor-pointer overflow-hidden rounded-[14px] border border-[#D9CEB9] bg-[#FBF6EC] transition-all hover:-translate-y-1 hover:shadow-[0_8px_24px_rgba(31,27,22,0.08)]"
+          <div className="grid grid-cols-1 gap-5 sm:grid-cols-2 lg:grid-cols-3">
+            {displaySamples.map((s) => (
+              <button
+                key={s.id}
+                onClick={() => s.audio_url && setActiveSample(s)}
+                disabled={!s.audio_url}
+                className="group relative flex flex-col overflow-hidden rounded-[16px] border border-[#D9CEB9] bg-[#FBF6EC] text-left transition-all hover:-translate-y-[3px] hover:shadow-[0_8px_24px_rgba(31,27,22,0.08)] disabled:cursor-default"
               >
-                <div className="relative aspect-[16/10] overflow-hidden bg-[#ECE2D0]">
-                  <img
-                    src={s.img}
-                    alt=""
-                    loading="lazy"
-                    className="h-full w-full object-cover transition-transform duration-500 group-hover:scale-105"
-                  />
-                  <div className="absolute bottom-3 left-3 flex h-10 w-10 items-center justify-center rounded-full bg-[rgba(246,240,230,0.95)]">
-                    <span
-                      className="ml-[3px] inline-block"
-                      style={{
-                        width: 0,
-                        height: 0,
-                        borderLeft: "10px solid #8D6FAF",
-                        borderTop: "6px solid transparent",
-                        borderBottom: "6px solid transparent",
-                      }}
+                <div className="relative aspect-[5/4] overflow-hidden bg-[#ECE2D0]">
+                  {s.cover_image_url && (
+                    <img
+                      src={s.cover_image_url}
+                      alt=""
+                      loading="lazy"
+                      className="h-full w-full object-cover transition-transform duration-700 group-hover:scale-[1.03]"
                     />
-                  </div>
-                  <div className="absolute right-3 top-3 rounded-full bg-[rgba(31,27,22,0.82)] px-2.5 py-[5px] text-[11px] font-medium tracking-[0.03em] text-[#F6F0E6] backdrop-blur-sm">
-                    {s.genre}
-                  </div>
+                  )}
+                  {s.audio_url ? (
+                    <div className="absolute inset-0 flex items-center justify-center bg-[rgba(31,27,22,0.0)] transition-colors group-hover:bg-[rgba(31,27,22,0.25)]">
+                      <span className="flex h-14 w-14 items-center justify-center rounded-full bg-[rgba(246,240,230,0.95)] shadow-[0_6px_18px_rgba(0,0,0,0.25)] transition-transform group-hover:scale-110">
+                        <span
+                          className="ml-1 inline-block"
+                          style={{
+                            width: 0,
+                            height: 0,
+                            borderLeft: "13px solid #8D6FAF",
+                            borderTop: "8px solid transparent",
+                            borderBottom: "8px solid transparent",
+                          }}
+                        />
+                      </span>
+                    </div>
+                  ) : (
+                    <div className="absolute right-3 top-3 rounded-full bg-[rgba(31,27,22,0.7)] px-2.5 py-1 text-[10px] font-semibold uppercase tracking-[0.12em] text-[#F6F0E6]">
+                      Coming soon
+                    </div>
+                  )}
                 </div>
-                <div className="p-[20px_22px_22px]">
-                  <h3 className="mb-2.5 font-display text-[20px] font-medium leading-[1.2] tracking-[-0.01em] text-[#1F1B16]">
+                <div className="flex flex-1 flex-col p-[20px_22px_22px]">
+                  <h3 className="mb-2 font-display text-[19px] font-medium leading-[1.25] tracking-[-0.01em] text-[#1F1B16] md:text-[20px]">
                     {s.title}
                   </h3>
-                  <div className="mb-3.5 border-l-2 border-[#E5D9EF] pl-3 text-[14.5px] italic leading-[1.5] text-[#5A5148]">
-                    {s.quote}
-                  </div>
-                  <div className="border-t border-[#D9CEB9] pt-3 text-[12.5px] text-[#8A8175]">
-                    {s.forText}
+                  {s.quote && (
+                    <p className="mb-3 text-[14px] italic leading-[1.55] text-[#5A5148]">
+                      {s.quote}
+                    </p>
+                  )}
+                  {s.for_text && (
+                    <div className="mt-auto pt-2 text-[12px] leading-[1.5] text-[#8A8175]">
+                      {s.for_text}
+                    </div>
+                  )}
+                  <div className="mt-2 text-[11px] font-semibold uppercase tracking-[0.12em] text-[#8D6FAF]">
+                    {s.genre_label}
                   </div>
                 </div>
-              </div>
+              </button>
             ))}
           </div>
 
@@ -600,284 +677,44 @@ function LandingPage() {
                 n: "02",
                 h: "We write and record.",
                 p: "You pick the genre, the tempo, and the voice. Or let us recommend based on the story you shared. Acoustic folk, country, gospel, worship, uplifting pop, or cinematic strings.",
-                m: "Produced to the same quality you hear on the radio.",
+                m: "Real production. Real arrangement. Built to be played, not just heard.",
               },
               {
                 n: "03",
                 h: "Delivered to your inbox.",
-                p: "Within seven days. MP3 and WAV files, a printable lyric sheet, and a private share page they can keep forever.",
-                m: "If the first version doesn't feel like them, we rewrite it. Always free.",
+                p: "In seven days. Streaming and downloadable, yours forever. Share it, give it, play it at the bedside, the church, the memorial, or the kitchen sink.",
+                m: "If it doesn't feel right, we rewrite it free. Or refund you in full. No questions.",
               },
-            ].map((step) => (
-              <div key={step.n}>
-                <div className="mb-3.5 font-display text-[76px] font-medium italic leading-none tracking-[-0.02em] text-[#8D6FAF] opacity-35">
-                  {step.n}
+            ].map((s) => (
+              <div key={s.n} className="relative">
+                <div className="mb-4 font-display text-[44px] font-light leading-none text-[#8D6FAF] md:text-[52px]">
+                  {s.n}
                 </div>
-                <h3 className="mb-3 font-display text-[26px] font-medium leading-[1.15] tracking-[-0.015em] text-[#1F1B16]">
-                  {step.h}
+                <h3 className="mb-2.5 font-display text-[22px] font-medium leading-[1.2] tracking-[-0.01em] text-[#1F1B16] md:text-[24px]">
+                  {s.h}
                 </h3>
-                <p className="text-[15.5px] leading-[1.6] text-[#5A5148]">
-                  {step.p}
+                <p className="mb-3 text-[15px] leading-[1.6] text-[#5A5148] md:text-[15.5px]">
+                  {s.p}
                 </p>
-                <div className="mt-3 text-[13px] italic text-[#8A8175]">
-                  {step.m}
-                </div>
-              </div>
-            ))}
-          </div>
-        </div>
-      </section>
-
-      {/* OBJECTION */}
-      <section className="relative overflow-hidden bg-[#1F1B16] px-0 py-[60px] text-[#F6F0E6] md:py-[80px]">
-        <div
-          className="absolute -left-12 -top-12 h-[300px] w-[300px] opacity-[0.22]"
-          style={{
-            background:
-              "radial-gradient(circle, #8D6FAF 0%, transparent 70%)",
-          }}
-        />
-        <div className="relative z-10 mx-auto max-w-[920px] px-5 sm:px-6">
-          <div className="mb-[18px] inline-flex items-center gap-2 text-[11px] font-semibold uppercase tracking-[0.16em] text-[#E5D9EF] md:mb-[22px] md:text-[11.5px]">
-            <span className="h-1.5 w-1.5 rounded-full bg-[#E5D9EF]" />
-            You don't have to find the words
-          </div>
-          <h2 className="mb-6 font-display text-[clamp(26px,6.5vw,44px)] font-normal italic leading-[1.15] tracking-[-0.015em] text-[#F6F0E6] md:mb-7">
-            "I'm not a songwriter. I don't even know what to say."{" "}
-            <em className="font-medium not-italic text-[#E5D9EF]">Good.</em>
-          </h2>
-          <p className="mb-5 max-w-[640px] text-[17.5px] leading-[1.65] text-[rgba(246,240,230,0.78)]">
-            That's the whole reason this exists.
-          </p>
-          <p className="mb-5 max-w-[640px] text-[17.5px] leading-[1.65] text-[rgba(246,240,230,0.78)]">
-            Most families come to us unsure of what to say, because cancer has
-            a way of making even love hard to put into words. So we built our
-            story questionnaire to do the remembering for you. The prompts
-            bring the right memories up on their own. You don't have to find
-            them. You just have to answer them.
-          </p>
-          <p className="mb-5 max-w-[640px] text-[17.5px] leading-[1.65] text-[rgba(246,240,230,0.78)]">
-            <strong className="font-semibold text-[#F6F0E6]">
-              Families tell us this part alone, answering the questions, is
-              already a gift.
-            </strong>{" "}
-            Some print them out just to keep.
-          </p>
-          <p className="mb-5 max-w-[640px] text-[17.5px] leading-[1.65] text-[rgba(246,240,230,0.78)]">
-            The only thing you have to bring is the love. You already have
-            that.
-          </p>
-          <Link
-            to="/create"
-            className="group mt-4 inline-flex items-center gap-2.5 rounded-full bg-[#F6F0E6] px-[34px] py-[18px] text-[16.5px] font-semibold text-[#1F1B16] transition-all hover:-translate-y-px hover:bg-[#E5D9EF]"
-          >
-            Start their song
-            <span className="transition-transform group-hover:translate-x-1">
-              →
-            </span>
-          </Link>
-        </div>
-      </section>
-
-      {/* WHAT YOU GET */}
-      <section className="px-0 py-[64px] md:py-[100px]">
-        <div className="mx-auto max-w-[1200px] px-5 sm:px-6">
-          <div className="grid items-center gap-10 md:grid-cols-2 md:gap-[60px]">
-            <div>
-              <Eyebrow>What you get</Eyebrow>
-              <h2 className="mb-6 font-display text-[clamp(28px,7vw,48px)] font-medium leading-[1.1] tracking-[-0.022em] text-[#1F1B16]">
-                Exactly what{" "}
-                <em className="italic text-[#8D6FAF]">arrives in your inbox.</em>
-              </h2>
-              <ul className="list-none">
-                {[
-                  {
-                    s: "A studio quality song",
-                    d: "MP3 and WAV files. Ready to play on any device. Phone, car, speaker.",
-                  },
-                  {
-                    s: "A printable lyric sheet",
-                    d: "Designed like a keepsake. Beautifully typeset PDF.",
-                  },
-                  {
-                    s: "A private share page",
-                    d: "Hidden from search. Keeps the full story behind the song.",
-                  },
-                  {
-                    s: "A free revision",
-                    d: "If the first version doesn't feel like them, we rewrite it.",
-                  },
-                  {
-                    s: "Yours forever",
-                    d: "No subscription. No paywall. No ads. Ever.",
-                  },
-                ].map((b, i, arr) => (
-                  <li
-                    key={b.s}
-                    className={`flex items-start gap-3.5 py-4 text-[16px] text-[#1F1B16] ${
-                      i === 0 ? "pt-0" : ""
-                    } ${
-                      i === arr.length - 1
-                        ? ""
-                        : "border-b border-[#D9CEB9]"
-                    }`}
-                  >
-                    <div className="mt-[1px] flex h-6 w-6 shrink-0 items-center justify-center rounded-full bg-[#8D6FAF]">
-                      <span
-                        className="block"
-                        style={{
-                          width: "5px",
-                          height: "9px",
-                          border: "solid #F6F0E6",
-                          borderWidth: "0 2px 2px 0",
-                          transform: "rotate(45deg) translate(-1px, -1px)",
-                        }}
-                      />
-                    </div>
-                    <div>
-                      <strong className="mb-0.5 block font-semibold">
-                        {b.s}
-                      </strong>
-                      <div className="mt-0.5 text-[13.5px] font-normal text-[#8A8175]">
-                        {b.d}
-                      </div>
-                    </div>
-                  </li>
-                ))}
-              </ul>
-            </div>
-
-            {/* Deliverable visual */}
-            <div className="rounded-[14px] bg-[#ECE2D0] p-9 shadow-[0_8px_24px_rgba(31,27,22,0.08)]">
-              <div className="mb-[18px] rounded-[12px] border border-[#D9CEB9] bg-[#FBF6EC] p-[22px] shadow-[0_2px_8px_rgba(31,27,22,0.06)]">
-                <div className="mb-3.5 flex items-center justify-between border-b border-[#D9CEB9] pb-3 text-[12px] text-[#8A8175]">
-                  <span>from RibbonSong</span>
-                  <span>today, 2:14 PM</span>
-                </div>
-                <div className="mb-2.5 font-display text-[20px] font-medium italic leading-[1.2] text-[#1F1B16]">
-                  Your song for Diane is ready 🎗️
-                </div>
-                <div className="text-[13.5px] leading-[1.5] text-[#5A5148]">
-                  Hi Rachel, we finished "For My Mother (Through Chemo)."
-                  Listen below, download your files, and find the private share
-                  page inside. We made something beautiful for her.
-                </div>
-              </div>
-              <div className="flex items-center gap-4 rounded-[14px] bg-[#1F1B16] p-[20px_22px] text-[#F6F0E6]">
-                <div className="flex h-[46px] w-[46px] shrink-0 items-center justify-center rounded-full bg-[#8D6FAF]">
-                  <span
-                    className="ml-[3px] inline-block"
-                    style={{
-                      width: 0,
-                      height: 0,
-                      borderLeft: "10px solid #F6F0E6",
-                      borderTop: "7px solid transparent",
-                      borderBottom: "7px solid transparent",
-                    }}
-                  />
-                </div>
-                <div className="min-w-0 flex-1">
-                  <div className="mb-0.5 font-display text-[15px] font-medium">
-                    For My Mother (Through Chemo)
-                  </div>
-                  <div className="text-[11.5px] text-[rgba(246,240,230,0.6)]">
-                    Acoustic Folk · 3:42
-                  </div>
-                </div>
-                <div className="flex h-7 flex-1 items-center gap-[2px]">
-                  {[10, 16, 22, 14, 20, 26, 18, 24, 12, 20, 28, 15, 22, 18, 14, 20, 26, 11, 18, 22, 14, 10, 16, 12].map(
-                    (h, i) => (
-                      <div
-                        key={i}
-                        className="flex-1 rounded-[1px]"
-                        style={{
-                          height: `${h}px`,
-                          background: i < 12 ? "#8D6FAF" : "#E5D9EF",
-                          opacity: i < 12 ? 1 : 0.4,
-                        }}
-                      />
-                    ),
-                  )}
-                </div>
-              </div>
-            </div>
-          </div>
-        </div>
-      </section>
-
-      {/* HOW IT'S MADE */}
-      <section className="bg-[#ECE2D0] px-0 py-[64px] md:py-[100px]">
-        <div className="mx-auto max-w-[1200px] px-5 sm:px-6">
-          <div className="mb-10 max-w-[720px] md:mb-14">
-            <Eyebrow>Made with care</Eyebrow>
-            <h2 className="mb-3.5 font-display text-[clamp(28px,7vw,48px)] font-medium leading-[1.1] tracking-[-0.022em] text-[#1F1B16]">
-              How your song <em className="italic text-[#8D6FAF]">comes together.</em>
-            </h2>
-            <p className="max-w-[560px] text-[17px] leading-[1.55] text-[#5A5148]">
-              Every RibbonSong moves through a careful creative process.
-              Nothing is automated. Nothing is rushed. Every detail is paid
-              attention to, because we know what's riding on it.
-            </p>
-          </div>
-
-          <div className="mt-12 grid grid-cols-1 gap-7 md:grid-cols-3">
-            {[
-              {
-                role: "The Story",
-                h: "Someone sits with your words.",
-                p: "Before a single note is written, someone reads everything you shared. They take the time to find the line that matters most, then build the rest of the song around it.",
-              },
-              {
-                role: "The Sound",
-                h: "Shaped to fit the person it's for.",
-                p: "You pick the genre, the tempo, and the voice. The song is produced to the same quality you hear on the radio. If your story calls for strings, it gets strings. If it calls for gospel, it gets gospel.",
-              },
-              {
-                role: "The Final Listen",
-                h: "It passes through our team before it reaches you.",
-                p: "Before anything leaves our studio, someone listens to the full song from beginning to end. If something doesn't feel right, we catch it. If you tell us something doesn't feel right, we fix it.",
-              },
-            ].map((m) => (
-              <div
-                key={m.role}
-                className="rounded-[14px] border border-[#D9CEB9] bg-[#FBF6EC] p-[32px_28px]"
-              >
-                <div className="mb-4 text-[11.5px] font-semibold uppercase tracking-[0.14em] text-[#8D6FAF]">
-                  {m.role}
-                </div>
-                <h3 className="mb-3.5 font-display text-[22px] font-medium leading-[1.2] tracking-[-0.015em] text-[#1F1B16]">
-                  {m.h}
-                </h3>
-                <p className="text-[14.5px] leading-[1.6] text-[#5A5148]">
-                  {m.p}
+                <p className="text-[13.5px] italic leading-[1.55] text-[#8A8175]">
+                  {s.m}
                 </p>
               </div>
             ))}
-          </div>
-
-          <div className="mt-12 flex items-center gap-5 rounded-[14px] bg-[#1F1B16] px-9 py-7 text-[#F6F0E6]">
-            <div className="shrink-0 text-[32px]">🎗️</div>
-            <p className="font-display text-[19px] italic leading-[1.45] tracking-[-0.01em]">
-              We built RibbonSong to hold what language alone cannot. We know
-              what's riding on every song we send. This is not a sweatshirt.
-            </p>
           </div>
         </div>
       </section>
 
       {/* TESTIMONIALS */}
-      <section id="stories" className="px-0 py-[64px] md:py-[100px]">
+      <section id="stories" className="bg-[#ECE2D0] px-0 py-[64px] md:py-[100px]">
         <div className="mx-auto max-w-[1200px] px-5 sm:px-6">
-          <div className="mb-10 max-w-[720px] md:mb-14">
-            <Eyebrow>Stories from families</Eyebrow>
+          <div className="mx-auto mb-10 max-w-[720px] text-center md:mb-14">
+            <Eyebrow center>Real families</Eyebrow>
             <h2 className="mb-3.5 font-display text-[clamp(28px,7vw,48px)] font-medium leading-[1.1] tracking-[-0.022em] text-[#1F1B16]">
-              2,400+ families.{" "}
-              <em className="italic text-[#8D6FAF]">Here's what they said.</em>
+              <em className="italic text-[#8D6FAF]">2,400+</em> songs delivered.
+              <br />
+              Each one held something a card couldn't.
             </h2>
-            <p className="max-w-[560px] text-[17px] leading-[1.55] text-[#5A5148]">
-              The best way to know what you're getting is to hear from the
-              families who already gave one.
-            </p>
           </div>
 
           <div className="grid grid-cols-1 gap-5 sm:grid-cols-2 lg:grid-cols-3">
@@ -885,175 +722,115 @@ function LandingPage() {
               t.type === "text" ? (
                 <div
                   key={i}
-                  className="flex flex-col justify-between rounded-[14px] border border-[#D9CEB9] bg-[#FBF6EC] p-[28px_26px]"
+                  className="flex flex-col rounded-[16px] border border-[#D9CEB9] bg-[#FBF6EC] p-[26px_24px]"
                 >
-                  <div>
-                    <div className="mb-3.5 text-[14px] tracking-[2px] text-[#C9A85A]">
-                      ★★★★★
-                    </div>
-                    <blockquote className="mb-[22px] font-display text-[17px] italic leading-[1.45] tracking-[-0.005em] text-[#1F1B16]">
-                      {t.quote}
-                    </blockquote>
-                  </div>
-                  <div className="flex items-center gap-3 border-t border-[#D9CEB9] pt-[18px]">
+                  <p className="mb-5 flex-1 text-[15px] leading-[1.6] text-[#1F1B16]">
+                    {t.quote}
+                  </p>
+                  <div className="flex items-center gap-3 border-t border-[#D9CEB9] pt-4">
                     <img
                       src={t.avatar}
                       alt=""
+                      loading="lazy"
                       className="h-10 w-10 rounded-full object-cover"
                     />
-                    <div className="text-[13px] leading-[1.35]">
-                      <strong className="block font-semibold text-[#1F1B16]">
+                    <div>
+                      <div className="text-[13.5px] font-semibold text-[#1F1B16]">
                         {t.name}
-                      </strong>
-                      <span className="text-[12px] text-[#8A8175]">
-                        {t.meta}
-                      </span>
+                      </div>
+                      <div className="text-[12px] text-[#8A8175]">{t.meta}</div>
                     </div>
                   </div>
                 </div>
               ) : (
                 <div
                   key={i}
-                  className="relative aspect-[4/5] min-h-[320px] overflow-hidden rounded-[14px]"
+                  className="relative aspect-[4/5] overflow-hidden rounded-[16px] bg-[#1F1B16]"
                 >
                   <img
                     src={t.img}
                     alt=""
                     loading="lazy"
-                    className="h-full w-full object-cover"
+                    className="h-full w-full object-cover opacity-90"
                   />
-                  <div
-                    className="absolute inset-0"
-                    style={{
-                      background:
-                        "linear-gradient(to top, rgba(31,27,22,0.88) 0%, transparent 55%)",
-                    }}
-                  />
-                  <div className="absolute right-4 top-4 z-10 flex h-9 w-9 items-center justify-center rounded-full bg-[rgba(246,240,230,0.95)]">
+                  <button
+                    aria-label="Play video"
+                    className="absolute left-1/2 top-1/2 flex h-14 w-14 -translate-x-1/2 -translate-y-1/2 items-center justify-center rounded-full bg-[rgba(246,240,230,0.95)] shadow-[0_8px_24px_rgba(0,0,0,0.35)]"
+                  >
                     <span
-                      className="ml-[2px] inline-block"
+                      className="ml-1 inline-block"
                       style={{
                         width: 0,
                         height: 0,
-                        borderLeft: "9px solid #8D6FAF",
-                        borderTop: "5.5px solid transparent",
-                        borderBottom: "5.5px solid transparent",
+                        borderLeft: "13px solid #8D6FAF",
+                        borderTop: "8px solid transparent",
+                        borderBottom: "8px solid transparent",
                       }}
                     />
-                  </div>
-                  <div className="absolute inset-x-5 bottom-5 z-10 text-[#F6F0E6]">
-                    <div className="mb-1.5 font-display text-[17px] font-medium">
+                  </button>
+                  <div className="absolute inset-x-4 bottom-4 text-[13px] leading-[1.4] text-[#F6F0E6]">
+                    <strong className="block text-[10.5px] font-semibold uppercase tracking-[0.12em] text-[#E5D9EF]">
                       {t.song}
-                    </div>
-                    <div className="text-[12px] text-[rgba(246,240,230,0.78)]">
-                      {t.who}
-                    </div>
+                    </strong>
+                    {t.who}
                   </div>
                 </div>
               ),
             )}
           </div>
-
-          <div className="mt-12 text-center">
-            <a
-              href="#stories"
-              className="border-b border-current pb-0.5 text-[15px] font-semibold text-[#8D6FAF]"
-            >
-              Read all 2,400+ reviews
-            </a>
-          </div>
         </div>
       </section>
 
       {/* GUARANTEE */}
-      <section className="bg-[#ECE2D0] px-0 py-[64px] md:py-[100px]">
-        <div className="mx-auto max-w-[1200px] px-5 sm:px-6">
-          <div className="relative mx-auto max-w-[820px] rounded-[14px] border-2 border-[#8D6FAF] bg-[#FBF6EC] p-[44px_24px_32px] text-center sm:p-[52px_56px]">
-            <div className="absolute -top-6 left-1/2 -translate-x-1/2 whitespace-nowrap rounded-full bg-[#8D6FAF] px-4 py-2 text-[10.5px] font-semibold uppercase tracking-[0.1em] text-[#F6F0E6] sm:-top-7 sm:px-6 sm:py-2.5 sm:text-[12px]">
-              Our promise to you
+      <section className="px-0 py-[64px] md:py-[100px]">
+        <div className="mx-auto max-w-[820px] px-5 sm:px-6">
+          <div className="rounded-[20px] border-2 border-[#1F1B16] bg-[#FBF6EC] p-[40px_32px] text-center md:p-[60px_56px]">
+            <div className="mx-auto mb-5 inline-flex items-center gap-2 text-[11px] font-semibold uppercase tracking-[0.18em] text-[#8D6FAF]">
+              <span className="h-1.5 w-1.5 rounded-full bg-[#8D6FAF]" />
+              Our promise
             </div>
-            <h2 className="mb-[18px] font-display text-[clamp(24px,6vw,38px)] font-medium leading-[1.2] tracking-[-0.018em]">
-              If it doesn't feel like{" "}
-              <em className="italic text-[#8D6FAF]">them</em>, we rewrite it.
-              Until it does.
-            </h2>
-            <p className="mx-auto mb-4 max-w-[620px] text-[15.5px] leading-[1.6] text-[#5A5148] md:text-[17px]">
-              If the first version of the song doesn't feel like the person
-              you love, not "isn't good enough," but doesn't feel like them, we
-              rewrite it. Free. As many times as it takes.
-            </p>
-            <p className="mx-auto mb-4 max-w-[620px] text-[15.5px] leading-[1.6] text-[#5A5148] md:text-[17px]">
-              And if after all of that it still isn't right, we refund you in
-              full. No questions. No forms. No argument.
-            </p>
-            <div className="mt-[26px] font-display text-[16.5px] italic leading-[1.4] text-[#8D6FAF] md:text-[18px]">
-              You cannot lose money on this.
+            <h2 className="mb-5 font-display text-[clamp(26px,5.5vw,38px)] font-medium leading-[1.18] tracking-[-0.018em] text-[#1F1B16]">
+              If it doesn't feel right,{" "}
+              <em className="italic text-[#8D6FAF]">we rewrite it.</em>
               <br />
-              The only thing you can do is give them something nobody else in
-              the world could give them.
-            </div>
-          </div>
-        </div>
-      </section>
-
-      {/* BEGIN BLOCK */}
-      <section id="begin" className="relative overflow-hidden px-0 py-[64px] text-center md:py-[100px]">
-        <div
-          className="pointer-events-none absolute left-1/2 top-1/2 h-[520px] w-[520px] -translate-x-1/2 -translate-y-1/2 opacity-50"
-          style={{
-            background:
-              "radial-gradient(circle, #E5D9EF 0%, transparent 70%)",
-          }}
-        />
-        <div className="relative z-10 mx-auto max-w-[920px] px-5 sm:px-6">
-          <Eyebrow center>Ready when you are</Eyebrow>
-          <h2 className="mb-[18px] font-display text-[clamp(28px,7vw,52px)] font-medium leading-[1.1] tracking-[-0.022em] text-[#1F1B16]">
-            Tell us about them.{" "}
-            <em className="italic text-[#8D6FAF]">We'll take it from there.</em>
-          </h2>
-          <p className="mx-auto mb-8 max-w-[560px] text-[16px] leading-[1.55] text-[#5A5148] md:mb-9 md:text-[18px]">
-            Your song starts with one story. Answer a few gentle questions,
-            choose how you want it to sound, and we'll do the rest.
-          </p>
-          <PrimaryBtn large>Start their song</PrimaryBtn>
-          <div className="mt-[22px] text-[12.5px] tracking-[0.02em] text-[#8A8175] md:text-[13.5px]">
-            No risk to begin &nbsp;·&nbsp; Free revisions &nbsp;·&nbsp;
-            Refunded if it isn't right
+              If it still doesn't, you don't pay.
+            </h2>
+            <p className="mx-auto max-w-[560px] text-[15.5px] leading-[1.6] text-[#5A5148] md:text-[16.5px]">
+              We know what's at stake. Every song goes through a careful review
+              before it reaches you. If it isn't right, we revise it as many
+              times as it takes — at no cost. And if after all of that you
+              still aren't moved, we refund you in full.
+            </p>
           </div>
         </div>
       </section>
 
       {/* FAQ */}
-      <section id="faq" className="bg-[#ECE2D0] px-0 py-[60px] md:py-[80px]">
-        <div className="mx-auto max-w-[1200px] px-5 sm:px-6">
-          <div className="mx-auto mb-10 max-w-[720px] text-center md:mb-14">
-            <Eyebrow center>Frequently asked</Eyebrow>
-            <h2 className="font-display text-[clamp(28px,7vw,48px)] font-medium leading-[1.1] tracking-[-0.022em] text-[#1F1B16]">
-              Everything you want to know{" "}
-              <em className="italic text-[#8D6FAF]">before you decide.</em>
+      <section id="faq" className="bg-[#ECE2D0] px-0 py-[64px] md:py-[100px]">
+        <div className="mx-auto max-w-[820px] px-5 sm:px-6">
+          <div className="mb-10 text-center md:mb-14">
+            <Eyebrow center>Common questions</Eyebrow>
+            <h2 className="font-display text-[clamp(28px,7vw,44px)] font-medium leading-[1.12] tracking-[-0.02em] text-[#1F1B16]">
+              Everything you might be{" "}
+              <em className="italic text-[#8D6FAF]">wondering.</em>
             </h2>
           </div>
 
-          <div className="mx-auto max-w-[820px]">
-            {faqs.map((f, i) => (
+          <div className="space-y-3">
+            {faqs.map((f) => (
               <details
                 key={f.q}
-                className={`group border-b border-[#D9CEB9] py-5 md:py-6 ${
-                  i === 0 ? "border-t" : ""
-                }`}
+                className="group rounded-[14px] border border-[#D9CEB9] bg-[#FBF6EC] p-[20px_24px] transition-colors open:border-[#8D6FAF]"
               >
-                <summary className="flex cursor-pointer list-none items-center justify-between gap-4 font-display text-[17px] font-medium tracking-[-0.01em] text-[#1F1B16] [&::-webkit-details-marker]:hidden md:gap-5 md:text-[20px]">
+                <summary className="flex cursor-pointer list-none items-center justify-between gap-4 font-display text-[17px] font-medium leading-[1.3] tracking-[-0.005em] text-[#1F1B16] md:text-[18px]">
                   {f.q}
-                  <span className="shrink-0 font-sans text-[22px] leading-none text-[#8D6FAF] group-open:hidden md:text-[24px]">
+                  <span className="shrink-0 text-[#8D6FAF] transition-transform group-open:rotate-45 text-[22px] leading-none">
                     +
                   </span>
-                  <span className="hidden shrink-0 font-sans text-[22px] leading-none text-[#8D6FAF] group-open:inline md:text-[24px]">
-                    −
-                  </span>
                 </summary>
-                <div className="max-w-[700px] pt-3 text-[14.5px] leading-[1.65] text-[#5A5148] md:pt-4 md:text-[15.5px]">
+                <p className="mt-3 text-[14.5px] leading-[1.65] text-[#5A5148] md:text-[15px]">
                   {f.a}
-                </div>
+                </p>
               </details>
             ))}
           </div>
@@ -1061,54 +838,98 @@ function LandingPage() {
       </section>
 
       {/* FINAL CTA */}
-      <section className="relative overflow-hidden bg-[#1F1B16] px-0 py-[80px] text-center text-[#F6F0E6] md:py-[120px]">
-        <div
-          className="absolute -right-24 -top-24 h-[400px] w-[400px] opacity-[0.22]"
-          style={{
-            background:
-              "radial-gradient(circle, #8D6FAF 0%, transparent 70%)",
-          }}
-        />
-        <div
-          className="absolute -bottom-36 -left-24 h-[400px] w-[400px] opacity-10"
-          style={{
-            background:
-              "radial-gradient(circle, #C9A85A 0%, transparent 70%)",
-          }}
-        />
-        <div className="relative z-10 mx-auto max-w-[920px] px-5 sm:px-6">
-          <h2 className="mb-[22px] font-display text-[clamp(26px,7vw,56px)] font-normal leading-[1.12] tracking-[-0.025em] text-[#F6F0E6]">
-            On the chemo days. The scan days. The milestone days.
-            <br />
-            And on the days{" "}
-            <em className="italic text-[#E5D9EF]">you miss them most.</em>
+      <section className="bg-[#1F1B16] px-0 py-[72px] md:py-[110px]">
+        <div className="mx-auto max-w-[820px] px-5 text-center sm:px-6">
+          <h2 className="mb-6 font-display text-[clamp(28px,7vw,52px)] font-medium italic leading-[1.1] tracking-[-0.02em] text-[#F6F0E6]">
+            <span className="not-italic text-[#E5D9EF]">&ldquo;</span>
+            They listened on repeat the night before they passed.
+            <span className="not-italic text-[#E5D9EF]">&rdquo;</span>
           </h2>
-          <p className="mx-auto mb-8 max-w-[580px] text-[16px] leading-[1.55] text-[rgba(246,240,230,0.75)] md:mb-9 md:text-[17px]">
-            Give them something only you could give.
+          <p className="mx-auto mb-8 max-w-[560px] text-[16px] leading-[1.6] text-[rgba(246,240,230,0.75)] md:text-[17px]">
+            You're not late. You're not too early. There's no perfect time to
+            give someone a song that says everything you couldn't. There's just
+            now.
           </p>
-          <Link
-            to="/create"
-            className="group inline-flex items-center gap-2.5 rounded-full bg-[#8D6FAF] px-8 py-4 text-[15.5px] font-semibold text-[#F6F0E6] transition-all hover:-translate-y-px hover:bg-[#6B4F8A] sm:px-10 sm:py-5 sm:text-[17px]"
-          >
-            Start their song
-            <span className="transition-transform group-hover:translate-x-1">
-              →
-            </span>
-          </Link>
-          <div className="mt-6 text-[13px] tracking-[0.02em] text-[rgba(246,240,230,0.6)]">
-            Delivered in seven days &nbsp;·&nbsp; Free revisions &nbsp;·&nbsp;
-            Money back guarantee
-          </div>
-          <div className="mt-3 tracking-[2px] text-[15px] text-[#C9A85A]">
-            ★★★★★{" "}
-            <span className="ml-2 font-sans text-[13px] tracking-normal text-[rgba(246,240,230,0.7)]">
-              4.9 from 2,400+ families
-            </span>
+          <PrimaryBtn large>Start their song</PrimaryBtn>
+          <div className="mt-6 text-[13px] text-[rgba(246,240,230,0.55)]">
+            Delivered in 7 days · Free revisions · Money back guarantee
           </div>
         </div>
       </section>
 
       <SiteFooter />
+
+      {/* PLAYER MODAL */}
+      <Dialog
+        open={!!activeSample}
+        onOpenChange={(open) => !open && setActiveSample(null)}
+      >
+        <DialogContent className="max-w-[640px] border-[#D9CEB9] bg-[#FBF6EC] p-0 [&>button]:text-[#5A5148]">
+          {activeSample && (
+            <div className="overflow-hidden rounded-lg">
+              {activeSample.cover_image_url && (
+                <div className="relative aspect-[16/9] w-full overflow-hidden bg-[#ECE2D0]">
+                  <img
+                    src={activeSample.cover_image_url}
+                    alt=""
+                    className="h-full w-full object-cover"
+                  />
+                  <div
+                    className="absolute inset-0"
+                    style={{
+                      background:
+                        "linear-gradient(to top, rgba(31,27,22,0.6), transparent 60%)",
+                    }}
+                  />
+                </div>
+              )}
+              <div className="p-6 sm:p-7">
+                <div className="mb-1 text-[11px] font-semibold uppercase tracking-[0.14em] text-[#8D6FAF]">
+                  {activeSample.genre_label}
+                </div>
+                <DialogTitle className="font-display text-[24px] font-medium leading-[1.2] tracking-[-0.01em] text-[#1F1B16] sm:text-[26px]">
+                  {activeSample.title}
+                </DialogTitle>
+                {activeSample.for_text && (
+                  <div className="mt-1 text-[13px] text-[#8A8175]">
+                    {activeSample.for_text}
+                  </div>
+                )}
+
+                {activeSample.audio_url && (
+                  <div className="mt-5">
+                    <AudioPlayer
+                      src={activeSample.audio_url}
+                      title={activeSample.title}
+                      variant="compact"
+                    />
+                  </div>
+                )}
+
+                {activeSample.quote && (
+                  <p className="mt-5 border-l-2 border-[#8D6FAF] pl-4 text-[14.5px] italic leading-[1.6] text-[#5A5148]">
+                    {activeSample.quote}
+                  </p>
+                )}
+
+                {activeSample.lyrics && (
+                  <details className="mt-5 group">
+                    <summary className="flex cursor-pointer list-none items-center gap-2 text-[12px] font-semibold uppercase tracking-[0.14em] text-[#8D6FAF]">
+                      Lyrics
+                      <span className="text-[#5A5148] transition-transform group-open:rotate-45">
+                        +
+                      </span>
+                    </summary>
+                    <pre className="mt-3 max-h-[260px] overflow-auto whitespace-pre-wrap font-sans text-[13.5px] leading-[1.65] text-[#5A5148]">
+                      {activeSample.lyrics}
+                    </pre>
+                  </details>
+                )}
+              </div>
+            </div>
+          )}
+        </DialogContent>
+      </Dialog>
     </div>
   );
 }
