@@ -218,11 +218,11 @@ function OrderCard({
               )}
             </button>
             <Link
-              to="/listen/$id"
-              params={{ id: slug }}
+              to="/portal/$id"
+              params={{ id: order.id }}
               className="inline-flex items-center gap-2 rounded-full border border-border bg-card px-5 py-2.5 text-sm font-medium hover:bg-peach/40"
             >
-              Open recipient view
+              Open my song page
             </Link>
           </div>
         </div>

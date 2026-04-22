@@ -12,6 +12,7 @@ import { Route as rootRouteImport } from './routes/__root'
 import { Route as Upsell3RouteImport } from './routes/upsell-3'
 import { Route as Upsell2RouteImport } from './routes/upsell-2'
 import { Route as Upsell1RouteImport } from './routes/upsell-1'
+import { Route as Staff7q9k2xRouteImport } from './routes/staff-7q9k2x'
 import { Route as ScratchRouteImport } from './routes/scratch'
 import { Route as ProcessingRouteImport } from './routes/processing'
 import { Route as LoginRouteImport } from './routes/login'
@@ -22,6 +23,7 @@ import { Route as AlmostThereRouteImport } from './routes/almost-there'
 import { Route as AdminRouteImport } from './routes/admin'
 import { Route as AccountRouteImport } from './routes/account'
 import { Route as IndexRouteImport } from './routes/index'
+import { Route as PortalIdRouteImport } from './routes/portal.$id'
 import { Route as ListenIdRouteImport } from './routes/listen.$id'
 import { Route as CheckoutReturnRouteImport } from './routes/checkout.return'
 import { Route as AuthCallbackRouteImport } from './routes/auth.callback'
@@ -42,6 +44,11 @@ const Upsell2Route = Upsell2RouteImport.update({
 const Upsell1Route = Upsell1RouteImport.update({
   id: '/upsell-1',
   path: '/upsell-1',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const Staff7q9k2xRoute = Staff7q9k2xRouteImport.update({
+  id: '/staff-7q9k2x',
+  path: '/staff-7q9k2x',
   getParentRoute: () => rootRouteImport,
 } as any)
 const ScratchRoute = ScratchRouteImport.update({
@@ -94,6 +101,11 @@ const IndexRoute = IndexRouteImport.update({
   path: '/',
   getParentRoute: () => rootRouteImport,
 } as any)
+const PortalIdRoute = PortalIdRouteImport.update({
+  id: '/portal/$id',
+  path: '/portal/$id',
+  getParentRoute: () => rootRouteImport,
+} as any)
 const ListenIdRoute = ListenIdRouteImport.update({
   id: '/listen/$id',
   path: '/listen/$id',
@@ -137,12 +149,14 @@ export interface FileRoutesByFullPath {
   '/login': typeof LoginRoute
   '/processing': typeof ProcessingRoute
   '/scratch': typeof ScratchRoute
+  '/staff-7q9k2x': typeof Staff7q9k2xRoute
   '/upsell-1': typeof Upsell1Route
   '/upsell-2': typeof Upsell2Route
   '/upsell-3': typeof Upsell3Route
   '/auth/callback': typeof AuthCallbackRoute
   '/checkout/return': typeof CheckoutReturnRoute
   '/listen/$id': typeof ListenIdRoute
+  '/portal/$id': typeof PortalIdRoute
   '/lovable/email/auth/preview': typeof LovableEmailAuthPreviewRoute
   '/lovable/email/auth/webhook': typeof LovableEmailAuthWebhookRoute
   '/lovable/email/queue/process': typeof LovableEmailQueueProcessRoute
@@ -158,12 +172,14 @@ export interface FileRoutesByTo {
   '/login': typeof LoginRoute
   '/processing': typeof ProcessingRoute
   '/scratch': typeof ScratchRoute
+  '/staff-7q9k2x': typeof Staff7q9k2xRoute
   '/upsell-1': typeof Upsell1Route
   '/upsell-2': typeof Upsell2Route
   '/upsell-3': typeof Upsell3Route
   '/auth/callback': typeof AuthCallbackRoute
   '/checkout/return': typeof CheckoutReturnRoute
   '/listen/$id': typeof ListenIdRoute
+  '/portal/$id': typeof PortalIdRoute
   '/lovable/email/auth/preview': typeof LovableEmailAuthPreviewRoute
   '/lovable/email/auth/webhook': typeof LovableEmailAuthWebhookRoute
   '/lovable/email/queue/process': typeof LovableEmailQueueProcessRoute
@@ -180,12 +196,14 @@ export interface FileRoutesById {
   '/login': typeof LoginRoute
   '/processing': typeof ProcessingRoute
   '/scratch': typeof ScratchRoute
+  '/staff-7q9k2x': typeof Staff7q9k2xRoute
   '/upsell-1': typeof Upsell1Route
   '/upsell-2': typeof Upsell2Route
   '/upsell-3': typeof Upsell3Route
   '/auth/callback': typeof AuthCallbackRoute
   '/checkout/return': typeof CheckoutReturnRoute
   '/listen/$id': typeof ListenIdRoute
+  '/portal/$id': typeof PortalIdRoute
   '/lovable/email/auth/preview': typeof LovableEmailAuthPreviewRoute
   '/lovable/email/auth/webhook': typeof LovableEmailAuthWebhookRoute
   '/lovable/email/queue/process': typeof LovableEmailQueueProcessRoute
@@ -203,12 +221,14 @@ export interface FileRouteTypes {
     | '/login'
     | '/processing'
     | '/scratch'
+    | '/staff-7q9k2x'
     | '/upsell-1'
     | '/upsell-2'
     | '/upsell-3'
     | '/auth/callback'
     | '/checkout/return'
     | '/listen/$id'
+    | '/portal/$id'
     | '/lovable/email/auth/preview'
     | '/lovable/email/auth/webhook'
     | '/lovable/email/queue/process'
@@ -224,12 +244,14 @@ export interface FileRouteTypes {
     | '/login'
     | '/processing'
     | '/scratch'
+    | '/staff-7q9k2x'
     | '/upsell-1'
     | '/upsell-2'
     | '/upsell-3'
     | '/auth/callback'
     | '/checkout/return'
     | '/listen/$id'
+    | '/portal/$id'
     | '/lovable/email/auth/preview'
     | '/lovable/email/auth/webhook'
     | '/lovable/email/queue/process'
@@ -245,12 +267,14 @@ export interface FileRouteTypes {
     | '/login'
     | '/processing'
     | '/scratch'
+    | '/staff-7q9k2x'
     | '/upsell-1'
     | '/upsell-2'
     | '/upsell-3'
     | '/auth/callback'
     | '/checkout/return'
     | '/listen/$id'
+    | '/portal/$id'
     | '/lovable/email/auth/preview'
     | '/lovable/email/auth/webhook'
     | '/lovable/email/queue/process'
@@ -267,11 +291,13 @@ export interface RootRouteChildren {
   LoginRoute: typeof LoginRoute
   ProcessingRoute: typeof ProcessingRoute
   ScratchRoute: typeof ScratchRoute
+  Staff7q9k2xRoute: typeof Staff7q9k2xRoute
   Upsell1Route: typeof Upsell1Route
   Upsell2Route: typeof Upsell2Route
   Upsell3Route: typeof Upsell3Route
   AuthCallbackRoute: typeof AuthCallbackRoute
   ListenIdRoute: typeof ListenIdRoute
+  PortalIdRoute: typeof PortalIdRoute
   LovableEmailAuthPreviewRoute: typeof LovableEmailAuthPreviewRoute
   LovableEmailAuthWebhookRoute: typeof LovableEmailAuthWebhookRoute
   LovableEmailQueueProcessRoute: typeof LovableEmailQueueProcessRoute
@@ -298,6 +324,13 @@ declare module '@tanstack/react-router' {
       path: '/upsell-1'
       fullPath: '/upsell-1'
       preLoaderRoute: typeof Upsell1RouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/staff-7q9k2x': {
+      id: '/staff-7q9k2x'
+      path: '/staff-7q9k2x'
+      fullPath: '/staff-7q9k2x'
+      preLoaderRoute: typeof Staff7q9k2xRouteImport
       parentRoute: typeof rootRouteImport
     }
     '/scratch': {
@@ -370,6 +403,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof IndexRouteImport
       parentRoute: typeof rootRouteImport
     }
+    '/portal/$id': {
+      id: '/portal/$id'
+      path: '/portal/$id'
+      fullPath: '/portal/$id'
+      preLoaderRoute: typeof PortalIdRouteImport
+      parentRoute: typeof rootRouteImport
+    }
     '/listen/$id': {
       id: '/listen/$id'
       path: '/listen/$id'
@@ -438,11 +478,13 @@ const rootRouteChildren: RootRouteChildren = {
   LoginRoute: LoginRoute,
   ProcessingRoute: ProcessingRoute,
   ScratchRoute: ScratchRoute,
+  Staff7q9k2xRoute: Staff7q9k2xRoute,
   Upsell1Route: Upsell1Route,
   Upsell2Route: Upsell2Route,
   Upsell3Route: Upsell3Route,
   AuthCallbackRoute: AuthCallbackRoute,
   ListenIdRoute: ListenIdRoute,
+  PortalIdRoute: PortalIdRoute,
   LovableEmailAuthPreviewRoute: LovableEmailAuthPreviewRoute,
   LovableEmailAuthWebhookRoute: LovableEmailAuthWebhookRoute,
   LovableEmailQueueProcessRoute: LovableEmailQueueProcessRoute,

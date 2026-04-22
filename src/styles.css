@@ -227,4 +227,16 @@
   .text-balance {
     text-wrap: balance;
   }
+  .animate-vinyl-spin {
+    animation: vinyl-spin 6s linear infinite;
+  }
+  .animate-vinyl-spin-slow-stop {
+    animation: vinyl-spin 18s linear infinite;
+    animation-play-state: paused;
+  }
+}
+
+@keyframes vinyl-spin {
+  from { transform: rotate(0deg); }
+  to { transform: rotate(360deg); }
 }
