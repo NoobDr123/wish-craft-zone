@@ -39,24 +39,40 @@ serve(async (req) => {
   if (req.method === "OPTIONS") return new Response(null, { headers: corsHeaders });
 
   try {
-    // Verify caller is an admin.
-    const authHeader = req.headers.get("Authorization") ?? "";
-    const token = authHeader.replace(/^Bearer\s+/i, "");
-    if (!token) return json({ error: "Unauthorized" }, 401);
-
-    const userClient = createClient(
-      Deno.env.get("SUPABASE_URL")!,
-      Deno.env.get("SUPABASE_ANON_KEY")!,
-      { global: { headers: { Authorization: `Bearer ${token}` } } },
-    );
-    const { data: userData } = await userClient.auth.getUser();
-    if (!userData?.user) return json({ error: "Unauthorized" }, 401);
-
-    const { data: isAdmin } = await supabase.rpc("has_role", {
-      _user_id: userData.user.id,
-      _role: "admin",
+    // Two ways to authorize:
+    //   1. Service-role key in `x-service-key` header (internal batch triggers)
+    //   2. Logged-in admin user (Authorization: Bearer <jwt>)
+    const serviceKey = Deno.env.get("SUPABASE_SERVICE_ROLE_KEY")!;
+    const internalKey =
+      req.headers.get("x-internal-secret") ??
+      req.headers.get("x-service-key");
+    console.log("auth check", {
+      hasInternal: !!internalKey,
+      internalLen: internalKey?.length ?? 0,
+      svcLen: serviceKey?.length ?? 0,
+      match: internalKey === serviceKey,
     });
-    if (!isAdmin) return json({ error: "Forbidden" }, 403);
+    const isInternal = !!internalKey && internalKey === serviceKey;
+
+    if (!isInternal) {
+      const authHeader = req.headers.get("Authorization") ?? "";
+      const token = authHeader.replace(/^Bearer\s+/i, "");
+      if (!token) return json({ error: "Unauthorized" }, 401);
+
+      const userClient = createClient(
+        Deno.env.get("SUPABASE_URL")!,
+        Deno.env.get("SUPABASE_ANON_KEY")!,
+        { global: { headers: { Authorization: `Bearer ${token}` } } },
+      );
+      const { data: userData } = await userClient.auth.getUser();
+      if (!userData?.user) return json({ error: "Unauthorized" }, 401);
+
+      const { data: isAdmin } = await supabase.rpc("has_role", {
+        _user_id: userData.user.id,
+        _role: "admin",
+      });
+      if (!isAdmin) return json({ error: "Forbidden" }, 403);
+    }
 
     const { sampleId } = await req.json();
     if (!sampleId) return json({ error: "Missing sampleId" }, 400);
