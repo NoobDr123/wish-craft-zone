@@ -14,25 +14,70 @@ export type Database = {
   }
   public: {
     Tables: {
+      job_events: {
+        Row: {
+          created_at: string
+          event_type: string
+          id: number
+          order_id: string
+          payload: Json | null
+        }
+        Insert: {
+          created_at?: string
+          event_type: string
+          id?: number
+          order_id: string
+          payload?: Json | null
+        }
+        Update: {
+          created_at?: string
+          event_type?: string
+          id?: number
+          order_id?: string
+          payload?: Json | null
+        }
+        Relationships: [
+          {
+            foreignKeyName: "job_events_order_id_fkey"
+            columns: ["order_id"]
+            isOneToOne: false
+            referencedRelation: "orders"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       orders: {
         Row: {
           amount_cents: number
+          audio_variants: Json | null
+          auto_qc_results: Json | null
+          brief: Json | null
           buyer_email: string
           buyer_name: string | null
           created_at: string
           currency: string
+          delivered_at: string | null
           delivery_date: string | null
           genre: string | null
           has_3rd_verse: boolean
           has_unlimited_edits: boolean
+          human_qc_notes: string | null
+          human_qc_reviewer: string | null
           id: string
           is_gift: boolean
           is_rush: boolean
+          kie_task_id: string | null
+          parent_order_id: string | null
           personal_note: string | null
+          priority: string
           quiz_payload: Json | null
           recipient_email: string | null
           recipient_name: string
           relationship: string | null
+          revision_count: number
+          revision_notes: string | null
+          selected_variant_id: string | null
+          share_page_slug: string | null
           song_title_idea: string | null
           status: string
           tempo: string | null
@@ -42,22 +87,35 @@ export type Database = {
         }
         Insert: {
           amount_cents?: number
+          audio_variants?: Json | null
+          auto_qc_results?: Json | null
+          brief?: Json | null
           buyer_email: string
           buyer_name?: string | null
           created_at?: string
           currency?: string
+          delivered_at?: string | null
           delivery_date?: string | null
           genre?: string | null
           has_3rd_verse?: boolean
           has_unlimited_edits?: boolean
+          human_qc_notes?: string | null
+          human_qc_reviewer?: string | null
           id?: string
           is_gift?: boolean
           is_rush?: boolean
+          kie_task_id?: string | null
+          parent_order_id?: string | null
           personal_note?: string | null
+          priority?: string
           quiz_payload?: Json | null
           recipient_email?: string | null
           recipient_name: string
           relationship?: string | null
+          revision_count?: number
+          revision_notes?: string | null
+          selected_variant_id?: string | null
+          share_page_slug?: string | null
           song_title_idea?: string | null
           status?: string
           tempo?: string | null
@@ -67,22 +125,35 @@ export type Database = {
         }
         Update: {
           amount_cents?: number
+          audio_variants?: Json | null
+          auto_qc_results?: Json | null
+          brief?: Json | null
           buyer_email?: string
           buyer_name?: string | null
           created_at?: string
           currency?: string
+          delivered_at?: string | null
           delivery_date?: string | null
           genre?: string | null
           has_3rd_verse?: boolean
           has_unlimited_edits?: boolean
+          human_qc_notes?: string | null
+          human_qc_reviewer?: string | null
           id?: string
           is_gift?: boolean
           is_rush?: boolean
+          kie_task_id?: string | null
+          parent_order_id?: string | null
           personal_note?: string | null
+          priority?: string
           quiz_payload?: Json | null
           recipient_email?: string | null
           recipient_name?: string
           relationship?: string | null
+          revision_count?: number
+          revision_notes?: string | null
+          selected_variant_id?: string | null
+          share_page_slug?: string | null
           song_title_idea?: string | null
           status?: string
           tempo?: string | null
@@ -90,7 +161,15 @@ export type Database = {
           user_id?: string | null
           voice?: string | null
         }
-        Relationships: []
+        Relationships: [
+          {
+            foreignKeyName: "orders_parent_order_id_fkey"
+            columns: ["parent_order_id"]
+            isOneToOne: false
+            referencedRelation: "orders"
+            referencedColumns: ["id"]
+          },
+        ]
       }
     }
     Views: {
