@@ -1,0 +1,23 @@
+User-agent: *
+Allow: /$
+Allow: /create
+Allow: /listen/
+Disallow: /_admin
+Disallow: /_admin/
+Disallow: /staff
+Disallow: /admin
+Disallow: /account
+Disallow: /dashboard
+Disallow: /portal/
+Disallow: /checkout
+Disallow: /upsell-1
+Disallow: /upsell-2
+Disallow: /upsell-3
+Disallow: /almost-there
+Disallow: /processing
+Disallow: /scratch
+Disallow: /auth/
+Disallow: /api/
+Disallow: /lovable/
+
+# No sitemap — admin and account paths must not be advertised.
