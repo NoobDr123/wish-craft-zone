@@ -478,7 +478,29 @@ function LandingPage() {
             </div>
 
             {/* Hero photo + song */}
-            <div className="order-1 md:order-2">
+            <div className="relative order-1 md:order-2">
+              {showPlayMe && !heroPlaying && (
+                <div className="pointer-events-none absolute -top-4 left-1/2 z-20 -translate-x-1/2 sm:-top-5">
+                  <div className="relative animate-bounce rounded-full bg-[#C7572E] px-3.5 py-1.5 shadow-[0_8px_20px_rgba(0,0,0,0.25)] sm:px-4 sm:py-2">
+                    <span className="flex items-center gap-1.5 whitespace-nowrap text-[11px] font-bold uppercase tracking-[0.12em] text-white sm:text-[12px]">
+                      <span aria-hidden>▶</span>
+                      Play me
+                    </span>
+                    <span
+                      aria-hidden
+                      className="absolute left-1/2 -translate-x-1/2"
+                      style={{
+                        bottom: -5,
+                        width: 0,
+                        height: 0,
+                        borderLeft: "6px solid transparent",
+                        borderRight: "6px solid transparent",
+                        borderTop: "6px solid #C7572E",
+                      }}
+                    />
+                  </div>
+                </div>
+              )}
               <div className="group relative aspect-[4/5] overflow-hidden rounded-[18px] bg-[#ECE2D0] shadow-[0_20px_60px_rgba(31,27,22,0.12)]">
                 {heroPlaying ? (
                   <video
