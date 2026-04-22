@@ -364,29 +364,8 @@ function LandingPage() {
   const [activeSample, setActiveSample] = useState<FeaturedSample | null>(null);
   const heroAudioRef = useRef<HTMLAudioElement | null>(null);
   const [heroPlaying, setHeroPlaying] = useState(false);
-  const [heroShaking, setHeroShaking] = useState(false);
   const [heroEverPlayed, setHeroEverPlayed] = useState(false);
-  const [showPlayMe, setShowPlayMe] = useState(false);
-
-  // On landing: gentle shake + "Play me" hint until the user plays the song once
-  useEffect(() => {
-    if (heroEverPlayed) return;
-    const startDelay = window.setTimeout(() => {
-      setHeroShaking(true);
-      setShowPlayMe(true);
-    }, 1200);
-
-    // Re-trigger shake periodically so it keeps drawing attention
-    const interval = window.setInterval(() => {
-      setHeroShaking(false);
-      window.setTimeout(() => setHeroShaking(true), 60);
-    }, 4500);
-
-    return () => {
-      window.clearTimeout(startDelay);
-      window.clearInterval(interval);
-    };
-  }, [heroEverPlayed]);
+  const [showPlayMe, setShowPlayMe] = useState(true);
 
   const handleHeroPlay = () => {
     const a = heroAudioRef.current;
@@ -396,8 +375,6 @@ function LandingPage() {
       setHeroPlaying(false);
       return;
     }
-    // Stop the attention-shake permanently once they engage
-    setHeroShaking(false);
     setShowPlayMe(false);
     setHeroEverPlayed(true);
     a.currentTime = 0;
@@ -515,9 +492,7 @@ function LandingPage() {
                   <img
                     src={rachelPhoto}
                     alt="Rachel and her mother holding hands in the car after her last chemo infusion"
-                    className={`h-full w-full object-contain bg-[#1F1B16] ${
-                      heroShaking ? "animate-photo-shake" : ""
-                    }`}
+                    className="h-full w-full object-contain bg-[#1F1B16]"
                     onClick={handleHeroPlay}
                   />
                 )}
@@ -527,7 +502,7 @@ function LandingPage() {
                   ref={heroAudioRef}
                   src={RACHEL_SONG_URL}
                   preload="metadata"
-                  onEnded={() => { setHeroPlaying(false); setHeroShaking(false); }}
+                  onEnded={() => { setHeroPlaying(false); }}
                 />
 
                 <button
@@ -566,12 +541,13 @@ function LandingPage() {
                 )}
 
                 {showPlayMe && !heroPlaying && (
-                  <div className="pointer-events-none absolute -top-3 left-1/2 -translate-x-1/2 sm:-top-4">
-                    <div className="relative animate-bounce rounded-full bg-[#C7572E] px-4 py-1.5 shadow-[0_8px_24px_rgba(199,87,46,0.45)] sm:px-5 sm:py-2">
-                      <span className="text-[11px] font-bold uppercase tracking-[0.16em] text-white sm:text-[12px]">
-                        ▶ Play me
+                  <div className="pointer-events-none absolute -top-2.5 left-1/2 z-10 -translate-x-1/2 sm:-top-3.5">
+                    <div className="relative animate-bounce rounded-full bg-[#C7572E] px-3.5 py-1 shadow-[0_6px_20px_rgba(199,87,46,0.5)] sm:px-4 sm:py-1.5">
+                      <span className="flex items-center gap-1.5 whitespace-nowrap text-[10px] font-bold uppercase tracking-[0.14em] text-white sm:text-[11px] sm:tracking-[0.16em]">
+                        <span aria-hidden className="text-[9px] sm:text-[10px]">▶</span>
+                        Play me
                       </span>
-                      <span className="absolute -bottom-1.5 left-1/2 h-3 w-3 -translate-x-1/2 rotate-45 bg-[#C7572E]" />
+                      <span className="absolute -bottom-1 left-1/2 h-2.5 w-2.5 -translate-x-1/2 rotate-45 bg-[#C7572E]" />
                     </div>
                   </div>
                 )}
