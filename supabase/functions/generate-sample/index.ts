@@ -156,6 +156,13 @@ serve(async (req) => {
       callBackUrl: `${CALLBACK_URL}?sampleId=${sampleId}`,
     };
 
+    console.log("kie submit", {
+      hasKey: !!KIE_API_KEY,
+      keyLen: KIE_API_KEY?.length ?? 0,
+      keyPrefix: KIE_API_KEY?.slice(0, 6) ?? "",
+      url: `${KIE_BASE}/api/v1/generate`,
+    });
+
     const res = await fetch(`${KIE_BASE}/api/v1/generate`, {
       method: "POST",
       headers: {
