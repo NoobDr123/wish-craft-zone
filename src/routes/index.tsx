@@ -964,27 +964,27 @@ function LandingPage() {
       </section>
 
       {/* GUARANTEE */}
-      <section className="bg-[#ECE2D0] px-0 py-[100px]">
-        <div className="mx-auto max-w-[1200px] px-6">
-          <div className="relative mx-auto max-w-[820px] rounded-[14px] border-2 border-[#8D6FAF] bg-[#FBF6EC] p-[52px_56px] text-center">
-            <div className="absolute -top-7 left-1/2 -translate-x-1/2 rounded-full bg-[#8D6FAF] px-6 py-2.5 text-[12px] font-semibold uppercase tracking-[0.1em] text-[#F6F0E6]">
+      <section className="bg-[#ECE2D0] px-0 py-[64px] md:py-[100px]">
+        <div className="mx-auto max-w-[1200px] px-5 sm:px-6">
+          <div className="relative mx-auto max-w-[820px] rounded-[14px] border-2 border-[#8D6FAF] bg-[#FBF6EC] p-[44px_24px_32px] text-center sm:p-[52px_56px]">
+            <div className="absolute -top-6 left-1/2 -translate-x-1/2 whitespace-nowrap rounded-full bg-[#8D6FAF] px-4 py-2 text-[10.5px] font-semibold uppercase tracking-[0.1em] text-[#F6F0E6] sm:-top-7 sm:px-6 sm:py-2.5 sm:text-[12px]">
               Our promise to you
             </div>
-            <h2 className="mb-[18px] font-display text-[clamp(28px,3.2vw,38px)] font-medium leading-[1.2] tracking-[-0.018em]">
+            <h2 className="mb-[18px] font-display text-[clamp(24px,6vw,38px)] font-medium leading-[1.2] tracking-[-0.018em]">
               If it doesn't feel like{" "}
               <em className="italic text-[#8D6FAF]">them</em>, we rewrite it.
               Until it does.
             </h2>
-            <p className="mx-auto mb-4 max-w-[620px] text-[17px] leading-[1.6] text-[#5A5148]">
+            <p className="mx-auto mb-4 max-w-[620px] text-[15.5px] leading-[1.6] text-[#5A5148] md:text-[17px]">
               If the first version of the song doesn't feel like the person
               you love, not "isn't good enough," but doesn't feel like them, we
               rewrite it. Free. As many times as it takes.
             </p>
-            <p className="mx-auto mb-4 max-w-[620px] text-[17px] leading-[1.6] text-[#5A5148]">
+            <p className="mx-auto mb-4 max-w-[620px] text-[15.5px] leading-[1.6] text-[#5A5148] md:text-[17px]">
               And if after all of that it still isn't right, we refund you in
               full. No questions. No forms. No argument.
             </p>
-            <div className="mt-[26px] font-display text-[18px] italic leading-[1.4] text-[#8D6FAF]">
+            <div className="mt-[26px] font-display text-[16.5px] italic leading-[1.4] text-[#8D6FAF] md:text-[18px]">
               You cannot lose money on this.
               <br />
               The only thing you can do is give them something nobody else in
@@ -995,7 +995,7 @@ function LandingPage() {
       </section>
 
       {/* BEGIN BLOCK */}
-      <section id="begin" className="relative overflow-hidden px-0 py-[100px] text-center">
+      <section id="begin" className="relative overflow-hidden px-0 py-[64px] text-center md:py-[100px]">
         <div
           className="pointer-events-none absolute left-1/2 top-1/2 h-[520px] w-[520px] -translate-x-1/2 -translate-y-1/2 opacity-50"
           style={{
@@ -1003,18 +1003,18 @@ function LandingPage() {
               "radial-gradient(circle, #E5D9EF 0%, transparent 70%)",
           }}
         />
-        <div className="relative z-10 mx-auto max-w-[920px] px-6">
+        <div className="relative z-10 mx-auto max-w-[920px] px-5 sm:px-6">
           <Eyebrow center>Ready when you are</Eyebrow>
-          <h2 className="mb-[18px] font-display text-[clamp(32px,4vw,52px)] font-medium leading-[1.1] tracking-[-0.022em] text-[#1F1B16]">
+          <h2 className="mb-[18px] font-display text-[clamp(28px,7vw,52px)] font-medium leading-[1.1] tracking-[-0.022em] text-[#1F1B16]">
             Tell us about them.{" "}
             <em className="italic text-[#8D6FAF]">We'll take it from there.</em>
           </h2>
-          <p className="mx-auto mb-9 max-w-[560px] text-[18px] leading-[1.55] text-[#5A5148]">
+          <p className="mx-auto mb-8 max-w-[560px] text-[16px] leading-[1.55] text-[#5A5148] md:mb-9 md:text-[18px]">
             Your song starts with one story. Answer a few gentle questions,
             choose how you want it to sound, and we'll do the rest.
           </p>
           <PrimaryBtn large>Start their song</PrimaryBtn>
-          <div className="mt-[22px] text-[13.5px] tracking-[0.02em] text-[#8A8175]">
+          <div className="mt-[22px] text-[12.5px] tracking-[0.02em] text-[#8A8175] md:text-[13.5px]">
             No risk to begin &nbsp;·&nbsp; Free revisions &nbsp;·&nbsp;
             Refunded if it isn't right
           </div>
@@ -1022,11 +1022,11 @@ function LandingPage() {
       </section>
 
       {/* FAQ */}
-      <section id="faq" className="bg-[#ECE2D0] px-0 py-[80px]">
-        <div className="mx-auto max-w-[1200px] px-6">
-          <div className="mx-auto mb-14 max-w-[720px] text-center">
+      <section id="faq" className="bg-[#ECE2D0] px-0 py-[60px] md:py-[80px]">
+        <div className="mx-auto max-w-[1200px] px-5 sm:px-6">
+          <div className="mx-auto mb-10 max-w-[720px] text-center md:mb-14">
             <Eyebrow center>Frequently asked</Eyebrow>
-            <h2 className="font-display text-[clamp(32px,4vw,48px)] font-medium leading-[1.1] tracking-[-0.022em] text-[#1F1B16]">
+            <h2 className="font-display text-[clamp(28px,7vw,48px)] font-medium leading-[1.1] tracking-[-0.022em] text-[#1F1B16]">
               Everything you want to know{" "}
               <em className="italic text-[#8D6FAF]">before you decide.</em>
             </h2>
@@ -1036,20 +1036,20 @@ function LandingPage() {
             {faqs.map((f, i) => (
               <details
                 key={f.q}
-                className={`group border-b border-[#D9CEB9] py-6 ${
+                className={`group border-b border-[#D9CEB9] py-5 md:py-6 ${
                   i === 0 ? "border-t" : ""
                 }`}
               >
-                <summary className="flex cursor-pointer list-none items-center justify-between gap-5 font-display text-[20px] font-medium tracking-[-0.01em] text-[#1F1B16] [&::-webkit-details-marker]:hidden">
+                <summary className="flex cursor-pointer list-none items-center justify-between gap-4 font-display text-[17px] font-medium tracking-[-0.01em] text-[#1F1B16] [&::-webkit-details-marker]:hidden md:gap-5 md:text-[20px]">
                   {f.q}
-                  <span className="shrink-0 font-sans text-[24px] leading-none text-[#8D6FAF] group-open:hidden">
+                  <span className="shrink-0 font-sans text-[22px] leading-none text-[#8D6FAF] group-open:hidden md:text-[24px]">
                     +
                   </span>
-                  <span className="hidden shrink-0 font-sans text-[24px] leading-none text-[#8D6FAF] group-open:inline">
+                  <span className="hidden shrink-0 font-sans text-[22px] leading-none text-[#8D6FAF] group-open:inline md:text-[24px]">
                     −
                   </span>
                 </summary>
-                <div className="max-w-[700px] pt-4 text-[15.5px] leading-[1.65] text-[#5A5148]">
+                <div className="max-w-[700px] pt-3 text-[14.5px] leading-[1.65] text-[#5A5148] md:pt-4 md:text-[15.5px]">
                   {f.a}
                 </div>
               </details>
@@ -1059,7 +1059,7 @@ function LandingPage() {
       </section>
 
       {/* FINAL CTA */}
-      <section className="relative overflow-hidden bg-[#1F1B16] px-0 py-[120px] text-center text-[#F6F0E6]">
+      <section className="relative overflow-hidden bg-[#1F1B16] px-0 py-[80px] text-center text-[#F6F0E6] md:py-[120px]">
         <div
           className="absolute -right-24 -top-24 h-[400px] w-[400px] opacity-[0.22]"
           style={{
