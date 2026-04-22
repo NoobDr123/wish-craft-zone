@@ -520,15 +520,15 @@ function LandingPage() {
       </section>
 
       {/* WHO IT'S FOR */}
-      <section id="who" className="bg-[#ECE2D0] px-0 py-[100px]">
-        <div className="mx-auto max-w-[1200px] px-6">
-          <div className="mb-14 max-w-[720px]">
+      <section id="who" className="bg-[#ECE2D0] px-0 py-[72px] md:py-[100px]">
+        <div className="mx-auto max-w-[1200px] px-5 sm:px-6">
+          <div className="mb-10 max-w-[720px] md:mb-14">
             <Eyebrow>Who it's for</Eyebrow>
-            <h2 className="mb-3.5 font-display text-[clamp(32px,4vw,48px)] font-medium leading-[1.1] tracking-[-0.022em] text-[#1F1B16]">
+            <h2 className="mb-3.5 font-display text-[clamp(28px,7vw,48px)] font-medium leading-[1.1] tracking-[-0.022em] text-[#1F1B16]">
               Wherever they are in the fight,{" "}
               <em className="italic text-[#8D6FAF]">meet them there.</em>
             </h2>
-            <p className="max-w-[560px] text-[17px] leading-[1.55] text-[#5A5148]">
+            <p className="max-w-[560px] text-[16px] leading-[1.55] text-[#5A5148] md:text-[17px]">
               Cancer doesn't touch two families the same way. A RibbonSong is
               shaped to honor exactly where your person is right now. Newly
               diagnosed, mid treatment, celebrating remission, or held in
@@ -536,36 +536,38 @@ function LandingPage() {
             </p>
           </div>
 
-          <div className="grid grid-cols-1 gap-4 sm:grid-cols-2 lg:grid-cols-3">
+          <div className="grid grid-cols-1 gap-5 sm:grid-cols-2 lg:grid-cols-3">
             {useCases.map((u) => (
               <div
                 key={u.eyebrow}
-                className="group relative aspect-[4/5] cursor-pointer overflow-hidden rounded-[14px] transition-transform hover:-translate-y-[3px]"
+                className="group relative flex flex-col overflow-hidden rounded-[16px] border border-[#D9CEB9] bg-[#FBF6EC] transition-all hover:-translate-y-[3px] hover:shadow-[0_8px_24px_rgba(31,27,22,0.08)]"
               >
-                <img
-                  src={u.img}
-                  alt=""
-                  loading="lazy"
-                  className="h-full w-full object-cover transition-transform duration-700 group-hover:scale-105"
-                />
-                <div
-                  className="absolute inset-0"
-                  style={{
-                    background:
-                      "linear-gradient(to top, rgba(31,27,22,0.82) 0%, rgba(31,27,22,0.05) 55%, transparent 100%)",
-                  }}
-                />
-                <div className="absolute inset-x-5 bottom-5 z-10 font-display text-[22px] font-medium leading-[1.15] tracking-[-0.01em] text-[#F6F0E6]">
-                  <span className="mb-1.5 block font-sans text-[11.5px] font-medium uppercase tracking-[0.14em] text-[#E5D9EF]">
+                <div className="relative aspect-[5/4] overflow-hidden bg-[#F6F0E6]">
+                  <img
+                    src={u.img}
+                    alt=""
+                    loading="lazy"
+                    width={512}
+                    height={640}
+                    className="h-full w-full object-cover transition-transform duration-700 group-hover:scale-[1.03]"
+                  />
+                </div>
+                <div className="flex flex-1 flex-col p-[22px_22px_24px]">
+                  <span className="mb-2 block text-[11px] font-semibold uppercase tracking-[0.14em] text-[#8D6FAF]">
                     {u.eyebrow}
                   </span>
-                  {u.label}
+                  <h3 className="mb-2 font-display text-[20px] font-medium leading-[1.2] tracking-[-0.01em] text-[#1F1B16] md:text-[22px]">
+                    {u.label}
+                  </h3>
+                  <p className="text-[14px] leading-[1.55] text-[#5A5148]">
+                    {u.body}
+                  </p>
                 </div>
               </div>
             ))}
           </div>
 
-          <div className="mt-12 text-center">
+          <div className="mt-10 text-center md:mt-12">
             <PrimaryBtn large>Start their song</PrimaryBtn>
           </div>
         </div>
