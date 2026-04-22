@@ -23,6 +23,7 @@ import { Route as AlmostThereRouteImport } from './routes/almost-there'
 import { Route as AdminRouteImport } from './routes/admin'
 import { Route as AccountRouteImport } from './routes/account'
 import { Route as IndexRouteImport } from './routes/index'
+import { Route as PortalIdRouteImport } from './routes/portal.$id'
 import { Route as ListenIdRouteImport } from './routes/listen.$id'
 import { Route as CheckoutReturnRouteImport } from './routes/checkout.return'
 import { Route as AuthCallbackRouteImport } from './routes/auth.callback'
@@ -100,6 +101,11 @@ const IndexRoute = IndexRouteImport.update({
   path: '/',
   getParentRoute: () => rootRouteImport,
 } as any)
+const PortalIdRoute = PortalIdRouteImport.update({
+  id: '/portal/$id',
+  path: '/portal/$id',
+  getParentRoute: () => rootRouteImport,
+} as any)
 const ListenIdRoute = ListenIdRouteImport.update({
   id: '/listen/$id',
   path: '/listen/$id',
@@ -150,6 +156,7 @@ export interface FileRoutesByFullPath {
   '/auth/callback': typeof AuthCallbackRoute
   '/checkout/return': typeof CheckoutReturnRoute
   '/listen/$id': typeof ListenIdRoute
+  '/portal/$id': typeof PortalIdRoute
   '/lovable/email/auth/preview': typeof LovableEmailAuthPreviewRoute
   '/lovable/email/auth/webhook': typeof LovableEmailAuthWebhookRoute
   '/lovable/email/queue/process': typeof LovableEmailQueueProcessRoute
@@ -172,6 +179,7 @@ export interface FileRoutesByTo {
   '/auth/callback': typeof AuthCallbackRoute
   '/checkout/return': typeof CheckoutReturnRoute
   '/listen/$id': typeof ListenIdRoute
+  '/portal/$id': typeof PortalIdRoute
   '/lovable/email/auth/preview': typeof LovableEmailAuthPreviewRoute
   '/lovable/email/auth/webhook': typeof LovableEmailAuthWebhookRoute
   '/lovable/email/queue/process': typeof LovableEmailQueueProcessRoute
@@ -195,6 +203,7 @@ export interface FileRoutesById {
   '/auth/callback': typeof AuthCallbackRoute
   '/checkout/return': typeof CheckoutReturnRoute
   '/listen/$id': typeof ListenIdRoute
+  '/portal/$id': typeof PortalIdRoute
   '/lovable/email/auth/preview': typeof LovableEmailAuthPreviewRoute
   '/lovable/email/auth/webhook': typeof LovableEmailAuthWebhookRoute
   '/lovable/email/queue/process': typeof LovableEmailQueueProcessRoute
@@ -219,6 +228,7 @@ export interface FileRouteTypes {
     | '/auth/callback'
     | '/checkout/return'
     | '/listen/$id'
+    | '/portal/$id'
     | '/lovable/email/auth/preview'
     | '/lovable/email/auth/webhook'
     | '/lovable/email/queue/process'
@@ -241,6 +251,7 @@ export interface FileRouteTypes {
     | '/auth/callback'
     | '/checkout/return'
     | '/listen/$id'
+    | '/portal/$id'
     | '/lovable/email/auth/preview'
     | '/lovable/email/auth/webhook'
     | '/lovable/email/queue/process'
@@ -263,6 +274,7 @@ export interface FileRouteTypes {
     | '/auth/callback'
     | '/checkout/return'
     | '/listen/$id'
+    | '/portal/$id'
     | '/lovable/email/auth/preview'
     | '/lovable/email/auth/webhook'
     | '/lovable/email/queue/process'
@@ -285,6 +297,7 @@ export interface RootRouteChildren {
   Upsell3Route: typeof Upsell3Route
   AuthCallbackRoute: typeof AuthCallbackRoute
   ListenIdRoute: typeof ListenIdRoute
+  PortalIdRoute: typeof PortalIdRoute
   LovableEmailAuthPreviewRoute: typeof LovableEmailAuthPreviewRoute
   LovableEmailAuthWebhookRoute: typeof LovableEmailAuthWebhookRoute
   LovableEmailQueueProcessRoute: typeof LovableEmailQueueProcessRoute
@@ -390,6 +403,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof IndexRouteImport
       parentRoute: typeof rootRouteImport
     }
+    '/portal/$id': {
+      id: '/portal/$id'
+      path: '/portal/$id'
+      fullPath: '/portal/$id'
+      preLoaderRoute: typeof PortalIdRouteImport
+      parentRoute: typeof rootRouteImport
+    }
     '/listen/$id': {
       id: '/listen/$id'
       path: '/listen/$id'
@@ -464,6 +484,7 @@ const rootRouteChildren: RootRouteChildren = {
   Upsell3Route: Upsell3Route,
   AuthCallbackRoute: AuthCallbackRoute,
   ListenIdRoute: ListenIdRoute,
+  PortalIdRoute: PortalIdRoute,
   LovableEmailAuthPreviewRoute: LovableEmailAuthPreviewRoute,
   LovableEmailAuthWebhookRoute: LovableEmailAuthWebhookRoute,
   LovableEmailQueueProcessRoute: LovableEmailQueueProcessRoute,
@@ -471,3 +492,12 @@ const rootRouteChildren: RootRouteChildren = {
 export const routeTree = rootRouteImport
   ._addFileChildren(rootRouteChildren)
   ._addFileTypes<FileRouteTypes>()
+
+import type { getRouter } from './router.tsx'
+import type { createStart } from '@tanstack/react-start'
+declare module '@tanstack/react-start' {
+  interface Register {
+    ssr: true
+    router: Awaited<ReturnType<typeof getRouter>>
+  }
+}
