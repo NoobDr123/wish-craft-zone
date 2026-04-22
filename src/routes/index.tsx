@@ -541,12 +541,13 @@ function LandingPage() {
                 )}
 
                 {showPlayMe && !heroPlaying && (
-                  <div className="pointer-events-none absolute -top-3 left-1/2 -translate-x-1/2 sm:-top-4">
-                    <div className="relative animate-bounce rounded-full bg-[#C7572E] px-4 py-1.5 shadow-[0_8px_24px_rgba(199,87,46,0.45)] sm:px-5 sm:py-2">
-                      <span className="text-[11px] font-bold uppercase tracking-[0.16em] text-white sm:text-[12px]">
-                        ▶ Play me
+                  <div className="pointer-events-none absolute -top-2.5 left-1/2 z-10 -translate-x-1/2 sm:-top-3.5">
+                    <div className="relative animate-bounce rounded-full bg-[#C7572E] px-3.5 py-1 shadow-[0_6px_20px_rgba(199,87,46,0.5)] sm:px-4 sm:py-1.5">
+                      <span className="flex items-center gap-1.5 whitespace-nowrap text-[10px] font-bold uppercase tracking-[0.14em] text-white sm:text-[11px] sm:tracking-[0.16em]">
+                        <span aria-hidden className="text-[9px] sm:text-[10px]">▶</span>
+                        Play me
                       </span>
-                      <span className="absolute -bottom-1.5 left-1/2 h-3 w-3 -translate-x-1/2 rotate-45 bg-[#C7572E]" />
+                      <span className="absolute -bottom-1 left-1/2 h-2.5 w-2.5 -translate-x-1/2 rotate-45 bg-[#C7572E]" />
                     </div>
                   </div>
                 )}
