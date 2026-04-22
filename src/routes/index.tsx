@@ -364,29 +364,8 @@ function LandingPage() {
   const [activeSample, setActiveSample] = useState<FeaturedSample | null>(null);
   const heroAudioRef = useRef<HTMLAudioElement | null>(null);
   const [heroPlaying, setHeroPlaying] = useState(false);
-  const [heroShaking, setHeroShaking] = useState(false);
   const [heroEverPlayed, setHeroEverPlayed] = useState(false);
-  const [showPlayMe, setShowPlayMe] = useState(false);
-
-  // On landing: gentle shake + "Play me" hint until the user plays the song once
-  useEffect(() => {
-    if (heroEverPlayed) return;
-    const startDelay = window.setTimeout(() => {
-      setHeroShaking(true);
-      setShowPlayMe(true);
-    }, 1200);
-
-    // Re-trigger shake periodically so it keeps drawing attention
-    const interval = window.setInterval(() => {
-      setHeroShaking(false);
-      window.setTimeout(() => setHeroShaking(true), 60);
-    }, 4500);
-
-    return () => {
-      window.clearTimeout(startDelay);
-      window.clearInterval(interval);
-    };
-  }, [heroEverPlayed]);
+  const [showPlayMe, setShowPlayMe] = useState(true);
 
   const handleHeroPlay = () => {
     const a = heroAudioRef.current;
@@ -396,8 +375,6 @@ function LandingPage() {
       setHeroPlaying(false);
       return;
     }
-    // Stop the attention-shake permanently once they engage
-    setHeroShaking(false);
     setShowPlayMe(false);
     setHeroEverPlayed(true);
     a.currentTime = 0;
