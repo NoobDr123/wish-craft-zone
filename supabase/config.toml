@@ -1,1 +1,13 @@
 project_id = "tytxdnftsnspejnyfbmg"
+
+[functions.create-checkout]
+verify_jwt = false
+
+[functions.charge-upsell]
+verify_jwt = false
+
+[functions.mark-upsells-complete]
+verify_jwt = false
+
+[functions.payments-webhook]
+verify_jwt = false
