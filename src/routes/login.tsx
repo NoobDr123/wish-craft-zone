@@ -1,6 +1,6 @@
 import { createFileRoute, Link, useNavigate } from "@tanstack/react-router";
 import { useEffect, useState, type FormEvent } from "react";
-import { ArrowLeft, Mail, CheckCircle2, Loader2 } from "lucide-react";
+import { ArrowLeft, Mail, CheckCircle2, Loader2, ShieldCheck, LifeBuoy } from "lucide-react";
 import { Logo } from "@/components/Logo";
 import { supabase } from "@/integrations/supabase/client";
 import { useAuth } from "@/hooks/useAuth";
@@ -8,7 +8,7 @@ import { useAuth } from "@/hooks/useAuth";
 export const Route = createFileRoute("/login")({
   component: LoginPage,
   head: () => ({
-    meta: [{ title: "Sign in · RibbonSong" }],
+    meta: [{ title: "Track your song · RibbonSong" }],
   }),
 });
 
@@ -63,7 +63,7 @@ function LoginPage() {
         </div>
       </header>
 
-      <main className="mx-auto flex min-h-[calc(100vh-65px)] max-w-md items-center px-5 py-12">
+      <main className="mx-auto flex min-h-[calc(100vh-65px)] max-w-xl flex-col items-center gap-6 px-5 py-12">
         <div className="w-full rounded-3xl border border-peach/70 bg-card p-7 shadow-card md:p-9">
           {sent ? (
             <div className="text-center">
@@ -74,9 +74,9 @@ function LoginPage() {
                 Check your inbox
               </h1>
               <p className="mt-3 text-base leading-relaxed text-muted-foreground">
-                We just sent a magic sign-in link to{" "}
+                We just sent a sign-in link to{" "}
                 <span className="font-semibold text-foreground">{email}</span>.
-                Click it to access your songs and orders.
+                Click it to access your song and order status.
               </p>
               <p className="mt-6 text-xs text-muted-foreground">
                 Didn't get it? Check spam, or{" "}
@@ -95,17 +95,39 @@ function LoginPage() {
                 <Mail className="h-7 w-7 text-primary" />
               </div>
               <h1 className="mt-5 text-center font-display text-3xl font-bold text-foreground">
-                Sign in to your account
+                Track your song
               </h1>
               <p className="mt-2 text-center text-sm text-muted-foreground">
-                Enter the email you used at checkout. We'll send you a one-tap
-                sign-in link — no password needed.
+                Enter your email to check your song status and delivery date.
               </p>
 
-              <form onSubmit={handleSubmit} className="mt-7 space-y-4">
+              <div className="mt-6 rounded-2xl border border-success/30 bg-success/5 p-4">
+                <div className="flex items-start gap-3">
+                  <ShieldCheck className="mt-0.5 h-5 w-5 shrink-0 text-success" />
+                  <div>
+                    <p className="text-sm font-semibold text-foreground">
+                      We deliver every order — you're safe!
+                    </p>
+                    <p className="mt-1 text-xs leading-relaxed text-muted-foreground">
+                      We have a 100% song delivery rate. If you can't find your
+                      song, it's usually a typo in your email or a spam filter.
+                      Email us at{" "}
+                      <a
+                        href="mailto:hello@ribbonsong.com"
+                        className="font-semibold text-primary underline-offset-4 hover:underline"
+                      >
+                        hello@ribbonsong.com
+                      </a>{" "}
+                      and we'll resend your song. We reply within 1–3 days.
+                    </p>
+                  </div>
+                </div>
+              </div>
+
+              <form onSubmit={handleSubmit} className="mt-6 space-y-4">
                 <div>
                   <label className="text-sm font-semibold text-foreground">
-                    Email address
+                    Enter your email address
                   </label>
                   <input
                     type="email"
@@ -133,7 +155,7 @@ function LoginPage() {
                       Sending link…
                     </>
                   ) : (
-                    <>Send magic link</>
+                    <>Track your song</>
                   )}
                 </button>
               </form>
@@ -151,6 +173,38 @@ function LoginPage() {
             </>
           )}
         </div>
+
+        {!sent && (
+          <div className="w-full rounded-3xl border border-peach/70 bg-card/60 p-6 shadow-sm md:p-7">
+            <div className="flex items-start gap-3">
+              <div className="flex h-10 w-10 shrink-0 items-center justify-center rounded-full bg-primary/10">
+                <LifeBuoy className="h-5 w-5 text-primary" />
+              </div>
+              <div className="flex-1">
+                <h2 className="font-display text-lg font-bold text-foreground">
+                  Need help?
+                </h2>
+                <p className="mt-1 text-sm leading-relaxed text-muted-foreground">
+                  If you're having trouble finding your order or have any
+                  questions, email us at{" "}
+                  <a
+                    href="mailto:hello@ribbonsong.com"
+                    className="font-semibold text-primary underline-offset-4 hover:underline"
+                  >
+                    hello@ribbonsong.com
+                  </a>
+                  . We reply within 1–3 days.
+                </p>
+                <a
+                  href="mailto:hello@ribbonsong.com"
+                  className="mt-4 inline-flex items-center justify-center rounded-xl border border-primary/30 bg-background px-5 py-2.5 text-sm font-semibold text-primary transition-colors hover:bg-primary/5"
+                >
+                  Contact us
+                </a>
+              </div>
+            </div>
+          </div>
+        )}
       </main>
     </div>
   );
