@@ -468,26 +468,36 @@ function LandingPage() {
             {/* Hero video */}
             <div className="order-1 md:order-2">
               <div className="relative aspect-[4/5] overflow-hidden rounded-[18px] bg-[#ECE2D0] shadow-[0_20px_60px_rgba(31,27,22,0.12)]">
-                <img
-                  src="https://images.unsplash.com/photo-1609220136736-443140cffec6?auto=format&fit=crop&w=900&q=80"
-                  alt="Mother and daughter listening"
+                <video
+                  ref={heroVideoRef}
+                  src={rachelVideoAsset.url}
+                  poster={rachelPoster}
                   className="h-full w-full object-cover"
+                  autoPlay
+                  loop
+                  muted
+                  playsInline
+                  preload="metadata"
+                  onClick={handleHeroPlay}
                 />
-                <button
-                  aria-label="Play video"
-                  className="absolute left-1/2 top-1/2 flex h-16 w-16 -translate-x-1/2 -translate-y-1/2 items-center justify-center rounded-full bg-[rgba(246,240,230,0.95)] shadow-[0_8px_32px_rgba(0,0,0,0.3)] transition-transform hover:scale-110 sm:h-20 sm:w-20"
-                >
-                  <span
-                    className="ml-1 inline-block"
-                    style={{
-                      width: 0,
-                      height: 0,
-                      borderLeft: "16px solid #8D6FAF",
-                      borderTop: "10px solid transparent",
-                      borderBottom: "10px solid transparent",
-                    }}
-                  />
-                </button>
+                {!heroPlaying && (
+                  <button
+                    aria-label="Play with sound"
+                    onClick={handleHeroPlay}
+                    className="absolute left-1/2 top-1/2 flex h-16 w-16 -translate-x-1/2 -translate-y-1/2 items-center justify-center rounded-full bg-[rgba(246,240,230,0.95)] shadow-[0_8px_32px_rgba(0,0,0,0.3)] transition-transform hover:scale-110 sm:h-20 sm:w-20"
+                  >
+                    <span
+                      className="ml-1 inline-block"
+                      style={{
+                        width: 0,
+                        height: 0,
+                        borderLeft: "16px solid #8D6FAF",
+                        borderTop: "10px solid transparent",
+                        borderBottom: "10px solid transparent",
+                      }}
+                    />
+                  </button>
+                )}
               </div>
               <div className="mt-3 px-1 text-[13px] leading-[1.5] text-[#5A5148] sm:text-[13.5px]">
                 <strong className="mr-1.5 text-[11px] font-semibold uppercase tracking-[0.12em] text-[#8D6FAF]">
