@@ -61,7 +61,9 @@ export type GenreKey =
   | "Country"
   | "R&B / Soul"
   | "Gospel / Worship"
-  | "Cinematic / Orchestral";
+  | "Cinematic / Orchestral"
+  | "Hip-Hop / Rap"
+  | "Rock / Indie";
 
 export type TempoKey = "Slow & Tender" | "Mid-tempo" | "Upbeat & Triumphant";
 export type VoiceKey = "Female Voice" | "Male Voice" | "Duet" | "No Preference";
