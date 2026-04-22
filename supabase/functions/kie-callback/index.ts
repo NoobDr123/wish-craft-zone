@@ -21,6 +21,7 @@ serve(async (req) => {
   try {
     const url = new URL(req.url);
     const orderIdFromQuery = url.searchParams.get("orderId");
+    const sampleIdFromQuery = url.searchParams.get("sampleId");
     const payload = await req.json().catch(() => ({}));
 
     const taskId =
@@ -32,6 +33,33 @@ serve(async (req) => {
 
     const stage = payload?.data?.callbackType ?? payload?.callbackType ?? "complete";
 
+    // ---- Sample callback path (homepage demo songs) ----
+    if (sampleIdFromQuery) {
+      const audioUrl =
+        payload?.data?.data?.[0]?.audio_url ??
+        payload?.data?.audio_url ??
+        payload?.audio_url ??
+        null;
+      const variants = payload?.data?.data ?? null;
+
+      const update: Record<string, unknown> = {
+        kie_callback_received_at: new Date().toISOString(),
+      };
+      if (audioUrl) {
+        update.audio_url = audioUrl;
+        update.status = "ready";
+      }
+      if (variants) update.audio_variants = variants;
+
+      await supabase
+        .from("featured_samples")
+        .update(update)
+        .eq("id", sampleIdFromQuery);
+
+      return json({ ok: true, sampleId: sampleIdFromQuery });
+    }
+
+    // ---- Order callback path (existing customer pipeline) ----
     let orderId = orderIdFromQuery;
     if (!orderId) {
       const { data: o } = await supabase
