@@ -52,7 +52,8 @@ export interface BriefScore {
   flow_and_singability: number; // 0-5
   tonal_match: number; // 0-5
   coherence: number; // 0-5
-  overall: number; // average, 0-5
+  tense_correctness: number; // 0-5 — HARD GATE for hospice/memory
+  overall: number; // weighted average, 0-5
   notes: string;
 }
 
