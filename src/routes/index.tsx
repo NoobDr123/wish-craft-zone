@@ -44,7 +44,7 @@ export const Route = createFileRoute("/")({
       {
         name: "description",
         content:
-          "When cancer takes the words away, give them a song. Written with care. Produced in studio. Delivered to your inbox in seven days.",
+          "When cancer takes the words away, give them a song. Written with care. Produced in studio. Delivered to your inbox in five days.",
       },
       {
         property: "og:title",
@@ -273,7 +273,7 @@ const testimonials: Array<
 const faqs = [
   {
     q: "How long does it take?",
-    a: "Standard delivery is seven days. If you're up against a hospice timeline or a specific date we need to hit, tell us. We will do everything in our power to meet the moment.",
+    a: "Standard delivery is five days. If you need it sooner, our 24-hour express option is available at checkout. If you're up against a hospice timeline or a specific date we need to hit, tell us. We will do everything in our power to meet the moment.",
   },
   {
     q: "What if I don't know what to say?",
@@ -746,7 +746,7 @@ function LandingPage() {
           <div className="mx-auto mb-10 max-w-[720px] text-center md:mb-14">
             <Eyebrow center>How it works</Eyebrow>
             <h2 className="mb-3.5 font-display text-[clamp(28px,7vw,48px)] font-medium leading-[1.1] tracking-[-0.022em] text-[#1F1B16]">
-              Three gentle steps. <em className="italic text-[#8D6FAF]">Seven days.</em>
+              Three gentle steps. <em className="italic text-[#8D6FAF]">Five days.</em>
             </h2>
             <p className="mx-auto mt-3.5 max-w-[560px] text-[17px] leading-[1.55] text-[#5A5148]">
               You don't have to know music. You don't have to know what to say.
@@ -771,7 +771,7 @@ function LandingPage() {
               {
                 n: "03",
                 h: "Delivered to your inbox.",
-                p: "In seven days. Streaming and downloadable, yours forever. Share it, give it, play it at the bedside, the church, the memorial, or the kitchen sink.",
+                p: "In five days. Streaming and downloadable, yours forever. Share it, give it, play it at the bedside, the church, the memorial, or the kitchen sink.",
                 m: "If it doesn't feel right, we rewrite it free. Or refund you in full. No questions.",
               },
             ].map((s) => (
@@ -941,7 +941,7 @@ function LandingPage() {
           </p>
           <PrimaryBtn large>Start their song</PrimaryBtn>
           <div className="mt-6 text-[13px] text-[rgba(246,240,230,0.55)]">
-            Delivered in 7 days · Free revisions · Money back guarantee
+            Delivered in 5 days · Free revisions · Money back guarantee
           </div>
         </div>
       </section>

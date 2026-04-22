@@ -41,7 +41,7 @@ function Upsell2() {
       headline="Need it sooner?"
       description={
         <>
-          Standard delivery takes 7 days. Skip the line and get your song
+          Standard delivery takes 5 days. Skip the line and get your song
           delivered in the next{" "}
           <span className="font-semibold text-foreground">24 hours</span> for{" "}
           <span className="font-semibold text-foreground">$59.00</span>.
@@ -53,7 +53,7 @@ function Upsell2() {
         "Email the moment it's ready",
       ]}
       acceptLabel="Yes, 24-hour rush · $59.00"
-      declineLabel="No thanks, I can wait 7 days"
+      declineLabel="No thanks, I can wait 5 days"
       onAccept={accept}
       onDecline={decline}
       processing={processing}

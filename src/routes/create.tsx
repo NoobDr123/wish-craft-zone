@@ -352,7 +352,7 @@ function CreatePage() {
     {
       chapter: "Delivery",
       title: "Where should we send it?",
-      subtitle: "We'll email you when it is ready, usually within 7 days.",
+      subtitle: "We'll email you when it is ready, usually within 5 days.",
       isValid: (s) =>
         s.buyer_name.trim().length > 1 && emailRe.test(s.buyer_email),
       render: () => (
