@@ -12,6 +12,7 @@ import { Route as rootRouteImport } from './routes/__root'
 import { Route as Upsell3RouteImport } from './routes/upsell-3'
 import { Route as Upsell2RouteImport } from './routes/upsell-2'
 import { Route as Upsell1RouteImport } from './routes/upsell-1'
+import { Route as Staff7q9k2xRouteImport } from './routes/staff-7q9k2x'
 import { Route as ScratchRouteImport } from './routes/scratch'
 import { Route as ProcessingRouteImport } from './routes/processing'
 import { Route as LoginRouteImport } from './routes/login'
@@ -42,6 +43,11 @@ const Upsell2Route = Upsell2RouteImport.update({
 const Upsell1Route = Upsell1RouteImport.update({
   id: '/upsell-1',
   path: '/upsell-1',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const Staff7q9k2xRoute = Staff7q9k2xRouteImport.update({
+  id: '/staff-7q9k2x',
+  path: '/staff-7q9k2x',
   getParentRoute: () => rootRouteImport,
 } as any)
 const ScratchRoute = ScratchRouteImport.update({
@@ -137,6 +143,7 @@ export interface FileRoutesByFullPath {
   '/login': typeof LoginRoute
   '/processing': typeof ProcessingRoute
   '/scratch': typeof ScratchRoute
+  '/staff-7q9k2x': typeof Staff7q9k2xRoute
   '/upsell-1': typeof Upsell1Route
   '/upsell-2': typeof Upsell2Route
   '/upsell-3': typeof Upsell3Route
@@ -158,6 +165,7 @@ export interface FileRoutesByTo {
   '/login': typeof LoginRoute
   '/processing': typeof ProcessingRoute
   '/scratch': typeof ScratchRoute
+  '/staff-7q9k2x': typeof Staff7q9k2xRoute
   '/upsell-1': typeof Upsell1Route
   '/upsell-2': typeof Upsell2Route
   '/upsell-3': typeof Upsell3Route
@@ -180,6 +188,7 @@ export interface FileRoutesById {
   '/login': typeof LoginRoute
   '/processing': typeof ProcessingRoute
   '/scratch': typeof ScratchRoute
+  '/staff-7q9k2x': typeof Staff7q9k2xRoute
   '/upsell-1': typeof Upsell1Route
   '/upsell-2': typeof Upsell2Route
   '/upsell-3': typeof Upsell3Route
@@ -203,6 +212,7 @@ export interface FileRouteTypes {
     | '/login'
     | '/processing'
     | '/scratch'
+    | '/staff-7q9k2x'
     | '/upsell-1'
     | '/upsell-2'
     | '/upsell-3'
@@ -224,6 +234,7 @@ export interface FileRouteTypes {
     | '/login'
     | '/processing'
     | '/scratch'
+    | '/staff-7q9k2x'
     | '/upsell-1'
     | '/upsell-2'
     | '/upsell-3'
@@ -245,6 +256,7 @@ export interface FileRouteTypes {
     | '/login'
     | '/processing'
     | '/scratch'
+    | '/staff-7q9k2x'
     | '/upsell-1'
     | '/upsell-2'
     | '/upsell-3'
@@ -267,6 +279,7 @@ export interface RootRouteChildren {
   LoginRoute: typeof LoginRoute
   ProcessingRoute: typeof ProcessingRoute
   ScratchRoute: typeof ScratchRoute
+  Staff7q9k2xRoute: typeof Staff7q9k2xRoute
   Upsell1Route: typeof Upsell1Route
   Upsell2Route: typeof Upsell2Route
   Upsell3Route: typeof Upsell3Route
@@ -298,6 +311,13 @@ declare module '@tanstack/react-router' {
       path: '/upsell-1'
       fullPath: '/upsell-1'
       preLoaderRoute: typeof Upsell1RouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/staff-7q9k2x': {
+      id: '/staff-7q9k2x'
+      path: '/staff-7q9k2x'
+      fullPath: '/staff-7q9k2x'
+      preLoaderRoute: typeof Staff7q9k2xRouteImport
       parentRoute: typeof rootRouteImport
     }
     '/scratch': {
@@ -438,6 +458,7 @@ const rootRouteChildren: RootRouteChildren = {
   LoginRoute: LoginRoute,
   ProcessingRoute: ProcessingRoute,
   ScratchRoute: ScratchRoute,
+  Staff7q9k2xRoute: Staff7q9k2xRoute,
   Upsell1Route: Upsell1Route,
   Upsell2Route: Upsell2Route,
   Upsell3Route: Upsell3Route,
@@ -450,3 +471,12 @@ const rootRouteChildren: RootRouteChildren = {
 export const routeTree = rootRouteImport
   ._addFileChildren(rootRouteChildren)
   ._addFileTypes<FileRouteTypes>()
+
+import type { getRouter } from './router.tsx'
+import type { createStart } from '@tanstack/react-start'
+declare module '@tanstack/react-start' {
+  interface Register {
+    ssr: true
+    router: Awaited<ReturnType<typeof getRouter>>
+  }
+}
