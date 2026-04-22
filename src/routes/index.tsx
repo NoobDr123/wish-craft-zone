@@ -425,29 +425,29 @@ function LandingPage() {
       {/* PRESS STRIP */}
       <div
         id="press"
-        className="border-y border-[#D9CEB9] bg-[#ECE2D0] px-0 py-9"
+        className="border-y border-[#D9CEB9] bg-[#ECE2D0] px-0 py-7 md:py-9"
       >
-        <div className="mx-auto flex max-w-[1200px] flex-wrap items-center justify-between gap-10 px-6">
-          <div className="shrink-0 text-[11.5px] font-semibold uppercase tracking-[0.18em] text-[#8A8175]">
+        <div className="mx-auto flex max-w-[1200px] flex-col items-center gap-5 px-5 sm:px-6 md:flex-row md:flex-wrap md:justify-between md:gap-10">
+          <div className="shrink-0 text-center text-[11px] font-semibold uppercase tracking-[0.18em] text-[#8A8175] md:text-[11.5px]">
             As featured in
           </div>
-          <div className="flex flex-1 flex-wrap items-center justify-around gap-11">
-            <span className="font-sans text-[15px] font-bold uppercase tracking-[0.12em] text-[#5A5148] opacity-70 transition-opacity hover:opacity-100">
+          <div className="flex flex-1 flex-wrap items-center justify-center gap-x-6 gap-y-3 md:justify-around md:gap-11">
+            <span className="font-sans text-[13px] font-bold uppercase tracking-[0.12em] text-[#5A5148] opacity-70 transition-opacity hover:opacity-100 md:text-[15px]">
               CBS
             </span>
-            <span className="font-display text-[20px] font-semibold tracking-[-0.01em] text-[#5A5148] opacity-70 transition-opacity hover:opacity-100">
+            <span className="font-display text-[17px] font-semibold tracking-[-0.01em] text-[#5A5148] opacity-70 transition-opacity hover:opacity-100 md:text-[20px]">
               People
             </span>
-            <span className="font-sans text-[15px] font-bold uppercase tracking-[0.12em] text-[#5A5148] opacity-70 transition-opacity hover:opacity-100">
+            <span className="font-sans text-[13px] font-bold uppercase tracking-[0.12em] text-[#5A5148] opacity-70 transition-opacity hover:opacity-100 md:text-[15px]">
               FOX
             </span>
-            <span className="font-display text-[20px] font-semibold tracking-[-0.01em] text-[#5A5148] opacity-70 transition-opacity hover:opacity-100">
+            <span className="font-display text-[17px] font-semibold tracking-[-0.01em] text-[#5A5148] opacity-70 transition-opacity hover:opacity-100 md:text-[20px]">
               Good Morning America
             </span>
-            <span className="font-sans text-[15px] font-bold uppercase tracking-[0.12em] text-[#5A5148] opacity-70 transition-opacity hover:opacity-100">
+            <span className="font-sans text-[13px] font-bold uppercase tracking-[0.12em] text-[#5A5148] opacity-70 transition-opacity hover:opacity-100 md:text-[15px]">
               Survivornet
             </span>
-            <span className="font-display text-[20px] font-semibold tracking-[-0.01em] text-[#5A5148] opacity-70 transition-opacity hover:opacity-100">
+            <span className="font-display text-[17px] font-semibold tracking-[-0.01em] text-[#5A5148] opacity-70 transition-opacity hover:opacity-100 md:text-[20px]">
               Yahoo Life
             </span>
           </div>
