@@ -3,6 +3,7 @@ import { useEffect, useMemo, useState } from "react";
 import { EmbeddedCheckoutProvider, EmbeddedCheckout } from "@stripe/react-stripe-js";
 import { Logo } from "@/components/Logo";
 import { PaymentTestModeBanner } from "@/components/PaymentTestModeBanner";
+import { AudioPlayer } from "@/components/AudioPlayer";
 import { useQuizStore, journeyStageOf, tenseOf } from "@/stores/quizStore";
 import { supabase } from "@/integrations/supabase/client";
 import { getStripe, stripeEnvironment } from "@/lib/stripe";
@@ -12,38 +13,36 @@ import {
   Gift,
   Music2,
   Pencil,
-  Play,
   ShieldCheck,
 } from "lucide-react";
+
+interface SampleSong {
+  id: string;
+  title: string;
+  for_text: string | null;
+  quote: string | null;
+  audio_url: string | null;
+  recipient_name: string;
+}
 
 export const Route = createFileRoute("/checkout")({
   component: CheckoutPage,
   head: () => ({
     meta: [{ title: "Almost There · RibbonSong" }],
   }),
+  loader: async () => {
+    const { data } = await supabase
+      .from("featured_samples")
+      .select("id,title,for_text,quote,audio_url,recipient_name")
+      .eq("published", true)
+      .not("audio_url", "is", null)
+      .order("sort_order", { ascending: true })
+      .limit(3);
+    return { samples: (data ?? []) as SampleSong[] };
+  },
 });
 
 const emailRe = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
-
-const SAMPLES = [
-  {
-    title: "Sent to Me from God",
-    by: "Pamela S.",
-    quote:
-      "Absolutely beautiful, you captured such special moments… we both were crying.",
-  },
-  {
-    title: "Saving Grace",
-    by: "Wendy B.",
-    quote:
-      "This is absolutely breathtaking. I can't believe it… I am going to have a hard time keeping this a secret until Sunday.",
-  },
-  {
-    title: "Stronger Now",
-    by: "Markeeta B.",
-    quote: "Very very wonderful song. I absolutely loved it and so did Dave!",
-  },
-];
 
 function formatDeliveryDate() {
   const d = new Date();
@@ -53,6 +52,7 @@ function formatDeliveryDate() {
 
 function CheckoutPage() {
   const navigate = useNavigate();
+  const { samples } = Route.useLoaderData() as { samples: SampleSong[] };
   const q = useQuizStore();
   const [email, setEmail] = useState(q.buyer_email || "");
   const [name, setName] = useState(q.buyer_name || "");
@@ -107,7 +107,7 @@ function CheckoutPage() {
           recipient_email: q.recipient_email || null,
           delivery_date: q.delivery_date || null,
           personal_note: q.personal_note || null,
-          amount_cents: 6999,
+          amount_cents: 4999,
           currency: "USD",
           status: "pending_payment",
           payment_status: "pending",
@@ -254,10 +254,10 @@ function CheckoutPage() {
             </span>
             <p className="flex items-baseline gap-2">
               <span className="text-base font-medium text-muted-foreground line-through">
-                $139.99
+                $99.99
               </span>
               <span className="font-display text-3xl font-bold text-primary">
-                $69.99
+                $49.99
               </span>
               <span className="text-sm font-semibold text-muted-foreground">
                 USD
@@ -316,7 +316,7 @@ function CheckoutPage() {
                 </>
               ) : (
                 <>
-                  <Gift className="h-5 w-5" /> Continue to Payment · $69.99
+                  <Gift className="h-5 w-5" /> Continue to Payment · $49.99
                 </>
               )}
             </button>
@@ -336,36 +336,36 @@ function CheckoutPage() {
         )}
 
         {/* Samples */}
-        <section className="mt-6 rounded-3xl border border-peach/70 bg-card p-6 shadow-soft md:p-7">
-          <h2 className="flex items-center gap-2 font-display text-2xl font-bold text-foreground">
-            <Music2 className="h-5 w-5 text-primary" /> Hear Other RibbonSongs We Made
-          </h2>
-          <div className="mt-5 space-y-4">
-            {SAMPLES.map((s) => (
-              <article
-                key={s.title}
-                className="rounded-2xl border border-peach/60 bg-background/60 p-4"
-              >
-                <div className="flex items-center gap-3">
-                  <button
-                    aria-label={`Play ${s.title}`}
-                    className="flex h-12 w-12 shrink-0 items-center justify-center rounded-full bg-primary text-primary-foreground transition-transform hover:scale-105"
-                  >
-                    <Play className="ml-0.5 h-5 w-5 fill-current" />
-                  </button>
-                  <div className="min-w-0 flex-1">
-                    <p className="truncate font-semibold text-foreground">{s.title}</p>
-                    <p className="truncate text-xs text-muted-foreground">Ordered by {s.by}</p>
-                  </div>
-                  <span className="text-xs tabular-nums text-muted-foreground">0:00</span>
-                </div>
-                <p className="mt-3 text-sm italic leading-relaxed text-foreground/80">
-                  &ldquo;{s.quote}&rdquo; — {s.by}
-                </p>
-              </article>
-            ))}
-          </div>
-        </section>
+        {samples.length > 0 && (
+          <section className="mt-6 rounded-3xl border border-peach/70 bg-card p-6 shadow-soft md:p-7">
+            <h2 className="flex items-center gap-2 font-display text-2xl font-bold text-foreground">
+              <Music2 className="h-5 w-5 text-primary" /> Hear Other RibbonSongs We Made
+            </h2>
+            <div className="mt-5 space-y-5">
+              {samples.map((s) => (
+                <article
+                  key={s.id}
+                  className="rounded-2xl border border-peach/60 bg-background/60 p-4"
+                >
+                  <p className="font-semibold text-foreground">{s.title}</p>
+                  {s.for_text && (
+                    <p className="mt-0.5 text-xs text-muted-foreground">{s.for_text}</p>
+                  )}
+                  {s.audio_url && (
+                    <div className="mt-3">
+                      <AudioPlayer src={s.audio_url} title={s.title} variant="compact" />
+                    </div>
+                  )}
+                  {s.quote && (
+                    <p className="mt-3 text-sm italic leading-relaxed text-foreground/80">
+                      &ldquo;{s.quote}&rdquo;
+                    </p>
+                  )}
+                </article>
+              ))}
+            </div>
+          </section>
+        )}
 
         {/* Money-back guarantee */}
         <section className="mt-6 rounded-3xl border border-peach/70 bg-card p-6 shadow-soft md:p-7">

@@ -101,7 +101,7 @@ function TermsPage() {
           <h2>5. Pricing, payment &amp; upsells</h2>
           <p>
             The base price for a song is shown at checkout (currently
-            $69.99 USD). After your purchase you may be offered optional
+            $49.99 USD). After your purchase you may be offered optional
             upgrades (for example, an extra verse, rush delivery, or unlimited
             edits). Optional upgrades are charged to the payment method you
             used at checkout only after you click to accept them. All payments
