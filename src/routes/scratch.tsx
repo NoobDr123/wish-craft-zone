@@ -289,24 +289,35 @@ function ScratchPage() {
       {stage === "scratch" ? (
         <main className="mx-auto max-w-xl px-5 py-12">
           <div className="text-center">
-            <div className="text-5xl">🎁</div>
-            <h1 className="mt-5 text-balance font-display text-3xl font-bold leading-tight text-foreground md:text-4xl">
-              You're lucky! Scratch and reveal your discount!
+            <span className="inline-flex items-center gap-1.5 rounded-full border border-primary/30 bg-primary/5 px-3 py-1 text-xs font-semibold uppercase tracking-wide text-primary">
+              <Sparkles className="h-3.5 w-3.5" />
+              {copy.eyebrow}
+            </span>
+            <div className="mt-5 text-5xl">{copy.emoji}</div>
+            <h1 className="mt-4 text-balance font-display text-3xl font-bold leading-tight text-foreground md:text-4xl">
+              {copy.scratchHeadline}
             </h1>
             <p className="mt-3 text-balance text-muted-foreground">
-              Scratch the gold surface to uncover your exclusive discount 👇
+              {copy.scratchSub}
             </p>
           </div>
 
           {/* Scratch card */}
           <div className="mt-8 select-none">
             <div className="relative mx-auto aspect-[5/3] w-full max-w-md overflow-hidden rounded-3xl border-2 border-[#c9914a]/40 bg-card shadow-card">
-              {/* Reveal layer — just -50% */}
+              {/* Reveal layer — personalized */}
               <div className="absolute inset-0 flex flex-col items-center justify-center bg-peach/40 p-6 text-center">
-                <span className="font-display text-7xl font-extrabold text-primary md:text-8xl">
+                {firstName && (
+                  <span className="text-xs font-semibold uppercase tracking-[0.2em] text-primary/80">
+                    For {firstName}
+                  </span>
+                )}
+                <span className="mt-1 font-display text-7xl font-extrabold text-primary md:text-8xl">
                   -50%
                 </span>
-                <span className="mt-2 text-3xl">🎉</span>
+                <span className="mt-1 text-sm font-medium text-foreground/70">
+                  off your personalized song
+                </span>
               </div>
               {/* Scratchable canvas overlay */}
               <canvas
@@ -354,28 +365,46 @@ function ScratchPage() {
       ) : (
         <main className="mx-auto max-w-xl px-5 py-12">
           <div className="text-center">
-            <div className="text-5xl">🎉</div>
-            <h1 className="mt-5 text-balance font-display text-3xl font-bold leading-tight text-foreground md:text-4xl">
-              Congrats! You unlocked -50% off! 🎉
+            <span className="inline-flex items-center gap-1.5 rounded-full border border-primary/30 bg-primary/5 px-3 py-1 text-xs font-semibold uppercase tracking-wide text-primary">
+              <Heart className="h-3.5 w-3.5" />
+              Reserved for {firstName || "you"}
+            </span>
+            <div className="mt-5 text-5xl">🎉</div>
+            <h1 className="mt-4 text-balance font-display text-3xl font-bold leading-tight text-foreground md:text-4xl">
+              {copy.claimHeadline}
             </h1>
+            <p className="mt-3 text-balance text-muted-foreground">
+              {copy.claimSub}
+            </p>
           </div>
 
-          {/* Discount badge */}
-          <div className="mt-8 flex flex-col items-center justify-center rounded-3xl border-2 border-primary/30 bg-peach/40 p-12 text-center shadow-card">
-            <span className="font-display text-7xl font-extrabold text-primary md:text-8xl">
+          {/* Discount badge — personalized */}
+          <div className="mt-8 flex flex-col items-center justify-center rounded-3xl border-2 border-primary/30 bg-peach/40 p-10 text-center shadow-card">
+            {firstName && (
+              <span className="text-xs font-semibold uppercase tracking-[0.2em] text-primary/80">
+                {journey === "memory"
+                  ? `In honor of ${firstName}`
+                  : `${firstName}'s song`}
+              </span>
+            )}
+            <span className="mt-2 font-display text-7xl font-extrabold text-primary md:text-8xl">
               -50%
             </span>
-            <span className="mt-2 text-3xl">🎉</span>
+            <span className="mt-1 text-sm font-medium text-foreground/70">
+              off your personalized song
+            </span>
           </div>
 
           {/* Countdown urgency banner */}
           <div className="mt-6 flex items-center justify-center gap-2 rounded-2xl border border-primary/30 bg-primary/5 px-4 py-3 text-center text-sm font-semibold text-primary">
             <Timer className="h-4 w-4" />
             {expired ? (
-              <span>Your discount expired! But you can still order a song.</span>
+              <span>
+                Your discount expired — but you can still order {firstName || "their"}'s song.
+              </span>
             ) : (
               <span>
-                Discount expires in{" "}
+                {firstName ? `${firstName}'s discount expires in ` : "Discount expires in "}
                 <span className="tabular-nums">
                   {mins}:{secs}
                 </span>
@@ -389,7 +418,7 @@ function ScratchPage() {
             className="mt-6 flex w-full items-center justify-center gap-2 rounded-full bg-primary px-8 py-5 text-base font-bold text-primary-foreground shadow-glow transition-all hover:bg-primary-hover active:scale-[0.99]"
           >
             <Gift className="h-5 w-5" />
-            Claim your special offer -50%
+            {copy.ctaLabel}
             <ArrowRight className="h-5 w-5" />
           </button>
 
