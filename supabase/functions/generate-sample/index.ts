@@ -18,7 +18,7 @@ const supabase = createClient(
 );
 
 const KIE_API_KEY = Deno.env.get("KIE_API_KEY")!;
-const KIE_BASE = "https://apibox.erweima.ai";
+const KIE_BASE = "https://api.kie.ai";
 const CALLBACK_URL = `${Deno.env.get("SUPABASE_URL")!}/functions/v1/kie-callback`;
 
 const WRITER_MODEL = "claude-opus-4-5";
