@@ -11,3 +11,24 @@ verify_jwt = false
 
 [functions.payments-webhook]
 verify_jwt = false
+
+[functions.kie-callback]
+verify_jwt = false
+
+[functions.drain-queue]
+verify_jwt = false
+
+[functions.generate-brief]
+verify_jwt = false
+
+[functions.submit-to-kie]
+verify_jwt = false
+
+[functions.process-kie-callback]
+verify_jwt = false
+
+[functions.deliver-song]
+verify_jwt = false
+
+[functions.send-app-email]
+verify_jwt = false
