@@ -107,7 +107,7 @@ function CheckoutPage() {
           recipient_email: q.recipient_email || null,
           delivery_date: q.delivery_date || null,
           personal_note: q.personal_note || null,
-          amount_cents: 6999,
+          amount_cents: 4999,
           currency: "USD",
           status: "pending_payment",
           payment_status: "pending",
@@ -254,10 +254,10 @@ function CheckoutPage() {
             </span>
             <p className="flex items-baseline gap-2">
               <span className="text-base font-medium text-muted-foreground line-through">
-                $139.99
+                $99.99
               </span>
               <span className="font-display text-3xl font-bold text-primary">
-                $69.99
+                $49.99
               </span>
               <span className="text-sm font-semibold text-muted-foreground">
                 USD
@@ -316,7 +316,7 @@ function CheckoutPage() {
                 </>
               ) : (
                 <>
-                  <Gift className="h-5 w-5" /> Continue to Payment · $69.99
+                  <Gift className="h-5 w-5" /> Continue to Payment · $49.99
                 </>
               )}
             </button>
