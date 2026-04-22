@@ -122,12 +122,15 @@ function ScratchPage() {
         ctx.fill();
       }
 
-      // Overlay text
+      // Overlay text — personalized
       ctx.fillStyle = "rgba(255,255,255,0.95)";
       ctx.textAlign = "center";
       ctx.textBaseline = "middle";
-      ctx.font = "800 24px Inter, system-ui, sans-serif";
-      ctx.fillText("✨ SCRATCH HERE ✨", rect.width / 2, rect.height / 2 - 12);
+      ctx.font = "800 22px Inter, system-ui, sans-serif";
+      const top = firstName
+        ? `✨ FOR ${firstName.toUpperCase()} ✨`
+        : "✨ SCRATCH HERE ✨";
+      ctx.fillText(top, rect.width / 2, rect.height / 2 - 14);
       ctx.font = "500 13px Inter, system-ui, sans-serif";
       ctx.fillText(
         "Drag to reveal your discount",
@@ -140,7 +143,7 @@ function ScratchPage() {
     const ro = new ResizeObserver(() => paint());
     ro.observe(canvas);
     return () => ro.disconnect();
-  }, [stage]);
+  }, [stage, firstName]);
 
   const fireConfetti = () => {
     const colors = ["#d97757", "#e9c089", "#f4d9a8", "#7bb37b", "#a07fe6"];
