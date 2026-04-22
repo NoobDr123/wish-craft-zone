@@ -1,5 +1,5 @@
 import { Link } from "@tanstack/react-router";
-import logoMark from "@/assets/ribbonsong-logo.png";
+import logoMark from "@/assets/ribbonsong-logo-v6.png";
 
 interface LogoProps {
   className?: string;
