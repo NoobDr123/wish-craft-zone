@@ -1,285 +1,232 @@
-import { createFileRoute, Link } from "@tanstack/react-router";
+// Real dashboard — lists user's orders, polls in-progress ones, links to /listen.
+
+import { createFileRoute, Link, useNavigate } from "@tanstack/react-router";
 import { useEffect, useState } from "react";
-import { Check, Copy, Download, FileText, Pencil } from "lucide-react";
+import { Check, Copy, Music } from "lucide-react";
 import { Logo } from "@/components/Logo";
 import { AudioPlayer } from "@/components/AudioPlayer";
-import { useQuizStore } from "@/stores/quizStore";
+import { useAuth } from "@/hooks/useAuth";
+import { supabase } from "@/integrations/supabase/client";
+import { Badge } from "@/components/ui/badge";
 
 export const Route = createFileRoute("/dashboard")({
   component: Dashboard,
-  head: () => ({
-    meta: [{ title: "Your Dashboard · RibbonSong" }],
-  }),
+  head: () => ({ meta: [{ title: "Your Dashboard · RibbonSong" }] }),
 });
 
-type Status = "drafting_lyrics" | "composing_music" | "finalizing" | "completed";
+interface Order {
+  id: string;
+  recipient_name: string;
+  status: string;
+  priority: string;
+  is_gift: boolean;
+  delivery_date: string | null;
+  scheduled_delivery_at: string | null;
+  delivered_at: string | null;
+  share_page_slug: string | null;
+  audio_variants: any;
+  selected_variant_id: string | null;
+  brief: any;
+  genre: string | null;
+  tempo: string | null;
+  has_3rd_verse: boolean;
+  is_rush: boolean;
+  has_unlimited_edits: boolean;
+  created_at: string;
+}
 
-const STAGES: { key: Status; label: string; description: string }[] = [
-  {
-    key: "drafting_lyrics",
-    label: "Drafting lyrics",
-    description: "Weaving your story into verses.",
-  },
-  {
-    key: "composing_music",
-    label: "Composing music",
-    description: "Bringing the melody to life.",
-  },
-  {
-    key: "finalizing",
-    label: "Final polish",
-    description: "Mixing and mastering for clarity.",
-  },
-  {
-    key: "completed",
-    label: "Ready to listen",
-    description: "Your song is delivered.",
-  },
-];
-
-const DEMO_LYRICS = `[Verse 1]
-You taught me how to laugh at rain
-How to hold a hand and ease the pain
-Every story, every quiet song
-You're the reason I am strong
-
-[Chorus]
-And I will sing you through the night
-A ribbon of love, a thread of light
-Whatever comes, you're not alone
-I'll carry you all the way home
-
-[Verse 2]
-The little kitchen, summer pies
-The way you crinkled up your eyes
-You're the kindness I still know
-Wherever, whoever I go
-
-[Chorus]
-And I will sing you through the night
-A ribbon of love, a thread of light
-Whatever comes, you're not alone
-I'll carry you all the way home
-
-[Outro]
-We'll carry you all the way home`;
+const STAGE_MAP: Record<string, { label: string; pct: number }> = {
+  received: { label: "Order received", pct: 5 },
+  upsells_complete: { label: "Setting up your song", pct: 10 },
+  brief_generating: { label: "Drafting lyrics", pct: 25 },
+  brief_ready: { label: "Lyrics complete", pct: 45 },
+  music_generating: { label: "Composing music", pct: 70 },
+  ready_to_deliver: { label: "Final polish", pct: 90 },
+  delivered: { label: "Delivered", pct: 100 },
+  brief_failed: { label: "Needs review", pct: 25 },
+  music_failed: { label: "Needs review", pct: 70 },
+};
 
 function Dashboard() {
-  const q = useQuizStore();
-  const [stageIndex, setStageIndex] = useState(0);
-  const [copied, setCopied] = useState(false);
+  const { user, loading } = useAuth();
+  const navigate = useNavigate();
+  const [orders, setOrders] = useState<Order[]>([]);
+  const [copied, setCopied] = useState<string | null>(null);
 
-  // Simulate progression for the demo
   useEffect(() => {
-    if (stageIndex >= STAGES.length - 1) return;
-    const t = setTimeout(() => setStageIndex((i) => i + 1), 3500);
-    return () => clearTimeout(t);
-  }, [stageIndex]);
+    if (loading) return;
+    if (!user) {
+      navigate({ to: "/login", search: { redirect: "/dashboard" } as any });
+      return;
+    }
+    fetchOrders();
+    const t = setInterval(fetchOrders, 8000); // poll every 8s
+    return () => clearInterval(t);
+  }, [loading, user]);
 
-  const completed = stageIndex === STAGES.length - 1;
-  const shareUrl =
-    typeof window !== "undefined" && q.orderId
-      ? `${window.location.origin}/listen/${q.orderId}`
-      : "";
-
-  const copy = async () => {
-    if (!shareUrl) return;
-    await navigator.clipboard.writeText(shareUrl);
-    setCopied(true);
-    setTimeout(() => setCopied(false), 2000);
+  const fetchOrders = async () => {
+    const { data } = await supabase
+      .from("orders")
+      .select(
+        "id, recipient_name, status, priority, is_gift, delivery_date, scheduled_delivery_at, delivered_at, share_page_slug, audio_variants, selected_variant_id, brief, genre, tempo, has_3rd_verse, is_rush, has_unlimited_edits, created_at",
+      )
+      .order("created_at", { ascending: false });
+    setOrders((data as Order[]) ?? []);
   };
+
+  const copy = async (url: string, id: string) => {
+    await navigator.clipboard.writeText(url);
+    setCopied(id);
+    setTimeout(() => setCopied(null), 2000);
+  };
+
+  if (loading) {
+    return (
+      <div className="min-h-screen flex items-center justify-center text-muted-foreground">
+        Loading…
+      </div>
+    );
+  }
 
   return (
     <div className="min-h-screen bg-background pb-24">
       <header className="border-b border-border/60 bg-background/80 px-6 py-5 backdrop-blur">
         <div className="mx-auto flex max-w-5xl items-center justify-between">
           <Logo />
-          <span className="text-sm text-muted-foreground">Your dashboard</span>
+          <Link to="/account" className="text-sm text-muted-foreground hover:text-foreground">
+            Account
+          </Link>
         </div>
       </header>
 
       <main className="mx-auto max-w-5xl px-6 py-12">
-        <div className="grid gap-10 lg:grid-cols-[1.4fr_1fr]">
-          <section>
-            <p className="text-sm font-medium uppercase tracking-wider text-primary">
-              {completed ? "Delivered" : "In progress"}
+        <h1 className="font-display text-4xl font-semibold">Your songs</h1>
+        <p className="mt-2 text-muted-foreground">
+          Every song you've made — past, present, and in progress.
+        </p>
+
+        {orders.length === 0 ? (
+          <div className="mt-12 rounded-3xl border border-dashed border-border bg-card/50 p-12 text-center">
+            <Music className="mx-auto h-12 w-12 text-primary/60" />
+            <h2 className="mt-4 font-display text-xl">No songs yet</h2>
+            <p className="mt-2 text-muted-foreground">
+              Make your first song — it takes about 5 minutes.
             </p>
-            <h1 className="mt-2 font-display text-4xl font-semibold leading-tight text-foreground md:text-5xl">
-              {completed
-                ? `${q.recipient_name || "Their"} song is ready.`
-                : `We're crafting ${q.recipient_name || "their"} song.`}
-            </h1>
-            <p className="mt-3 text-lg text-muted-foreground">
-              {completed
-                ? "Listen, share, and keep it forever."
-                : "We'll email you the moment it's ready. You can close this page anytime."}
-            </p>
-
-            {completed ? (
-              <div className="mt-10 space-y-6">
-                <AudioPlayer
-                  variant="full"
-                  title={`A Song for ${q.recipient_name || "You"}`}
-                  artist={`${q.genre ?? "Acoustic Folk"} · ${q.tempo ?? "Mid-tempo"}`}
-                  src="https://cdn.pixabay.com/audio/2022/10/30/audio_347111d654.mp3"
-                  lyrics={DEMO_LYRICS}
-                />
-                <div className="grid gap-3 sm:grid-cols-3">
-                  <ActionButton icon={Download} label="Download MP3" />
-                  <ActionButton icon={Download} label="Download WAV" />
-                  <ActionButton icon={FileText} label="Lyric sheet PDF" />
-                </div>
-              </div>
-            ) : (
-              <ol className="mt-10 space-y-4">
-                {STAGES.slice(0, -1).map((s, i) => {
-                  const state =
-                    i < stageIndex
-                      ? "done"
-                      : i === stageIndex
-                        ? "active"
-                        : "pending";
-                  return (
-                    <li
-                      key={s.key}
-                      className={`flex items-start gap-4 rounded-2xl border p-5 transition-all ${
-                        state === "active"
-                          ? "border-primary bg-card shadow-soft"
-                          : state === "done"
-                            ? "border-success/40 bg-card"
-                            : "border-border bg-card/50"
-                      }`}
-                    >
-                      <div
-                        className={`flex h-9 w-9 shrink-0 items-center justify-center rounded-full ${
-                          state === "done"
-                            ? "bg-success text-success-foreground"
-                            : state === "active"
-                              ? "bg-primary text-primary-foreground"
-                              : "bg-peach text-muted-foreground"
-                        }`}
-                      >
-                        {state === "done" ? (
-                          <Check className="h-4 w-4" />
-                        ) : (
-                          <span className="text-sm font-medium">{i + 1}</span>
-                        )}
-                      </div>
-                      <div className="flex-1">
-                        <p className="font-display text-lg font-semibold text-foreground">
-                          {s.label}
-                          {state === "active" && (
-                            <span className="ml-2 text-sm font-normal text-muted-foreground">
-                              · in progress
-                            </span>
-                          )}
-                        </p>
-                        <p className="text-sm text-muted-foreground">
-                          {s.description}
-                        </p>
-                      </div>
-                    </li>
-                  );
-                })}
-              </ol>
-            )}
-          </section>
-
-          <aside className="space-y-6">
-            <div className="rounded-3xl border border-border bg-card p-6 shadow-soft">
-              <h2 className="font-display text-lg font-semibold text-foreground">
-                Order details
-              </h2>
-              <dl className="mt-4 space-y-3 text-sm">
-                <Row label="For" value={q.recipient_name || "Not set"} />
-                <Row label="Relationship" value={q.relationship ?? "Not set"} />
-                <Row label="Genre" value={q.genre ?? "Not set"} />
-                <Row label="Tempo" value={q.tempo ?? "Not set"} />
-                <Row
-                  label="Add-ons"
-                  value={
-                    [
-                      q.has_3rd_verse && "3rd verse",
-                      q.is_rush && "24h rush",
-                      q.has_unlimited_edits && "Unlimited edits",
-                    ]
-                      .filter(Boolean)
-                      .join(" · ") || "None"
-                  }
-                />
-              </dl>
-            </div>
-
-            {completed && shareUrl && (
-              <div className="rounded-3xl border border-border bg-card p-6 shadow-soft">
-                <h2 className="font-display text-lg font-semibold text-foreground">
-                  Share their song
-                </h2>
-                <p className="mt-1 text-sm text-muted-foreground">
-                  A beautiful, distraction-free page just for them.
-                </p>
-                <div className="mt-4 flex items-center gap-2 rounded-xl border border-dashed border-peach bg-background px-3 py-2 text-xs">
-                  <span className="truncate text-muted-foreground">
-                    {shareUrl}
-                  </span>
-                </div>
-                <button
-                  onClick={copy}
-                  className="mt-3 inline-flex w-full items-center justify-center gap-2 rounded-full bg-primary px-4 py-2.5 text-sm font-medium text-primary-foreground transition-colors hover:bg-primary-hover"
-                >
-                  {copied ? (
-                    <>
-                      <Check className="h-4 w-4" /> Link copied
-                    </>
-                  ) : (
-                    <>
-                      <Copy className="h-4 w-4" /> Copy public link
-                    </>
-                  )}
-                </button>
-                <Link
-                  to="/listen/$id"
-                  params={{ id: q.orderId ?? "preview" }}
-                  className="mt-2 inline-flex w-full items-center justify-center gap-2 rounded-full border border-border px-4 py-2.5 text-sm font-medium text-foreground transition-colors hover:bg-peach/40"
-                >
-                  Open recipient view
-                </Link>
-              </div>
-            )}
-
-            {completed && (
-              <button className="inline-flex w-full items-center justify-center gap-2 rounded-full border border-border bg-card px-4 py-3 text-sm font-medium text-foreground transition-colors hover:bg-peach/40">
-                <Pencil className="h-4 w-4" />
-                Request a refinement
-              </button>
-            )}
-          </aside>
-        </div>
+            <Link
+              to="/create"
+              className="mt-6 inline-flex items-center justify-center rounded-full bg-primary px-6 py-3 text-sm font-medium text-primary-foreground hover:bg-primary-hover"
+            >
+              Start a song
+            </Link>
+          </div>
+        ) : (
+          <div className="mt-10 space-y-6">
+            {orders.map((o) => (
+              <OrderCard
+                key={o.id}
+                order={o}
+                onCopy={copy}
+                copied={copied === o.id}
+              />
+            ))}
+          </div>
+        )}
       </main>
     </div>
   );
 }
 
-function Row({ label, value }: { label: string; value: string }) {
-  return (
-    <div className="flex items-center justify-between gap-4">
-      <dt className="text-muted-foreground">{label}</dt>
-      <dd className="text-right font-medium text-foreground">{value}</dd>
-    </div>
-  );
-}
-
-function ActionButton({
-  icon: Icon,
-  label,
+function OrderCard({
+  order,
+  onCopy,
+  copied,
 }: {
-  icon: typeof Download;
-  label: string;
+  order: Order;
+  onCopy: (url: string, id: string) => void;
+  copied: boolean;
 }) {
+  const stage = STAGE_MAP[order.status] ?? { label: order.status, pct: 0 };
+  const delivered = order.status === "delivered";
+  const variants = (order.audio_variants as any[]) ?? [];
+  const variant =
+    variants.find((v) => v.id === order.selected_variant_id) ?? variants[0];
+  const slug = order.share_page_slug ?? order.id;
+  const shareUrl =
+    typeof window !== "undefined" ? `${window.location.origin}/listen/${slug}` : "";
+  const title = (order.brief as any)?.title;
+  const lyrics = (order.brief as any)?.lyrics ?? "";
+
   return (
-    <button className="flex items-center justify-center gap-2 rounded-full border border-border bg-card px-4 py-3 text-sm font-medium text-foreground transition-colors hover:bg-peach/40">
-      <Icon className="h-4 w-4" />
-      {label}
-    </button>
+    <article className="rounded-3xl border border-border bg-card p-6 shadow-soft md:p-8">
+      <div className="flex items-start justify-between gap-4">
+        <div>
+          <p className="text-xs font-medium uppercase tracking-wider text-primary">
+            {delivered ? "Delivered" : "In progress"}
+          </p>
+          <h2 className="mt-1 font-display text-2xl font-semibold">
+            {title ?? `A song for ${order.recipient_name}`}
+          </h2>
+          <p className="mt-1 text-sm text-muted-foreground">
+            {order.genre ?? "Acoustic"} · {order.tempo ?? "Mid-tempo"}
+            {order.is_gift ? " · Gift" : ""}
+            {order.priority === "priority" || order.is_rush ? " · Priority" : ""}
+          </p>
+        </div>
+        <Badge variant={delivered ? "default" : "outline"}>{stage.label}</Badge>
+      </div>
+
+      {!delivered && (
+        <div className="mt-6">
+          <div className="h-2 overflow-hidden rounded-full bg-peach/40">
+            <div
+              className="h-full bg-gradient-to-r from-primary to-primary-glow transition-all duration-1000"
+              style={{ width: `${stage.pct}%` }}
+            />
+          </div>
+          <p className="mt-3 text-sm text-muted-foreground">
+            {order.is_gift && order.delivery_date
+              ? `Delivers to ${order.recipient_name} on ${new Date(order.delivery_date).toLocaleDateString()}.`
+              : order.scheduled_delivery_at
+                ? `Estimated delivery: ${new Date(order.scheduled_delivery_at).toLocaleString()}.`
+                : "We'll email you the moment it's ready."}
+          </p>
+        </div>
+      )}
+
+      {delivered && variant?.audio_url && (
+        <div className="mt-6 space-y-4">
+          <AudioPlayer
+            variant="full"
+            title={title ?? `A Song for ${order.recipient_name}`}
+            artist={`${order.genre ?? "Acoustic"} · ${order.tempo ?? "Mid-tempo"}`}
+            src={variant.audio_url}
+            lyrics={lyrics}
+          />
+          <div className="flex flex-wrap gap-3">
+            <button
+              onClick={() => onCopy(shareUrl, order.id)}
+              className="inline-flex items-center gap-2 rounded-full bg-primary px-5 py-2.5 text-sm font-medium text-primary-foreground hover:bg-primary-hover"
+            >
+              {copied ? (
+                <>
+                  <Check className="h-4 w-4" /> Link copied
+                </>
+              ) : (
+                <>
+                  <Copy className="h-4 w-4" /> Copy share link
+                </>
+              )}
+            </button>
+            <Link
+              to="/listen/$id"
+              params={{ id: slug }}
+              className="inline-flex items-center gap-2 rounded-full border border-border bg-card px-5 py-2.5 text-sm font-medium hover:bg-peach/40"
+            >
+              Open recipient view
+            </Link>
+          </div>
+        </div>
+      )}
+    </article>
   );
 }
