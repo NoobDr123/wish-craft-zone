@@ -171,6 +171,30 @@ export type Database = {
           },
         ]
       }
+      mfa_verifications: {
+        Row: {
+          expires_at: string
+          id: string
+          user_agent: string | null
+          user_id: string
+          verified_at: string
+        }
+        Insert: {
+          expires_at?: string
+          id?: string
+          user_agent?: string | null
+          user_id: string
+          verified_at?: string
+        }
+        Update: {
+          expires_at?: string
+          id?: string
+          user_agent?: string | null
+          user_id?: string
+          verified_at?: string
+        }
+        Relationships: []
+      }
       orders: {
         Row: {
           amount_cents: number
@@ -341,6 +365,168 @@ export type Database = {
           },
         ]
       }
+      reaction_videos: {
+        Row: {
+          buyer_email: string
+          caption: string | null
+          created_at: string
+          file_size_bytes: number | null
+          id: string
+          is_public: boolean
+          mime_type: string | null
+          order_id: string
+          status: string
+          storage_path: string
+          updated_at: string
+          user_id: string | null
+        }
+        Insert: {
+          buyer_email: string
+          caption?: string | null
+          created_at?: string
+          file_size_bytes?: number | null
+          id?: string
+          is_public?: boolean
+          mime_type?: string | null
+          order_id: string
+          status?: string
+          storage_path: string
+          updated_at?: string
+          user_id?: string | null
+        }
+        Update: {
+          buyer_email?: string
+          caption?: string | null
+          created_at?: string
+          file_size_bytes?: number | null
+          id?: string
+          is_public?: boolean
+          mime_type?: string | null
+          order_id?: string
+          status?: string
+          storage_path?: string
+          updated_at?: string
+          user_id?: string | null
+        }
+        Relationships: [
+          {
+            foreignKeyName: "reaction_videos_order_id_fkey"
+            columns: ["order_id"]
+            isOneToOne: false
+            referencedRelation: "orders"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      refund_requests: {
+        Row: {
+          admin_notes: string | null
+          amount_cents: number | null
+          buyer_email: string
+          created_at: string
+          id: string
+          order_id: string
+          reaction_video_id: string | null
+          reason: string
+          request_type: string
+          resolved_at: string | null
+          resolved_by: string | null
+          status: string
+          updated_at: string
+          user_id: string | null
+        }
+        Insert: {
+          admin_notes?: string | null
+          amount_cents?: number | null
+          buyer_email: string
+          created_at?: string
+          id?: string
+          order_id: string
+          reaction_video_id?: string | null
+          reason: string
+          request_type: string
+          resolved_at?: string | null
+          resolved_by?: string | null
+          status?: string
+          updated_at?: string
+          user_id?: string | null
+        }
+        Update: {
+          admin_notes?: string | null
+          amount_cents?: number | null
+          buyer_email?: string
+          created_at?: string
+          id?: string
+          order_id?: string
+          reaction_video_id?: string | null
+          reason?: string
+          request_type?: string
+          resolved_at?: string | null
+          resolved_by?: string | null
+          status?: string
+          updated_at?: string
+          user_id?: string | null
+        }
+        Relationships: [
+          {
+            foreignKeyName: "refund_requests_order_id_fkey"
+            columns: ["order_id"]
+            isOneToOne: false
+            referencedRelation: "orders"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      revision_requests: {
+        Row: {
+          admin_notes: string | null
+          buyer_email: string
+          created_at: string
+          delivered_audio_url: string | null
+          id: string
+          is_free: boolean
+          notes: string
+          order_id: string
+          status: string
+          updated_at: string
+          user_id: string | null
+        }
+        Insert: {
+          admin_notes?: string | null
+          buyer_email: string
+          created_at?: string
+          delivered_audio_url?: string | null
+          id?: string
+          is_free?: boolean
+          notes: string
+          order_id: string
+          status?: string
+          updated_at?: string
+          user_id?: string | null
+        }
+        Update: {
+          admin_notes?: string | null
+          buyer_email?: string
+          created_at?: string
+          delivered_audio_url?: string | null
+          id?: string
+          is_free?: boolean
+          notes?: string
+          order_id?: string
+          status?: string
+          updated_at?: string
+          user_id?: string | null
+        }
+        Relationships: [
+          {
+            foreignKeyName: "revision_requests_order_id_fkey"
+            columns: ["order_id"]
+            isOneToOne: false
+            referencedRelation: "orders"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       stripe_events: {
         Row: {
           event_id: string
@@ -389,6 +575,33 @@ export type Database = {
         }
         Relationships: []
       }
+      user_mfa: {
+        Row: {
+          created_at: string
+          enrolled: boolean
+          recovery_codes: string[]
+          totp_secret: string
+          updated_at: string
+          user_id: string
+        }
+        Insert: {
+          created_at?: string
+          enrolled?: boolean
+          recovery_codes?: string[]
+          totp_secret: string
+          updated_at?: string
+          user_id: string
+        }
+        Update: {
+          created_at?: string
+          enrolled?: boolean
+          recovery_codes?: string[]
+          totp_secret?: string
+          updated_at?: string
+          user_id?: string
+        }
+        Relationships: []
+      }
       user_roles: {
         Row: {
           created_at: string
@@ -432,6 +645,7 @@ export type Database = {
         }
         Returns: boolean
       }
+      has_valid_mfa: { Args: { _user_id: string }; Returns: boolean }
       move_to_dlq: {
         Args: {
           dlq_name: string
