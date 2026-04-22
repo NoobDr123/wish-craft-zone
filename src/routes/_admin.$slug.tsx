@@ -1,7 +1,14 @@
-// Admin console — gated by login + admin role + 12-hour TOTP 2FA.
-// Reachable at the obfuscated path defined in src/config/admin.ts.
+// Admin console — gated by:
+//   1. Server-side slug check (ADMIN_SLUG env var, never in client bundle)
+//   2. Login (Supabase auth)
+//   3. Admin role (user_roles table)
+//   4. TOTP 2FA, re-prompted every 12 hours
+//
+// The route path is /_admin/$slug. The component name and route file name
+// are intentionally generic so a competitor scraping the JS bundle sees
+// only "_admin" with no slug value. Wrong slug -> 404 thrown server-side.
 
-import { createFileRoute, Link, useNavigate } from "@tanstack/react-router";
+import { createFileRoute, Link, notFound, useNavigate } from "@tanstack/react-router";
 import { useEffect, useState } from "react";
 import { Logo } from "@/components/Logo";
 import { Button } from "@/components/ui/button";
@@ -10,14 +17,24 @@ import { useAdminGuard } from "@/hooks/useAdminGuard";
 import { AdminMfaEnroll } from "@/components/admin/AdminMfaEnroll";
 import { AdminMfaChallenge } from "@/components/admin/AdminMfaChallenge";
 import { supabase } from "@/integrations/supabase/client";
-import { ADMIN_PATH } from "@/config/admin";
+import { verifyAdminSlug } from "@/config/admin";
 
-export const Route = createFileRoute("/staff-7q9k2x")({
+export const Route = createFileRoute("/_admin/$slug")({
+  // Server-side gate — runs before component mounts, on every navigation.
+  // If the slug doesn't match ADMIN_SLUG, we throw notFound() so the user
+  // sees the standard 404 (no signal that this URL means anything).
+  beforeLoad: async ({ params }) => {
+    const { ok } = await verifyAdminSlug({ data: { slug: params.slug } });
+    if (!ok) {
+      throw notFound();
+    }
+  },
   component: StaffPage,
   head: () => ({
     meta: [
-      { title: "Staff · RibbonSong" },
-      { name: "robots", content: "noindex,nofollow" },
+      { title: "Page not found · RibbonSong" },
+      { name: "robots", content: "noindex,nofollow,noarchive,nosnippet" },
+      { name: "referrer", content: "no-referrer" },
     ],
   }),
 });
@@ -27,13 +44,15 @@ type Tab = "orders" | "refunds" | "reactions" | "revisions";
 function StaffPage() {
   const { state, user, refresh } = useAdminGuard();
   const navigate = useNavigate();
+  const { slug } = Route.useParams();
+  const adminPath = `/_admin/${slug}`;
   const [tab, setTab] = useState<Tab>("orders");
 
   useEffect(() => {
     if (state === "anonymous") {
-      navigate({ to: "/login", search: { redirect: ADMIN_PATH } as any });
+      navigate({ to: "/login", search: { redirect: adminPath } as any });
     }
-  }, [state, navigate]);
+  }, [state, navigate, adminPath]);
 
   if (state === "loading" || state === "anonymous") {
     return (
@@ -420,16 +439,13 @@ function RefundsPanel() {
               <tr key={r.id} className="border-b border-border/40 align-top">
                 <td className="p-3 text-xs">
                   <div className="font-medium">{r.buyer_email}</div>
-                  <Link
-                    to="/staff-7q9k2x"
+                  <button
+                    type="button"
                     className="text-muted-foreground underline"
-                    onClick={(e) => {
-                      e.preventDefault();
-                      navigator.clipboard.writeText(r.order_id);
-                    }}
+                    onClick={() => navigator.clipboard.writeText(r.order_id)}
                   >
                     Copy order ID
-                  </Link>
+                  </button>
                 </td>
                 <td className="p-3 text-xs capitalize">
                   {r.request_type.replace("_", " ")}

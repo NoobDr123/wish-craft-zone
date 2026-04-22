@@ -12,7 +12,6 @@ import { Route as rootRouteImport } from './routes/__root'
 import { Route as Upsell3RouteImport } from './routes/upsell-3'
 import { Route as Upsell2RouteImport } from './routes/upsell-2'
 import { Route as Upsell1RouteImport } from './routes/upsell-1'
-import { Route as Staff7q9k2xRouteImport } from './routes/staff-7q9k2x'
 import { Route as ScratchRouteImport } from './routes/scratch'
 import { Route as ProcessingRouteImport } from './routes/processing'
 import { Route as LoginRouteImport } from './routes/login'
@@ -20,13 +19,13 @@ import { Route as DashboardRouteImport } from './routes/dashboard'
 import { Route as CreateRouteImport } from './routes/create'
 import { Route as CheckoutRouteImport } from './routes/checkout'
 import { Route as AlmostThereRouteImport } from './routes/almost-there'
-import { Route as AdminRouteImport } from './routes/admin'
 import { Route as AccountRouteImport } from './routes/account'
 import { Route as IndexRouteImport } from './routes/index'
 import { Route as PortalIdRouteImport } from './routes/portal.$id'
 import { Route as ListenIdRouteImport } from './routes/listen.$id'
 import { Route as CheckoutReturnRouteImport } from './routes/checkout.return'
 import { Route as AuthCallbackRouteImport } from './routes/auth.callback'
+import { Route as AdminSlugRouteImport } from './routes/_admin.$slug'
 import { Route as LovableEmailQueueProcessRouteImport } from './routes/lovable/email/queue/process'
 import { Route as LovableEmailAuthWebhookRouteImport } from './routes/lovable/email/auth/webhook'
 import { Route as LovableEmailAuthPreviewRouteImport } from './routes/lovable/email/auth/preview'
@@ -44,11 +43,6 @@ const Upsell2Route = Upsell2RouteImport.update({
 const Upsell1Route = Upsell1RouteImport.update({
   id: '/upsell-1',
   path: '/upsell-1',
-  getParentRoute: () => rootRouteImport,
-} as any)
-const Staff7q9k2xRoute = Staff7q9k2xRouteImport.update({
-  id: '/staff-7q9k2x',
-  path: '/staff-7q9k2x',
   getParentRoute: () => rootRouteImport,
 } as any)
 const ScratchRoute = ScratchRouteImport.update({
@@ -86,11 +80,6 @@ const AlmostThereRoute = AlmostThereRouteImport.update({
   path: '/almost-there',
   getParentRoute: () => rootRouteImport,
 } as any)
-const AdminRoute = AdminRouteImport.update({
-  id: '/admin',
-  path: '/admin',
-  getParentRoute: () => rootRouteImport,
-} as any)
 const AccountRoute = AccountRouteImport.update({
   id: '/account',
   path: '/account',
@@ -121,6 +110,11 @@ const AuthCallbackRoute = AuthCallbackRouteImport.update({
   path: '/auth/callback',
   getParentRoute: () => rootRouteImport,
 } as any)
+const AdminSlugRoute = AdminSlugRouteImport.update({
+  id: '/_admin/$slug',
+  path: '/$slug',
+  getParentRoute: () => rootRouteImport,
+} as any)
 const LovableEmailQueueProcessRoute =
   LovableEmailQueueProcessRouteImport.update({
     id: '/lovable/email/queue/process',
@@ -141,7 +135,6 @@ const LovableEmailAuthPreviewRoute = LovableEmailAuthPreviewRouteImport.update({
 export interface FileRoutesByFullPath {
   '/': typeof IndexRoute
   '/account': typeof AccountRoute
-  '/admin': typeof AdminRoute
   '/almost-there': typeof AlmostThereRoute
   '/checkout': typeof CheckoutRouteWithChildren
   '/create': typeof CreateRoute
@@ -149,10 +142,10 @@ export interface FileRoutesByFullPath {
   '/login': typeof LoginRoute
   '/processing': typeof ProcessingRoute
   '/scratch': typeof ScratchRoute
-  '/staff-7q9k2x': typeof Staff7q9k2xRoute
   '/upsell-1': typeof Upsell1Route
   '/upsell-2': typeof Upsell2Route
   '/upsell-3': typeof Upsell3Route
+  '/$slug': typeof AdminSlugRoute
   '/auth/callback': typeof AuthCallbackRoute
   '/checkout/return': typeof CheckoutReturnRoute
   '/listen/$id': typeof ListenIdRoute
@@ -164,7 +157,6 @@ export interface FileRoutesByFullPath {
 export interface FileRoutesByTo {
   '/': typeof IndexRoute
   '/account': typeof AccountRoute
-  '/admin': typeof AdminRoute
   '/almost-there': typeof AlmostThereRoute
   '/checkout': typeof CheckoutRouteWithChildren
   '/create': typeof CreateRoute
@@ -172,10 +164,10 @@ export interface FileRoutesByTo {
   '/login': typeof LoginRoute
   '/processing': typeof ProcessingRoute
   '/scratch': typeof ScratchRoute
-  '/staff-7q9k2x': typeof Staff7q9k2xRoute
   '/upsell-1': typeof Upsell1Route
   '/upsell-2': typeof Upsell2Route
   '/upsell-3': typeof Upsell3Route
+  '/$slug': typeof AdminSlugRoute
   '/auth/callback': typeof AuthCallbackRoute
   '/checkout/return': typeof CheckoutReturnRoute
   '/listen/$id': typeof ListenIdRoute
@@ -188,7 +180,6 @@ export interface FileRoutesById {
   __root__: typeof rootRouteImport
   '/': typeof IndexRoute
   '/account': typeof AccountRoute
-  '/admin': typeof AdminRoute
   '/almost-there': typeof AlmostThereRoute
   '/checkout': typeof CheckoutRouteWithChildren
   '/create': typeof CreateRoute
@@ -196,10 +187,10 @@ export interface FileRoutesById {
   '/login': typeof LoginRoute
   '/processing': typeof ProcessingRoute
   '/scratch': typeof ScratchRoute
-  '/staff-7q9k2x': typeof Staff7q9k2xRoute
   '/upsell-1': typeof Upsell1Route
   '/upsell-2': typeof Upsell2Route
   '/upsell-3': typeof Upsell3Route
+  '/_admin/$slug': typeof AdminSlugRoute
   '/auth/callback': typeof AuthCallbackRoute
   '/checkout/return': typeof CheckoutReturnRoute
   '/listen/$id': typeof ListenIdRoute
@@ -213,7 +204,6 @@ export interface FileRouteTypes {
   fullPaths:
     | '/'
     | '/account'
-    | '/admin'
     | '/almost-there'
     | '/checkout'
     | '/create'
@@ -221,10 +211,10 @@ export interface FileRouteTypes {
     | '/login'
     | '/processing'
     | '/scratch'
-    | '/staff-7q9k2x'
     | '/upsell-1'
     | '/upsell-2'
     | '/upsell-3'
+    | '/$slug'
     | '/auth/callback'
     | '/checkout/return'
     | '/listen/$id'
@@ -236,7 +226,6 @@ export interface FileRouteTypes {
   to:
     | '/'
     | '/account'
-    | '/admin'
     | '/almost-there'
     | '/checkout'
     | '/create'
@@ -244,10 +233,10 @@ export interface FileRouteTypes {
     | '/login'
     | '/processing'
     | '/scratch'
-    | '/staff-7q9k2x'
     | '/upsell-1'
     | '/upsell-2'
     | '/upsell-3'
+    | '/$slug'
     | '/auth/callback'
     | '/checkout/return'
     | '/listen/$id'
@@ -259,7 +248,6 @@ export interface FileRouteTypes {
     | '__root__'
     | '/'
     | '/account'
-    | '/admin'
     | '/almost-there'
     | '/checkout'
     | '/create'
@@ -267,10 +255,10 @@ export interface FileRouteTypes {
     | '/login'
     | '/processing'
     | '/scratch'
-    | '/staff-7q9k2x'
     | '/upsell-1'
     | '/upsell-2'
     | '/upsell-3'
+    | '/_admin/$slug'
     | '/auth/callback'
     | '/checkout/return'
     | '/listen/$id'
@@ -283,7 +271,6 @@ export interface FileRouteTypes {
 export interface RootRouteChildren {
   IndexRoute: typeof IndexRoute
   AccountRoute: typeof AccountRoute
-  AdminRoute: typeof AdminRoute
   AlmostThereRoute: typeof AlmostThereRoute
   CheckoutRoute: typeof CheckoutRouteWithChildren
   CreateRoute: typeof CreateRoute
@@ -291,10 +278,10 @@ export interface RootRouteChildren {
   LoginRoute: typeof LoginRoute
   ProcessingRoute: typeof ProcessingRoute
   ScratchRoute: typeof ScratchRoute
-  Staff7q9k2xRoute: typeof Staff7q9k2xRoute
   Upsell1Route: typeof Upsell1Route
   Upsell2Route: typeof Upsell2Route
   Upsell3Route: typeof Upsell3Route
+  AdminSlugRoute: typeof AdminSlugRoute
   AuthCallbackRoute: typeof AuthCallbackRoute
   ListenIdRoute: typeof ListenIdRoute
   PortalIdRoute: typeof PortalIdRoute
@@ -324,13 +311,6 @@ declare module '@tanstack/react-router' {
       path: '/upsell-1'
       fullPath: '/upsell-1'
       preLoaderRoute: typeof Upsell1RouteImport
-      parentRoute: typeof rootRouteImport
-    }
-    '/staff-7q9k2x': {
-      id: '/staff-7q9k2x'
-      path: '/staff-7q9k2x'
-      fullPath: '/staff-7q9k2x'
-      preLoaderRoute: typeof Staff7q9k2xRouteImport
       parentRoute: typeof rootRouteImport
     }
     '/scratch': {
@@ -382,13 +362,6 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof AlmostThereRouteImport
       parentRoute: typeof rootRouteImport
     }
-    '/admin': {
-      id: '/admin'
-      path: '/admin'
-      fullPath: '/admin'
-      preLoaderRoute: typeof AdminRouteImport
-      parentRoute: typeof rootRouteImport
-    }
     '/account': {
       id: '/account'
       path: '/account'
@@ -431,6 +404,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof AuthCallbackRouteImport
       parentRoute: typeof rootRouteImport
     }
+    '/_admin/$slug': {
+      id: '/_admin/$slug'
+      path: '/$slug'
+      fullPath: '/$slug'
+      preLoaderRoute: typeof AdminSlugRouteImport
+      parentRoute: typeof rootRouteImport
+    }
     '/lovable/email/queue/process': {
       id: '/lovable/email/queue/process'
       path: '/lovable/email/queue/process'
@@ -470,7 +450,6 @@ const CheckoutRouteWithChildren = CheckoutRoute._addFileChildren(
 const rootRouteChildren: RootRouteChildren = {
   IndexRoute: IndexRoute,
   AccountRoute: AccountRoute,
-  AdminRoute: AdminRoute,
   AlmostThereRoute: AlmostThereRoute,
   CheckoutRoute: CheckoutRouteWithChildren,
   CreateRoute: CreateRoute,
@@ -478,10 +457,10 @@ const rootRouteChildren: RootRouteChildren = {
   LoginRoute: LoginRoute,
   ProcessingRoute: ProcessingRoute,
   ScratchRoute: ScratchRoute,
-  Staff7q9k2xRoute: Staff7q9k2xRoute,
   Upsell1Route: Upsell1Route,
   Upsell2Route: Upsell2Route,
   Upsell3Route: Upsell3Route,
+  AdminSlugRoute: AdminSlugRoute,
   AuthCallbackRoute: AuthCallbackRoute,
   ListenIdRoute: ListenIdRoute,
   PortalIdRoute: PortalIdRoute,

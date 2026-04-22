@@ -44,6 +44,11 @@ export const Route = createRootRoute({
       },
       { property: "og:type", content: "website" },
       { name: "twitter:card", content: "summary_large_image" },
+      // Security/opsec defense in depth:
+      { httpEquiv: "Content-Security-Policy", content: "frame-ancestors 'none'" },
+      { name: "referrer", content: "strict-origin-when-cross-origin" },
+      // Suppress framework fingerprinting via generator meta.
+      { name: "generator", content: "" },
     ],
     links: [
       { rel: "preconnect", href: "https://fonts.googleapis.com" },
