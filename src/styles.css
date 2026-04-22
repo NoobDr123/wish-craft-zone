@@ -66,17 +66,18 @@
   --color-sidebar-border: var(--sidebar-border);
   --color-sidebar-ring: var(--sidebar-ring);
 
-  --font-display: "Playfair Display", "Iowan Old Style", Georgia, serif;
-  --font-sans: "Inter", system-ui, -apple-system, "Segoe UI", sans-serif;
+  --font-display: "Fraunces", "Iowan Old Style", Georgia, serif;
+  --font-sans: "Instrument Sans", system-ui, -apple-system, "Segoe UI", sans-serif;
 
-  --shadow-soft: 0 4px 20px rgba(45, 43, 42, 0.05);
-  --shadow-card: 0 8px 30px rgba(45, 43, 42, 0.08);
+  --shadow-soft: 0 2px 8px rgba(31, 27, 22, 0.06);
+  --shadow-card: 0 8px 24px rgba(31, 27, 22, 0.08);
+  --shadow-lg: 0 20px 60px rgba(31, 27, 22, 0.12);
   --shadow-glow: 0 10px 40px -10px color-mix(in oklab, var(--primary) 35%, transparent);
 
   --gradient-warm: linear-gradient(
     135deg,
-    oklch(0.972 0.008 80) 0%,
-    oklch(0.94 0.018 60) 100%
+    #F6F0E6 0%,
+    #ECE2D0 100%
   );
   --gradient-ribbon: linear-gradient(
     135deg,
@@ -86,66 +87,76 @@
 }
 
 :root {
-  --radius: 1rem;
+  --radius: 14px;
 
-  /* Warm Cream */
-  --background: oklch(0.972 0.008 80);
-  --foreground: oklch(0.235 0.005 60);
+  /* Warm Cream base — #F6F0E6 */
+  --background: #F6F0E6;
+  --background-warm: #ECE2D0;
+  --background-card: #FBF6EC;
+  --foreground: #1F1B16;
+  --foreground-soft: #5A5148;
+  --foreground-faint: #8A8175;
 
-  --card: oklch(1 0 0);
-  --card-foreground: oklch(0.235 0.005 60);
+  --card: #FBF6EC;
+  --card-foreground: #1F1B16;
 
-  --popover: oklch(1 0 0);
-  --popover-foreground: oklch(0.235 0.005 60);
+  --popover: #FBF6EC;
+  --popover-foreground: #1F1B16;
 
-  /* Ribbon Lavender — primary cancer-awareness color */
-  --primary: oklch(0.52 0.11 295);
-  --primary-foreground: oklch(0.99 0.005 80);
-  --primary-hover: oklch(0.46 0.12 295);
+  /* Lavender — primary cancer-awareness */
+  --primary: #8D6FAF;
+  --primary-foreground: #FFF7EE;
+  --primary-hover: #6B4F8A;
+  --lavender: #8D6FAF;
+  --lavender-deep: #6B4F8A;
+  --lavender-soft: #E5D9EF;
 
-  --secondary: oklch(0.94 0.012 70);
-  --secondary-foreground: oklch(0.235 0.005 60);
+  --secondary: #ECE2D0;
+  --secondary-foreground: #1F1B16;
 
-  --muted: oklch(0.94 0.012 70);
-  --muted-foreground: oklch(0.535 0.008 60);
+  --muted: #ECE2D0;
+  --muted-foreground: #5A5148;
 
-  /* Soft Peach used as accent */
-  --accent: oklch(0.88 0.025 50);
-  --accent-foreground: oklch(0.235 0.005 60);
+  --accent: #E5D9EF;
+  --accent-foreground: #1F1B16;
 
-  /* Warm Terracotta — used as warm secondary accent */
-  --ribbon: oklch(0.58 0.13 40);
-  --ribbon-foreground: oklch(0.99 0.005 80);
+  /* Gold accent — #C9A85A */
+  --ribbon: #C9A85A;
+  --ribbon-foreground: #1F1B16;
+  --gold: #C9A85A;
 
-  --peach: oklch(0.88 0.025 50);
-  --peach-foreground: oklch(0.235 0.005 60);
+  --peach: #ECE2D0;
+  --peach-foreground: #1F1B16;
 
-  /* Muted Sage */
-  --success: oklch(0.52 0.08 150);
-  --success-foreground: oklch(0.99 0.005 80);
+  --success: #4A7C59;
+  --success-foreground: #FFF7EE;
 
-  /* Soft Brick */
-  --destructive: oklch(0.58 0.15 25);
-  --destructive-foreground: oklch(0.99 0.005 80);
+  --destructive: #B5453A;
+  --destructive-foreground: #FFF7EE;
 
-  --border: oklch(0.88 0.025 50);
-  --input: oklch(0.88 0.025 50);
-  --ring: oklch(0.52 0.11 295);
+  --border: #D9CEB9;
+  --input: #D9CEB9;
+  --ring: #8D6FAF;
+  --line: #D9CEB9;
 
-  --chart-1: oklch(0.52 0.11 295);
-  --chart-2: oklch(0.58 0.13 40);
-  --chart-3: oklch(0.52 0.08 150);
-  --chart-4: oklch(0.88 0.025 50);
-  --chart-5: oklch(0.58 0.15 25);
+  --ink: #1F1B16;
+  --ink-soft: #5A5148;
+  --ink-faint: #8A8175;
 
-  --sidebar: oklch(0.972 0.008 80);
-  --sidebar-foreground: oklch(0.235 0.005 60);
-  --sidebar-primary: oklch(0.52 0.11 295);
-  --sidebar-primary-foreground: oklch(0.99 0.005 80);
-  --sidebar-accent: oklch(0.88 0.025 50);
-  --sidebar-accent-foreground: oklch(0.235 0.005 60);
-  --sidebar-border: oklch(0.88 0.025 50);
-  --sidebar-ring: oklch(0.52 0.11 295);
+  --chart-1: #8D6FAF;
+  --chart-2: #C9A85A;
+  --chart-3: #4A7C59;
+  --chart-4: #ECE2D0;
+  --chart-5: #B5453A;
+
+  --sidebar: #F6F0E6;
+  --sidebar-foreground: #1F1B16;
+  --sidebar-primary: #8D6FAF;
+  --sidebar-primary-foreground: #FFF7EE;
+  --sidebar-accent: #E5D9EF;
+  --sidebar-accent-foreground: #1F1B16;
+  --sidebar-border: #D9CEB9;
+  --sidebar-ring: #8D6FAF;
 }
 
 .dark {

@@ -6,48 +6,88 @@ export function SiteHeader() {
   const { user, loading } = useAuth();
 
   return (
-    <header className="sticky top-0 z-40 border-b border-border/60 bg-background/80 backdrop-blur">
-      <div className="mx-auto flex h-16 max-w-6xl items-center justify-between px-6">
-        <Logo />
-        <nav className="hidden items-center gap-8 text-sm text-muted-foreground md:flex">
-          <a href="/#for-who" className="transition-colors hover:text-foreground">
-            Who it's for
-          </a>
-          <a href="/#how-it-works" className="transition-colors hover:text-foreground">
-            How it works
-          </a>
-          <a href="/#samples" className="transition-colors hover:text-foreground">
-            Listen
-          </a>
-          <a href="/#stories" className="transition-colors hover:text-foreground">
-            Stories
-          </a>
-        </nav>
-        <div className="flex items-center gap-3">
-          {!loading &&
-            (user ? (
-              <Link
-                to="/account"
-                className="hidden text-sm font-medium text-muted-foreground transition-colors hover:text-foreground sm:inline"
-              >
-                My account
-              </Link>
-            ) : (
-              <Link
-                to="/login"
-                className="hidden text-sm font-medium text-muted-foreground transition-colors hover:text-foreground sm:inline"
-              >
-                Sign in
-              </Link>
-            ))}
-          <Link
-            to="/create"
-            className="inline-flex items-center justify-center rounded-full bg-primary px-5 py-2.5 text-sm font-medium text-primary-foreground shadow-soft transition-all hover:bg-primary-hover hover:shadow-glow"
-          >
-            Create their song
-          </Link>
-        </div>
+    <>
+      {/* Multi-color cancer awareness ribbon strip */}
+      <div
+        className="h-[3px] w-full"
+        style={{
+          background:
+            "linear-gradient(to right, #E8A5B8 0%, #E8A5B8 14%, #B8E0E0 14%, #B8E0E0 28%, #E8D8A0 28%, #E8D8A0 42%, #E8B090 42%, #E8B090 56%, #B0D4A8 56%, #B0D4A8 70%, #C8B0E0 70%, #C8B0E0 84%, #9B2D77 84%, #9B2D77 100%)",
+        }}
+      />
+
+      {/* Promo bar */}
+      <div className="bg-[#1F1B16] px-5 py-[11px] text-center text-[13px] font-medium tracking-[0.01em] text-[#F6F0E6]">
+        <span className="mr-1.5 text-[#E5D9EF]">🎗️</span>
+        For every fighter, every survivor, every loved one. Delivered with care
+        in seven days.
+        <Link
+          to="/create"
+          className="ml-2 border-b border-current text-[#C9A85A]"
+        >
+          Start their song
+        </Link>
       </div>
-    </header>
+
+      {/* Nav */}
+      <header className="sticky top-0 z-50 border-b border-[#D9CEB9] bg-[rgba(246,240,230,0.92)] py-[18px] backdrop-blur-md">
+        <div className="mx-auto flex max-w-[1200px] items-center justify-between px-6">
+          <Logo />
+          <nav className="hidden items-center gap-8 text-[14.5px] font-medium text-[#5A5148] md:flex">
+            <a
+              href="/#listen"
+              className="transition-colors hover:text-[#8D6FAF]"
+            >
+              Listen
+            </a>
+            <a
+              href="/#who"
+              className="transition-colors hover:text-[#8D6FAF]"
+            >
+              Who it's for
+            </a>
+            <a
+              href="/#how"
+              className="transition-colors hover:text-[#8D6FAF]"
+            >
+              How it works
+            </a>
+            <a
+              href="/#stories"
+              className="transition-colors hover:text-[#8D6FAF]"
+            >
+              Stories
+            </a>
+            <a href="/#faq" className="transition-colors hover:text-[#8D6FAF]">
+              FAQ
+            </a>
+          </nav>
+          <div className="flex items-center gap-5 text-[14.5px]">
+            {!loading &&
+              (user ? (
+                <Link
+                  to="/account"
+                  className="hidden text-[#5A5148] transition-colors hover:text-[#1F1B16] sm:inline"
+                >
+                  My account
+                </Link>
+              ) : (
+                <Link
+                  to="/login"
+                  className="hidden text-[#5A5148] transition-colors hover:text-[#1F1B16] sm:inline"
+                >
+                  Sign in
+                </Link>
+              ))}
+            <Link
+              to="/create"
+              className="inline-flex items-center gap-2.5 rounded-full bg-[#8D6FAF] px-[26px] py-[14px] text-[15px] font-semibold text-[#FFF7EE] shadow-[0_6px_16px_rgba(141,111,175,0.28)] transition-all hover:-translate-y-px hover:bg-[#6B4F8A] hover:shadow-[0_10px_24px_rgba(141,111,175,0.35)]"
+            >
+              Start their song
+            </Link>
+          </div>
+        </div>
+      </header>
+    </>
   );
 }
