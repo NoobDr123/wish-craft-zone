@@ -455,12 +455,11 @@ function LandingPage() {
       </div>
 
       {/* LISTEN */}
-      <section id="listen" className="px-0 py-[100px]">
-        <div className="mx-auto max-w-[1200px] px-6">
-          <div className="mx-auto mb-14 max-w-[720px] text-center">
+      <section id="listen" className="px-0 py-[64px] md:py-[100px]">
+        <div className="mx-auto max-w-[1200px] px-5 sm:px-6">
+          <div className="mx-auto mb-10 max-w-[720px] text-center md:mb-14">
             <Eyebrow center>Listen</Eyebrow>
-            <h2 className="mb-3.5 font-display text-[clamp(32px,4vw,48px)] font-medium leading-[1.1] tracking-[-0.022em] text-[#1F1B16]">
-              Hear real songs, written for{" "}
+            <h2 className="mb-3.5 font-display text-[clamp(28px,7vw,48px)] font-medium leading-[1.1] tracking-[-0.022em] text-[#1F1B16]">
               <em className="italic text-[#8D6FAF]">real families.</em>
             </h2>
             <p className="mx-auto mt-3.5 max-w-[560px] text-[17px] leading-[1.55] text-[#5A5148]">
@@ -574,11 +573,11 @@ function LandingPage() {
       </section>
 
       {/* HOW IT WORKS */}
-      <section id="how" className="px-0 py-[100px]">
-        <div className="mx-auto max-w-[1200px] px-6">
-          <div className="mx-auto mb-14 max-w-[720px] text-center">
+      <section id="how" className="px-0 py-[64px] md:py-[100px]">
+        <div className="mx-auto max-w-[1200px] px-5 sm:px-6">
+          <div className="mx-auto mb-10 max-w-[720px] text-center md:mb-14">
             <Eyebrow center>How it works</Eyebrow>
-            <h2 className="mb-3.5 font-display text-[clamp(32px,4vw,48px)] font-medium leading-[1.1] tracking-[-0.022em] text-[#1F1B16]">
+            <h2 className="mb-3.5 font-display text-[clamp(28px,7vw,48px)] font-medium leading-[1.1] tracking-[-0.022em] text-[#1F1B16]">
               Three gentle steps. <em className="italic text-[#8D6FAF]">Seven days.</em>
             </h2>
             <p className="mx-auto mt-3.5 max-w-[560px] text-[17px] leading-[1.55] text-[#5A5148]">
@@ -628,7 +627,7 @@ function LandingPage() {
       </section>
 
       {/* OBJECTION */}
-      <section className="relative overflow-hidden bg-[#1F1B16] px-0 py-[80px] text-[#F6F0E6]">
+      <section className="relative overflow-hidden bg-[#1F1B16] px-0 py-[60px] text-[#F6F0E6] md:py-[80px]">
         <div
           className="absolute -left-12 -top-12 h-[300px] w-[300px] opacity-[0.22]"
           style={{
@@ -636,12 +635,12 @@ function LandingPage() {
               "radial-gradient(circle, #8D6FAF 0%, transparent 70%)",
           }}
         />
-        <div className="relative z-10 mx-auto max-w-[920px] px-6">
-          <div className="mb-[22px] inline-flex items-center gap-2 text-[11.5px] font-semibold uppercase tracking-[0.16em] text-[#E5D9EF]">
+        <div className="relative z-10 mx-auto max-w-[920px] px-5 sm:px-6">
+          <div className="mb-[18px] inline-flex items-center gap-2 text-[11px] font-semibold uppercase tracking-[0.16em] text-[#E5D9EF] md:mb-[22px] md:text-[11.5px]">
             <span className="h-1.5 w-1.5 rounded-full bg-[#E5D9EF]" />
             You don't have to find the words
           </div>
-          <h2 className="mb-7 font-display text-[clamp(30px,3.6vw,44px)] font-normal italic leading-[1.15] tracking-[-0.015em] text-[#F6F0E6]">
+          <h2 className="mb-6 font-display text-[clamp(26px,6.5vw,44px)] font-normal italic leading-[1.15] tracking-[-0.015em] text-[#F6F0E6] md:mb-7">
             "I'm not a songwriter. I don't even know what to say."{" "}
             <em className="font-medium not-italic text-[#E5D9EF]">Good.</em>
           </h2>
@@ -679,12 +678,12 @@ function LandingPage() {
       </section>
 
       {/* WHAT YOU GET */}
-      <section className="px-0 py-[100px]">
-        <div className="mx-auto max-w-[1200px] px-6">
-          <div className="grid items-center gap-[60px] md:grid-cols-2">
+      <section className="px-0 py-[64px] md:py-[100px]">
+        <div className="mx-auto max-w-[1200px] px-5 sm:px-6">
+          <div className="grid items-center gap-10 md:grid-cols-2 md:gap-[60px]">
             <div>
               <Eyebrow>What you get</Eyebrow>
-              <h2 className="mb-6 font-display text-[clamp(32px,4vw,48px)] font-medium leading-[1.1] tracking-[-0.022em] text-[#1F1B16]">
+              <h2 className="mb-6 font-display text-[clamp(28px,7vw,48px)] font-medium leading-[1.1] tracking-[-0.022em] text-[#1F1B16]">
                 Exactly what{" "}
                 <em className="italic text-[#8D6FAF]">arrives in your inbox.</em>
               </h2>
@@ -805,11 +804,11 @@ function LandingPage() {
       </section>
 
       {/* HOW IT'S MADE */}
-      <section className="bg-[#ECE2D0] px-0 py-[100px]">
-        <div className="mx-auto max-w-[1200px] px-6">
-          <div className="mb-14 max-w-[720px]">
+      <section className="bg-[#ECE2D0] px-0 py-[64px] md:py-[100px]">
+        <div className="mx-auto max-w-[1200px] px-5 sm:px-6">
+          <div className="mb-10 max-w-[720px] md:mb-14">
             <Eyebrow>Made with care</Eyebrow>
-            <h2 className="mb-3.5 font-display text-[clamp(32px,4vw,48px)] font-medium leading-[1.1] tracking-[-0.022em] text-[#1F1B16]">
+            <h2 className="mb-3.5 font-display text-[clamp(28px,7vw,48px)] font-medium leading-[1.1] tracking-[-0.022em] text-[#1F1B16]">
               How your song <em className="italic text-[#8D6FAF]">comes together.</em>
             </h2>
             <p className="max-w-[560px] text-[17px] leading-[1.55] text-[#5A5148]">
@@ -865,11 +864,11 @@ function LandingPage() {
       </section>
 
       {/* TESTIMONIALS */}
-      <section id="stories" className="px-0 py-[100px]">
-        <div className="mx-auto max-w-[1200px] px-6">
-          <div className="mb-14 max-w-[720px]">
+      <section id="stories" className="px-0 py-[64px] md:py-[100px]">
+        <div className="mx-auto max-w-[1200px] px-5 sm:px-6">
+          <div className="mb-10 max-w-[720px] md:mb-14">
             <Eyebrow>Stories from families</Eyebrow>
-            <h2 className="mb-3.5 font-display text-[clamp(32px,4vw,48px)] font-medium leading-[1.1] tracking-[-0.022em] text-[#1F1B16]">
+            <h2 className="mb-3.5 font-display text-[clamp(28px,7vw,48px)] font-medium leading-[1.1] tracking-[-0.022em] text-[#1F1B16]">
               2,400+ families.{" "}
               <em className="italic text-[#8D6FAF]">Here's what they said.</em>
             </h2>
