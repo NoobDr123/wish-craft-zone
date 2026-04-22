@@ -66,17 +66,18 @@
   --color-sidebar-border: var(--sidebar-border);
   --color-sidebar-ring: var(--sidebar-ring);
 
-  --font-display: "Playfair Display", "Iowan Old Style", Georgia, serif;
-  --font-sans: "Inter", system-ui, -apple-system, "Segoe UI", sans-serif;
+  --font-display: "Fraunces", "Iowan Old Style", Georgia, serif;
+  --font-sans: "Instrument Sans", system-ui, -apple-system, "Segoe UI", sans-serif;
 
-  --shadow-soft: 0 4px 20px rgba(45, 43, 42, 0.05);
-  --shadow-card: 0 8px 30px rgba(45, 43, 42, 0.08);
+  --shadow-soft: 0 2px 8px rgba(31, 27, 22, 0.06);
+  --shadow-card: 0 8px 24px rgba(31, 27, 22, 0.08);
+  --shadow-lg: 0 20px 60px rgba(31, 27, 22, 0.12);
   --shadow-glow: 0 10px 40px -10px color-mix(in oklab, var(--primary) 35%, transparent);
 
   --gradient-warm: linear-gradient(
     135deg,
-    oklch(0.972 0.008 80) 0%,
-    oklch(0.94 0.018 60) 100%
+    #F6F0E6 0%,
+    #ECE2D0 100%
   );
   --gradient-ribbon: linear-gradient(
     135deg,
