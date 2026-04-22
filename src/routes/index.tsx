@@ -541,13 +541,34 @@ function LandingPage() {
                 )}
 
                 {showPlayMe && !heroPlaying && (
-                  <div className="pointer-events-none absolute -top-2.5 left-1/2 z-10 -translate-x-1/2 sm:-top-3.5">
-                    <div className="relative animate-bounce rounded-full bg-[#C7572E] px-3.5 py-1 shadow-[0_6px_20px_rgba(199,87,46,0.5)] sm:px-4 sm:py-1.5">
-                      <span className="flex items-center gap-1.5 whitespace-nowrap text-[10px] font-bold uppercase tracking-[0.14em] text-white sm:text-[11px] sm:tracking-[0.16em]">
-                        <span aria-hidden className="text-[9px] sm:text-[10px]">▶</span>
+                  <div className="pointer-events-none absolute -top-4 left-1/2 z-10 -translate-x-1/2 sm:-top-5">
+                    <div className="relative animate-bounce rounded-full bg-[#C7572E] px-4 py-1.5 shadow-[0_10px_24px_rgba(0,0,0,0.4)] ring-1 ring-black/10 sm:px-5 sm:py-2">
+                      <span className="flex items-center gap-2 whitespace-nowrap text-[11px] font-bold uppercase tracking-[0.16em] text-white sm:text-[12px]">
+                        <span
+                          aria-hidden
+                          className="inline-block"
+                          style={{
+                            width: 0,
+                            height: 0,
+                            borderLeft: "7px solid #ffffff",
+                            borderTop: "5px solid transparent",
+                            borderBottom: "5px solid transparent",
+                          }}
+                        />
                         Play me
                       </span>
-                      <span className="absolute -bottom-1 left-1/2 h-2.5 w-2.5 -translate-x-1/2 rotate-45 bg-[#C7572E]" />
+                      <span
+                        aria-hidden
+                        className="absolute left-1/2 -translate-x-1/2"
+                        style={{
+                          bottom: -6,
+                          width: 0,
+                          height: 0,
+                          borderLeft: "7px solid transparent",
+                          borderRight: "7px solid transparent",
+                          borderTop: "7px solid #C7572E",
+                        }}
+                      />
                     </div>
                   </div>
                 )}
