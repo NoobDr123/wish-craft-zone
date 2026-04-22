@@ -1,9 +1,9 @@
 import { createFileRoute, useNavigate, Link } from "@tanstack/react-router";
-import { useEffect, useRef, useState } from "react";
+import { useEffect, useMemo, useRef, useState } from "react";
 import confetti from "canvas-confetti";
 import { Logo } from "@/components/Logo";
-import { useQuizStore } from "@/stores/quizStore";
-import { ArrowLeft, ArrowRight, Gift, Timer, AlertTriangle, Flame } from "lucide-react";
+import { journeyStageOf, useQuizStore } from "@/stores/quizStore";
+import { ArrowLeft, ArrowRight, Gift, Timer, AlertTriangle, Flame, Heart, Sparkles } from "lucide-react";
 
 export const Route = createFileRoute("/scratch")({
   component: ScratchPage,
