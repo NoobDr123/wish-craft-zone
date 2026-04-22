@@ -39,7 +39,7 @@ export const Route = createFileRoute("/_admin/$slug")({
   }),
 });
 
-type Tab = "orders" | "refunds" | "reactions" | "revisions";
+type Tab = "orders" | "refunds" | "reactions" | "revisions" | "samples";
 
 function StaffPage() {
   const { state, user, refresh } = useAdminGuard();
@@ -130,6 +130,7 @@ function StaffPage() {
           {(
             [
               ["orders", "Orders"],
+              ["samples", "Samples"],
               ["refunds", "Refund queue"],
               ["reactions", "Reactions"],
               ["revisions", "Revisions"],
@@ -155,6 +156,7 @@ function StaffPage() {
 
       <main className="mx-auto max-w-7xl px-6 py-10">
         {tab === "orders" && <OrdersPanel />}
+        {tab === "samples" && <SamplesPanel />}
         {tab === "refunds" && <RefundsPanel />}
         {tab === "reactions" && <ReactionsPanel />}
         {tab === "revisions" && <RevisionsPanel />}
