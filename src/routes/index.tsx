@@ -356,7 +356,7 @@ function Eyebrow({
 }
 
 function LandingPage() {
-  const { samples } = Route.useLoaderData();
+  const { samples } = Route.useLoaderData() as { samples: FeaturedSample[] };
   const [activeSample, setActiveSample] = useState<FeaturedSample | null>(null);
 
   // Choose displayed list — real samples if available, otherwise the fallback set
