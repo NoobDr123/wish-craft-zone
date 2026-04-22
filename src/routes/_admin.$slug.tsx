@@ -902,21 +902,21 @@ function SamplesPanel() {
           <div className="grid gap-4 md:grid-cols-2">
             <Field label="Title">
               <input
-                className="input"
+                className="w-full rounded-md border border-border bg-background px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-primary/40"
                 value={form.title}
                 onChange={(e) => setForm({ ...form, title: e.target.value })}
               />
             </Field>
             <Field label="Recipient name">
               <input
-                className="input"
+                className="w-full rounded-md border border-border bg-background px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-primary/40"
                 value={form.recipient_name}
                 onChange={(e) => setForm({ ...form, recipient_name: e.target.value })}
               />
             </Field>
             <Field label="Relationship">
               <input
-                className="input"
+                className="w-full rounded-md border border-border bg-background px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-primary/40"
                 placeholder="e.g. Mother, Husband"
                 value={form.relationship}
                 onChange={(e) => setForm({ ...form, relationship: e.target.value })}
@@ -924,7 +924,7 @@ function SamplesPanel() {
             </Field>
             <Field label="Stage / situation">
               <input
-                className="input"
+                className="w-full rounded-md border border-border bg-background px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-primary/40"
                 placeholder="e.g. In treatment, Survivor, Memory"
                 value={form.stage}
                 onChange={(e) => setForm({ ...form, stage: e.target.value })}
@@ -932,42 +932,42 @@ function SamplesPanel() {
             </Field>
             <Field label="Genre (key)">
               <input
-                className="input"
+                className="w-full rounded-md border border-border bg-background px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-primary/40"
                 value={form.genre}
                 onChange={(e) => setForm({ ...form, genre: e.target.value })}
               />
             </Field>
             <Field label="Genre label">
               <input
-                className="input"
+                className="w-full rounded-md border border-border bg-background px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-primary/40"
                 value={form.genre_label}
                 onChange={(e) => setForm({ ...form, genre_label: e.target.value })}
               />
             </Field>
             <Field label="Tempo">
               <input
-                className="input"
+                className="w-full rounded-md border border-border bg-background px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-primary/40"
                 value={form.tempo}
                 onChange={(e) => setForm({ ...form, tempo: e.target.value })}
               />
             </Field>
             <Field label="Voice">
               <input
-                className="input"
+                className="w-full rounded-md border border-border bg-background px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-primary/40"
                 value={form.voice}
                 onChange={(e) => setForm({ ...form, voice: e.target.value })}
               />
             </Field>
             <Field label="Quote (homepage card)">
               <input
-                className="input"
+                className="w-full rounded-md border border-border bg-background px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-primary/40"
                 value={form.quote}
                 onChange={(e) => setForm({ ...form, quote: e.target.value })}
               />
             </Field>
             <Field label="For (homepage card)">
               <input
-                className="input"
+                className="w-full rounded-md border border-border bg-background px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-primary/40"
                 placeholder="e.g. For Mom · Stage III"
                 value={form.for_text}
                 onChange={(e) => setForm({ ...form, for_text: e.target.value })}
@@ -975,7 +975,7 @@ function SamplesPanel() {
             </Field>
             <Field label="Cover image URL">
               <input
-                className="input"
+                className="w-full rounded-md border border-border bg-background px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-primary/40"
                 value={form.cover_image_url}
                 onChange={(e) => setForm({ ...form, cover_image_url: e.target.value })}
               />
@@ -983,7 +983,7 @@ function SamplesPanel() {
             <Field label="Sort order">
               <input
                 type="number"
-                className="input"
+                className="w-full rounded-md border border-border bg-background px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-primary/40"
                 value={form.sort_order}
                 onChange={(e) => setForm({ ...form, sort_order: Number(e.target.value) })}
               />
@@ -992,7 +992,7 @@ function SamplesPanel() {
           <div className="mt-4">
             <Field label="Story prompt (sender's words)">
               <textarea
-                className="input min-h-[120px]"
+                className="w-full rounded-md border border-border bg-background px-3 py-2 text-sm min-h-[120px] focus:outline-none focus:ring-2 focus:ring-primary/40"
                 value={form.story_prompt}
                 onChange={(e) => setForm({ ...form, story_prompt: e.target.value })}
               />
