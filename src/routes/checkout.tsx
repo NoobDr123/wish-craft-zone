@@ -52,6 +52,7 @@ function formatDeliveryDate() {
 
 function CheckoutPage() {
   const navigate = useNavigate();
+  const { samples } = Route.useLoaderData() as { samples: SampleSong[] };
   const q = useQuizStore();
   const [email, setEmail] = useState(q.buyer_email || "");
   const [name, setName] = useState(q.buyer_name || "");
@@ -335,36 +336,36 @@ function CheckoutPage() {
         )}
 
         {/* Samples */}
-        <section className="mt-6 rounded-3xl border border-peach/70 bg-card p-6 shadow-soft md:p-7">
-          <h2 className="flex items-center gap-2 font-display text-2xl font-bold text-foreground">
-            <Music2 className="h-5 w-5 text-primary" /> Hear Other RibbonSongs We Made
-          </h2>
-          <div className="mt-5 space-y-4">
-            {SAMPLES.map((s) => (
-              <article
-                key={s.title}
-                className="rounded-2xl border border-peach/60 bg-background/60 p-4"
-              >
-                <div className="flex items-center gap-3">
-                  <button
-                    aria-label={`Play ${s.title}`}
-                    className="flex h-12 w-12 shrink-0 items-center justify-center rounded-full bg-primary text-primary-foreground transition-transform hover:scale-105"
-                  >
-                    <Play className="ml-0.5 h-5 w-5 fill-current" />
-                  </button>
-                  <div className="min-w-0 flex-1">
-                    <p className="truncate font-semibold text-foreground">{s.title}</p>
-                    <p className="truncate text-xs text-muted-foreground">Ordered by {s.by}</p>
-                  </div>
-                  <span className="text-xs tabular-nums text-muted-foreground">0:00</span>
-                </div>
-                <p className="mt-3 text-sm italic leading-relaxed text-foreground/80">
-                  &ldquo;{s.quote}&rdquo; — {s.by}
-                </p>
-              </article>
-            ))}
-          </div>
-        </section>
+        {samples.length > 0 && (
+          <section className="mt-6 rounded-3xl border border-peach/70 bg-card p-6 shadow-soft md:p-7">
+            <h2 className="flex items-center gap-2 font-display text-2xl font-bold text-foreground">
+              <Music2 className="h-5 w-5 text-primary" /> Hear Other RibbonSongs We Made
+            </h2>
+            <div className="mt-5 space-y-5">
+              {samples.map((s) => (
+                <article
+                  key={s.id}
+                  className="rounded-2xl border border-peach/60 bg-background/60 p-4"
+                >
+                  <p className="font-semibold text-foreground">{s.title}</p>
+                  {s.for_text && (
+                    <p className="mt-0.5 text-xs text-muted-foreground">{s.for_text}</p>
+                  )}
+                  {s.audio_url && (
+                    <div className="mt-3">
+                      <AudioPlayer src={s.audio_url} title={s.title} variant="compact" />
+                    </div>
+                  )}
+                  {s.quote && (
+                    <p className="mt-3 text-sm italic leading-relaxed text-foreground/80">
+                      &ldquo;{s.quote}&rdquo;
+                    </p>
+                  )}
+                </article>
+              ))}
+            </div>
+          </section>
+        )}
 
         {/* Money-back guarantee */}
         <section className="mt-6 rounded-3xl border border-peach/70 bg-card p-6 shadow-soft md:p-7">
