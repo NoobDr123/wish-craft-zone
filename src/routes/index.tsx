@@ -317,7 +317,7 @@ function LandingPage() {
       <SiteHeader />
 
       {/* HERO */}
-      <section className="relative overflow-hidden px-0 py-[70px] pb-[60px]">
+      <section className="relative overflow-hidden px-0 py-[40px] pb-[40px] sm:py-[70px] sm:pb-[60px]">
         <div
           className="pointer-events-none absolute -right-[120px] -top-[100px] h-[420px] w-[420px] rounded-full opacity-60"
           style={{
@@ -325,11 +325,11 @@ function LandingPage() {
               "radial-gradient(circle, #E5D9EF 0%, transparent 70%)",
           }}
         />
-        <div className="mx-auto max-w-[1200px] px-6">
-          <div className="grid items-center gap-[60px] md:grid-cols-[1.15fr_1fr]">
+        <div className="mx-auto max-w-[1200px] px-5 sm:px-6">
+          <div className="grid items-center gap-10 md:grid-cols-[1.15fr_1fr] md:gap-[60px]">
             <div>
               <Eyebrow>The #1 Custom Song Platform For Cancer Families</Eyebrow>
-              <h1 className="mb-[26px] max-w-[700px] font-display text-[clamp(38px,5.2vw,64px)] font-medium italic leading-[1.04] tracking-[-0.025em] text-[#1F1B16]">
+              <h1 className="mb-[22px] max-w-[700px] font-display text-[clamp(30px,8vw,64px)] font-medium italic leading-[1.06] tracking-[-0.025em] text-[#1F1B16] md:mb-[26px]">
                 <span className="font-display text-[1.1em] font-semibold not-italic text-[#8D6FAF] -mr-[0.04em]">
                   &ldquo;
                 </span>
@@ -339,36 +339,36 @@ function LandingPage() {
                   &rdquo;
                 </span>
               </h1>
-              <div className="mb-7 text-sm text-[#8A8175]">
+              <div className="mb-6 text-[13px] text-[#8A8175] md:mb-7 md:text-sm">
                 <strong className="font-semibold text-[#5A5148]">
                   Rachel L., Columbus OH
                 </strong>{" "}
                 &nbsp;·&nbsp; Daughter, for her mother in treatment
               </div>
-              <p className="mb-8 max-w-[540px] text-[18px] leading-[1.55] text-[#5A5148]">
+              <p className="mb-7 max-w-[540px] text-[16px] leading-[1.55] text-[#5A5148] md:mb-8 md:text-[18px]">
                 When cancer takes the words away, give them a song.{" "}
                 <strong className="font-semibold text-[#1F1B16]">
                   Written with care. Produced in studio. Delivered to your
                   inbox.
                 </strong>
               </p>
-              <div className="mb-7 flex flex-wrap items-center gap-4">
+              <div className="mb-7 flex flex-wrap items-center gap-3 sm:gap-4">
                 <PrimaryBtn large>Start their song</PrimaryBtn>
                 <GhostBtn href="#listen">Listen to real songs</GhostBtn>
               </div>
-              <div className="flex flex-wrap items-center gap-3.5 text-[13px] text-[#5A5148]">
+              <div className="flex flex-wrap items-center gap-x-3 gap-y-2 text-[13px] text-[#5A5148] sm:gap-3.5">
                 <span className="tracking-[1px] text-[#C9A85A]">★★★★★</span>
                 <span>
                   <strong className="text-[#1F1B16]">4.9</strong> from 2,400+
                   families
                 </span>
-                <span className="inline-block h-[3px] w-[3px] rounded-full bg-[#8A8175]" />
+                <span className="hidden sm:inline-block h-[3px] w-[3px] rounded-full bg-[#8A8175]" />
                 <span>Free revisions</span>
-                <span className="inline-block h-[3px] w-[3px] rounded-full bg-[#8A8175]" />
+                <span className="hidden sm:inline-block h-[3px] w-[3px] rounded-full bg-[#8A8175]" />
                 <span>Money back guarantee</span>
               </div>
-              <div className="mt-9 flex items-center gap-3.5 border-t border-[#D9CEB9] pt-7">
-                <div className="flex">
+              <div className="mt-8 flex items-center gap-3.5 border-t border-[#D9CEB9] pt-6 md:mt-9 md:pt-7">
+                <div className="flex shrink-0">
                   {[47, 32, 26, 44, 16].map((id, i) => (
                     <img
                       key={id}
@@ -380,7 +380,7 @@ function LandingPage() {
                     />
                   ))}
                 </div>
-                <div className="text-[13.5px] text-[#5A5148]">
+                <div className="text-[13px] leading-[1.4] text-[#5A5148] md:text-[13.5px]">
                   Loved by{" "}
                   <strong className="text-[#1F1B16]">2,400+ families</strong>{" "}
                   fighting, surviving, and remembering
@@ -397,21 +397,21 @@ function LandingPage() {
               />
               <button
                 aria-label="Play video"
-                className="absolute left-1/2 top-1/2 flex h-20 w-20 -translate-x-1/2 -translate-y-1/2 items-center justify-center rounded-full bg-[rgba(246,240,230,0.95)] shadow-[0_8px_32px_rgba(0,0,0,0.3)] transition-transform hover:scale-110"
+                className="absolute left-1/2 top-1/2 flex h-16 w-16 -translate-x-1/2 -translate-y-1/2 items-center justify-center rounded-full bg-[rgba(246,240,230,0.95)] shadow-[0_8px_32px_rgba(0,0,0,0.3)] transition-transform hover:scale-110 sm:h-20 sm:w-20"
               >
                 <span
                   className="ml-1 inline-block"
                   style={{
                     width: 0,
                     height: 0,
-                    borderLeft: "18px solid #8D6FAF",
-                    borderTop: "11px solid transparent",
-                    borderBottom: "11px solid transparent",
+                    borderLeft: "16px solid #8D6FAF",
+                    borderTop: "10px solid transparent",
+                    borderBottom: "10px solid transparent",
                   }}
                 />
               </button>
-              <div className="absolute inset-x-5 bottom-5 rounded-[10px] bg-[rgba(31,27,22,0.85)] p-[14px_16px] text-[13.5px] leading-[1.45] text-[#F6F0E6] backdrop-blur-md">
-                <strong className="mb-1 block text-[11px] font-semibold uppercase tracking-[0.1em] text-[#E5D9EF]">
+              <div className="absolute inset-x-4 bottom-4 rounded-[10px] bg-[rgba(31,27,22,0.85)] p-[12px_14px] text-[12.5px] leading-[1.45] text-[#F6F0E6] backdrop-blur-md sm:inset-x-5 sm:bottom-5 sm:p-[14px_16px] sm:text-[13.5px]">
+                <strong className="mb-1 block text-[10.5px] font-semibold uppercase tracking-[0.1em] text-[#E5D9EF] sm:text-[11px]">
                   Watch Rachel's story
                 </strong>
                 The song that played on the drive home from her mother's last
