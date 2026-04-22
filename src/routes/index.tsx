@@ -500,14 +500,27 @@ function LandingPage() {
             {/* Hero photo + song */}
             <div className="order-1 md:order-2">
               <div className="group relative aspect-[4/5] overflow-hidden rounded-[18px] bg-[#ECE2D0] shadow-[0_20px_60px_rgba(31,27,22,0.12)]">
-                <img
-                  src={rachelPhoto}
-                  alt="Rachel and her mother holding hands in the car after her last chemo infusion"
-                  className={`h-full w-full object-contain bg-[#1F1B16] ${
-                    heroShaking ? "animate-photo-shake" : ""
-                  }`}
-                  onClick={handleHeroPlay}
-                />
+                {heroPlaying ? (
+                  <video
+                    src="/rachel-mother-real.mp4"
+                    poster={rachelPhoto}
+                    className="h-full w-full object-contain bg-[#1F1B16]"
+                    autoPlay
+                    loop
+                    muted
+                    playsInline
+                    onClick={handleHeroPlay}
+                  />
+                ) : (
+                  <img
+                    src={rachelPhoto}
+                    alt="Rachel and her mother holding hands in the car after her last chemo infusion"
+                    className={`h-full w-full object-contain bg-[#1F1B16] ${
+                      heroShaking ? "animate-photo-shake" : ""
+                    }`}
+                    onClick={handleHeroPlay}
+                  />
+                )}
                 <div className="pointer-events-none absolute inset-x-0 bottom-0 h-1/3 bg-gradient-to-t from-black/55 via-black/15 to-transparent" />
 
                 <audio
