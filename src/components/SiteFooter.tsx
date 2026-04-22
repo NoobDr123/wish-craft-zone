@@ -1,24 +1,50 @@
-import { Logo } from "./Logo";
+import { Link } from "@tanstack/react-router";
+import { RibbonMark } from "./Logo";
 
 export function SiteFooter() {
   return (
-    <footer className="border-t border-border/60 bg-background">
-      <div className="mx-auto flex max-w-6xl flex-col items-start justify-between gap-6 px-6 py-12 md:flex-row md:items-center">
-        <div className="space-y-3">
-          <Logo />
-          <p className="max-w-sm text-sm text-muted-foreground">
-            Because sometimes words aren&rsquo;t enough. Turn your love into a song
-            for the bravest fighter in your life.
-          </p>
-        </div>
-        <div className="flex flex-col gap-2 text-sm text-muted-foreground md:items-end">
-          <a href="mailto:hello@ribbonsong.com" className="hover:text-foreground">
-            hello@ribbonsong.com
-          </a>
-          <p className="text-xs">
-            &copy; {new Date().getFullYear()} RibbonSong. Made with care.
-          </p>
-        </div>
+    <footer className="border-t border-[rgba(246,240,230,0.1)] bg-[#1F1B16] px-0 py-[48px] pb-9 text-[13px] text-[rgba(246,240,230,0.6)]">
+      <div className="mx-auto flex max-w-[1200px] flex-wrap items-center justify-between gap-5 px-6">
+        <Link
+          to="/"
+          className="inline-flex items-center gap-2 font-display text-[18px] font-semibold tracking-[-0.02em] text-[#F6F0E6]"
+        >
+          <RibbonMark className="h-6 w-6" />
+          RibbonSong
+        </Link>
+        <ul className="flex flex-wrap gap-7">
+          <li>
+            <a href="/#stories" className="hover:text-[#E5D9EF]">
+              Reviews
+            </a>
+          </li>
+          <li>
+            <a href="/#press" className="hover:text-[#E5D9EF]">
+              Press
+            </a>
+          </li>
+          <li>
+            <Link to="/login" className="hover:text-[#E5D9EF]">
+              Track Order
+            </Link>
+          </li>
+          <li>
+            <a href="/terms" className="hover:text-[#E5D9EF]">
+              Terms
+            </a>
+          </li>
+          <li>
+            <a href="/privacy" className="hover:text-[#E5D9EF]">
+              Privacy
+            </a>
+          </li>
+          <li>
+            <a href="mailto:hello@ribbonsong.com" className="hover:text-[#E5D9EF]">
+              Contact
+            </a>
+          </li>
+        </ul>
+        <div>© {new Date().getFullYear()} RibbonSong</div>
       </div>
     </footer>
   );
