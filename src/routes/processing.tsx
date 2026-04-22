@@ -12,7 +12,7 @@ function ProcessingPage() {
   const q = useQuizStore();
 
   useEffect(() => {
-    const t = setTimeout(() => navigate({ to: "/dashboard" }), 2800);
+    const t = setTimeout(() => navigate({ to: "/dashboard" }), 3500);
     return () => clearTimeout(t);
   }, [navigate]);
 

@@ -1,85 +1,124 @@
-import { createFileRoute } from "@tanstack/react-router";
+// Listen page — public share view of a delivered song.
+// Anyone with the URL can play. Loads order by share_page_slug or id.
+
+import { createFileRoute, Link, notFound } from "@tanstack/react-router";
+import { useEffect, useState } from "react";
 import { AudioPlayer } from "@/components/AudioPlayer";
 import { RibbonMark } from "@/components/Logo";
+import { supabase } from "@/integrations/supabase/client";
 
 export const Route = createFileRoute("/listen/$id")({
   component: ListenPage,
-  head: () => ({
+  head: ({ loaderData }: any) => ({
     meta: [
-      { title: "A song for you · RibbonSong" },
+      {
+        title: loaderData?.title
+          ? `${loaderData.title} · A song for you · RibbonSong`
+          : "A song for you · RibbonSong",
+      },
       {
         name: "description",
         content: "A personal song crafted with love, just for you.",
       },
+      { property: "og:title", content: loaderData?.title ?? "A song for you" },
+      {
+        property: "og:description",
+        content: "A personal song crafted with love.",
+      },
     ],
   }),
+  loader: async ({ params }) => {
+    const { data, error } = await supabase
+      .from("orders")
+      .select(
+        "id, recipient_name, buyer_name, personal_note, audio_variants, selected_variant_id, brief, genre, tempo, status, share_page_slug",
+      )
+      .or(`share_page_slug.eq.${params.id},id.eq.${params.id}`)
+      .eq("status", "delivered")
+      .maybeSingle();
+
+    if (error || !data) throw notFound();
+    return {
+      title: (data.brief as any)?.title ?? null,
+      order: data,
+    };
+  },
+  notFoundComponent: () => (
+    <div className="min-h-screen bg-background flex items-center justify-center px-6 text-center">
+      <div>
+        <RibbonMark className="mx-auto h-12 w-12 text-primary" />
+        <h1 className="mt-4 font-display text-3xl font-semibold">Song not found</h1>
+        <p className="mt-2 text-muted-foreground">
+          This song link may have been mistyped or is not yet delivered.
+        </p>
+        <Link to="/" className="mt-6 inline-block text-primary underline">
+          Back to RibbonSong
+        </Link>
+      </div>
+    </div>
+  ),
 });
 
-const DEMO_LYRICS = `[Verse 1]
-You taught me how to laugh at rain
-How to hold a hand and ease the pain
-Every story, every quiet song
-You're the reason I am strong
-
-[Chorus]
-And I will sing you through the night
-A ribbon of love, a thread of light
-Whatever comes, you're not alone
-I'll carry you all the way home
-
-[Verse 2]
-The little kitchen, summer pies
-The way you crinkled up your eyes
-You're the kindness I still know
-Wherever, whoever I go
-
-[Chorus]
-And I will sing you through the night
-A ribbon of love, a thread of light
-Whatever comes, you're not alone
-I'll carry you all the way home
-
-[Outro]
-We'll carry you all the way home`;
-
 function ListenPage() {
+  const { order, title } = Route.useLoaderData();
+  const [variant, setVariant] = useState<any>(null);
+
+  useEffect(() => {
+    const variants = (order.audio_variants as any[]) ?? [];
+    const chosen =
+      variants.find((v) => v.id === order.selected_variant_id) ?? variants[0];
+    setVariant(chosen);
+  }, [order]);
+
+  const lyrics = (order.brief as any)?.lyrics ?? "";
+
   return (
     <div className="min-h-screen bg-gradient-warm">
       <main className="mx-auto max-w-2xl px-6 py-20">
         <div className="text-center">
           <RibbonMark className="mx-auto h-12 w-12 text-primary" />
           <p className="mt-4 text-sm font-medium uppercase tracking-[0.2em] text-muted-foreground">
-            A song for you
+            A song for {order.recipient_name}
           </p>
           <h1 className="mt-4 font-display text-5xl font-semibold leading-tight text-foreground md:text-6xl">
-            From someone who loves you.
+            {title ?? "From someone who loves you."}
           </h1>
         </div>
 
-        <figure className="mt-12 rounded-[2rem] border border-border bg-card/80 p-8 shadow-soft backdrop-blur md:p-10">
-          <blockquote className="font-display text-xl italic leading-relaxed text-foreground">
-            &ldquo;I wrote this with you in my heart. Every word is true. I wanted
-            you to have something you could play whenever you needed to feel
-            held. I love you.&rdquo;
-          </blockquote>
-          <figcaption className="mt-4 text-sm text-muted-foreground">
-            With all my love
-          </figcaption>
-        </figure>
+        {order.personal_note && (
+          <figure className="mt-12 rounded-[2rem] border border-border bg-card/80 p-8 shadow-soft backdrop-blur md:p-10">
+            <blockquote className="font-display text-xl italic leading-relaxed text-foreground">
+              &ldquo;{order.personal_note}&rdquo;
+            </blockquote>
+            {order.buyer_name && (
+              <figcaption className="mt-4 text-sm text-muted-foreground">
+                — {order.buyer_name}
+              </figcaption>
+            )}
+          </figure>
+        )}
 
         <div className="mt-10">
-          <AudioPlayer
-            variant="full"
-            title="A Song For You"
-            artist="Made with love"
-            src="https://cdn.pixabay.com/audio/2022/10/30/audio_347111d654.mp3"
-            lyrics={DEMO_LYRICS}
-          />
+          {variant?.audio_url ? (
+            <AudioPlayer
+              variant="full"
+              title={title ?? `A Song for ${order.recipient_name}`}
+              artist={`${order.genre ?? "Acoustic"} · ${order.tempo ?? "Mid-tempo"}`}
+              src={variant.audio_url}
+              lyrics={lyrics}
+            />
+          ) : (
+            <p className="text-center text-muted-foreground">
+              Audio is loading. Please refresh in a moment.
+            </p>
+          )}
         </div>
 
         <p className="mt-12 text-center text-xs text-muted-foreground">
           Made with love via{" "}
-          <span className="font-medium text-foreground">RibbonSong</span>
+          <Link to="/" className="font-medium text-foreground underline">
+            RibbonSong
+          </Link>
         </p>
       </main>
     </div>
