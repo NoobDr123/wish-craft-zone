@@ -2,6 +2,8 @@ import { createFileRoute, useNavigate } from "@tanstack/react-router";
 import { useState } from "react";
 import { UpsellShell } from "@/components/UpsellShell";
 import { useQuizStore } from "@/stores/quizStore";
+import { supabase } from "@/integrations/supabase/client";
+import { stripeEnvironment } from "@/lib/stripe";
 
 export const Route = createFileRoute("/upsell-3")({
   component: Upsell3,
@@ -12,14 +14,37 @@ function Upsell3() {
   const q = useQuizStore();
   const [processing, setProcessing] = useState(false);
 
-  const accept = () => {
-    setProcessing(true);
-    setTimeout(() => {
-      q.set("has_unlimited_edits", true);
-      navigate({ to: "/processing" });
-    }, 900);
+  const finishAndAdvance = async () => {
+    // Tell the backend upsell decisions are done — this flips status to
+    // upsells_complete which fires the trigger that enqueues brief generation.
+    if (q.orderId) {
+      await supabase.functions.invoke("mark-upsells-complete", {
+        body: { orderId: q.orderId },
+      });
+    }
+    navigate({ to: "/processing" });
   };
-  const decline = () => navigate({ to: "/processing" });
+
+  const accept = async () => {
+    if (!q.orderId) {
+      await finishAndAdvance();
+      return;
+    }
+    setProcessing(true);
+    const { data } = await supabase.functions.invoke("charge-upsell", {
+      body: {
+        orderId: q.orderId,
+        upsellType: "unlimited_edits",
+        environment: stripeEnvironment,
+      },
+    });
+    if (data?.success) q.set("has_unlimited_edits", true);
+    await finishAndAdvance();
+  };
+
+  const decline = async () => {
+    await finishAndAdvance();
+  };
 
   return (
     <UpsellShell
