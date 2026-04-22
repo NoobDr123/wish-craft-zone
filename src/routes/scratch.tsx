@@ -8,7 +8,10 @@ import { ArrowLeft, ArrowRight, Gift, Sparkles, Timer } from "lucide-react";
 export const Route = createFileRoute("/scratch")({
   component: ScratchPage,
   head: () => ({
-    meta: [{ title: "Scratch to reveal · RibbonSong" }],
+    meta: [
+      { title: "Scratch to reveal · RibbonSong" },
+      { name: "robots", content: "noindex,nofollow" },
+    ],
   }),
 });
 
