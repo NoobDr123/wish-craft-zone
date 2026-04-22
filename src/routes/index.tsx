@@ -1074,19 +1074,19 @@ function LandingPage() {
               "radial-gradient(circle, #C9A85A 0%, transparent 70%)",
           }}
         />
-        <div className="relative z-10 mx-auto max-w-[920px] px-6">
-          <h2 className="mb-[22px] font-display text-[clamp(32px,4.4vw,56px)] font-normal leading-[1.12] tracking-[-0.025em] text-[#F6F0E6]">
+        <div className="relative z-10 mx-auto max-w-[920px] px-5 sm:px-6">
+          <h2 className="mb-[22px] font-display text-[clamp(26px,7vw,56px)] font-normal leading-[1.12] tracking-[-0.025em] text-[#F6F0E6]">
             On the chemo days. The scan days. The milestone days.
             <br />
             And on the days{" "}
             <em className="italic text-[#E5D9EF]">you miss them most.</em>
           </h2>
-          <p className="mx-auto mb-9 max-w-[580px] text-[17px] leading-[1.55] text-[rgba(246,240,230,0.75)]">
+          <p className="mx-auto mb-8 max-w-[580px] text-[16px] leading-[1.55] text-[rgba(246,240,230,0.75)] md:mb-9 md:text-[17px]">
             Give them something only you could give.
           </p>
           <Link
             to="/create"
-            className="group inline-flex items-center gap-2.5 rounded-full bg-[#8D6FAF] px-10 py-5 text-[17px] font-semibold text-[#F6F0E6] transition-all hover:-translate-y-px hover:bg-[#6B4F8A]"
+            className="group inline-flex items-center gap-2.5 rounded-full bg-[#8D6FAF] px-8 py-4 text-[15.5px] font-semibold text-[#F6F0E6] transition-all hover:-translate-y-px hover:bg-[#6B4F8A] sm:px-10 sm:py-5 sm:text-[17px]"
           >
             Start their song
             <span className="transition-transform group-hover:translate-x-1">
