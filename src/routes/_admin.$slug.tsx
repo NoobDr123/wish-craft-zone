@@ -749,3 +749,370 @@ function RevisionsPanel() {
     </>
   );
 }
+
+/* ---------- Featured Samples ---------- */
+
+interface SampleRow {
+  id: string;
+  title: string;
+  recipient_name: string;
+  relationship: string | null;
+  stage: string | null;
+  story_prompt: string;
+  genre: string;
+  genre_label: string;
+  tempo: string;
+  voice: string;
+  quote: string | null;
+  for_text: string | null;
+  cover_image_url: string | null;
+  audio_url: string | null;
+  status: string;
+  flag_reason: string | null;
+  published: boolean;
+  sort_order: number;
+  kie_task_id: string | null;
+  created_at: string;
+}
+
+const EMPTY_SAMPLE = {
+  title: "",
+  recipient_name: "",
+  relationship: "",
+  stage: "",
+  story_prompt: "",
+  genre: "folk",
+  genre_label: "Folk",
+  tempo: "mid",
+  voice: "female",
+  quote: "",
+  for_text: "",
+  cover_image_url: "",
+  sort_order: 0,
+};
+
+function SamplesPanel() {
+  const [samples, setSamples] = useState<SampleRow[]>([]);
+  const [busy, setBusy] = useState<string | null>(null);
+  const [showForm, setShowForm] = useState(false);
+  const [form, setForm] = useState({ ...EMPTY_SAMPLE });
+
+  useEffect(() => {
+    load();
+  }, []);
+
+  const load = async () => {
+    const { data } = await supabase
+      .from("featured_samples")
+      .select("*")
+      .order("sort_order", { ascending: true })
+      .order("created_at", { ascending: false });
+    setSamples((data ?? []) as SampleRow[]);
+  };
+
+  const create = async () => {
+    if (!form.title || !form.recipient_name || !form.story_prompt) {
+      alert("Title, recipient, and story are required");
+      return;
+    }
+    setBusy("create");
+    const { error } = await supabase.from("featured_samples").insert({
+      title: form.title,
+      recipient_name: form.recipient_name,
+      relationship: form.relationship || null,
+      stage: form.stage || null,
+      story_prompt: form.story_prompt,
+      genre: form.genre,
+      genre_label: form.genre_label,
+      tempo: form.tempo,
+      voice: form.voice,
+      quote: form.quote || null,
+      for_text: form.for_text || null,
+      cover_image_url: form.cover_image_url || null,
+      sort_order: Number(form.sort_order) || 0,
+      status: "draft",
+    });
+    setBusy(null);
+    if (error) {
+      alert(error.message);
+      return;
+    }
+    setForm({ ...EMPTY_SAMPLE });
+    setShowForm(false);
+    load();
+  };
+
+  const generate = async (id: string) => {
+    setBusy(id);
+    const { data: { session } } = await supabase.auth.getSession();
+    const res = await fetch(
+      `${import.meta.env.VITE_SUPABASE_URL}/functions/v1/generate-sample`,
+      {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+          Authorization: `Bearer ${session?.access_token}`,
+        },
+        body: JSON.stringify({ sampleId: id }),
+      },
+    );
+    const json = await res.json().catch(() => ({}));
+    setBusy(null);
+    if (!res.ok) {
+      alert(`Generation failed: ${json.error ?? res.statusText}`);
+      return;
+    }
+    load();
+  };
+
+  const togglePublish = async (s: SampleRow) => {
+    setBusy(s.id);
+    await supabase
+      .from("featured_samples")
+      .update({ published: !s.published })
+      .eq("id", s.id);
+    setBusy(null);
+    load();
+  };
+
+  const remove = async (id: string) => {
+    if (!confirm("Delete this sample?")) return;
+    setBusy(id);
+    await supabase.from("featured_samples").delete().eq("id", id);
+    setBusy(null);
+    load();
+  };
+
+  return (
+    <>
+      <div className="mb-6 flex items-center justify-between">
+        <div>
+          <h2 className="font-display text-2xl font-semibold">Featured Samples</h2>
+          <p className="text-sm text-muted-foreground">
+            Demo songs shown on the landing page. Generate via Claude + KIE.
+          </p>
+        </div>
+        <Button onClick={() => setShowForm((v) => !v)}>
+          {showForm ? "Cancel" : "+ New sample"}
+        </Button>
+      </div>
+
+      {showForm && (
+        <div className="mb-8 rounded-lg border border-border bg-card p-6">
+          <div className="grid gap-4 md:grid-cols-2">
+            <Field label="Title">
+              <input
+                className="w-full rounded-md border border-border bg-background px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-primary/40"
+                value={form.title}
+                onChange={(e) => setForm({ ...form, title: e.target.value })}
+              />
+            </Field>
+            <Field label="Recipient name">
+              <input
+                className="w-full rounded-md border border-border bg-background px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-primary/40"
+                value={form.recipient_name}
+                onChange={(e) => setForm({ ...form, recipient_name: e.target.value })}
+              />
+            </Field>
+            <Field label="Relationship">
+              <input
+                className="w-full rounded-md border border-border bg-background px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-primary/40"
+                placeholder="e.g. Mother, Husband"
+                value={form.relationship}
+                onChange={(e) => setForm({ ...form, relationship: e.target.value })}
+              />
+            </Field>
+            <Field label="Stage / situation">
+              <input
+                className="w-full rounded-md border border-border bg-background px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-primary/40"
+                placeholder="e.g. In treatment, Survivor, Memory"
+                value={form.stage}
+                onChange={(e) => setForm({ ...form, stage: e.target.value })}
+              />
+            </Field>
+            <Field label="Genre (key)">
+              <input
+                className="w-full rounded-md border border-border bg-background px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-primary/40"
+                value={form.genre}
+                onChange={(e) => setForm({ ...form, genre: e.target.value })}
+              />
+            </Field>
+            <Field label="Genre label">
+              <input
+                className="w-full rounded-md border border-border bg-background px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-primary/40"
+                value={form.genre_label}
+                onChange={(e) => setForm({ ...form, genre_label: e.target.value })}
+              />
+            </Field>
+            <Field label="Tempo">
+              <input
+                className="w-full rounded-md border border-border bg-background px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-primary/40"
+                value={form.tempo}
+                onChange={(e) => setForm({ ...form, tempo: e.target.value })}
+              />
+            </Field>
+            <Field label="Voice">
+              <input
+                className="w-full rounded-md border border-border bg-background px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-primary/40"
+                value={form.voice}
+                onChange={(e) => setForm({ ...form, voice: e.target.value })}
+              />
+            </Field>
+            <Field label="Quote (homepage card)">
+              <input
+                className="w-full rounded-md border border-border bg-background px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-primary/40"
+                value={form.quote}
+                onChange={(e) => setForm({ ...form, quote: e.target.value })}
+              />
+            </Field>
+            <Field label="For (homepage card)">
+              <input
+                className="w-full rounded-md border border-border bg-background px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-primary/40"
+                placeholder="e.g. For Mom · Stage III"
+                value={form.for_text}
+                onChange={(e) => setForm({ ...form, for_text: e.target.value })}
+              />
+            </Field>
+            <Field label="Cover image URL">
+              <input
+                className="w-full rounded-md border border-border bg-background px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-primary/40"
+                value={form.cover_image_url}
+                onChange={(e) => setForm({ ...form, cover_image_url: e.target.value })}
+              />
+            </Field>
+            <Field label="Sort order">
+              <input
+                type="number"
+                className="w-full rounded-md border border-border bg-background px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-primary/40"
+                value={form.sort_order}
+                onChange={(e) => setForm({ ...form, sort_order: Number(e.target.value) })}
+              />
+            </Field>
+          </div>
+          <div className="mt-4">
+            <Field label="Story prompt (sender's words)">
+              <textarea
+                className="w-full rounded-md border border-border bg-background px-3 py-2 text-sm min-h-[120px] focus:outline-none focus:ring-2 focus:ring-primary/40"
+                value={form.story_prompt}
+                onChange={(e) => setForm({ ...form, story_prompt: e.target.value })}
+              />
+            </Field>
+          </div>
+          <div className="mt-4 flex justify-end gap-2">
+            <Button variant="outline" onClick={() => setShowForm(false)}>
+              Cancel
+            </Button>
+            <Button onClick={create} disabled={busy === "create"}>
+              {busy === "create" ? "Saving…" : "Save sample"}
+            </Button>
+          </div>
+        </div>
+      )}
+
+      <div className="overflow-x-auto rounded-lg border border-border">
+        <table className="w-full text-sm">
+          <thead className="bg-muted/40 text-left">
+            <tr>
+              <th className="p-3">Title</th>
+              <th className="p-3">For</th>
+              <th className="p-3">Genre</th>
+              <th className="p-3">Status</th>
+              <th className="p-3">Audio</th>
+              <th className="p-3">Published</th>
+              <th className="p-3 text-right">Actions</th>
+            </tr>
+          </thead>
+          <tbody>
+            {samples.map((s) => (
+              <tr key={s.id} className="border-t border-border">
+                <td className="p-3 font-medium">{s.title}</td>
+                <td className="p-3 text-muted-foreground">
+                  {s.for_text ?? s.recipient_name}
+                </td>
+                <td className="p-3">{s.genre_label}</td>
+                <td className="p-3">
+                  <Badge variant="outline" className="text-xs">
+                    {s.status}
+                  </Badge>
+                  {s.flag_reason && (
+                    <div className="mt-1 text-xs text-destructive">
+                      {s.flag_reason.slice(0, 80)}
+                    </div>
+                  )}
+                </td>
+                <td className="p-3">
+                  {s.audio_url ? (
+                    <a
+                      href={s.audio_url}
+                      target="_blank"
+                      rel="noreferrer"
+                      className="text-primary underline"
+                    >
+                      Listen
+                    </a>
+                  ) : (
+                    <span className="text-muted-foreground">—</span>
+                  )}
+                </td>
+                <td className="p-3">
+                  <button
+                    onClick={() => togglePublish(s)}
+                    disabled={busy === s.id || !s.audio_url}
+                    className={`rounded px-2 py-1 text-xs ${
+                      s.published
+                        ? "bg-primary text-primary-foreground"
+                        : "bg-muted text-muted-foreground"
+                    } disabled:opacity-50`}
+                  >
+                    {s.published ? "Published" : "Draft"}
+                  </button>
+                </td>
+                <td className="p-3 text-right">
+                  <div className="flex justify-end gap-2">
+                    {!s.kie_task_id && (
+                      <Button
+                        size="sm"
+                        variant="outline"
+                        onClick={() => generate(s.id)}
+                        disabled={busy === s.id}
+                      >
+                        {busy === s.id ? "Generating…" : "Generate"}
+                      </Button>
+                    )}
+                    <Button
+                      size="sm"
+                      variant="ghost"
+                      onClick={() => remove(s.id)}
+                      disabled={busy === s.id}
+                      className="text-destructive hover:text-destructive"
+                    >
+                      Delete
+                    </Button>
+                  </div>
+                </td>
+              </tr>
+            ))}
+            {samples.length === 0 && (
+              <tr>
+                <td colSpan={7} className="p-8 text-center text-muted-foreground">
+                  No samples yet. Click "+ New sample" to seed one.
+                </td>
+              </tr>
+            )}
+          </tbody>
+        </table>
+      </div>
+    </>
+  );
+}
+
+function Field({ label, children }: { label: string; children: React.ReactNode }) {
+  return (
+    <label className="block">
+      <span className="mb-1 block text-xs font-medium text-muted-foreground">
+        {label}
+      </span>
+      {children}
+    </label>
+  );
+}
