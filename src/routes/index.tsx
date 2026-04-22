@@ -2,6 +2,15 @@ import { createFileRoute, Link } from "@tanstack/react-router";
 import { SiteHeader } from "@/components/SiteHeader";
 import { SiteFooter } from "@/components/SiteFooter";
 import heroImg from "@/assets/hero-ribbon.jpg";
+import whoNewlyDiagnosed from "@/assets/who-newly-diagnosed.png";
+import whoInTreatment from "@/assets/who-in-treatment.png";
+import whoSurvivor from "@/assets/who-survivor.png";
+import whoMemory from "@/assets/who-memory.png";
+import whoChild from "@/assets/who-child.png";
+import whoCaregiver from "@/assets/who-caregiver.png";
+import whoParent from "@/assets/who-parent.png";
+import whoStrength from "@/assets/who-strength.png";
+import whoYourself from "@/assets/who-yourself.png";
 
 export const Route = createFileRoute("/")({
   component: LandingPage,
@@ -79,47 +88,56 @@ const useCases = [
   {
     eyebrow: "Newly Diagnosed",
     label: "When the world just changed",
-    img: "https://images.unsplash.com/photo-1573497019940-1c28c88b4f3e?auto=format&fit=crop&w=500&q=80",
+    body: "For the days right after the news, when nothing makes sense yet.",
+    img: whoNewlyDiagnosed,
   },
   {
     eyebrow: "In Treatment",
     label: "A reminder on the hardest days",
-    img: "https://images.unsplash.com/photo-1551836022-d5d88e9218df?auto=format&fit=crop&w=500&q=80",
+    body: "Something to play during chemo, on the drive home, in the quiet hours.",
+    img: whoInTreatment,
   },
   {
     eyebrow: "For a Survivor",
     label: "Every scan. Every milestone.",
-    img: "https://images.unsplash.com/photo-1549080316-42e61b00f70e?auto=format&fit=crop&w=500&q=80",
+    body: "An anthem for the bell rung, the all-clear, the next birthday.",
+    img: whoSurvivor,
   },
   {
     eyebrow: "In Loving Memory",
     label: "A keepsake that holds them",
-    img: "https://images.unsplash.com/photo-1541855127-3f61e1d3c20a?auto=format&fit=crop&w=500&q=80",
+    body: "A song that carries their voice, their love, their light forward.",
+    img: whoMemory,
   },
   {
     eyebrow: "For a Child Fighting",
     label: "Courage set to music",
-    img: "https://images.unsplash.com/photo-1504813184591-01572f98c85f?auto=format&fit=crop&w=500&q=80",
+    body: "Something brave they can play when the hospital feels too big.",
+    img: whoChild,
   },
   {
     eyebrow: "For a Caregiver",
     label: "For the ones who stand beside them",
-    img: "https://images.unsplash.com/photo-1490818387583-1baba5e638af?auto=format&fit=crop&w=500&q=80",
+    body: "For the partners, the parents, the friends who never let go.",
+    img: whoCaregiver,
   },
   {
     eyebrow: "For a Parent",
     label: "The ones who raised you",
-    img: "https://images.unsplash.com/photo-1478476868527-002ae3f3e159?auto=format&fit=crop&w=500&q=80",
+    body: "For your mom, your dad, the person who taught you what love is.",
+    img: whoParent,
   },
   {
     eyebrow: "For Strength",
     label: "When they need it most",
-    img: "https://images.unsplash.com/photo-1508214751196-bcfd4ca60f91?auto=format&fit=crop&w=500&q=80",
+    body: "Something to hold onto when the weight feels too much to carry.",
+    img: whoStrength,
   },
   {
     eyebrow: "For Yourself",
     label: "A song for your own fight",
-    img: "https://images.unsplash.com/photo-1518310952931-b1de897abd40?auto=format&fit=crop&w=500&q=80",
+    body: "Sometimes the song you need most is the one written for you.",
+    img: whoYourself,
   },
 ];
 
