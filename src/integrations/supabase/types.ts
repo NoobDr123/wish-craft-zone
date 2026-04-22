@@ -221,6 +221,13 @@ export type Database = {
             referencedRelation: "orders"
             referencedColumns: ["id"]
           },
+          {
+            foreignKeyName: "job_events_order_id_fkey"
+            columns: ["order_id"]
+            isOneToOne: false
+            referencedRelation: "public_shared_songs"
+            referencedColumns: ["id"]
+          },
         ]
       }
       kie_callbacks: {
@@ -257,6 +264,13 @@ export type Database = {
             columns: ["order_id"]
             isOneToOne: false
             referencedRelation: "orders"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "kie_callbacks_order_id_fkey"
+            columns: ["order_id"]
+            isOneToOne: false
+            referencedRelation: "public_shared_songs"
             referencedColumns: ["id"]
           },
         ]
@@ -453,6 +467,13 @@ export type Database = {
             referencedRelation: "orders"
             referencedColumns: ["id"]
           },
+          {
+            foreignKeyName: "orders_parent_order_id_fkey"
+            columns: ["parent_order_id"]
+            isOneToOne: false
+            referencedRelation: "public_shared_songs"
+            referencedColumns: ["id"]
+          },
         ]
       }
       reaction_videos: {
@@ -504,6 +525,13 @@ export type Database = {
             columns: ["order_id"]
             isOneToOne: false
             referencedRelation: "orders"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "reaction_videos_order_id_fkey"
+            columns: ["order_id"]
+            isOneToOne: false
+            referencedRelation: "public_shared_songs"
             referencedColumns: ["id"]
           },
         ]
@@ -565,6 +593,13 @@ export type Database = {
             referencedRelation: "orders"
             referencedColumns: ["id"]
           },
+          {
+            foreignKeyName: "refund_requests_order_id_fkey"
+            columns: ["order_id"]
+            isOneToOne: false
+            referencedRelation: "public_shared_songs"
+            referencedColumns: ["id"]
+          },
         ]
       }
       revision_requests: {
@@ -613,6 +648,13 @@ export type Database = {
             columns: ["order_id"]
             isOneToOne: false
             referencedRelation: "orders"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "revision_requests_order_id_fkey"
+            columns: ["order_id"]
+            isOneToOne: false
+            referencedRelation: "public_shared_songs"
             referencedColumns: ["id"]
           },
         ]
@@ -715,7 +757,48 @@ export type Database = {
       }
     }
     Views: {
-      [_ in never]: never
+      public_shared_songs: {
+        Row: {
+          audio_variants: Json | null
+          brief: Json | null
+          delivered_at: string | null
+          genre: string | null
+          id: string | null
+          recipient_name: string | null
+          selected_variant_id: string | null
+          share_page_slug: string | null
+          song_title_idea: string | null
+          tempo: string | null
+          voice: string | null
+        }
+        Insert: {
+          audio_variants?: Json | null
+          brief?: Json | null
+          delivered_at?: string | null
+          genre?: string | null
+          id?: string | null
+          recipient_name?: string | null
+          selected_variant_id?: string | null
+          share_page_slug?: string | null
+          song_title_idea?: string | null
+          tempo?: string | null
+          voice?: string | null
+        }
+        Update: {
+          audio_variants?: Json | null
+          brief?: Json | null
+          delivered_at?: string | null
+          genre?: string | null
+          id?: string | null
+          recipient_name?: string | null
+          selected_variant_id?: string | null
+          share_page_slug?: string | null
+          song_title_idea?: string | null
+          tempo?: string | null
+          voice?: string | null
+        }
+        Relationships: []
+      }
     }
     Functions: {
       claim_my_guest_orders: { Args: never; Returns: number }
