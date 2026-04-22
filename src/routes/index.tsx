@@ -439,20 +439,20 @@ function LandingPage() {
                   inbox.
                 </strong>
               </p>
-              <div className="mb-7 flex flex-wrap items-center gap-3 sm:gap-4">
-                <PrimaryBtn large>Start their song</PrimaryBtn>
-                <GhostBtn href="#listen">Listen to real songs</GhostBtn>
+              <div className="mb-7 flex w-full flex-col items-stretch gap-3 sm:w-auto sm:flex-row sm:flex-wrap sm:items-center sm:gap-4">
+                <PrimaryBtn large fullWidth>Start their song</PrimaryBtn>
               </div>
-              <div className="flex flex-wrap items-center gap-x-3 gap-y-2 text-[13px] text-[#5A5148] sm:gap-3.5">
-                <span className="tracking-[1px] text-[#C9A85A]">★★★★★</span>
-                <span>
-                  <strong className="text-[#1F1B16]">4.9</strong> from 2,400+
-                  families
-                </span>
+              <div className="flex flex-col items-center gap-2 text-center text-[13px] text-[#5A5148] sm:flex-row sm:flex-wrap sm:items-center sm:gap-x-3 sm:gap-y-2 sm:text-left sm:gap-3.5">
+                <div className="flex items-center gap-2">
+                  <span className="tracking-[1px] text-[#C9A85A]">★★★★★</span>
+                  <span>
+                    <strong className="text-[#1F1B16]">4.9</strong> from 2,400+ families
+                  </span>
+                </div>
                 <span className="hidden sm:inline-block h-[3px] w-[3px] rounded-full bg-[#8A8175]" />
-                <span>Free revisions</span>
+                <span className="hidden sm:inline">Free revisions</span>
                 <span className="hidden sm:inline-block h-[3px] w-[3px] rounded-full bg-[#8A8175]" />
-                <span>Money back guarantee</span>
+                <span className="hidden sm:inline">Money back guarantee</span>
               </div>
               <div className="mt-8 flex items-center gap-3.5 border-t border-[#D9CEB9] pt-6 md:mt-9 md:pt-7">
                 <div className="flex shrink-0">
