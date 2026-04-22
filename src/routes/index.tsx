@@ -331,9 +331,10 @@ function GhostBtn({ children, href }: { children: React.ReactNode; href: string 
   return (
     <a
       href={href}
-      className="inline-flex items-center gap-2.5 rounded-full border border-[#1F1B16] bg-transparent px-[26px] py-[14px] text-[15px] font-semibold text-[#1F1B16] transition-all hover:bg-[#1F1B16] hover:text-[#F6F0E6]"
+      className="inline-flex items-center gap-1.5 px-1 py-[14px] text-[15px] font-semibold text-[#1F1B16] underline decoration-[#1F1B16]/40 decoration-[1.5px] underline-offset-[6px] transition-colors hover:text-[#8D6FAF] hover:decoration-[#8D6FAF]"
     >
       {children}
+      <span aria-hidden>→</span>
     </a>
   );
 }
@@ -541,24 +542,24 @@ function LandingPage() {
                 )}
 
                 {showPlayMe && !heroPlaying && (
-                  <div className="pointer-events-none absolute left-1/2 top-[calc(50%+3.25rem)] z-10 -translate-x-1/2 -translate-y-1/2 sm:top-[calc(50%+4.25rem)]">
-                    <div className="animate-bounce rounded-full bg-black/58 px-3 py-1.5 backdrop-blur-sm ring-1 ring-white/15 shadow-[0_10px_28px_rgba(0,0,0,0.28)] sm:px-4 sm:py-2">
-                      <span className="flex items-center gap-2 whitespace-nowrap text-[10px] font-semibold uppercase tracking-[0.14em] text-white sm:text-[11px]">
-                        <span className="flex h-5 w-5 items-center justify-center rounded-full bg-white/14 sm:h-6 sm:w-6">
-                          <span
-                            aria-hidden
-                            className="ml-0.5 inline-block"
-                            style={{
-                              width: 0,
-                              height: 0,
-                              borderLeft: "6px solid #ffffff",
-                              borderTop: "4px solid transparent",
-                              borderBottom: "4px solid transparent",
-                            }}
-                          />
-                        </span>
+                  <div className="pointer-events-none absolute -top-3 left-1/2 z-10 -translate-x-1/2 sm:-top-4">
+                    <div className="relative animate-bounce rounded-full bg-[#C7572E] px-3.5 py-1.5 shadow-[0_8px_20px_rgba(0,0,0,0.25)] sm:px-4 sm:py-2">
+                      <span className="flex items-center gap-1.5 whitespace-nowrap text-[11px] font-bold uppercase tracking-[0.12em] text-white sm:text-[12px]">
+                        <span aria-hidden>▶</span>
                         Play me
                       </span>
+                      <span
+                        aria-hidden
+                        className="absolute left-1/2 -translate-x-1/2"
+                        style={{
+                          bottom: -5,
+                          width: 0,
+                          height: 0,
+                          borderLeft: "6px solid transparent",
+                          borderRight: "6px solid transparent",
+                          borderTop: "6px solid #C7572E",
+                        }}
+                      />
                     </div>
                   </div>
                 )}
