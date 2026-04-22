@@ -3,6 +3,7 @@ import { useEffect, useMemo, useState } from "react";
 import { EmbeddedCheckoutProvider, EmbeddedCheckout } from "@stripe/react-stripe-js";
 import { Logo } from "@/components/Logo";
 import { PaymentTestModeBanner } from "@/components/PaymentTestModeBanner";
+import { AudioPlayer } from "@/components/AudioPlayer";
 import { useQuizStore, journeyStageOf, tenseOf } from "@/stores/quizStore";
 import { supabase } from "@/integrations/supabase/client";
 import { getStripe, stripeEnvironment } from "@/lib/stripe";
@@ -12,38 +13,36 @@ import {
   Gift,
   Music2,
   Pencil,
-  Play,
   ShieldCheck,
 } from "lucide-react";
+
+interface SampleSong {
+  id: string;
+  title: string;
+  for_text: string | null;
+  quote: string | null;
+  audio_url: string | null;
+  recipient_name: string;
+}
 
 export const Route = createFileRoute("/checkout")({
   component: CheckoutPage,
   head: () => ({
     meta: [{ title: "Almost There · RibbonSong" }],
   }),
+  loader: async () => {
+    const { data } = await supabase
+      .from("featured_samples")
+      .select("id,title,for_text,quote,audio_url,recipient_name")
+      .eq("published", true)
+      .not("audio_url", "is", null)
+      .order("sort_order", { ascending: true })
+      .limit(3);
+    return { samples: (data ?? []) as SampleSong[] };
+  },
 });
 
 const emailRe = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
-
-const SAMPLES = [
-  {
-    title: "Sent to Me from God",
-    by: "Pamela S.",
-    quote:
-      "Absolutely beautiful, you captured such special moments… we both were crying.",
-  },
-  {
-    title: "Saving Grace",
-    by: "Wendy B.",
-    quote:
-      "This is absolutely breathtaking. I can't believe it… I am going to have a hard time keeping this a secret until Sunday.",
-  },
-  {
-    title: "Stronger Now",
-    by: "Markeeta B.",
-    quote: "Very very wonderful song. I absolutely loved it and so did Dave!",
-  },
-];
 
 function formatDeliveryDate() {
   const d = new Date();
