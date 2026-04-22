@@ -58,6 +58,8 @@ const GENRES = [
   "R&B / Soul",
   "Gospel / Worship",
   "Cinematic / Orchestral",
+  "Hip-Hop / Rap",
+  "Rock / Indie",
 ] as const;
 
 const TEMPOS = ["Slow & Tender", "Mid-tempo", "Upbeat & Triumphant"] as const;
