@@ -439,16 +439,13 @@ function RefundsPanel() {
               <tr key={r.id} className="border-b border-border/40 align-top">
                 <td className="p-3 text-xs">
                   <div className="font-medium">{r.buyer_email}</div>
-                  <Link
-                    to="/staff-7q9k2x"
+                  <button
+                    type="button"
                     className="text-muted-foreground underline"
-                    onClick={(e) => {
-                      e.preventDefault();
-                      navigator.clipboard.writeText(r.order_id);
-                    }}
+                    onClick={() => navigator.clipboard.writeText(r.order_id)}
                   >
                     Copy order ID
-                  </Link>
+                  </button>
                 </td>
                 <td className="p-3 text-xs capitalize">
                   {r.request_type.replace("_", " ")}
