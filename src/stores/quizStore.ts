@@ -21,6 +21,7 @@ export type StageKey =
   | "In hospice / final chapter"
   | "In loving memory";
 
+// Kept for back-compat with existing code paths; not surfaced in new quiz UI.
 export type CancerTypeKey =
   | "Breast"
   | "Lung"
@@ -42,6 +43,7 @@ export type ToneKey =
   | "Reverent & prayerful"
   | "Bittersweet & honoring";
 
+// New theme set — superset across journey stages. Filtered by stage in UI.
 export type CoreMessage =
   | "You are not alone"
   | "I'm so proud of your strength"
@@ -49,7 +51,9 @@ export type CoreMessage =
   | "Thank you for everything"
   | "It's okay to rest now"
   | "Your love lives on in us"
-  | "We will carry you through this";
+  | "We will carry you through this"
+  | "You shaped who I am"
+  | "I will remember you every day";
 
 export type GenreKey =
   | "Acoustic Folk"
@@ -62,6 +66,9 @@ export type GenreKey =
 export type TempoKey = "Slow & Tender" | "Mid-tempo" | "Upbeat & Triumphant";
 export type VoiceKey = "Female Voice" | "Male Voice" | "Duet" | "No Preference";
 
+export type JourneyStage = "active" | "hospice" | "memory";
+export type Tense = "present" | "present_fading" | "past";
+
 export interface QuizState {
   // Step 1 — Who is this for
   relationship?: RelationshipKey;
@@ -70,33 +77,35 @@ export interface QuizState {
   pronunciation: string;
   age_range: string;
 
-  // Step 2 — Their fight
+  // Step 2 — Their journey
   stage?: StageKey;
   cancer_type?: CancerTypeKey;
-  fighting_for: string; // who/what they're fighting for
-  signature_strength: string; // how they show strength
-  hardest_moment: string; // optional, the hard thing
-  what_helps_most: string; // what brings them comfort
 
-  // Step 3 — Who they are
-  qualities: string;
+  // Step 3-6 — Story (free text)
+  fighting_for: string; // q4 — fighting for / holding onto / lived for
+  qualities: string; // q5 — qualities you love / loved
+  shared_memory: string; // q6 — one memory
+
+  // Legacy free-text fields (kept for back-compat with edge fn; unused in new UI)
+  signature_strength: string;
+  hardest_moment: string;
+  what_helps_most: string;
   inside_joke: string;
-  shared_memory: string;
-  little_things: string; // small details — laugh, smell, phrase
+  little_things: string;
   faith_or_beliefs: string;
 
-  // Step 4 — The message
-  message?: CoreMessage;
-  personal_words: string; // free-form letter to them
+  // Step 7-8 — The message
+  message?: CoreMessage; // q7 theme
+  personal_words: string; // q8 letter
   hope_for_them: string;
 
-  // Step 5 — Sound
+  // Step 9 — Sound
   genre?: GenreKey;
   tempo?: TempoKey;
   voice?: VoiceKey;
   song_title_idea: string;
 
-  // Step 6 — Delivery
+  // Step 10-11 — Delivery
   buyer_name: string;
   buyer_email: string;
   is_gift: boolean;
@@ -149,6 +158,21 @@ export const useQuizStore = create<QuizState>()(
       set: (key, value) => set({ [key]: value } as Partial<QuizState>),
       reset: () => set({ ...initial, orderId: undefined }),
     }),
-    { name: "ribbonsong-quiz-v2" },
+    { name: "ribbonsong-quiz-v3" },
   ),
 );
+
+// -------- Helpers --------
+
+export function journeyStageOf(stage?: StageKey): JourneyStage {
+  if (stage === "In loving memory") return "memory";
+  if (stage === "In hospice / final chapter") return "hospice";
+  return "active";
+}
+
+export function tenseOf(stage?: StageKey): Tense {
+  const j = journeyStageOf(stage);
+  if (j === "memory") return "past";
+  if (j === "hospice") return "present_fading";
+  return "present";
+}
