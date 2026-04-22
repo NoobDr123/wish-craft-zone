@@ -329,18 +329,6 @@ function PrimaryBtn({
   );
 }
 
-function GhostBtn({ children, href }: { children: React.ReactNode; href: string }) {
-  return (
-    <a
-      href={href}
-      className="inline-flex items-center gap-1.5 px-1 py-[14px] text-[15px] font-semibold text-[#1F1B16] underline decoration-[#1F1B16]/40 decoration-[1.5px] underline-offset-[6px] transition-colors hover:text-[#8D6FAF] hover:decoration-[#8D6FAF]"
-    >
-      {children}
-      <span aria-hidden>→</span>
-    </a>
-  );
-}
-
 function Eyebrow({
   children,
   className = "",
