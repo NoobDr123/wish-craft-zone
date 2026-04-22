@@ -326,16 +326,16 @@ function LandingPage() {
           }}
         />
         <div className="mx-auto max-w-[1200px] px-5 sm:px-6">
-          <div className="grid items-center gap-10 md:grid-cols-[1.15fr_1fr] md:gap-[60px]">
-            <div>
+          <div className="grid items-center gap-8 md:grid-cols-[1.15fr_1fr] md:gap-[60px]">
+            <div className="order-2 md:order-1">
               <Eyebrow>The #1 Custom Song Platform For Cancer Families</Eyebrow>
-              <h1 className="mb-[22px] max-w-[700px] font-display text-[clamp(30px,8vw,64px)] font-medium italic leading-[1.06] tracking-[-0.025em] text-[#1F1B16] md:mb-[26px]">
-                <span className="font-display text-[1.1em] font-semibold not-italic text-[#8D6FAF] -mr-[0.04em]">
+              <h1 className="mb-[22px] max-w-[700px] font-display text-[clamp(28px,7.5vw,64px)] font-medium italic leading-[1.08] tracking-[-0.025em] text-[#1F1B16] md:mb-[26px]">
+                <span className="font-display text-[1.05em] font-semibold not-italic text-[#8D6FAF]">
                   &ldquo;
                 </span>
                 I played it on the drive home from her last chemo. We both
                 cried the whole way.
-                <span className="font-display text-[1.1em] font-semibold not-italic text-[#8D6FAF]">
+                <span className="font-display text-[1.05em] font-semibold not-italic text-[#8D6FAF]">
                   &rdquo;
                 </span>
               </h1>
@@ -389,30 +389,32 @@ function LandingPage() {
             </div>
 
             {/* Hero video */}
-            <div className="relative aspect-[4/5] overflow-hidden rounded-[18px] bg-[#ECE2D0] shadow-[0_20px_60px_rgba(31,27,22,0.12)]">
-              <img
-                src="https://images.unsplash.com/photo-1609220136736-443140cffec6?auto=format&fit=crop&w=900&q=80"
-                alt="Mother and daughter listening"
-                className="h-full w-full object-cover"
-              />
-              <button
-                aria-label="Play video"
-                className="absolute left-1/2 top-1/2 flex h-16 w-16 -translate-x-1/2 -translate-y-1/2 items-center justify-center rounded-full bg-[rgba(246,240,230,0.95)] shadow-[0_8px_32px_rgba(0,0,0,0.3)] transition-transform hover:scale-110 sm:h-20 sm:w-20"
-              >
-                <span
-                  className="ml-1 inline-block"
-                  style={{
-                    width: 0,
-                    height: 0,
-                    borderLeft: "16px solid #8D6FAF",
-                    borderTop: "10px solid transparent",
-                    borderBottom: "10px solid transparent",
-                  }}
+            <div className="order-1 md:order-2">
+              <div className="relative aspect-[4/5] overflow-hidden rounded-[18px] bg-[#ECE2D0] shadow-[0_20px_60px_rgba(31,27,22,0.12)]">
+                <img
+                  src="https://images.unsplash.com/photo-1609220136736-443140cffec6?auto=format&fit=crop&w=900&q=80"
+                  alt="Mother and daughter listening"
+                  className="h-full w-full object-cover"
                 />
-              </button>
-              <div className="absolute inset-x-4 bottom-4 rounded-[10px] bg-[rgba(31,27,22,0.85)] p-[12px_14px] text-[12.5px] leading-[1.45] text-[#F6F0E6] backdrop-blur-md sm:inset-x-5 sm:bottom-5 sm:p-[14px_16px] sm:text-[13.5px]">
-                <strong className="mb-1 block text-[10.5px] font-semibold uppercase tracking-[0.1em] text-[#E5D9EF] sm:text-[11px]">
-                  Watch Rachel's story
+                <button
+                  aria-label="Play video"
+                  className="absolute left-1/2 top-1/2 flex h-16 w-16 -translate-x-1/2 -translate-y-1/2 items-center justify-center rounded-full bg-[rgba(246,240,230,0.95)] shadow-[0_8px_32px_rgba(0,0,0,0.3)] transition-transform hover:scale-110 sm:h-20 sm:w-20"
+                >
+                  <span
+                    className="ml-1 inline-block"
+                    style={{
+                      width: 0,
+                      height: 0,
+                      borderLeft: "16px solid #8D6FAF",
+                      borderTop: "10px solid transparent",
+                      borderBottom: "10px solid transparent",
+                    }}
+                  />
+                </button>
+              </div>
+              <div className="mt-3 px-1 text-[13px] leading-[1.5] text-[#5A5148] sm:text-[13.5px]">
+                <strong className="mr-1.5 text-[11px] font-semibold uppercase tracking-[0.12em] text-[#8D6FAF]">
+                  Watch Rachel's story ·
                 </strong>
                 The song that played on the drive home from her mother's last
                 infusion.
