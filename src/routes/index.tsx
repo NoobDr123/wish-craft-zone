@@ -1,5 +1,5 @@
 import { createFileRoute, Link } from "@tanstack/react-router";
-import { useRef, useState } from "react";
+import { useEffect, useRef, useState } from "react";
 import rachelPhoto from "@/assets/rachel-mother-real.jpg";
 
 const RACHEL_SONG_URL =
@@ -365,6 +365,28 @@ function LandingPage() {
   const heroAudioRef = useRef<HTMLAudioElement | null>(null);
   const [heroPlaying, setHeroPlaying] = useState(false);
   const [heroShaking, setHeroShaking] = useState(false);
+  const [heroEverPlayed, setHeroEverPlayed] = useState(false);
+  const [showPlayMe, setShowPlayMe] = useState(false);
+
+  // On landing: gentle shake + "Play me" hint until the user plays the song once
+  useEffect(() => {
+    if (heroEverPlayed) return;
+    const startDelay = window.setTimeout(() => {
+      setHeroShaking(true);
+      setShowPlayMe(true);
+    }, 1200);
+
+    // Re-trigger shake periodically so it keeps drawing attention
+    const interval = window.setInterval(() => {
+      setHeroShaking(false);
+      window.setTimeout(() => setHeroShaking(true), 60);
+    }, 4500);
+
+    return () => {
+      window.clearTimeout(startDelay);
+      window.clearInterval(interval);
+    };
+  }, [heroEverPlayed]);
 
   const handleHeroPlay = () => {
     const a = heroAudioRef.current;
@@ -372,17 +394,16 @@ function LandingPage() {
     if (heroPlaying) {
       a.pause();
       setHeroPlaying(false);
-      setHeroShaking(false);
       return;
     }
-    // Start shaking immediately, delay audio ~700ms for anticipation
-    setHeroShaking(true);
+    // Stop the attention-shake permanently once they engage
+    setHeroShaking(false);
+    setShowPlayMe(false);
+    setHeroEverPlayed(true);
     a.currentTime = 0;
-    window.setTimeout(() => {
-      a.play()
-        .then(() => setHeroPlaying(true))
-        .catch(() => setHeroShaking(false));
-    }, 700);
+    a.play()
+      .then(() => setHeroPlaying(true))
+      .catch(() => {});
   };
 
   // Choose displayed list — real samples if available, otherwise the fallback set
@@ -528,6 +549,17 @@ function LandingPage() {
                     <span className="text-[11px] font-medium uppercase tracking-[0.12em] text-white/95">
                       For My Mother — Now playing
                     </span>
+                  </div>
+                )}
+
+                {showPlayMe && !heroPlaying && (
+                  <div className="pointer-events-none absolute -top-3 left-1/2 -translate-x-1/2 sm:-top-4">
+                    <div className="relative animate-bounce rounded-full bg-[#C7572E] px-4 py-1.5 shadow-[0_8px_24px_rgba(199,87,46,0.45)] sm:px-5 sm:py-2">
+                      <span className="text-[11px] font-bold uppercase tracking-[0.16em] text-white sm:text-[12px]">
+                        ▶ Play me
+                      </span>
+                      <span className="absolute -bottom-1.5 left-1/2 h-3 w-3 -translate-x-1/2 rotate-45 bg-[#C7572E]" />
+                    </div>
                   </div>
                 )}
               </div>
