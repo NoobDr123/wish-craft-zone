@@ -1,5 +1,5 @@
 import { createFileRoute, Link } from "@tanstack/react-router";
-import { useEffect, useState } from "react";
+import { useState } from "react";
 import { SiteHeader } from "@/components/SiteHeader";
 import { SiteFooter } from "@/components/SiteFooter";
 import { supabase } from "@/integrations/supabase/client";
@@ -18,6 +18,22 @@ import whoYourself from "@/assets/who-yourself.png";
 
 export const Route = createFileRoute("/")({
   component: LandingPage,
+  loader: async () => {
+    const { data, error } = await supabase
+      .from("featured_samples")
+      .select(
+        "id,title,quote,for_text,genre_label,cover_image_url,audio_url,lyrics",
+      )
+      .eq("published", true)
+      .not("audio_url", "is", null)
+      .order("sort_order", { ascending: true })
+      .limit(6);
+    if (error) {
+      console.error("[index loader] featured_samples error", error);
+      return { samples: [] as FeaturedSample[] };
+    }
+    return { samples: (data ?? []) as FeaturedSample[] };
+  },
   head: () => ({
     meta: [
       { title: "RibbonSong — Give them a song when words run out" },
@@ -340,25 +356,8 @@ function Eyebrow({
 }
 
 function LandingPage() {
-  const [samples, setSamples] = useState<FeaturedSample[]>([]);
+  const { samples } = Route.useLoaderData() as { samples: FeaturedSample[] };
   const [activeSample, setActiveSample] = useState<FeaturedSample | null>(null);
-
-  useEffect(() => {
-    let mounted = true;
-    supabase
-      .from("featured_samples")
-      .select("id,title,quote,for_text,genre_label,cover_image_url,audio_url,lyrics")
-      .eq("published", true)
-      .not("audio_url", "is", null)
-      .order("sort_order", { ascending: true })
-      .limit(6)
-      .then(({ data }) => {
-        if (mounted && data) setSamples(data as FeaturedSample[]);
-      });
-    return () => {
-      mounted = false;
-    };
-  }, []);
 
   // Choose displayed list — real samples if available, otherwise the fallback set
   const displaySamples =
