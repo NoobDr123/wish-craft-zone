@@ -360,6 +360,19 @@ function Eyebrow({
 function LandingPage() {
   const { samples } = Route.useLoaderData() as { samples: FeaturedSample[] };
   const [activeSample, setActiveSample] = useState<FeaturedSample | null>(null);
+  const heroVideoRef = useRef<HTMLVideoElement | null>(null);
+  const [heroPlaying, setHeroPlaying] = useState(false);
+
+  const handleHeroPlay = () => {
+    const v = heroVideoRef.current;
+    if (!v) return;
+    v.muted = false;
+    v.currentTime = 0;
+    v.play().catch(() => {
+      // Autoplay with sound blocked — leave muted-loop as fallback
+    });
+    setHeroPlaying(true);
+  };
 
   // Choose displayed list — real samples if available, otherwise the fallback set
   const displaySamples =
