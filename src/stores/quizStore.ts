@@ -117,6 +117,7 @@ export interface QuizState {
 
   // Order context (set after checkout sim)
   orderId?: string;
+  checkoutSessionId?: string;
   has_3rd_verse: boolean;
   is_rush: boolean;
   has_unlimited_edits: boolean;

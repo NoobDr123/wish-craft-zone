@@ -42,6 +42,7 @@ function CheckoutReturnPage() {
 
       if (order?.payment_status === "paid") {
         q.set("orderId", order.id);
+        q.set("checkoutSessionId", session_id);
         setStatus("ready");
         // Tiny pause so the user sees the success state, then to the first upsell.
         setTimeout(() => navigate({ to: "/upsell-1" }), 800);
@@ -51,7 +52,10 @@ function CheckoutReturnPage() {
       if (attempts > 15) {
         // Webhook took too long — still send them to upsell-1 anyway. Worst case
         // upsell charges fail silently and they just see the standard pipeline.
-        if (order?.id) q.set("orderId", order.id);
+        if (order?.id) {
+          q.set("orderId", order.id);
+          q.set("checkoutSessionId", session_id);
+        }
         setStatus("ready");
         setTimeout(() => navigate({ to: "/upsell-1" }), 600);
         return;

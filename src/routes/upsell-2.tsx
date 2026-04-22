@@ -25,6 +25,7 @@ function Upsell2() {
         orderId: q.orderId,
         upsellType: "rush_delivery",
         environment: stripeEnvironment,
+        sessionId: q.checkoutSessionId,
       },
     });
     if (data?.success) q.set("is_rush", true);

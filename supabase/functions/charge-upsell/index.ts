@@ -18,19 +18,53 @@ serve(async (req) => {
   if (req.method === "OPTIONS") return new Response(null, { headers: corsHeaders });
 
   try {
-    const { orderId, upsellType, environment } = await req.json();
+    const { orderId, upsellType, environment, sessionId } = await req.json();
     if (!orderId || !upsellType) return json({ success: false, reason: "missing_params" }, 400);
 
     const upsell = UPSELL_PRICES[upsellType];
     if (!upsell) return json({ success: false, reason: "unknown_upsell" }, 400);
 
+    // ---- AuthZ: prove caller owns this order ----
+    // Accept EITHER (a) an authenticated user matching the order, OR
+    // (b) the Stripe checkout session_id the buyer received on the return URL.
+    // The session_id is an unguessable, single-purchase-scoped token issued by Stripe.
+    const authHeader = req.headers.get("Authorization");
+    let authedUserId: string | null = null;
+    let authedEmail: string | null = null;
+    if (authHeader?.startsWith("Bearer ")) {
+      const token = authHeader.slice(7);
+      const { data: userData } = await supabase.auth.getUser(token);
+      authedUserId = userData?.user?.id ?? null;
+      authedEmail = userData?.user?.email?.toLowerCase() ?? null;
+    }
+
     const { data: order, error } = await supabase
       .from("orders")
-      .select("stripe_customer_id, stripe_payment_method_id, product_config")
+      .select(
+        "user_id, buyer_email, status, stripe_customer_id, stripe_payment_method_id, stripe_checkout_session_id, product_config",
+      )
       .eq("id", orderId)
       .single();
 
     if (error || !order) return json({ success: false, reason: "order_not_found" }, 404);
+
+    const ownsViaAuth =
+      (authedUserId && order.user_id && order.user_id === authedUserId) ||
+      (authedEmail && order.buyer_email && order.buyer_email.toLowerCase() === authedEmail);
+    const ownsViaSession =
+      typeof sessionId === "string" &&
+      sessionId.length > 0 &&
+      order.stripe_checkout_session_id === sessionId;
+
+    if (!ownsViaAuth && !ownsViaSession) {
+      return json({ success: false, reason: "unauthorized" }, 401);
+    }
+
+    // Defence-in-depth: only allow charges while the order is in the upsell window.
+    if (order.status !== "awaiting_upsells") {
+      return json({ success: false, reason: "not_in_upsell_window" }, 409);
+    }
+
     if (!order.stripe_customer_id || !order.stripe_payment_method_id) {
       return json({ success: false, reason: "no_saved_card" }, 400);
     }
