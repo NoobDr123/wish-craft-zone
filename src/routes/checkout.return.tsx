@@ -34,7 +34,7 @@ function CheckoutReturnPage() {
       attempts += 1;
       const { data: order } = await supabase
         .from("orders")
-        .select("id, payment_status, status")
+        .select("id, payment_status, status, amount_paid_cents, amount_cents, currency")
         .eq("stripe_checkout_session_id", session_id)
         .maybeSingle();
 
@@ -43,6 +43,24 @@ function CheckoutReturnPage() {
       if (order?.payment_status === "paid") {
         q.set("orderId", order.id);
         q.set("checkoutSessionId", session_id);
+
+        // Fire Meta Pixel Purchase event ONCE, before upsells, with real first-order value.
+        try {
+          const fbq = (window as any).fbq;
+          if (typeof fbq === "function" && !localStorage.getItem("rs_px_fired")) {
+            const cents = order.amount_paid_cents || order.amount_cents || 0;
+            fbq("track", "Purchase", {
+              value: Number((cents / 100).toFixed(2)),
+              currency: (order.currency || "USD").toUpperCase(),
+              content_type: "product",
+              content_name: "RibbonSong Personalized Song",
+            });
+            localStorage.setItem("rs_px_fired", "true");
+          }
+        } catch {
+          // Pixel failures must never block the funnel.
+        }
+
         setStatus("ready");
         // Tiny pause so the user sees the success state, then to the first upsell.
         setTimeout(() => navigate({ to: "/upsell-1" }), 800);
