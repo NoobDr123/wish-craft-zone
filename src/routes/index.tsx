@@ -1,5 +1,5 @@
 import { createFileRoute, Link } from "@tanstack/react-router";
-import { useRef, useState } from "react";
+import { useEffect, useRef, useState } from "react";
 import rachelPhoto from "@/assets/rachel-mother-real.jpg";
 
 const RACHEL_SONG_URL =
@@ -365,6 +365,28 @@ function LandingPage() {
   const heroAudioRef = useRef<HTMLAudioElement | null>(null);
   const [heroPlaying, setHeroPlaying] = useState(false);
   const [heroShaking, setHeroShaking] = useState(false);
+  const [heroEverPlayed, setHeroEverPlayed] = useState(false);
+  const [showPlayMe, setShowPlayMe] = useState(false);
+
+  // On landing: gentle shake + "Play me" hint until the user plays the song once
+  useEffect(() => {
+    if (heroEverPlayed) return;
+    const startDelay = window.setTimeout(() => {
+      setHeroShaking(true);
+      setShowPlayMe(true);
+    }, 1200);
+
+    // Re-trigger shake periodically so it keeps drawing attention
+    const interval = window.setInterval(() => {
+      setHeroShaking(false);
+      window.setTimeout(() => setHeroShaking(true), 60);
+    }, 4500);
+
+    return () => {
+      window.clearTimeout(startDelay);
+      window.clearInterval(interval);
+    };
+  }, [heroEverPlayed]);
 
   const handleHeroPlay = () => {
     const a = heroAudioRef.current;
@@ -372,17 +394,16 @@ function LandingPage() {
     if (heroPlaying) {
       a.pause();
       setHeroPlaying(false);
-      setHeroShaking(false);
       return;
     }
-    // Start shaking immediately, delay audio ~700ms for anticipation
-    setHeroShaking(true);
+    // Stop the attention-shake permanently once they engage
+    setHeroShaking(false);
+    setShowPlayMe(false);
+    setHeroEverPlayed(true);
     a.currentTime = 0;
-    window.setTimeout(() => {
-      a.play()
-        .then(() => setHeroPlaying(true))
-        .catch(() => setHeroShaking(false));
-    }, 700);
+    a.play()
+      .then(() => setHeroPlaying(true))
+      .catch(() => {});
   };
 
   // Choose displayed list — real samples if available, otherwise the fallback set
