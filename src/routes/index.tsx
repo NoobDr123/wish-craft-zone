@@ -308,34 +308,24 @@ const faqs = [
 function PrimaryBtn({
   children,
   large,
+  fullWidth,
   to = "/create",
 }: {
   children: React.ReactNode;
   large?: boolean;
+  fullWidth?: boolean;
   to?: string;
 }) {
   return (
     <Link
       to={to}
-      className={`group inline-flex items-center gap-2.5 rounded-full bg-[#8D6FAF] font-semibold text-[#FFF7EE] tracking-[0.005em] shadow-[0_6px_16px_rgba(141,111,175,0.28)] transition-all hover:-translate-y-px hover:bg-[#6B4F8A] hover:shadow-[0_10px_24px_rgba(141,111,175,0.35)] ${
+      className={`group inline-flex items-center justify-center gap-2.5 rounded-full bg-[#8D6FAF] font-semibold text-[#FFF7EE] tracking-[0.005em] shadow-[0_6px_16px_rgba(141,111,175,0.28)] transition-all hover:-translate-y-px hover:bg-[#6B4F8A] hover:shadow-[0_10px_24px_rgba(141,111,175,0.35)] ${
         large ? "px-[34px] py-[18px] text-[16.5px]" : "px-[26px] py-[14px] text-[15px]"
-      }`}
+      } ${fullWidth ? "w-full sm:w-auto" : ""}`}
     >
       {children}
       <span className="transition-transform group-hover:translate-x-1">→</span>
     </Link>
-  );
-}
-
-function GhostBtn({ children, href }: { children: React.ReactNode; href: string }) {
-  return (
-    <a
-      href={href}
-      className="inline-flex items-center gap-1.5 px-1 py-[14px] text-[15px] font-semibold text-[#1F1B16] underline decoration-[#1F1B16]/40 decoration-[1.5px] underline-offset-[6px] transition-colors hover:text-[#8D6FAF] hover:decoration-[#8D6FAF]"
-    >
-      {children}
-      <span aria-hidden>→</span>
-    </a>
   );
 }
 
@@ -439,20 +429,20 @@ function LandingPage() {
                   inbox.
                 </strong>
               </p>
-              <div className="mb-7 flex flex-wrap items-center gap-3 sm:gap-4">
-                <PrimaryBtn large>Start their song</PrimaryBtn>
-                <GhostBtn href="#listen">Listen to real songs</GhostBtn>
+              <div className="mb-7 flex w-full flex-col items-stretch gap-3 sm:w-auto sm:flex-row sm:flex-wrap sm:items-center sm:gap-4">
+                <PrimaryBtn large fullWidth>Start their song</PrimaryBtn>
               </div>
-              <div className="flex flex-wrap items-center gap-x-3 gap-y-2 text-[13px] text-[#5A5148] sm:gap-3.5">
-                <span className="tracking-[1px] text-[#C9A85A]">★★★★★</span>
-                <span>
-                  <strong className="text-[#1F1B16]">4.9</strong> from 2,400+
-                  families
-                </span>
+              <div className="flex flex-col items-center gap-2 text-center text-[13px] text-[#5A5148] sm:flex-row sm:flex-wrap sm:items-center sm:gap-x-3 sm:gap-y-2 sm:text-left sm:gap-3.5">
+                <div className="flex items-center gap-2">
+                  <span className="tracking-[1px] text-[#C9A85A]">★★★★★</span>
+                  <span>
+                    <strong className="text-[#1F1B16]">4.9</strong> from 2,400+ families
+                  </span>
+                </div>
                 <span className="hidden sm:inline-block h-[3px] w-[3px] rounded-full bg-[#8A8175]" />
-                <span>Free revisions</span>
+                <span className="hidden sm:inline">Free revisions</span>
                 <span className="hidden sm:inline-block h-[3px] w-[3px] rounded-full bg-[#8A8175]" />
-                <span>Money back guarantee</span>
+                <span className="hidden sm:inline">Money back guarantee</span>
               </div>
               <div className="mt-8 flex items-center gap-3.5 border-t border-[#D9CEB9] pt-6 md:mt-9 md:pt-7">
                 <div className="flex shrink-0">
@@ -476,7 +466,29 @@ function LandingPage() {
             </div>
 
             {/* Hero photo + song */}
-            <div className="order-1 md:order-2">
+            <div className="relative order-1 md:order-2">
+              {showPlayMe && !heroPlaying && (
+                <div className="pointer-events-none absolute -top-4 left-1/2 z-20 -translate-x-1/2 sm:-top-5">
+                  <div className="relative animate-bounce rounded-full bg-[#C7572E] px-3.5 py-1.5 shadow-[0_8px_20px_rgba(0,0,0,0.25)] sm:px-4 sm:py-2">
+                    <span className="flex items-center gap-1.5 whitespace-nowrap text-[11px] font-bold uppercase tracking-[0.12em] text-white sm:text-[12px]">
+                      <span aria-hidden>▶</span>
+                      Play me
+                    </span>
+                    <span
+                      aria-hidden
+                      className="absolute left-1/2 -translate-x-1/2"
+                      style={{
+                        bottom: -5,
+                        width: 0,
+                        height: 0,
+                        borderLeft: "6px solid transparent",
+                        borderRight: "6px solid transparent",
+                        borderTop: "6px solid #C7572E",
+                      }}
+                    />
+                  </div>
+                </div>
+              )}
               <div className="group relative aspect-[4/5] overflow-hidden rounded-[18px] bg-[#ECE2D0] shadow-[0_20px_60px_rgba(31,27,22,0.12)]">
                 {heroPlaying ? (
                   <video
@@ -538,29 +550,6 @@ function LandingPage() {
                     <span className="text-[11px] font-medium uppercase tracking-[0.12em] text-white/95">
                       For My Mother — Now playing
                     </span>
-                  </div>
-                )}
-
-                {showPlayMe && !heroPlaying && (
-                  <div className="pointer-events-none absolute -top-3 left-1/2 z-10 -translate-x-1/2 sm:-top-4">
-                    <div className="relative animate-bounce rounded-full bg-[#C7572E] px-3.5 py-1.5 shadow-[0_8px_20px_rgba(0,0,0,0.25)] sm:px-4 sm:py-2">
-                      <span className="flex items-center gap-1.5 whitespace-nowrap text-[11px] font-bold uppercase tracking-[0.12em] text-white sm:text-[12px]">
-                        <span aria-hidden>▶</span>
-                        Play me
-                      </span>
-                      <span
-                        aria-hidden
-                        className="absolute left-1/2 -translate-x-1/2"
-                        style={{
-                          bottom: -5,
-                          width: 0,
-                          height: 0,
-                          borderLeft: "6px solid transparent",
-                          borderRight: "6px solid transparent",
-                          borderTop: "6px solid #C7572E",
-                        }}
-                      />
-                    </div>
                   </div>
                 )}
               </div>
