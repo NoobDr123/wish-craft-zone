@@ -492,9 +492,7 @@ function LandingPage() {
                   <img
                     src={rachelPhoto}
                     alt="Rachel and her mother holding hands in the car after her last chemo infusion"
-                    className={`h-full w-full object-contain bg-[#1F1B16] ${
-                      heroShaking ? "animate-photo-shake" : ""
-                    }`}
+                    className="h-full w-full object-contain bg-[#1F1B16]"
                     onClick={handleHeroPlay}
                   />
                 )}
@@ -504,7 +502,7 @@ function LandingPage() {
                   ref={heroAudioRef}
                   src={RACHEL_SONG_URL}
                   preload="metadata"
-                  onEnded={() => { setHeroPlaying(false); setHeroShaking(false); }}
+                  onEnded={() => { setHeroPlaying(false); }}
                 />
 
                 <button
