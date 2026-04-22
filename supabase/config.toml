@@ -35,3 +35,6 @@ verify_jwt = false
 
 [functions.generate-sample]
 verify_jwt = false
+
+[functions.admin-mfa]
+verify_jwt = false
