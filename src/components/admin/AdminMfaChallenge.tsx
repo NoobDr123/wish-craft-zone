@@ -1,17 +1,33 @@
 // Per-session TOTP challenge. Required every 12 hours.
+// All TOTP/recovery verification happens server-side via the admin-mfa edge function.
 
 import { useState } from "react";
 import { Logo } from "@/components/Logo";
 import { Button } from "@/components/ui/button";
 import { supabase } from "@/integrations/supabase/client";
-import { verifyTotpCode } from "@/lib/totp";
 
 interface Props {
   userId: string;
   onVerified: () => void;
 }
 
-export function AdminMfaChallenge({ userId, onVerified }: Props) {
+async function callMfa(action: string, payload: Record<string, unknown> = {}) {
+  const { data, error } = await supabase.functions.invoke("admin-mfa", {
+    body: { action, ...payload },
+  });
+  if (error) {
+    // supabase.functions.invoke surfaces a generic message; try to read the body.
+    const msg =
+      (data && (data as any).error) || error.message || "Verification failed.";
+    throw new Error(msg);
+  }
+  if (data && (data as any).error) {
+    throw new Error((data as any).error);
+  }
+  return data;
+}
+
+export function AdminMfaChallenge({ userId: _userId, onVerified }: Props) {
   const [token, setToken] = useState("");
   const [recoveryMode, setRecoveryMode] = useState(false);
   const [recoveryCode, setRecoveryCode] = useState("");
@@ -22,51 +38,11 @@ export function AdminMfaChallenge({ userId, onVerified }: Props) {
     setError(null);
     setBusy(true);
     try {
-      const { data: mfa } = await supabase
-        .from("user_mfa")
-        .select("totp_secret, recovery_codes")
-        .eq("user_id", userId)
-        .maybeSingle();
-      if (!mfa) {
-        setError("2FA is not set up.");
-        return;
-      }
-
-      let ok = false;
       if (recoveryMode) {
-        const code = recoveryCode.trim().toUpperCase();
-        if ((mfa.recovery_codes ?? []).includes(code)) {
-          // burn the code
-          const remaining = (mfa.recovery_codes as string[]).filter(
-            (c) => c !== code,
-          );
-          await supabase
-            .from("user_mfa")
-            .update({ recovery_codes: remaining })
-            .eq("user_id", userId);
-          ok = true;
-        }
+        await callMfa("verify-recovery", { code: recoveryCode });
       } else {
-        ok = verifyTotpCode(mfa.totp_secret, token);
+        await callMfa("verify-totp", { token });
       }
-
-      if (!ok) {
-        setError(
-          recoveryMode
-            ? "That recovery code is not valid."
-            : "That code is not valid. Try again.",
-        );
-        return;
-      }
-
-      const { error: vErr } = await supabase
-        .from("mfa_verifications")
-        .insert({
-          user_id: userId,
-          user_agent:
-            typeof navigator !== "undefined" ? navigator.userAgent : null,
-        });
-      if (vErr) throw vErr;
       onVerified();
     } catch (e: any) {
       setError(e?.message ?? "Verification failed.");
