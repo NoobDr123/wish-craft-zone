@@ -364,6 +364,7 @@ function LandingPage() {
   const [activeSample, setActiveSample] = useState<FeaturedSample | null>(null);
   const heroAudioRef = useRef<HTMLAudioElement | null>(null);
   const [heroPlaying, setHeroPlaying] = useState(false);
+  const [heroShaking, setHeroShaking] = useState(false);
 
   const handleHeroPlay = () => {
     const a = heroAudioRef.current;
@@ -371,13 +372,17 @@ function LandingPage() {
     if (heroPlaying) {
       a.pause();
       setHeroPlaying(false);
+      setHeroShaking(false);
       return;
     }
+    // Start shaking immediately, delay audio ~700ms for anticipation
+    setHeroShaking(true);
     a.currentTime = 0;
-    a.play().catch(() => {
-      // playback blocked
-    });
-    setHeroPlaying(true);
+    window.setTimeout(() => {
+      a.play()
+        .then(() => setHeroPlaying(true))
+        .catch(() => setHeroShaking(false));
+    }, 700);
   };
 
   // Choose displayed list — real samples if available, otherwise the fallback set
