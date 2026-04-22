@@ -30,6 +30,46 @@ function ScratchPage() {
   const initRef = useRef(false);
   const [countdown, setCountdown] = useState(COUNTDOWN_SECONDS);
 
+  const recipientName = (q.recipient_name || "").trim();
+  const firstName = recipientName.split(/\s+/)[0] || "";
+  const journey = useMemo(() => journeyStageOf(q.stage), [q.stage]);
+  const relationship = q.relationship_other?.trim() || q.relationship || "";
+
+  // Stage-aware copy
+  const copy = useMemo(() => {
+    if (journey === "memory") {
+      return {
+        eyebrow: `A keepsake for ${firstName}'s memory`,
+        scratchHeadline: `A small gift, in honor of ${firstName}`,
+        scratchSub: `Scratch the gold below — we've set aside something gentle to help you create ${firstName}'s song.`,
+        claimHeadline: `Your tribute to ${firstName} just got easier 💛`,
+        claimSub: `Use this within 10 minutes to lock in -50% off ${firstName}'s memorial song.`,
+        ctaLabel: `Claim -50% off ${firstName}'s song`,
+        emoji: "🕊️",
+      };
+    }
+    if (journey === "hospice") {
+      return {
+        eyebrow: `Every moment with ${firstName} matters`,
+        scratchHeadline: `A little something to help you reach ${firstName} sooner`,
+        scratchSub: `Scratch the gold — we've reserved a discount so ${firstName} can hear their song without delay.`,
+        claimHeadline: `Get ${firstName}'s song into their hands faster 💛`,
+        claimSub: `This -50% offer holds your priority slot for the next 10 minutes.`,
+        ctaLabel: `Claim -50% & prioritize ${firstName}`,
+        emoji: "🤍",
+      };
+    }
+    return {
+      eyebrow: `A surprise for ${firstName}${relationship ? `, your ${relationship.toLowerCase()}` : ""}`,
+      scratchHeadline: `You unlocked something special for ${firstName}!`,
+      scratchSub: `Scratch the gold below to reveal an exclusive discount on ${firstName}'s personalized song 👇`,
+      claimHeadline: `${firstName}'s song just got 50% off! 🎉`,
+      claimSub: `Lock it in within 10 minutes — this offer is only on this page.`,
+      ctaLabel: `Claim ${firstName}'s -50% offer`,
+      emoji: "🎁",
+    };
+  }, [journey, firstName, relationship]);
+
   useEffect(() => {
     if (!q.recipient_name) navigate({ to: "/create" });
   }, [q.recipient_name, navigate]);
