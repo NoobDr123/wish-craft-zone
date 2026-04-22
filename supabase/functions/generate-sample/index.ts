@@ -42,17 +42,10 @@ serve(async (req) => {
     // Two ways to authorize:
     //   1. Service-role key in `x-service-key` header (internal batch triggers)
     //   2. Logged-in admin user (Authorization: Bearer <jwt>)
-    const serviceKey = Deno.env.get("SUPABASE_SERVICE_ROLE_KEY")!;
-    const internalKey =
-      req.headers.get("x-internal-secret") ??
-      req.headers.get("x-service-key");
-    console.log("auth check", {
-      hasInternal: !!internalKey,
-      internalLen: internalKey?.length ?? 0,
-      svcLen: serviceKey?.length ?? 0,
-      match: internalKey === serviceKey,
-    });
-    const isInternal = !!internalKey && internalKey === serviceKey;
+    const internalSecret = Deno.env.get("INTERNAL_TRIGGER_SECRET");
+    const providedSecret = req.headers.get("x-internal-secret");
+    const isInternal =
+      !!internalSecret && !!providedSecret && providedSecret === internalSecret;
 
     if (!isInternal) {
       const authHeader = req.headers.get("Authorization") ?? "";
