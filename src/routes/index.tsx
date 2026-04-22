@@ -2,6 +2,15 @@ import { createFileRoute, Link } from "@tanstack/react-router";
 import { SiteHeader } from "@/components/SiteHeader";
 import { SiteFooter } from "@/components/SiteFooter";
 import heroImg from "@/assets/hero-ribbon.jpg";
+import whoNewlyDiagnosed from "@/assets/who-newly-diagnosed.png";
+import whoInTreatment from "@/assets/who-in-treatment.png";
+import whoSurvivor from "@/assets/who-survivor.png";
+import whoMemory from "@/assets/who-memory.png";
+import whoChild from "@/assets/who-child.png";
+import whoCaregiver from "@/assets/who-caregiver.png";
+import whoParent from "@/assets/who-parent.png";
+import whoStrength from "@/assets/who-strength.png";
+import whoYourself from "@/assets/who-yourself.png";
 
 export const Route = createFileRoute("/")({
   component: LandingPage,
@@ -79,47 +88,56 @@ const useCases = [
   {
     eyebrow: "Newly Diagnosed",
     label: "When the world just changed",
-    img: "https://images.unsplash.com/photo-1573497019940-1c28c88b4f3e?auto=format&fit=crop&w=500&q=80",
+    body: "For the days right after the news, when nothing makes sense yet.",
+    img: whoNewlyDiagnosed,
   },
   {
     eyebrow: "In Treatment",
     label: "A reminder on the hardest days",
-    img: "https://images.unsplash.com/photo-1551836022-d5d88e9218df?auto=format&fit=crop&w=500&q=80",
+    body: "Something to play during chemo, on the drive home, in the quiet hours.",
+    img: whoInTreatment,
   },
   {
     eyebrow: "For a Survivor",
     label: "Every scan. Every milestone.",
-    img: "https://images.unsplash.com/photo-1549080316-42e61b00f70e?auto=format&fit=crop&w=500&q=80",
+    body: "An anthem for the bell rung, the all-clear, the next birthday.",
+    img: whoSurvivor,
   },
   {
     eyebrow: "In Loving Memory",
     label: "A keepsake that holds them",
-    img: "https://images.unsplash.com/photo-1541855127-3f61e1d3c20a?auto=format&fit=crop&w=500&q=80",
+    body: "A song that carries their voice, their love, their light forward.",
+    img: whoMemory,
   },
   {
     eyebrow: "For a Child Fighting",
     label: "Courage set to music",
-    img: "https://images.unsplash.com/photo-1504813184591-01572f98c85f?auto=format&fit=crop&w=500&q=80",
+    body: "Something brave they can play when the hospital feels too big.",
+    img: whoChild,
   },
   {
     eyebrow: "For a Caregiver",
     label: "For the ones who stand beside them",
-    img: "https://images.unsplash.com/photo-1490818387583-1baba5e638af?auto=format&fit=crop&w=500&q=80",
+    body: "For the partners, the parents, the friends who never let go.",
+    img: whoCaregiver,
   },
   {
     eyebrow: "For a Parent",
     label: "The ones who raised you",
-    img: "https://images.unsplash.com/photo-1478476868527-002ae3f3e159?auto=format&fit=crop&w=500&q=80",
+    body: "For your mom, your dad, the person who taught you what love is.",
+    img: whoParent,
   },
   {
     eyebrow: "For Strength",
     label: "When they need it most",
-    img: "https://images.unsplash.com/photo-1508214751196-bcfd4ca60f91?auto=format&fit=crop&w=500&q=80",
+    body: "Something to hold onto when the weight feels too much to carry.",
+    img: whoStrength,
   },
   {
     eyebrow: "For Yourself",
     label: "A song for your own fight",
-    img: "https://images.unsplash.com/photo-1518310952931-b1de897abd40?auto=format&fit=crop&w=500&q=80",
+    body: "Sometimes the song you need most is the one written for you.",
+    img: whoYourself,
   },
 ];
 
@@ -299,7 +317,7 @@ function LandingPage() {
       <SiteHeader />
 
       {/* HERO */}
-      <section className="relative overflow-hidden px-0 py-[70px] pb-[60px]">
+      <section className="relative overflow-hidden px-0 py-[40px] pb-[40px] sm:py-[70px] sm:pb-[60px]">
         <div
           className="pointer-events-none absolute -right-[120px] -top-[100px] h-[420px] w-[420px] rounded-full opacity-60"
           style={{
@@ -307,11 +325,11 @@ function LandingPage() {
               "radial-gradient(circle, #E5D9EF 0%, transparent 70%)",
           }}
         />
-        <div className="mx-auto max-w-[1200px] px-6">
-          <div className="grid items-center gap-[60px] md:grid-cols-[1.15fr_1fr]">
+        <div className="mx-auto max-w-[1200px] px-5 sm:px-6">
+          <div className="grid items-center gap-10 md:grid-cols-[1.15fr_1fr] md:gap-[60px]">
             <div>
               <Eyebrow>The #1 Custom Song Platform For Cancer Families</Eyebrow>
-              <h1 className="mb-[26px] max-w-[700px] font-display text-[clamp(38px,5.2vw,64px)] font-medium italic leading-[1.04] tracking-[-0.025em] text-[#1F1B16]">
+              <h1 className="mb-[22px] max-w-[700px] font-display text-[clamp(30px,8vw,64px)] font-medium italic leading-[1.06] tracking-[-0.025em] text-[#1F1B16] md:mb-[26px]">
                 <span className="font-display text-[1.1em] font-semibold not-italic text-[#8D6FAF] -mr-[0.04em]">
                   &ldquo;
                 </span>
@@ -321,36 +339,36 @@ function LandingPage() {
                   &rdquo;
                 </span>
               </h1>
-              <div className="mb-7 text-sm text-[#8A8175]">
+              <div className="mb-6 text-[13px] text-[#8A8175] md:mb-7 md:text-sm">
                 <strong className="font-semibold text-[#5A5148]">
                   Rachel L., Columbus OH
                 </strong>{" "}
                 &nbsp;·&nbsp; Daughter, for her mother in treatment
               </div>
-              <p className="mb-8 max-w-[540px] text-[18px] leading-[1.55] text-[#5A5148]">
+              <p className="mb-7 max-w-[540px] text-[16px] leading-[1.55] text-[#5A5148] md:mb-8 md:text-[18px]">
                 When cancer takes the words away, give them a song.{" "}
                 <strong className="font-semibold text-[#1F1B16]">
                   Written with care. Produced in studio. Delivered to your
                   inbox.
                 </strong>
               </p>
-              <div className="mb-7 flex flex-wrap items-center gap-4">
+              <div className="mb-7 flex flex-wrap items-center gap-3 sm:gap-4">
                 <PrimaryBtn large>Start their song</PrimaryBtn>
                 <GhostBtn href="#listen">Listen to real songs</GhostBtn>
               </div>
-              <div className="flex flex-wrap items-center gap-3.5 text-[13px] text-[#5A5148]">
+              <div className="flex flex-wrap items-center gap-x-3 gap-y-2 text-[13px] text-[#5A5148] sm:gap-3.5">
                 <span className="tracking-[1px] text-[#C9A85A]">★★★★★</span>
                 <span>
                   <strong className="text-[#1F1B16]">4.9</strong> from 2,400+
                   families
                 </span>
-                <span className="inline-block h-[3px] w-[3px] rounded-full bg-[#8A8175]" />
+                <span className="hidden sm:inline-block h-[3px] w-[3px] rounded-full bg-[#8A8175]" />
                 <span>Free revisions</span>
-                <span className="inline-block h-[3px] w-[3px] rounded-full bg-[#8A8175]" />
+                <span className="hidden sm:inline-block h-[3px] w-[3px] rounded-full bg-[#8A8175]" />
                 <span>Money back guarantee</span>
               </div>
-              <div className="mt-9 flex items-center gap-3.5 border-t border-[#D9CEB9] pt-7">
-                <div className="flex">
+              <div className="mt-8 flex items-center gap-3.5 border-t border-[#D9CEB9] pt-6 md:mt-9 md:pt-7">
+                <div className="flex shrink-0">
                   {[47, 32, 26, 44, 16].map((id, i) => (
                     <img
                       key={id}
@@ -362,7 +380,7 @@ function LandingPage() {
                     />
                   ))}
                 </div>
-                <div className="text-[13.5px] text-[#5A5148]">
+                <div className="text-[13px] leading-[1.4] text-[#5A5148] md:text-[13.5px]">
                   Loved by{" "}
                   <strong className="text-[#1F1B16]">2,400+ families</strong>{" "}
                   fighting, surviving, and remembering
@@ -379,21 +397,21 @@ function LandingPage() {
               />
               <button
                 aria-label="Play video"
-                className="absolute left-1/2 top-1/2 flex h-20 w-20 -translate-x-1/2 -translate-y-1/2 items-center justify-center rounded-full bg-[rgba(246,240,230,0.95)] shadow-[0_8px_32px_rgba(0,0,0,0.3)] transition-transform hover:scale-110"
+                className="absolute left-1/2 top-1/2 flex h-16 w-16 -translate-x-1/2 -translate-y-1/2 items-center justify-center rounded-full bg-[rgba(246,240,230,0.95)] shadow-[0_8px_32px_rgba(0,0,0,0.3)] transition-transform hover:scale-110 sm:h-20 sm:w-20"
               >
                 <span
                   className="ml-1 inline-block"
                   style={{
                     width: 0,
                     height: 0,
-                    borderLeft: "18px solid #8D6FAF",
-                    borderTop: "11px solid transparent",
-                    borderBottom: "11px solid transparent",
+                    borderLeft: "16px solid #8D6FAF",
+                    borderTop: "10px solid transparent",
+                    borderBottom: "10px solid transparent",
                   }}
                 />
               </button>
-              <div className="absolute inset-x-5 bottom-5 rounded-[10px] bg-[rgba(31,27,22,0.85)] p-[14px_16px] text-[13.5px] leading-[1.45] text-[#F6F0E6] backdrop-blur-md">
-                <strong className="mb-1 block text-[11px] font-semibold uppercase tracking-[0.1em] text-[#E5D9EF]">
+              <div className="absolute inset-x-4 bottom-4 rounded-[10px] bg-[rgba(31,27,22,0.85)] p-[12px_14px] text-[12.5px] leading-[1.45] text-[#F6F0E6] backdrop-blur-md sm:inset-x-5 sm:bottom-5 sm:p-[14px_16px] sm:text-[13.5px]">
+                <strong className="mb-1 block text-[10.5px] font-semibold uppercase tracking-[0.1em] text-[#E5D9EF] sm:text-[11px]">
                   Watch Rachel's story
                 </strong>
                 The song that played on the drive home from her mother's last
@@ -407,29 +425,29 @@ function LandingPage() {
       {/* PRESS STRIP */}
       <div
         id="press"
-        className="border-y border-[#D9CEB9] bg-[#ECE2D0] px-0 py-9"
+        className="border-y border-[#D9CEB9] bg-[#ECE2D0] px-0 py-7 md:py-9"
       >
-        <div className="mx-auto flex max-w-[1200px] flex-wrap items-center justify-between gap-10 px-6">
-          <div className="shrink-0 text-[11.5px] font-semibold uppercase tracking-[0.18em] text-[#8A8175]">
+        <div className="mx-auto flex max-w-[1200px] flex-col items-center gap-5 px-5 sm:px-6 md:flex-row md:flex-wrap md:justify-between md:gap-10">
+          <div className="shrink-0 text-center text-[11px] font-semibold uppercase tracking-[0.18em] text-[#8A8175] md:text-[11.5px]">
             As featured in
           </div>
-          <div className="flex flex-1 flex-wrap items-center justify-around gap-11">
-            <span className="font-sans text-[15px] font-bold uppercase tracking-[0.12em] text-[#5A5148] opacity-70 transition-opacity hover:opacity-100">
+          <div className="flex flex-1 flex-wrap items-center justify-center gap-x-6 gap-y-3 md:justify-around md:gap-11">
+            <span className="font-sans text-[13px] font-bold uppercase tracking-[0.12em] text-[#5A5148] opacity-70 transition-opacity hover:opacity-100 md:text-[15px]">
               CBS
             </span>
-            <span className="font-display text-[20px] font-semibold tracking-[-0.01em] text-[#5A5148] opacity-70 transition-opacity hover:opacity-100">
+            <span className="font-display text-[17px] font-semibold tracking-[-0.01em] text-[#5A5148] opacity-70 transition-opacity hover:opacity-100 md:text-[20px]">
               People
             </span>
-            <span className="font-sans text-[15px] font-bold uppercase tracking-[0.12em] text-[#5A5148] opacity-70 transition-opacity hover:opacity-100">
+            <span className="font-sans text-[13px] font-bold uppercase tracking-[0.12em] text-[#5A5148] opacity-70 transition-opacity hover:opacity-100 md:text-[15px]">
               FOX
             </span>
-            <span className="font-display text-[20px] font-semibold tracking-[-0.01em] text-[#5A5148] opacity-70 transition-opacity hover:opacity-100">
+            <span className="font-display text-[17px] font-semibold tracking-[-0.01em] text-[#5A5148] opacity-70 transition-opacity hover:opacity-100 md:text-[20px]">
               Good Morning America
             </span>
-            <span className="font-sans text-[15px] font-bold uppercase tracking-[0.12em] text-[#5A5148] opacity-70 transition-opacity hover:opacity-100">
+            <span className="font-sans text-[13px] font-bold uppercase tracking-[0.12em] text-[#5A5148] opacity-70 transition-opacity hover:opacity-100 md:text-[15px]">
               Survivornet
             </span>
-            <span className="font-display text-[20px] font-semibold tracking-[-0.01em] text-[#5A5148] opacity-70 transition-opacity hover:opacity-100">
+            <span className="font-display text-[17px] font-semibold tracking-[-0.01em] text-[#5A5148] opacity-70 transition-opacity hover:opacity-100 md:text-[20px]">
               Yahoo Life
             </span>
           </div>
@@ -437,12 +455,11 @@ function LandingPage() {
       </div>
 
       {/* LISTEN */}
-      <section id="listen" className="px-0 py-[100px]">
-        <div className="mx-auto max-w-[1200px] px-6">
-          <div className="mx-auto mb-14 max-w-[720px] text-center">
+      <section id="listen" className="px-0 py-[64px] md:py-[100px]">
+        <div className="mx-auto max-w-[1200px] px-5 sm:px-6">
+          <div className="mx-auto mb-10 max-w-[720px] text-center md:mb-14">
             <Eyebrow center>Listen</Eyebrow>
-            <h2 className="mb-3.5 font-display text-[clamp(32px,4vw,48px)] font-medium leading-[1.1] tracking-[-0.022em] text-[#1F1B16]">
-              Hear real songs, written for{" "}
+            <h2 className="mb-3.5 font-display text-[clamp(28px,7vw,48px)] font-medium leading-[1.1] tracking-[-0.022em] text-[#1F1B16]">
               <em className="italic text-[#8D6FAF]">real families.</em>
             </h2>
             <p className="mx-auto mt-3.5 max-w-[560px] text-[17px] leading-[1.55] text-[#5A5148]">
@@ -502,15 +519,15 @@ function LandingPage() {
       </section>
 
       {/* WHO IT'S FOR */}
-      <section id="who" className="bg-[#ECE2D0] px-0 py-[100px]">
-        <div className="mx-auto max-w-[1200px] px-6">
-          <div className="mb-14 max-w-[720px]">
+      <section id="who" className="bg-[#ECE2D0] px-0 py-[72px] md:py-[100px]">
+        <div className="mx-auto max-w-[1200px] px-5 sm:px-6">
+          <div className="mb-10 max-w-[720px] md:mb-14">
             <Eyebrow>Who it's for</Eyebrow>
-            <h2 className="mb-3.5 font-display text-[clamp(32px,4vw,48px)] font-medium leading-[1.1] tracking-[-0.022em] text-[#1F1B16]">
+            <h2 className="mb-3.5 font-display text-[clamp(28px,7vw,48px)] font-medium leading-[1.1] tracking-[-0.022em] text-[#1F1B16]">
               Wherever they are in the fight,{" "}
               <em className="italic text-[#8D6FAF]">meet them there.</em>
             </h2>
-            <p className="max-w-[560px] text-[17px] leading-[1.55] text-[#5A5148]">
+            <p className="max-w-[560px] text-[16px] leading-[1.55] text-[#5A5148] md:text-[17px]">
               Cancer doesn't touch two families the same way. A RibbonSong is
               shaped to honor exactly where your person is right now. Newly
               diagnosed, mid treatment, celebrating remission, or held in
@@ -518,47 +535,49 @@ function LandingPage() {
             </p>
           </div>
 
-          <div className="grid grid-cols-1 gap-4 sm:grid-cols-2 lg:grid-cols-3">
+          <div className="grid grid-cols-1 gap-5 sm:grid-cols-2 lg:grid-cols-3">
             {useCases.map((u) => (
               <div
                 key={u.eyebrow}
-                className="group relative aspect-[4/5] cursor-pointer overflow-hidden rounded-[14px] transition-transform hover:-translate-y-[3px]"
+                className="group relative flex flex-col overflow-hidden rounded-[16px] border border-[#D9CEB9] bg-[#FBF6EC] transition-all hover:-translate-y-[3px] hover:shadow-[0_8px_24px_rgba(31,27,22,0.08)]"
               >
-                <img
-                  src={u.img}
-                  alt=""
-                  loading="lazy"
-                  className="h-full w-full object-cover transition-transform duration-700 group-hover:scale-105"
-                />
-                <div
-                  className="absolute inset-0"
-                  style={{
-                    background:
-                      "linear-gradient(to top, rgba(31,27,22,0.82) 0%, rgba(31,27,22,0.05) 55%, transparent 100%)",
-                  }}
-                />
-                <div className="absolute inset-x-5 bottom-5 z-10 font-display text-[22px] font-medium leading-[1.15] tracking-[-0.01em] text-[#F6F0E6]">
-                  <span className="mb-1.5 block font-sans text-[11.5px] font-medium uppercase tracking-[0.14em] text-[#E5D9EF]">
+                <div className="relative aspect-[5/4] overflow-hidden bg-[#F6F0E6]">
+                  <img
+                    src={u.img}
+                    alt=""
+                    loading="lazy"
+                    width={512}
+                    height={640}
+                    className="h-full w-full object-cover transition-transform duration-700 group-hover:scale-[1.03]"
+                  />
+                </div>
+                <div className="flex flex-1 flex-col p-[22px_22px_24px]">
+                  <span className="mb-2 block text-[11px] font-semibold uppercase tracking-[0.14em] text-[#8D6FAF]">
                     {u.eyebrow}
                   </span>
-                  {u.label}
+                  <h3 className="mb-2 font-display text-[20px] font-medium leading-[1.2] tracking-[-0.01em] text-[#1F1B16] md:text-[22px]">
+                    {u.label}
+                  </h3>
+                  <p className="text-[14px] leading-[1.55] text-[#5A5148]">
+                    {u.body}
+                  </p>
                 </div>
               </div>
             ))}
           </div>
 
-          <div className="mt-12 text-center">
+          <div className="mt-10 text-center md:mt-12">
             <PrimaryBtn large>Start their song</PrimaryBtn>
           </div>
         </div>
       </section>
 
       {/* HOW IT WORKS */}
-      <section id="how" className="px-0 py-[100px]">
-        <div className="mx-auto max-w-[1200px] px-6">
-          <div className="mx-auto mb-14 max-w-[720px] text-center">
+      <section id="how" className="px-0 py-[64px] md:py-[100px]">
+        <div className="mx-auto max-w-[1200px] px-5 sm:px-6">
+          <div className="mx-auto mb-10 max-w-[720px] text-center md:mb-14">
             <Eyebrow center>How it works</Eyebrow>
-            <h2 className="mb-3.5 font-display text-[clamp(32px,4vw,48px)] font-medium leading-[1.1] tracking-[-0.022em] text-[#1F1B16]">
+            <h2 className="mb-3.5 font-display text-[clamp(28px,7vw,48px)] font-medium leading-[1.1] tracking-[-0.022em] text-[#1F1B16]">
               Three gentle steps. <em className="italic text-[#8D6FAF]">Seven days.</em>
             </h2>
             <p className="mx-auto mt-3.5 max-w-[560px] text-[17px] leading-[1.55] text-[#5A5148]">
@@ -608,7 +627,7 @@ function LandingPage() {
       </section>
 
       {/* OBJECTION */}
-      <section className="relative overflow-hidden bg-[#1F1B16] px-0 py-[80px] text-[#F6F0E6]">
+      <section className="relative overflow-hidden bg-[#1F1B16] px-0 py-[60px] text-[#F6F0E6] md:py-[80px]">
         <div
           className="absolute -left-12 -top-12 h-[300px] w-[300px] opacity-[0.22]"
           style={{
@@ -616,12 +635,12 @@ function LandingPage() {
               "radial-gradient(circle, #8D6FAF 0%, transparent 70%)",
           }}
         />
-        <div className="relative z-10 mx-auto max-w-[920px] px-6">
-          <div className="mb-[22px] inline-flex items-center gap-2 text-[11.5px] font-semibold uppercase tracking-[0.16em] text-[#E5D9EF]">
+        <div className="relative z-10 mx-auto max-w-[920px] px-5 sm:px-6">
+          <div className="mb-[18px] inline-flex items-center gap-2 text-[11px] font-semibold uppercase tracking-[0.16em] text-[#E5D9EF] md:mb-[22px] md:text-[11.5px]">
             <span className="h-1.5 w-1.5 rounded-full bg-[#E5D9EF]" />
             You don't have to find the words
           </div>
-          <h2 className="mb-7 font-display text-[clamp(30px,3.6vw,44px)] font-normal italic leading-[1.15] tracking-[-0.015em] text-[#F6F0E6]">
+          <h2 className="mb-6 font-display text-[clamp(26px,6.5vw,44px)] font-normal italic leading-[1.15] tracking-[-0.015em] text-[#F6F0E6] md:mb-7">
             "I'm not a songwriter. I don't even know what to say."{" "}
             <em className="font-medium not-italic text-[#E5D9EF]">Good.</em>
           </h2>
@@ -659,12 +678,12 @@ function LandingPage() {
       </section>
 
       {/* WHAT YOU GET */}
-      <section className="px-0 py-[100px]">
-        <div className="mx-auto max-w-[1200px] px-6">
-          <div className="grid items-center gap-[60px] md:grid-cols-2">
+      <section className="px-0 py-[64px] md:py-[100px]">
+        <div className="mx-auto max-w-[1200px] px-5 sm:px-6">
+          <div className="grid items-center gap-10 md:grid-cols-2 md:gap-[60px]">
             <div>
               <Eyebrow>What you get</Eyebrow>
-              <h2 className="mb-6 font-display text-[clamp(32px,4vw,48px)] font-medium leading-[1.1] tracking-[-0.022em] text-[#1F1B16]">
+              <h2 className="mb-6 font-display text-[clamp(28px,7vw,48px)] font-medium leading-[1.1] tracking-[-0.022em] text-[#1F1B16]">
                 Exactly what{" "}
                 <em className="italic text-[#8D6FAF]">arrives in your inbox.</em>
               </h2>
@@ -785,11 +804,11 @@ function LandingPage() {
       </section>
 
       {/* HOW IT'S MADE */}
-      <section className="bg-[#ECE2D0] px-0 py-[100px]">
-        <div className="mx-auto max-w-[1200px] px-6">
-          <div className="mb-14 max-w-[720px]">
+      <section className="bg-[#ECE2D0] px-0 py-[64px] md:py-[100px]">
+        <div className="mx-auto max-w-[1200px] px-5 sm:px-6">
+          <div className="mb-10 max-w-[720px] md:mb-14">
             <Eyebrow>Made with care</Eyebrow>
-            <h2 className="mb-3.5 font-display text-[clamp(32px,4vw,48px)] font-medium leading-[1.1] tracking-[-0.022em] text-[#1F1B16]">
+            <h2 className="mb-3.5 font-display text-[clamp(28px,7vw,48px)] font-medium leading-[1.1] tracking-[-0.022em] text-[#1F1B16]">
               How your song <em className="italic text-[#8D6FAF]">comes together.</em>
             </h2>
             <p className="max-w-[560px] text-[17px] leading-[1.55] text-[#5A5148]">
@@ -845,11 +864,11 @@ function LandingPage() {
       </section>
 
       {/* TESTIMONIALS */}
-      <section id="stories" className="px-0 py-[100px]">
-        <div className="mx-auto max-w-[1200px] px-6">
-          <div className="mb-14 max-w-[720px]">
+      <section id="stories" className="px-0 py-[64px] md:py-[100px]">
+        <div className="mx-auto max-w-[1200px] px-5 sm:px-6">
+          <div className="mb-10 max-w-[720px] md:mb-14">
             <Eyebrow>Stories from families</Eyebrow>
-            <h2 className="mb-3.5 font-display text-[clamp(32px,4vw,48px)] font-medium leading-[1.1] tracking-[-0.022em] text-[#1F1B16]">
+            <h2 className="mb-3.5 font-display text-[clamp(28px,7vw,48px)] font-medium leading-[1.1] tracking-[-0.022em] text-[#1F1B16]">
               2,400+ families.{" "}
               <em className="italic text-[#8D6FAF]">Here's what they said.</em>
             </h2>
@@ -945,27 +964,27 @@ function LandingPage() {
       </section>
 
       {/* GUARANTEE */}
-      <section className="bg-[#ECE2D0] px-0 py-[100px]">
-        <div className="mx-auto max-w-[1200px] px-6">
-          <div className="relative mx-auto max-w-[820px] rounded-[14px] border-2 border-[#8D6FAF] bg-[#FBF6EC] p-[52px_56px] text-center">
-            <div className="absolute -top-7 left-1/2 -translate-x-1/2 rounded-full bg-[#8D6FAF] px-6 py-2.5 text-[12px] font-semibold uppercase tracking-[0.1em] text-[#F6F0E6]">
+      <section className="bg-[#ECE2D0] px-0 py-[64px] md:py-[100px]">
+        <div className="mx-auto max-w-[1200px] px-5 sm:px-6">
+          <div className="relative mx-auto max-w-[820px] rounded-[14px] border-2 border-[#8D6FAF] bg-[#FBF6EC] p-[44px_24px_32px] text-center sm:p-[52px_56px]">
+            <div className="absolute -top-6 left-1/2 -translate-x-1/2 whitespace-nowrap rounded-full bg-[#8D6FAF] px-4 py-2 text-[10.5px] font-semibold uppercase tracking-[0.1em] text-[#F6F0E6] sm:-top-7 sm:px-6 sm:py-2.5 sm:text-[12px]">
               Our promise to you
             </div>
-            <h2 className="mb-[18px] font-display text-[clamp(28px,3.2vw,38px)] font-medium leading-[1.2] tracking-[-0.018em]">
+            <h2 className="mb-[18px] font-display text-[clamp(24px,6vw,38px)] font-medium leading-[1.2] tracking-[-0.018em]">
               If it doesn't feel like{" "}
               <em className="italic text-[#8D6FAF]">them</em>, we rewrite it.
               Until it does.
             </h2>
-            <p className="mx-auto mb-4 max-w-[620px] text-[17px] leading-[1.6] text-[#5A5148]">
+            <p className="mx-auto mb-4 max-w-[620px] text-[15.5px] leading-[1.6] text-[#5A5148] md:text-[17px]">
               If the first version of the song doesn't feel like the person
               you love, not "isn't good enough," but doesn't feel like them, we
               rewrite it. Free. As many times as it takes.
             </p>
-            <p className="mx-auto mb-4 max-w-[620px] text-[17px] leading-[1.6] text-[#5A5148]">
+            <p className="mx-auto mb-4 max-w-[620px] text-[15.5px] leading-[1.6] text-[#5A5148] md:text-[17px]">
               And if after all of that it still isn't right, we refund you in
               full. No questions. No forms. No argument.
             </p>
-            <div className="mt-[26px] font-display text-[18px] italic leading-[1.4] text-[#8D6FAF]">
+            <div className="mt-[26px] font-display text-[16.5px] italic leading-[1.4] text-[#8D6FAF] md:text-[18px]">
               You cannot lose money on this.
               <br />
               The only thing you can do is give them something nobody else in
@@ -976,7 +995,7 @@ function LandingPage() {
       </section>
 
       {/* BEGIN BLOCK */}
-      <section id="begin" className="relative overflow-hidden px-0 py-[100px] text-center">
+      <section id="begin" className="relative overflow-hidden px-0 py-[64px] text-center md:py-[100px]">
         <div
           className="pointer-events-none absolute left-1/2 top-1/2 h-[520px] w-[520px] -translate-x-1/2 -translate-y-1/2 opacity-50"
           style={{
@@ -984,18 +1003,18 @@ function LandingPage() {
               "radial-gradient(circle, #E5D9EF 0%, transparent 70%)",
           }}
         />
-        <div className="relative z-10 mx-auto max-w-[920px] px-6">
+        <div className="relative z-10 mx-auto max-w-[920px] px-5 sm:px-6">
           <Eyebrow center>Ready when you are</Eyebrow>
-          <h2 className="mb-[18px] font-display text-[clamp(32px,4vw,52px)] font-medium leading-[1.1] tracking-[-0.022em] text-[#1F1B16]">
+          <h2 className="mb-[18px] font-display text-[clamp(28px,7vw,52px)] font-medium leading-[1.1] tracking-[-0.022em] text-[#1F1B16]">
             Tell us about them.{" "}
             <em className="italic text-[#8D6FAF]">We'll take it from there.</em>
           </h2>
-          <p className="mx-auto mb-9 max-w-[560px] text-[18px] leading-[1.55] text-[#5A5148]">
+          <p className="mx-auto mb-8 max-w-[560px] text-[16px] leading-[1.55] text-[#5A5148] md:mb-9 md:text-[18px]">
             Your song starts with one story. Answer a few gentle questions,
             choose how you want it to sound, and we'll do the rest.
           </p>
           <PrimaryBtn large>Start their song</PrimaryBtn>
-          <div className="mt-[22px] text-[13.5px] tracking-[0.02em] text-[#8A8175]">
+          <div className="mt-[22px] text-[12.5px] tracking-[0.02em] text-[#8A8175] md:text-[13.5px]">
             No risk to begin &nbsp;·&nbsp; Free revisions &nbsp;·&nbsp;
             Refunded if it isn't right
           </div>
@@ -1003,11 +1022,11 @@ function LandingPage() {
       </section>
 
       {/* FAQ */}
-      <section id="faq" className="bg-[#ECE2D0] px-0 py-[80px]">
-        <div className="mx-auto max-w-[1200px] px-6">
-          <div className="mx-auto mb-14 max-w-[720px] text-center">
+      <section id="faq" className="bg-[#ECE2D0] px-0 py-[60px] md:py-[80px]">
+        <div className="mx-auto max-w-[1200px] px-5 sm:px-6">
+          <div className="mx-auto mb-10 max-w-[720px] text-center md:mb-14">
             <Eyebrow center>Frequently asked</Eyebrow>
-            <h2 className="font-display text-[clamp(32px,4vw,48px)] font-medium leading-[1.1] tracking-[-0.022em] text-[#1F1B16]">
+            <h2 className="font-display text-[clamp(28px,7vw,48px)] font-medium leading-[1.1] tracking-[-0.022em] text-[#1F1B16]">
               Everything you want to know{" "}
               <em className="italic text-[#8D6FAF]">before you decide.</em>
             </h2>
@@ -1017,20 +1036,20 @@ function LandingPage() {
             {faqs.map((f, i) => (
               <details
                 key={f.q}
-                className={`group border-b border-[#D9CEB9] py-6 ${
+                className={`group border-b border-[#D9CEB9] py-5 md:py-6 ${
                   i === 0 ? "border-t" : ""
                 }`}
               >
-                <summary className="flex cursor-pointer list-none items-center justify-between gap-5 font-display text-[20px] font-medium tracking-[-0.01em] text-[#1F1B16] [&::-webkit-details-marker]:hidden">
+                <summary className="flex cursor-pointer list-none items-center justify-between gap-4 font-display text-[17px] font-medium tracking-[-0.01em] text-[#1F1B16] [&::-webkit-details-marker]:hidden md:gap-5 md:text-[20px]">
                   {f.q}
-                  <span className="shrink-0 font-sans text-[24px] leading-none text-[#8D6FAF] group-open:hidden">
+                  <span className="shrink-0 font-sans text-[22px] leading-none text-[#8D6FAF] group-open:hidden md:text-[24px]">
                     +
                   </span>
-                  <span className="hidden shrink-0 font-sans text-[24px] leading-none text-[#8D6FAF] group-open:inline">
+                  <span className="hidden shrink-0 font-sans text-[22px] leading-none text-[#8D6FAF] group-open:inline md:text-[24px]">
                     −
                   </span>
                 </summary>
-                <div className="max-w-[700px] pt-4 text-[15.5px] leading-[1.65] text-[#5A5148]">
+                <div className="max-w-[700px] pt-3 text-[14.5px] leading-[1.65] text-[#5A5148] md:pt-4 md:text-[15.5px]">
                   {f.a}
                 </div>
               </details>
@@ -1040,7 +1059,7 @@ function LandingPage() {
       </section>
 
       {/* FINAL CTA */}
-      <section className="relative overflow-hidden bg-[#1F1B16] px-0 py-[120px] text-center text-[#F6F0E6]">
+      <section className="relative overflow-hidden bg-[#1F1B16] px-0 py-[80px] text-center text-[#F6F0E6] md:py-[120px]">
         <div
           className="absolute -right-24 -top-24 h-[400px] w-[400px] opacity-[0.22]"
           style={{
@@ -1055,19 +1074,19 @@ function LandingPage() {
               "radial-gradient(circle, #C9A85A 0%, transparent 70%)",
           }}
         />
-        <div className="relative z-10 mx-auto max-w-[920px] px-6">
-          <h2 className="mb-[22px] font-display text-[clamp(32px,4.4vw,56px)] font-normal leading-[1.12] tracking-[-0.025em] text-[#F6F0E6]">
+        <div className="relative z-10 mx-auto max-w-[920px] px-5 sm:px-6">
+          <h2 className="mb-[22px] font-display text-[clamp(26px,7vw,56px)] font-normal leading-[1.12] tracking-[-0.025em] text-[#F6F0E6]">
             On the chemo days. The scan days. The milestone days.
             <br />
             And on the days{" "}
             <em className="italic text-[#E5D9EF]">you miss them most.</em>
           </h2>
-          <p className="mx-auto mb-9 max-w-[580px] text-[17px] leading-[1.55] text-[rgba(246,240,230,0.75)]">
+          <p className="mx-auto mb-8 max-w-[580px] text-[16px] leading-[1.55] text-[rgba(246,240,230,0.75)] md:mb-9 md:text-[17px]">
             Give them something only you could give.
           </p>
           <Link
             to="/create"
-            className="group inline-flex items-center gap-2.5 rounded-full bg-[#8D6FAF] px-10 py-5 text-[17px] font-semibold text-[#F6F0E6] transition-all hover:-translate-y-px hover:bg-[#6B4F8A]"
+            className="group inline-flex items-center gap-2.5 rounded-full bg-[#8D6FAF] px-8 py-4 text-[15.5px] font-semibold text-[#F6F0E6] transition-all hover:-translate-y-px hover:bg-[#6B4F8A] sm:px-10 sm:py-5 sm:text-[17px]"
           >
             Start their song
             <span className="transition-transform group-hover:translate-x-1">
