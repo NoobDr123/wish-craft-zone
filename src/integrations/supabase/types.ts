@@ -757,6 +757,69 @@ export type Database = {
       }
     }
     Views: {
+      public_featured_samples: {
+        Row: {
+          audio_url: string | null
+          cover_image_url: string | null
+          created_at: string | null
+          for_text: string | null
+          genre: string | null
+          genre_label: string | null
+          id: string | null
+          lyrics: string | null
+          quote: string | null
+          recipient_name: string | null
+          relationship: string | null
+          sort_order: number | null
+          stage: string | null
+          story_prompt: string | null
+          tempo: string | null
+          title: string | null
+          updated_at: string | null
+          voice: string | null
+        }
+        Insert: {
+          audio_url?: string | null
+          cover_image_url?: string | null
+          created_at?: string | null
+          for_text?: string | null
+          genre?: string | null
+          genre_label?: string | null
+          id?: string | null
+          lyrics?: string | null
+          quote?: string | null
+          recipient_name?: string | null
+          relationship?: string | null
+          sort_order?: number | null
+          stage?: string | null
+          story_prompt?: string | null
+          tempo?: string | null
+          title?: string | null
+          updated_at?: string | null
+          voice?: string | null
+        }
+        Update: {
+          audio_url?: string | null
+          cover_image_url?: string | null
+          created_at?: string | null
+          for_text?: string | null
+          genre?: string | null
+          genre_label?: string | null
+          id?: string | null
+          lyrics?: string | null
+          quote?: string | null
+          recipient_name?: string | null
+          relationship?: string | null
+          sort_order?: number | null
+          stage?: string | null
+          story_prompt?: string | null
+          tempo?: string | null
+          title?: string | null
+          updated_at?: string | null
+          voice?: string | null
+        }
+        Relationships: []
+      }
       public_shared_songs: {
         Row: {
           audio_variants: Json | null
@@ -796,6 +859,27 @@ export type Database = {
           song_title_idea?: string | null
           tempo?: string | null
           voice?: string | null
+        }
+        Relationships: []
+      }
+      user_mfa_status: {
+        Row: {
+          created_at: string | null
+          enrolled: boolean | null
+          updated_at: string | null
+          user_id: string | null
+        }
+        Insert: {
+          created_at?: string | null
+          enrolled?: boolean | null
+          updated_at?: string | null
+          user_id?: string | null
+        }
+        Update: {
+          created_at?: string | null
+          enrolled?: boolean | null
+          updated_at?: string | null
+          user_id?: string | null
         }
         Relationships: []
       }
