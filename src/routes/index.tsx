@@ -1,7 +1,9 @@
 import { createFileRoute, Link } from "@tanstack/react-router";
 import { useRef, useState } from "react";
-import rachelVideoAsset from "@/assets/rachel-mother-car.mp4.asset.json";
-import rachelPoster from "@/assets/rachel-mother-car.jpg";
+import rachelPhoto from "@/assets/rachel-mother-real.jpg";
+
+const RACHEL_SONG_URL =
+  "https://tempfile.aiquickdraw.com/r/87ddf1c43b994c3c9e593b383ec8de16.mp3";
 import { SiteHeader } from "@/components/SiteHeader";
 import { SiteFooter } from "@/components/SiteFooter";
 import { supabase } from "@/integrations/supabase/client";
@@ -360,16 +362,20 @@ function Eyebrow({
 function LandingPage() {
   const { samples } = Route.useLoaderData() as { samples: FeaturedSample[] };
   const [activeSample, setActiveSample] = useState<FeaturedSample | null>(null);
-  const heroVideoRef = useRef<HTMLVideoElement | null>(null);
+  const heroAudioRef = useRef<HTMLAudioElement | null>(null);
   const [heroPlaying, setHeroPlaying] = useState(false);
 
   const handleHeroPlay = () => {
-    const v = heroVideoRef.current;
-    if (!v) return;
-    v.muted = false;
-    v.currentTime = 0;
-    v.play().catch(() => {
-      // Autoplay with sound blocked — leave muted-loop as fallback
+    const a = heroAudioRef.current;
+    if (!a) return;
+    if (heroPlaying) {
+      a.pause();
+      setHeroPlaying(false);
+      return;
+    }
+    a.currentTime = 0;
+    a.play().catch(() => {
+      // playback blocked
     });
     setHeroPlaying(true);
   };
@@ -465,27 +471,39 @@ function LandingPage() {
               </div>
             </div>
 
-            {/* Hero video */}
+            {/* Hero photo + song */}
             <div className="order-1 md:order-2">
-              <div className="relative aspect-[4/5] overflow-hidden rounded-[18px] bg-[#ECE2D0] shadow-[0_20px_60px_rgba(31,27,22,0.12)]">
-                <video
-                  ref={heroVideoRef}
-                  src={rachelVideoAsset.url}
-                  poster={rachelPoster}
-                  className="h-full w-full object-cover"
-                  autoPlay
-                  loop
-                  muted
-                  playsInline
-                  preload="metadata"
+              <div className="group relative aspect-[4/5] overflow-hidden rounded-[18px] bg-[#ECE2D0] shadow-[0_20px_60px_rgba(31,27,22,0.12)]">
+                <img
+                  src={rachelPhoto}
+                  alt="Rachel and her mother holding hands in the car after her last chemo infusion"
+                  className={`h-full w-full object-cover transition-transform duration-[8000ms] ease-out ${
+                    heroPlaying ? "scale-110" : "scale-100"
+                  }`}
                   onClick={handleHeroPlay}
                 />
-                {!heroPlaying && (
-                  <button
-                    aria-label="Play with sound"
-                    onClick={handleHeroPlay}
-                    className="absolute left-1/2 top-1/2 flex h-16 w-16 -translate-x-1/2 -translate-y-1/2 items-center justify-center rounded-full bg-[rgba(246,240,230,0.95)] shadow-[0_8px_32px_rgba(0,0,0,0.3)] transition-transform hover:scale-110 sm:h-20 sm:w-20"
-                  >
+                <div className="pointer-events-none absolute inset-x-0 bottom-0 h-1/2 bg-gradient-to-t from-black/55 via-black/15 to-transparent" />
+
+                <audio
+                  ref={heroAudioRef}
+                  src={RACHEL_SONG_URL}
+                  preload="metadata"
+                  onEnded={() => setHeroPlaying(false)}
+                />
+
+                <button
+                  aria-label={heroPlaying ? "Pause song" : "Play Rachel's song"}
+                  onClick={handleHeroPlay}
+                  className={`absolute left-1/2 top-1/2 flex h-16 w-16 -translate-x-1/2 -translate-y-1/2 items-center justify-center rounded-full bg-[rgba(246,240,230,0.95)] shadow-[0_8px_32px_rgba(0,0,0,0.35)] transition-all hover:scale-110 sm:h-20 sm:w-20 ${
+                    heroPlaying ? "opacity-0 group-hover:opacity-100" : "opacity-100"
+                  }`}
+                >
+                  {heroPlaying ? (
+                    <span className="flex gap-[5px]">
+                      <span className="block h-5 w-[5px] rounded-sm bg-[#8D6FAF] sm:h-6" />
+                      <span className="block h-5 w-[5px] rounded-sm bg-[#8D6FAF] sm:h-6" />
+                    </span>
+                  ) : (
                     <span
                       className="ml-1 inline-block"
                       style={{
@@ -496,12 +514,21 @@ function LandingPage() {
                         borderBottom: "10px solid transparent",
                       }}
                     />
-                  </button>
+                  )}
+                </button>
+
+                {heroPlaying && (
+                  <div className="absolute bottom-3 left-3 right-3 flex items-center gap-2 rounded-full bg-black/40 px-3 py-1.5 backdrop-blur-sm">
+                    <span className="flex h-2 w-2 animate-pulse rounded-full bg-[#E8C547]" />
+                    <span className="text-[11px] font-medium uppercase tracking-[0.12em] text-white/95">
+                      For My Mother — Now playing
+                    </span>
+                  </div>
                 )}
               </div>
               <div className="mt-3 px-1 text-[13px] leading-[1.5] text-[#5A5148] sm:text-[13.5px]">
                 <strong className="mr-1.5 text-[11px] font-semibold uppercase tracking-[0.12em] text-[#8D6FAF]">
-                  Watch Rachel's story ·
+                  Hear Rachel's song ·
                 </strong>
                 The song that played on the drive home from her mother's last
                 infusion.
