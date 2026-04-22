@@ -1,0 +1,1 @@
+UPDATE public.featured_samples SET published = true WHERE status = 'ready' AND audio_url IS NOT NULL;
