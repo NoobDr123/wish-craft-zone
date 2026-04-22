@@ -129,8 +129,10 @@ export type Database = {
           share_page_slug: string | null
           song_title_idea: string | null
           status: string
+          stripe_checkout_session_id: string | null
           stripe_customer_id: string | null
           stripe_payment_intent_id: string | null
+          stripe_payment_method_id: string | null
           tempo: string | null
           updated_at: string
           user_id: string | null
@@ -180,8 +182,10 @@ export type Database = {
           share_page_slug?: string | null
           song_title_idea?: string | null
           status?: string
+          stripe_checkout_session_id?: string | null
           stripe_customer_id?: string | null
           stripe_payment_intent_id?: string | null
+          stripe_payment_method_id?: string | null
           tempo?: string | null
           updated_at?: string
           user_id?: string | null
@@ -231,8 +235,10 @@ export type Database = {
           share_page_slug?: string | null
           song_title_idea?: string | null
           status?: string
+          stripe_checkout_session_id?: string | null
           stripe_customer_id?: string | null
           stripe_payment_intent_id?: string | null
+          stripe_payment_method_id?: string | null
           tempo?: string | null
           updated_at?: string
           user_id?: string | null

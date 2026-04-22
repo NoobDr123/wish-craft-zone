@@ -2,6 +2,8 @@ import { createFileRoute, useNavigate } from "@tanstack/react-router";
 import { useState } from "react";
 import { UpsellShell } from "@/components/UpsellShell";
 import { useQuizStore } from "@/stores/quizStore";
+import { supabase } from "@/integrations/supabase/client";
+import { stripeEnvironment } from "@/lib/stripe";
 
 export const Route = createFileRoute("/upsell-2")({
   component: Upsell2,
@@ -12,13 +14,23 @@ function Upsell2() {
   const q = useQuizStore();
   const [processing, setProcessing] = useState(false);
 
-  const accept = () => {
-    setProcessing(true);
-    setTimeout(() => {
-      q.set("is_rush", true);
+  const accept = async () => {
+    if (!q.orderId) {
       navigate({ to: "/upsell-3" });
-    }, 900);
+      return;
+    }
+    setProcessing(true);
+    const { data } = await supabase.functions.invoke("charge-upsell", {
+      body: {
+        orderId: q.orderId,
+        upsellType: "rush_delivery",
+        environment: stripeEnvironment,
+      },
+    });
+    if (data?.success) q.set("is_rush", true);
+    navigate({ to: "/upsell-3" });
   };
+
   const decline = () => navigate({ to: "/upsell-3" });
 
   return (
