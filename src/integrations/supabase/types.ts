@@ -101,6 +101,96 @@ export type Database = {
         }
         Relationships: []
       }
+      featured_samples: {
+        Row: {
+          audio_url: string | null
+          audio_variants: Json | null
+          brief: Json | null
+          brief_score: Json | null
+          cover_image_url: string | null
+          created_at: string
+          flag_reason: string | null
+          for_text: string | null
+          genre: string
+          genre_label: string
+          id: string
+          kie_callback_received_at: string | null
+          kie_submitted_at: string | null
+          kie_task_id: string | null
+          lyrics: string | null
+          published: boolean
+          quote: string | null
+          recipient_name: string
+          relationship: string | null
+          sort_order: number
+          stage: string | null
+          status: string
+          story_prompt: string
+          tempo: string
+          title: string
+          updated_at: string
+          voice: string
+        }
+        Insert: {
+          audio_url?: string | null
+          audio_variants?: Json | null
+          brief?: Json | null
+          brief_score?: Json | null
+          cover_image_url?: string | null
+          created_at?: string
+          flag_reason?: string | null
+          for_text?: string | null
+          genre?: string
+          genre_label?: string
+          id?: string
+          kie_callback_received_at?: string | null
+          kie_submitted_at?: string | null
+          kie_task_id?: string | null
+          lyrics?: string | null
+          published?: boolean
+          quote?: string | null
+          recipient_name: string
+          relationship?: string | null
+          sort_order?: number
+          stage?: string | null
+          status?: string
+          story_prompt: string
+          tempo?: string
+          title: string
+          updated_at?: string
+          voice?: string
+        }
+        Update: {
+          audio_url?: string | null
+          audio_variants?: Json | null
+          brief?: Json | null
+          brief_score?: Json | null
+          cover_image_url?: string | null
+          created_at?: string
+          flag_reason?: string | null
+          for_text?: string | null
+          genre?: string
+          genre_label?: string
+          id?: string
+          kie_callback_received_at?: string | null
+          kie_submitted_at?: string | null
+          kie_task_id?: string | null
+          lyrics?: string | null
+          published?: boolean
+          quote?: string | null
+          recipient_name?: string
+          relationship?: string | null
+          sort_order?: number
+          stage?: string | null
+          status?: string
+          story_prompt?: string
+          tempo?: string
+          title?: string
+          updated_at?: string
+          voice?: string
+        }
+        Relationships: []
+      }
       job_events: {
         Row: {
           created_at: string
