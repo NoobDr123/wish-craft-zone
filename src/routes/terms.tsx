@@ -111,7 +111,7 @@ function TermsPage() {
 
           <h2>6. Delivery</h2>
           <p>
-            Standard delivery is typically within 7 days. Rush delivery, when
+            Standard delivery is typically within 5 days. Rush delivery, when
             purchased, targets 24 hours. Delivery times are estimates, not
             guarantees, and can be affected by quality review, AI provider
             availability, or other factors.

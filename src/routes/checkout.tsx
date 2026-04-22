@@ -46,7 +46,7 @@ const emailRe = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
 
 function formatDeliveryDate() {
   const d = new Date();
-  d.setDate(d.getDate() + 7);
+  d.setDate(d.getDate() + 5);
   return d.toLocaleDateString("en-US", { month: "short", day: "numeric" });
 }
 

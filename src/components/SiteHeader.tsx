@@ -21,9 +21,9 @@ export function SiteHeader() {
         <span className="mr-1.5 text-[#E5D9EF]">🎗️</span>
         <span className="hidden sm:inline">
           For every fighter, every survivor, every loved one. Delivered with
-          care in seven days.
+          care in five days.
         </span>
-        <span className="sm:hidden">Delivered with care in 7 days.</span>
+        <span className="sm:hidden">Delivered with care in 5 days.</span>
         <Link
           to="/create"
           className="ml-2 border-b border-current text-[#C9A85A]"
