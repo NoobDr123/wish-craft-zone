@@ -28,13 +28,14 @@ export const Route = createFileRoute("/listen/$id")({
     ],
   }),
   loader: async ({ params }) => {
-    const { data, error } = await supabase
-      .from("orders")
+    // Reads from the safe `public_shared_songs` view — no buyer email, no Stripe IDs,
+    // no personal notes are exposed publicly.
+    const { data, error } = await (supabase as any)
+      .from("public_shared_songs")
       .select(
-        "id, recipient_name, buyer_name, personal_note, audio_variants, selected_variant_id, brief, genre, tempo, status, share_page_slug",
+        "id, recipient_name, audio_variants, selected_variant_id, brief, genre, tempo, share_page_slug",
       )
       .or(`share_page_slug.eq.${params.id},id.eq.${params.id}`)
-      .eq("status", "delivered")
       .maybeSingle();
 
     if (error || !data) throw notFound();
@@ -84,19 +85,6 @@ function ListenPage() {
             {title ?? "From someone who loves you."}
           </h1>
         </div>
-
-        {order.personal_note && (
-          <figure className="mt-12 rounded-[2rem] border border-border bg-card/80 p-8 shadow-soft backdrop-blur md:p-10">
-            <blockquote className="font-display text-xl italic leading-relaxed text-foreground">
-              &ldquo;{order.personal_note}&rdquo;
-            </blockquote>
-            {order.buyer_name && (
-              <figcaption className="mt-4 text-sm text-muted-foreground">
-                — {order.buyer_name}
-              </figcaption>
-            )}
-          </figure>
-        )}
 
         <div className="mt-10">
           {variant?.audio_url ? (
