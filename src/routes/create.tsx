@@ -1,5 +1,5 @@
 import { useMemo, useState } from "react";
-import { createFileRoute, useNavigate } from "@tanstack/react-router";
+import { createFileRoute, Link, useNavigate } from "@tanstack/react-router";
 import { QuizShell } from "@/components/QuizShell";
 import {
   ListSelect,
@@ -141,6 +141,17 @@ function CreatePage() {
               maxLength={40}
             />
           </Question>
+          <p className="rounded-2xl border border-border bg-secondary/40 px-4 py-3 text-center text-xs leading-relaxed text-muted-foreground">
+            By continuing through this quiz you agree to our{" "}
+            <Link to="/terms" className="font-medium text-foreground underline">
+              Terms of Service
+            </Link>{" "}
+            and{" "}
+            <Link to="/privacy" className="font-medium text-foreground underline">
+              Privacy Policy
+            </Link>
+            .
+          </p>
         </div>
       ),
     },

@@ -12,8 +12,10 @@ import { Route as rootRouteImport } from './routes/__root'
 import { Route as Upsell3RouteImport } from './routes/upsell-3'
 import { Route as Upsell2RouteImport } from './routes/upsell-2'
 import { Route as Upsell1RouteImport } from './routes/upsell-1'
+import { Route as TermsRouteImport } from './routes/terms'
 import { Route as ScratchRouteImport } from './routes/scratch'
 import { Route as ProcessingRouteImport } from './routes/processing'
+import { Route as PrivacyRouteImport } from './routes/privacy'
 import { Route as LoginRouteImport } from './routes/login'
 import { Route as DashboardRouteImport } from './routes/dashboard'
 import { Route as CreateRouteImport } from './routes/create'
@@ -45,6 +47,11 @@ const Upsell1Route = Upsell1RouteImport.update({
   path: '/upsell-1',
   getParentRoute: () => rootRouteImport,
 } as any)
+const TermsRoute = TermsRouteImport.update({
+  id: '/terms',
+  path: '/terms',
+  getParentRoute: () => rootRouteImport,
+} as any)
 const ScratchRoute = ScratchRouteImport.update({
   id: '/scratch',
   path: '/scratch',
@@ -53,6 +60,11 @@ const ScratchRoute = ScratchRouteImport.update({
 const ProcessingRoute = ProcessingRouteImport.update({
   id: '/processing',
   path: '/processing',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const PrivacyRoute = PrivacyRouteImport.update({
+  id: '/privacy',
+  path: '/privacy',
   getParentRoute: () => rootRouteImport,
 } as any)
 const LoginRoute = LoginRouteImport.update({
@@ -140,8 +152,10 @@ export interface FileRoutesByFullPath {
   '/create': typeof CreateRoute
   '/dashboard': typeof DashboardRoute
   '/login': typeof LoginRoute
+  '/privacy': typeof PrivacyRoute
   '/processing': typeof ProcessingRoute
   '/scratch': typeof ScratchRoute
+  '/terms': typeof TermsRoute
   '/upsell-1': typeof Upsell1Route
   '/upsell-2': typeof Upsell2Route
   '/upsell-3': typeof Upsell3Route
@@ -162,8 +176,10 @@ export interface FileRoutesByTo {
   '/create': typeof CreateRoute
   '/dashboard': typeof DashboardRoute
   '/login': typeof LoginRoute
+  '/privacy': typeof PrivacyRoute
   '/processing': typeof ProcessingRoute
   '/scratch': typeof ScratchRoute
+  '/terms': typeof TermsRoute
   '/upsell-1': typeof Upsell1Route
   '/upsell-2': typeof Upsell2Route
   '/upsell-3': typeof Upsell3Route
@@ -185,8 +201,10 @@ export interface FileRoutesById {
   '/create': typeof CreateRoute
   '/dashboard': typeof DashboardRoute
   '/login': typeof LoginRoute
+  '/privacy': typeof PrivacyRoute
   '/processing': typeof ProcessingRoute
   '/scratch': typeof ScratchRoute
+  '/terms': typeof TermsRoute
   '/upsell-1': typeof Upsell1Route
   '/upsell-2': typeof Upsell2Route
   '/upsell-3': typeof Upsell3Route
@@ -209,8 +227,10 @@ export interface FileRouteTypes {
     | '/create'
     | '/dashboard'
     | '/login'
+    | '/privacy'
     | '/processing'
     | '/scratch'
+    | '/terms'
     | '/upsell-1'
     | '/upsell-2'
     | '/upsell-3'
@@ -231,8 +251,10 @@ export interface FileRouteTypes {
     | '/create'
     | '/dashboard'
     | '/login'
+    | '/privacy'
     | '/processing'
     | '/scratch'
+    | '/terms'
     | '/upsell-1'
     | '/upsell-2'
     | '/upsell-3'
@@ -253,8 +275,10 @@ export interface FileRouteTypes {
     | '/create'
     | '/dashboard'
     | '/login'
+    | '/privacy'
     | '/processing'
     | '/scratch'
+    | '/terms'
     | '/upsell-1'
     | '/upsell-2'
     | '/upsell-3'
@@ -276,8 +300,10 @@ export interface RootRouteChildren {
   CreateRoute: typeof CreateRoute
   DashboardRoute: typeof DashboardRoute
   LoginRoute: typeof LoginRoute
+  PrivacyRoute: typeof PrivacyRoute
   ProcessingRoute: typeof ProcessingRoute
   ScratchRoute: typeof ScratchRoute
+  TermsRoute: typeof TermsRoute
   Upsell1Route: typeof Upsell1Route
   Upsell2Route: typeof Upsell2Route
   Upsell3Route: typeof Upsell3Route
@@ -313,6 +339,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof Upsell1RouteImport
       parentRoute: typeof rootRouteImport
     }
+    '/terms': {
+      id: '/terms'
+      path: '/terms'
+      fullPath: '/terms'
+      preLoaderRoute: typeof TermsRouteImport
+      parentRoute: typeof rootRouteImport
+    }
     '/scratch': {
       id: '/scratch'
       path: '/scratch'
@@ -325,6 +358,13 @@ declare module '@tanstack/react-router' {
       path: '/processing'
       fullPath: '/processing'
       preLoaderRoute: typeof ProcessingRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/privacy': {
+      id: '/privacy'
+      path: '/privacy'
+      fullPath: '/privacy'
+      preLoaderRoute: typeof PrivacyRouteImport
       parentRoute: typeof rootRouteImport
     }
     '/login': {
@@ -455,8 +495,10 @@ const rootRouteChildren: RootRouteChildren = {
   CreateRoute: CreateRoute,
   DashboardRoute: DashboardRoute,
   LoginRoute: LoginRoute,
+  PrivacyRoute: PrivacyRoute,
   ProcessingRoute: ProcessingRoute,
   ScratchRoute: ScratchRoute,
+  TermsRoute: TermsRoute,
   Upsell1Route: Upsell1Route,
   Upsell2Route: Upsell2Route,
   Upsell3Route: Upsell3Route,

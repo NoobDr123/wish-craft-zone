@@ -30,14 +30,14 @@ export function SiteFooter() {
             </Link>
           </li>
           <li>
-            <a href="/terms" className="hover:text-[#E5D9EF]">
+            <Link to="/terms" className="hover:text-[#E5D9EF]">
               Terms
-            </a>
+            </Link>
           </li>
           <li>
-            <a href="/privacy" className="hover:text-[#E5D9EF]">
+            <Link to="/privacy" className="hover:text-[#E5D9EF]">
               Privacy
-            </a>
+            </Link>
           </li>
           <li>
             <a href="mailto:hello@ribbonsong.com" className="hover:text-[#E5D9EF]">
