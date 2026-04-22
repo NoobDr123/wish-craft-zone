@@ -344,7 +344,6 @@ function LandingPage() {
   const [activeSample, setActiveSample] = useState<FeaturedSample | null>(null);
 
   useEffect(() => {
-    let mounted = true;
     supabase
       .from("featured_samples")
       .select("id,title,quote,for_text,genre_label,cover_image_url,audio_url,lyrics")
@@ -352,12 +351,15 @@ function LandingPage() {
       .not("audio_url", "is", null)
       .order("sort_order", { ascending: true })
       .limit(6)
-      .then(({ data }) => {
-        if (mounted && data) setSamples(data as FeaturedSample[]);
+      .then(({ data, error }) => {
+        if (error) {
+          console.error("[LandingPage] featured_samples fetch error", error);
+          return;
+        }
+        if (data && data.length > 0) {
+          setSamples(data as FeaturedSample[]);
+        }
       });
-    return () => {
-      mounted = false;
-    };
   }, []);
 
   // Choose displayed list — real samples if available, otherwise the fallback set
