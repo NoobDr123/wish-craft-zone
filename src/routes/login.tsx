@@ -8,7 +8,7 @@ import { useAuth } from "@/hooks/useAuth";
 export const Route = createFileRoute("/login")({
   component: LoginPage,
   head: () => ({
-    meta: [{ title: "Sign in · RibbonSong" }],
+    meta: [{ title: "Track your song · RibbonSong" }],
   }),
 });
 
