@@ -46,18 +46,61 @@ export type Database = {
           },
         ]
       }
+      kie_callbacks: {
+        Row: {
+          id: number
+          order_id: string | null
+          payload: Json
+          processed: boolean
+          received_at: string
+          stage: string
+          task_id: string
+        }
+        Insert: {
+          id?: number
+          order_id?: string | null
+          payload: Json
+          processed?: boolean
+          received_at?: string
+          stage: string
+          task_id: string
+        }
+        Update: {
+          id?: number
+          order_id?: string | null
+          payload?: Json
+          processed?: boolean
+          received_at?: string
+          stage?: string
+          task_id?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "kie_callbacks_order_id_fkey"
+            columns: ["order_id"]
+            isOneToOne: false
+            referencedRelation: "orders"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       orders: {
         Row: {
           amount_cents: number
+          amount_paid_cents: number
           audio_variants: Json | null
           auto_qc_results: Json | null
           brief: Json | null
+          brief_score: Json | null
           buyer_email: string
           buyer_name: string | null
           created_at: string
           currency: string
+          customer_name: string | null
           delivered_at: string | null
           delivery_date: string | null
+          flag_reason: string | null
+          flagged_for_review: boolean
           genre: string | null
           has_3rd_verse: boolean
           has_unlimited_edits: boolean
@@ -66,20 +109,28 @@ export type Database = {
           id: string
           is_gift: boolean
           is_rush: boolean
+          kie_callback_received_at: string | null
+          kie_submitted_at: string | null
           kie_task_id: string | null
           parent_order_id: string | null
+          payment_status: string
           personal_note: string | null
           priority: string
+          product_config: Json
           quiz_payload: Json | null
           recipient_email: string | null
           recipient_name: string
+          recipient_relationship: string | null
           relationship: string | null
           revision_count: number
           revision_notes: string | null
+          scheduled_delivery_at: string | null
           selected_variant_id: string | null
           share_page_slug: string | null
           song_title_idea: string | null
           status: string
+          stripe_customer_id: string | null
+          stripe_payment_intent_id: string | null
           tempo: string | null
           updated_at: string
           user_id: string | null
@@ -87,15 +138,20 @@ export type Database = {
         }
         Insert: {
           amount_cents?: number
+          amount_paid_cents?: number
           audio_variants?: Json | null
           auto_qc_results?: Json | null
           brief?: Json | null
+          brief_score?: Json | null
           buyer_email: string
           buyer_name?: string | null
           created_at?: string
           currency?: string
+          customer_name?: string | null
           delivered_at?: string | null
           delivery_date?: string | null
+          flag_reason?: string | null
+          flagged_for_review?: boolean
           genre?: string | null
           has_3rd_verse?: boolean
           has_unlimited_edits?: boolean
@@ -104,20 +160,28 @@ export type Database = {
           id?: string
           is_gift?: boolean
           is_rush?: boolean
+          kie_callback_received_at?: string | null
+          kie_submitted_at?: string | null
           kie_task_id?: string | null
           parent_order_id?: string | null
+          payment_status?: string
           personal_note?: string | null
           priority?: string
+          product_config?: Json
           quiz_payload?: Json | null
           recipient_email?: string | null
           recipient_name: string
+          recipient_relationship?: string | null
           relationship?: string | null
           revision_count?: number
           revision_notes?: string | null
+          scheduled_delivery_at?: string | null
           selected_variant_id?: string | null
           share_page_slug?: string | null
           song_title_idea?: string | null
           status?: string
+          stripe_customer_id?: string | null
+          stripe_payment_intent_id?: string | null
           tempo?: string | null
           updated_at?: string
           user_id?: string | null
@@ -125,15 +189,20 @@ export type Database = {
         }
         Update: {
           amount_cents?: number
+          amount_paid_cents?: number
           audio_variants?: Json | null
           auto_qc_results?: Json | null
           brief?: Json | null
+          brief_score?: Json | null
           buyer_email?: string
           buyer_name?: string | null
           created_at?: string
           currency?: string
+          customer_name?: string | null
           delivered_at?: string | null
           delivery_date?: string | null
+          flag_reason?: string | null
+          flagged_for_review?: boolean
           genre?: string | null
           has_3rd_verse?: boolean
           has_unlimited_edits?: boolean
@@ -142,20 +211,28 @@ export type Database = {
           id?: string
           is_gift?: boolean
           is_rush?: boolean
+          kie_callback_received_at?: string | null
+          kie_submitted_at?: string | null
           kie_task_id?: string | null
           parent_order_id?: string | null
+          payment_status?: string
           personal_note?: string | null
           priority?: string
+          product_config?: Json
           quiz_payload?: Json | null
           recipient_email?: string | null
           recipient_name?: string
+          recipient_relationship?: string | null
           relationship?: string | null
           revision_count?: number
           revision_notes?: string | null
+          scheduled_delivery_at?: string | null
           selected_variant_id?: string | null
           share_page_slug?: string | null
           song_title_idea?: string | null
           status?: string
+          stripe_customer_id?: string | null
+          stripe_payment_intent_id?: string | null
           tempo?: string | null
           updated_at?: string
           user_id?: string | null
@@ -170,6 +247,30 @@ export type Database = {
             referencedColumns: ["id"]
           },
         ]
+      }
+      stripe_events: {
+        Row: {
+          event_id: string
+          event_type: string | null
+          payload: Json | null
+          processed: boolean
+          received_at: string
+        }
+        Insert: {
+          event_id: string
+          event_type?: string | null
+          payload?: Json | null
+          processed?: boolean
+          received_at?: string
+        }
+        Update: {
+          event_id?: string
+          event_type?: string | null
+          payload?: Json | null
+          processed?: boolean
+          received_at?: string
+        }
+        Relationships: []
       }
     }
     Views: {
