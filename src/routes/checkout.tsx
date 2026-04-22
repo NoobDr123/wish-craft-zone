@@ -3,7 +3,7 @@ import { useEffect, useMemo, useState } from "react";
 import { EmbeddedCheckoutProvider, EmbeddedCheckout } from "@stripe/react-stripe-js";
 import { Logo } from "@/components/Logo";
 import { PaymentTestModeBanner } from "@/components/PaymentTestModeBanner";
-import { useQuizStore } from "@/stores/quizStore";
+import { useQuizStore, journeyStageOf, tenseOf } from "@/stores/quizStore";
 import { supabase } from "@/integrations/supabase/client";
 import { getStripe, stripeEnvironment } from "@/lib/stripe";
 import {
@@ -84,6 +84,13 @@ function CheckoutPage() {
       const { data: authData } = await supabase.auth.getUser();
       const userId = authData.user?.id ?? null;
 
+      const journey = journeyStageOf(q.stage);
+      const tense = tenseOf(q.stage);
+      const relationshipResolved =
+        q.relationship === "Other" && q.relationship_other.trim()
+          ? q.relationship_other.trim()
+          : (q.relationship ?? null);
+
       const { data: order, error: insertError } = await supabase
         .from("orders")
         .insert({
@@ -91,7 +98,7 @@ function CheckoutPage() {
           buyer_email: email.trim().toLowerCase(),
           buyer_name: name,
           recipient_name: q.recipient_name,
-          relationship: q.relationship ?? null,
+          relationship: relationshipResolved,
           genre: q.genre ?? null,
           tempo: q.tempo ?? null,
           voice: q.voice ?? null,
@@ -104,7 +111,28 @@ function CheckoutPage() {
           currency: "USD",
           status: "pending_payment",
           payment_status: "pending",
+          priority: journey === "hospice" ? "hospice" : "standard",
           quiz_payload: {
+            // Spec keys (new)
+            q1_relationship: q.relationship,
+            q1_relationship_other: q.relationship_other || null,
+            q1_recipient_name: q.recipient_name,
+            q1_pronunciation: q.pronunciation || null,
+            q1_age_range: q.age_range || null,
+            q3_journey: q.stage,
+            q3_journey_stage: journey,
+            q3_tense: tense,
+            q4_fighting_for: q.fighting_for,
+            q5_qualities: q.qualities,
+            q6_shared_memory: q.shared_memory,
+            q7_theme: q.message,
+            q8_letter: q.personal_words,
+            q9_genre: q.genre,
+            q9_tempo: q.tempo,
+            q9_voice: q.voice,
+            q9_song_title_idea: q.song_title_idea || null,
+
+            // Legacy keys (kept so existing edge fn keeps working)
             stage: q.stage,
             cancer_type: q.cancer_type,
             message: q.message,
@@ -119,6 +147,9 @@ function CheckoutPage() {
             faith_or_beliefs: q.faith_or_beliefs,
             personal_words: q.personal_words,
             hope_for_them: q.hope_for_them,
+            relationship: relationshipResolved,
+            journey_stage: journey,
+            tense,
           },
         })
         .select("id")
