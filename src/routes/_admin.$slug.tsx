@@ -12,7 +12,7 @@ import { AdminMfaChallenge } from "@/components/admin/AdminMfaChallenge";
 import { supabase } from "@/integrations/supabase/client";
 import { ADMIN_PATH } from "@/config/admin";
 
-export const Route = createFileRoute("/staff-7q9k2x")({
+export const Route = createFileRoute("/_admin/$slug")({
   component: StaffPage,
   head: () => ({
     meta: [
