@@ -52,19 +52,33 @@ serve(async (req) => {
       const token = authHeader.replace(/^Bearer\s+/i, "");
       if (!token) return json({ error: "Unauthorized" }, 401);
 
-      const userClient = createClient(
-        Deno.env.get("SUPABASE_URL")!,
-        Deno.env.get("SUPABASE_ANON_KEY")!,
-        { global: { headers: { Authorization: `Bearer ${token}` } } },
-      );
-      const { data: userData } = await userClient.auth.getUser();
-      if (!userData?.user) return json({ error: "Unauthorized" }, 401);
+      // Service-role JWT bypass (decode payload, check role claim)
+      let isServiceRoleJwt = false;
+      try {
+        const parts = token.split(".");
+        if (parts.length === 3) {
+          const payload = JSON.parse(atob(parts[1].replace(/-/g, "+").replace(/_/g, "/")));
+          if (payload?.role === "service_role") isServiceRoleJwt = true;
+        }
+      } catch {
+        /* not a JWT */
+      }
 
-      const { data: isAdmin } = await supabase.rpc("has_role", {
-        _user_id: userData.user.id,
-        _role: "admin",
-      });
-      if (!isAdmin) return json({ error: "Forbidden" }, 403);
+      if (!isServiceRoleJwt) {
+        const userClient = createClient(
+          Deno.env.get("SUPABASE_URL")!,
+          Deno.env.get("SUPABASE_ANON_KEY")!,
+          { global: { headers: { Authorization: `Bearer ${token}` } } },
+        );
+        const { data: userData } = await userClient.auth.getUser();
+        if (!userData?.user) return json({ error: "Unauthorized" }, 401);
+
+        const { data: isAdmin } = await supabase.rpc("has_role", {
+          _user_id: userData.user.id,
+          _role: "admin",
+        });
+        if (!isAdmin) return json({ error: "Forbidden" }, 403);
+      }
     }
 
     const { sampleId } = await req.json();
