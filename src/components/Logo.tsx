@@ -1,4 +1,5 @@
 import { Link } from "@tanstack/react-router";
+import logoMark from "@/assets/ribbonsong-logo.png";
 
 interface LogoProps {
   className?: string;
@@ -11,7 +12,7 @@ export function Logo({ className = "" }: LogoProps) {
       className={`group inline-flex items-center gap-2 ${className}`}
       aria-label="RibbonSong home"
     >
-      <RibbonMark className="h-7 w-7 text-primary transition-transform group-hover:rotate-[-6deg]" />
+      <RibbonMark className="h-8 w-8 transition-transform group-hover:rotate-[-6deg]" />
       <span className="font-display text-xl font-semibold tracking-tight text-foreground">
         Ribbon<span className="text-primary">Song</span>
       </span>
@@ -21,28 +22,14 @@ export function Logo({ className = "" }: LogoProps) {
 
 export function RibbonMark({ className = "" }: { className?: string }) {
   return (
-    <svg
-      viewBox="0 0 32 32"
-      fill="none"
-      xmlns="http://www.w3.org/2000/svg"
-      className={className}
+    <img
+      src={logoMark}
+      alt=""
+      width={64}
+      height={64}
+      loading="lazy"
+      className={`object-contain ${className}`}
       aria-hidden
-    >
-      <path
-        d="M11 4c-1.5 3-1.5 5 0 8l5 8 5-8c1.5-3 1.5-5 0-8"
-        stroke="currentColor"
-        strokeWidth="2.2"
-        strokeLinecap="round"
-        strokeLinejoin="round"
-      />
-      <path
-        d="M11 12l-3.5 5a3 3 0 002.5 4.6L13 21M21 12l3.5 5a3 3 0 01-2.5 4.6L19 21"
-        stroke="currentColor"
-        strokeWidth="2.2"
-        strokeLinecap="round"
-        strokeLinejoin="round"
-      />
-      <circle cx="16" cy="25" r="1.6" fill="currentColor" />
-    </svg>
+    />
   );
 }
