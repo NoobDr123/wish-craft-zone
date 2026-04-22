@@ -308,18 +308,20 @@ const faqs = [
 function PrimaryBtn({
   children,
   large,
+  fullWidth,
   to = "/create",
 }: {
   children: React.ReactNode;
   large?: boolean;
+  fullWidth?: boolean;
   to?: string;
 }) {
   return (
     <Link
       to={to}
-      className={`group inline-flex items-center gap-2.5 rounded-full bg-[#8D6FAF] font-semibold text-[#FFF7EE] tracking-[0.005em] shadow-[0_6px_16px_rgba(141,111,175,0.28)] transition-all hover:-translate-y-px hover:bg-[#6B4F8A] hover:shadow-[0_10px_24px_rgba(141,111,175,0.35)] ${
+      className={`group inline-flex items-center justify-center gap-2.5 rounded-full bg-[#8D6FAF] font-semibold text-[#FFF7EE] tracking-[0.005em] shadow-[0_6px_16px_rgba(141,111,175,0.28)] transition-all hover:-translate-y-px hover:bg-[#6B4F8A] hover:shadow-[0_10px_24px_rgba(141,111,175,0.35)] ${
         large ? "px-[34px] py-[18px] text-[16.5px]" : "px-[26px] py-[14px] text-[15px]"
-      }`}
+      } ${fullWidth ? "w-full sm:w-auto" : ""}`}
     >
       {children}
       <span className="transition-transform group-hover:translate-x-1">→</span>
