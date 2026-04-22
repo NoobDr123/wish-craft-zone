@@ -38,6 +38,7 @@ function Upsell1() {
         orderId: q.orderId,
         upsellType: "extra_verse",
         environment: stripeEnvironment,
+        sessionId: q.checkoutSessionId,
       },
     });
     if (data?.success) q.set("has_3rd_verse", true);

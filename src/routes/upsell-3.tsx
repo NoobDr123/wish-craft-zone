@@ -36,6 +36,7 @@ function Upsell3() {
         orderId: q.orderId,
         upsellType: "unlimited_edits",
         environment: stripeEnvironment,
+        sessionId: q.checkoutSessionId,
       },
     });
     if (data?.success) q.set("has_unlimited_edits", true);
