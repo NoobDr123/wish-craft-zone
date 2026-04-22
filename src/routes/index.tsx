@@ -329,13 +329,13 @@ function LandingPage() {
           <div className="grid items-center gap-8 md:grid-cols-[1.15fr_1fr] md:gap-[60px]">
             <div className="order-2 md:order-1">
               <Eyebrow>The #1 Custom Song Platform For Cancer Families</Eyebrow>
-              <h1 className="mb-[22px] max-w-[700px] font-display text-[clamp(30px,8vw,64px)] font-medium italic leading-[1.06] tracking-[-0.025em] text-[#1F1B16] md:mb-[26px]">
-                <span className="font-display text-[1.1em] font-semibold not-italic text-[#8D6FAF] -mr-[0.04em]">
+              <h1 className="mb-[22px] max-w-[700px] font-display text-[clamp(28px,7.5vw,64px)] font-medium italic leading-[1.08] tracking-[-0.025em] text-[#1F1B16] md:mb-[26px]">
+                <span className="font-display text-[1.05em] font-semibold not-italic text-[#8D6FAF]">
                   &ldquo;
                 </span>
                 I played it on the drive home from her last chemo. We both
                 cried the whole way.
-                <span className="font-display text-[1.1em] font-semibold not-italic text-[#8D6FAF]">
+                <span className="font-display text-[1.05em] font-semibold not-italic text-[#8D6FAF]">
                   &rdquo;
                 </span>
               </h1>
