@@ -44,18 +44,19 @@ export const Route = createRootRoute({
       },
       { property: "og:type", content: "website" },
       { name: "twitter:card", content: "summary_large_image" },
-      // Security/opsec defense in depth:
-      { httpEquiv: "Content-Security-Policy", content: "frame-ancestors 'none'" },
-      { name: "referrer", content: "strict-origin-when-cross-origin" },
-      // Suppress framework fingerprinting via generator meta.
-      { name: "generator", content: "" },
+      { name: "twitter:title", content: "RibbonSong: Turn your love into a song" },
+      { name: "description", content: "Transform the love, prayers, and memories of those affected by cancer into deeply personal songs that provide comfort, strength, and a lasting legacy." },
+      { property: "og:description", content: "Transform the love, prayers, and memories of those affected by cancer into deeply personal songs that provide comfort, strength, and a lasting legacy." },
+      { name: "twitter:description", content: "Transform the love, prayers, and memories of those affected by cancer into deeply personal songs that provide comfort, strength, and a lasting legacy." },
+      { property: "og:image", content: "https://storage.googleapis.com/gpt-engineer-file-uploads/1ev7Eg3pjJSl6ntuLoRoywF3VFi1/social-images/social-1776831350372-apple-touch-icon.webp" },
+      { name: "twitter:image", content: "https://storage.googleapis.com/gpt-engineer-file-uploads/1ev7Eg3pjJSl6ntuLoRoywF3VFi1/social-images/social-1776831350372-apple-touch-icon.webp" },
     ],
     links: [
       { rel: "preconnect", href: "https://fonts.googleapis.com" },
       { rel: "preconnect", href: "https://fonts.gstatic.com", crossOrigin: "anonymous" },
       {
         rel: "stylesheet",
-        href: "https://fonts.googleapis.com/css2?family=Fraunces:ital,opsz,wght@0,9..144,400;0,9..144,500;0,9..144,600;0,9..144,700;1,9..144,400;1,9..144,500;1,9..144,600&family=Instrument+Sans:ital,wght@0,400;0,500;0,600;1,400&display=swap",
+        href: "https://fonts.googleapis.com/css2?family=Playfair+Display:wght@400;500;600;700&family=Inter:wght@300;400;500;600;700&display=swap",
       },
       {
         rel: "stylesheet",
