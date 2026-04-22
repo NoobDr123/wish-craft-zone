@@ -113,16 +113,57 @@ export function TextInput(props: TextInputProps) {
   );
 }
 
-interface TextAreaProps extends React.TextareaHTMLAttributes<HTMLTextAreaElement> {}
+interface TextAreaProps extends React.TextareaHTMLAttributes<HTMLTextAreaElement> {
+  showCount?: boolean;
+}
 
-export function TextArea(props: TextAreaProps) {
+export function TextArea({ showCount, ...props }: TextAreaProps) {
+  const value = String(props.value ?? "");
+  const max = typeof props.maxLength === "number" ? props.maxLength : undefined;
   return (
-    <textarea
-      {...props}
-      rows={props.rows ?? 5}
-      className={`w-full resize-none rounded-2xl border border-dashed border-peach bg-card px-5 py-4 text-base leading-relaxed text-foreground outline-none transition-all placeholder:text-muted-foreground/70 focus:border-solid focus:border-primary focus:shadow-soft ${
-        props.className ?? ""
-      }`}
-    />
+    <div className="relative">
+      <textarea
+        {...props}
+        rows={props.rows ?? 5}
+        className={`w-full resize-none rounded-2xl border border-dashed border-peach bg-card px-5 py-4 text-base leading-relaxed text-foreground outline-none transition-all placeholder:text-muted-foreground/70 focus:border-solid focus:border-primary focus:shadow-soft ${
+          props.className ?? ""
+        }`}
+      />
+      {showCount && max !== undefined && (
+        <span
+          className={`pointer-events-none absolute bottom-3 right-4 rounded bg-card/90 px-1.5 py-0.5 text-xs tabular-nums ${
+            value.length > max * 0.85 ? "text-primary" : "text-muted-foreground/70"
+          }`}
+        >
+          {value.length} / {max}
+        </span>
+      )}
+    </div>
+  );
+}
+
+interface TipChipsProps {
+  label?: string;
+  chips: string[];
+}
+
+export function TipChips({ label = "Try mentioning", chips }: TipChipsProps) {
+  if (!chips.length) return null;
+  return (
+    <div className="mt-4">
+      <p className="mb-2.5 text-[11px] font-semibold uppercase tracking-[0.12em] text-muted-foreground/80">
+        {label}
+      </p>
+      <div className="flex flex-wrap gap-2">
+        {chips.map((chip) => (
+          <span
+            key={chip}
+            className="rounded-full border border-border/70 bg-secondary/70 px-3.5 py-1.5 text-[13px] font-medium text-muted-foreground"
+          >
+            {chip}
+          </span>
+        ))}
+      </div>
+    </div>
   );
 }

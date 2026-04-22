@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useMemo, useState } from "react";
 import { createFileRoute, useNavigate } from "@tanstack/react-router";
 import { QuizShell } from "@/components/QuizShell";
 import {
@@ -7,8 +7,22 @@ import {
   Question,
   TextArea,
   TextInput,
+  TipChips,
 } from "@/components/QuizInputs";
 import { useQuizStore } from "@/stores/quizStore";
+import {
+  getProfile,
+  journeyOptions,
+  themeOptions,
+  q4Copy,
+  q5Copy,
+  q6Copy,
+  q8Copy,
+  q4Tips,
+  q5Tips,
+  q6Tips,
+  q8Tips,
+} from "@/lib/quizCopy";
 
 export const Route = createFileRoute("/create")({
   component: CreatePage,
@@ -37,25 +51,6 @@ const RELATIONSHIPS = [
   "Other",
 ] as const;
 
-const STAGES = [
-  "Just diagnosed",
-  "In treatment",
-  "Between treatments",
-  "In remission / survivor",
-  "In hospice / final chapter",
-  "In loving memory",
-] as const;
-
-const MESSAGES = [
-  "You are not alone",
-  "I'm so proud of your strength",
-  "Keep fighting, we're with you",
-  "Thank you for everything",
-  "It's okay to rest now",
-  "Your love lives on in us",
-  "We will carry you through this",
-] as const;
-
 const GENRES = [
   "Acoustic Folk",
   "Pop",
@@ -67,6 +62,8 @@ const GENRES = [
 
 const TEMPOS = ["Slow & Tender", "Mid-tempo", "Upbeat & Triumphant"] as const;
 const VOICES = ["Female Voice", "Male Voice", "Duet", "No Preference"] as const;
+
+const emailRe = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
 
 type QuizSnapshot = ReturnType<typeof useQuizStore.getState>;
 
@@ -80,28 +77,42 @@ type Step = {
   nextLabel?: string;
 };
 
-const emailRe = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
-
 function CreatePage() {
   const navigate = useNavigate();
   const q = useQuizStore();
   const [index, setIndex] = useState(0);
 
-  const name = q.recipient_name.trim() || "them";
+  const profile = useMemo(
+    () => getProfile(q.relationship, q.relationship_other, q.recipient_name, q.stage),
+    [q.relationship, q.relationship_other, q.recipient_name, q.stage],
+  );
+  const name = profile.name;
+
+  const journey = useMemo(() => journeyOptions(profile), [profile]);
+  const themes = useMemo(() => themeOptions(profile.stage), [profile.stage]);
+  const c4 = useMemo(() => q4Copy(profile), [profile]);
+  const c5 = useMemo(() => q5Copy(profile), [profile]);
+  const c6 = useMemo(() => q6Copy(profile), [profile]);
+  const c8 = useMemo(() => q8Copy(profile), [profile]);
+
+  // If a previously-selected theme is no longer valid for the current stage, clear it.
+  if (q.message && !themes.some((t) => t.value === q.message)) {
+    q.set("message", undefined);
+  }
 
   const steps: Step[] = [
-    // 1. Relationship + name (with inline "Other" reveal)
+    // 1. Relationship + (Other reveal) + first name
     {
       chapter: "Who they are",
       title: "Who is this song for?",
-      subtitle: "Their name and your relationship help us write in the right voice.",
+      subtitle: "Pick whoever fits closest. We'll use their name in the song.",
       isValid: (s) =>
         !!s.relationship &&
-        s.recipient_name.trim().length > 0 &&
+        s.recipient_name.trim().length > 1 &&
         (s.relationship !== "Other" || s.relationship_other.trim().length > 1),
       render: () => (
-        <div className="space-y-6">
-          <Question label="They are my...">
+        <div className="space-y-7">
+          <Question label="They are my…">
             <PillSelect
               options={RELATIONSHIPS}
               value={q.relationship}
@@ -110,148 +121,192 @@ function CreatePage() {
             />
           </Question>
           {q.relationship === "Other" && (
-            <Question label="Who are they to you?">
+            <Question label="Tell us how you know them" helper="A few words. Whatever feels true.">
               <TextInput
-                placeholder="My godmother, my best friend…"
+                placeholder="e.g. aunt, neighbor, godmother, best friend since childhood"
                 value={q.relationship_other}
                 onChange={(e) => q.set("relationship_other", e.target.value)}
-                maxLength={120}
+                maxLength={80}
                 autoFocus
               />
             </Question>
           )}
-          <Question label="Their first name">
+          <Question label="Their first name" helper="Just their first name.">
             <TextInput
-              placeholder="e.g. Maria"
+              placeholder="e.g. Sarah"
               value={q.recipient_name}
               onChange={(e) => q.set("recipient_name", e.target.value)}
-              maxLength={80}
+              maxLength={40}
             />
           </Question>
         </div>
       ),
     },
 
-    // 2. Stage
+    // 2. Journey stage (rich radio with sub-copy)
     {
       chapter: "Their fight",
       title: `Where is ${name} in their journey?`,
-      subtitle: "This shapes the emotional tone of the song.",
+      subtitle: "Pick what's closest right now. This shapes the tone of the whole song.",
       isValid: (s) => !!s.stage,
       render: () => (
         <Question label="Choose what fits best today">
-          <ListSelect
-            options={STAGES}
-            value={q.stage}
-            onChange={(v) => q.set("stage", v)}
-          />
+          <div className="space-y-2.5">
+            {journey.map((opt) => {
+              const active = q.stage === opt.value;
+              return (
+                <button
+                  key={opt.value}
+                  type="button"
+                  onClick={() => q.set("stage", opt.value)}
+                  className={`flex w-full items-start justify-between gap-4 rounded-2xl border p-5 text-left transition-all ${
+                    active
+                      ? "border-primary bg-accent shadow-soft"
+                      : "border-border bg-card hover:border-primary/50 hover:bg-accent/40"
+                  }`}
+                >
+                  <span className="flex-1">
+                    <span className="block font-display text-lg font-medium text-foreground">
+                      {opt.title}
+                    </span>
+                    <span className="mt-1 block text-sm leading-relaxed text-muted-foreground">
+                      {opt.sub}
+                    </span>
+                  </span>
+                  <span
+                    className={`mt-1 flex h-5 w-5 shrink-0 items-center justify-center rounded-full border-2 transition-all ${
+                      active ? "border-primary bg-primary" : "border-border"
+                    }`}
+                  >
+                    {active && (
+                      <span className="h-2 w-2 rounded-full bg-primary-foreground" />
+                    )}
+                  </span>
+                </button>
+              );
+            })}
+          </div>
         </Question>
       ),
     },
 
-    // 3. Fighting for
+    // 3. Q4 — fighting for / holding onto / lived for
     {
       chapter: "Their fight",
-      title: `Who or what is ${name} fighting for?`,
-      subtitle: "The people, dreams, or moments that pull them forward.",
-      isValid: (s) => s.fighting_for.trim().length > 2,
+      title: c4.question,
+      subtitle: c4.helper,
+      isValid: (s) => s.fighting_for.trim().length >= 15,
       render: () => (
-        <Question label="They are fighting for...">
+        <Question label={c4.sublabel}>
           <TextArea
-            placeholder="Their grandkids. Walking their daughter down the aisle. One more summer at the lake…"
+            placeholder={c4.placeholder}
             value={q.fighting_for}
             onChange={(e) => q.set("fighting_for", e.target.value)}
-            maxLength={500}
-            rows={4}
+            maxLength={200}
+            rows={5}
+            showCount
             autoFocus
           />
+          <TipChips chips={q4Tips(profile)} />
         </Question>
       ),
     },
 
-    // 4a. Qualities
+    // 4. Q5 — qualities
     {
       chapter: "Their soul",
-      title: "What do you love most about them?",
-      subtitle: "The qualities that make them, them.",
-      isValid: (s) => s.qualities.trim().length > 2,
+      title: c5.question,
+      subtitle: c5.helper,
+      isValid: (s) => s.qualities.trim().length >= 15,
       render: () => (
-        <Question label="The qualities you love most">
+        <Question label={c5.sublabel}>
           <TextArea
-            placeholder="Wickedly funny. Patient. Stubborn in the best way…"
+            placeholder={c5.placeholder}
             value={q.qualities}
             onChange={(e) => q.set("qualities", e.target.value)}
-            maxLength={500}
-            rows={4}
+            maxLength={200}
+            rows={5}
+            showCount
           />
+          <TipChips chips={q5Tips(profile)} />
         </Question>
       ),
     },
 
-    // 4b. Memory
+    // 5. Q6 — one memory
     {
       chapter: "Their soul",
-      title: "Share a memory you'll never forget.",
-      subtitle: "One moment with them that always stays with you.",
-      isValid: (s) => s.shared_memory.trim().length > 2,
+      title: c6.question,
+      subtitle: c6.helper,
+      isValid: (s) => s.shared_memory.trim().length >= 15,
       render: () => (
-        <Question label="A memory you will never forget">
+        <Question label={c6.sublabel}>
           <TextArea
-            placeholder="Dancing in the kitchen on Christmas morning. The day she taught me to ride a bike…"
+            placeholder={c6.placeholder}
             value={q.shared_memory}
             onChange={(e) => q.set("shared_memory", e.target.value)}
-            maxLength={600}
+            maxLength={300}
             rows={5}
+            showCount
           />
+          <TipChips chips={q6Tips(profile)} />
         </Question>
       ),
     },
 
-    // 5a. Core message
+    // 6. Q7 — theme (filtered by stage)
     {
       chapter: "The message",
-      title: `What do you want ${name} to hear?`,
-      subtitle: "Pick the heart of the song.",
-      isValid: (s) => !!s.message,
+      title: "What's the heart of this song?",
+      subtitle: "Pick the one that says what you most want them to feel when they hear it.",
+      isValid: (s) => !!s.message && themes.some((t) => t.value === s.message),
       render: () => (
-        <Question label="The heart of the song">
+        <Question label="Choose what fits">
           <ListSelect
-            options={MESSAGES}
-            value={q.message}
-            onChange={(v) => q.set("message", v)}
+            options={themes.map((t) => t.title)}
+            value={themes.find((t) => t.value === q.message)?.title}
+            onChange={(label) => {
+              const found = themes.find((t) => t.title === label);
+              if (found) q.set("message", found.value);
+            }}
           />
         </Question>
       ),
     },
 
-    // 5b. Personal words
+    // 7. Q8 — letter
     {
       chapter: "The message",
-      title: `What do you wish you could say to ${name}?`,
-      subtitle: "Write to them like a letter. We will weave your words into the lyrics.",
-      isValid: (s) => s.personal_words.trim().length > 2,
+      title: c8.question,
+      subtitle: c8.helper,
+      isValid: (s) => s.personal_words.trim().length >= 40,
       render: () => (
-        <Question label="Your words to them">
+        <Question label={c8.sublabel}>
           <TextArea
-            placeholder={`${name === "them" ? "Mom" : name}, I do not say this enough...`}
+            placeholder={c8.placeholder}
             value={q.personal_words}
             onChange={(e) => q.set("personal_words", e.target.value)}
-            maxLength={1000}
-            rows={5}
+            maxLength={800}
+            rows={8}
+            showCount
             autoFocus
+          />
+          <TipChips
+            label="Things that make letters unforgettable"
+            chips={q8Tips(profile)}
           />
         </Question>
       ),
     },
 
-    // 6. Sound — genre + tempo + voice
+    // 8. Sound — genre + tempo + voice
     {
       chapter: "Their sound",
-      title: "What should the song sound like?",
-      subtitle: "Genre, pace, and voice all on one screen.",
+      title: "How should it sound?",
+      subtitle: "Pick what feels right. We'll shape everything to fit.",
       isValid: (s) => !!s.genre && !!s.tempo && !!s.voice,
       render: () => (
-        <div className="space-y-6">
+        <div className="space-y-7">
           <Question label="Genre">
             <PillSelect
               options={GENRES}
@@ -260,7 +315,7 @@ function CreatePage() {
               columns={2}
             />
           </Question>
-          <Question label="Tempo and energy">
+          <Question label="Tempo">
             <PillSelect
               options={TEMPOS}
               value={q.tempo}
@@ -280,21 +335,21 @@ function CreatePage() {
       ),
     },
 
-    // 7. Buyer name + email
+    // 9. Buyer name + email
     {
       chapter: "Delivery",
       title: "Where should we send it?",
-      subtitle: "We will email you when it is ready, usually within 7 days.",
+      subtitle: "We'll email you when it is ready, usually within 7 days.",
       isValid: (s) =>
-        s.buyer_name.trim().length > 0 && emailRe.test(s.buyer_email),
+        s.buyer_name.trim().length > 1 && emailRe.test(s.buyer_email),
       render: () => (
         <div className="space-y-6">
           <Question label="Your name">
             <TextInput
-              placeholder="Your full name"
+              placeholder="Your first name"
               value={q.buyer_name}
               onChange={(e) => q.set("buyer_name", e.target.value)}
-              maxLength={80}
+              maxLength={60}
             />
           </Question>
           <Question label="Your email">
@@ -310,22 +365,23 @@ function CreatePage() {
       ),
     },
 
-    // 8. Gift toggle
+    // 10. Gift toggle
     {
       chapter: "Delivery",
       title: "Send it directly to them?",
       subtitle: "Or keep it private and share it your own way.",
       isValid: (s) =>
         !s.is_gift || s.recipient_email === "" || emailRe.test(s.recipient_email),
+      nextLabel: "Review my order",
       render: () => (
         <div className="space-y-6">
           <Question label="Send as a gift?">
-            <div className="flex items-center gap-3">
+            <div className="flex items-start gap-4">
               <button
                 type="button"
                 onClick={() => q.set("is_gift", !q.is_gift)}
-                className={`relative h-7 w-12 rounded-full transition-colors ${
-                  q.is_gift ? "bg-primary" : "bg-peach"
+                className={`relative h-7 w-12 shrink-0 rounded-full transition-colors ${
+                  q.is_gift ? "bg-primary" : "bg-border"
                 }`}
                 aria-pressed={q.is_gift}
               >
@@ -335,7 +391,7 @@ function CreatePage() {
                   }`}
                 />
               </button>
-              <span className="text-sm text-muted-foreground">
+              <span className="text-sm leading-relaxed text-muted-foreground">
                 {q.is_gift
                   ? "We will deliver the song to them on a date you choose."
                   : "We will send it to you to share however you like."}
@@ -344,11 +400,11 @@ function CreatePage() {
           </Question>
 
           {q.is_gift && (
-            <div className="space-y-6 rounded-3xl border border-dashed border-peach bg-card/60 p-6 animate-in fade-in slide-in-from-top-2">
+            <div className="space-y-6 rounded-3xl border border-dashed border-border bg-secondary/40 p-6 animate-in fade-in slide-in-from-top-2">
               <Question label="Their email (optional)">
                 <TextInput
                   type="email"
-                  placeholder="their@email.com"
+                  placeholder="recipient@example.com"
                   value={q.recipient_email}
                   onChange={(e) => q.set("recipient_email", e.target.value)}
                   maxLength={120}
@@ -366,15 +422,15 @@ function CreatePage() {
                   placeholder="A few warm words to greet them when they open the gift…"
                   value={q.personal_note}
                   onChange={(e) => q.set("personal_note", e.target.value)}
-                  maxLength={400}
+                  maxLength={300}
                   rows={3}
+                  showCount
                 />
               </Question>
             </div>
           )}
         </div>
       ),
-      nextLabel: "Review my order",
     },
   ];
 
