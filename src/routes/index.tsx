@@ -477,12 +477,12 @@ function LandingPage() {
                 <img
                   src={rachelPhoto}
                   alt="Rachel and her mother holding hands in the car after her last chemo infusion"
-                  className={`h-full w-full object-cover transition-transform duration-[8000ms] ease-out ${
-                    heroPlaying ? "scale-110" : "scale-100"
+                  className={`h-full w-full object-contain bg-[#1F1B16] ${
+                    heroPlaying ? "animate-photo-shake" : ""
                   }`}
                   onClick={handleHeroPlay}
                 />
-                <div className="pointer-events-none absolute inset-x-0 bottom-0 h-1/2 bg-gradient-to-t from-black/55 via-black/15 to-transparent" />
+                <div className="pointer-events-none absolute inset-x-0 bottom-0 h-1/3 bg-gradient-to-t from-black/55 via-black/15 to-transparent" />
 
                 <audio
                   ref={heroAudioRef}
