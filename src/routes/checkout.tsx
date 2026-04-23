@@ -1,12 +1,12 @@
 import { createFileRoute, useNavigate, Link } from "@tanstack/react-router";
-import { useEffect, useMemo, useState } from "react";
-import { EmbeddedCheckoutProvider, EmbeddedCheckout } from "@stripe/react-stripe-js";
+import { useEffect, useState } from "react";
 import { Logo } from "@/components/Logo";
 import { PaymentTestModeBanner } from "@/components/PaymentTestModeBanner";
 import { AudioPlayer } from "@/components/AudioPlayer";
+import { CustomPaymentForm } from "@/components/CustomPaymentForm";
 import { useQuizStore, journeyStageOf, tenseOf } from "@/stores/quizStore";
 import { supabase } from "@/integrations/supabase/client";
-import { getStripe, stripeEnvironment } from "@/lib/stripe";
+import { stripeEnvironment } from "@/lib/stripe";
 import {
   ArrowLeft,
   CheckCircle2,
