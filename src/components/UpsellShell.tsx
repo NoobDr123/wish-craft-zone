@@ -1,5 +1,6 @@
 import { Gift, ShieldCheck, Sparkles, AlertTriangle } from "lucide-react";
 import { Logo } from "./Logo";
+import { CheckoutProgress } from "./CheckoutProgress";
 
 interface UpsellShellProps {
   step: 1 | 2 | 3;
@@ -34,16 +35,19 @@ export function UpsellShell({
 
   return (
     <div className="min-h-screen bg-background">
-      {/* Payment-in-progress warning bar — sticky at the very top */}
-      <div className="sticky top-0 z-50 w-full border-b border-red-300 bg-red-50">
-        <div className="mx-auto flex max-w-3xl items-center justify-center gap-2 px-4 py-2.5 text-center">
-          <AlertTriangle className="h-4 w-4 shrink-0 text-red-600" />
-          <p className="text-xs font-semibold text-red-700 md:text-sm">
+      {/* Payment-in-progress warning bar — sticky at the very top, themed */}
+      <div className="sticky top-0 z-50 w-full border-b border-primary/20 bg-primary/10 backdrop-blur-md">
+        <div className="mx-auto flex max-w-2xl items-center justify-center gap-2 px-4 py-2.5 text-center">
+          <AlertTriangle className="h-4 w-4 shrink-0 text-primary" />
+          <p className="text-xs font-semibold text-primary md:text-sm">
             We are completing your payment. Don't close or refresh this page —
             it can cause double charges.
           </p>
         </div>
       </div>
+
+      {/* Themed progress: Payment ✓ → Bonus (current) → Log in */}
+      <CheckoutProgress current={2} />
 
       <header className="px-6 pt-6">
         <div className="mx-auto flex max-w-3xl items-center justify-between">
@@ -95,7 +99,19 @@ export function UpsellShell({
             </ul>
           )}
 
-          <div className="mt-10 space-y-3">
+          {/* Price line — sits cleanly above the CTA, not crammed inside it */}
+          {priceLabel && (
+            <div className="mt-8 flex items-baseline justify-between border-t border-border/60 pt-5">
+              <span className="text-sm font-medium uppercase tracking-wider text-muted-foreground">
+                One-time add-on
+              </span>
+              <span className="font-display text-3xl font-semibold text-foreground">
+                {priceLabel}
+              </span>
+            </div>
+          )}
+
+          <div className="mt-6 space-y-3">
             <button
               onClick={onAccept}
               disabled={processing}
@@ -110,7 +126,6 @@ export function UpsellShell({
                 <>
                   <Gift className="h-5 w-5" />
                   {ctaText}
-                  {priceLabel && <span className="font-bold">— {priceLabel}</span>}
                 </>
               )}
             </button>
