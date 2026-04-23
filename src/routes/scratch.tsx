@@ -3,6 +3,7 @@ import { useEffect, useMemo, useRef, useState } from "react";
 import confetti from "canvas-confetti";
 import { Logo } from "@/components/Logo";
 import { journeyStageOf, useQuizStore } from "@/stores/quizStore";
+import { prefetchCheckout } from "@/lib/checkoutPrefetch";
 import { ArrowLeft, ArrowRight, Gift, Timer, AlertTriangle, Flame, Heart, Sparkles } from "lucide-react";
 
 export const Route = createFileRoute("/scratch")({
