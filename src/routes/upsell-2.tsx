@@ -74,13 +74,13 @@ function Upsell2() {
           <>
             Standard delivery takes up to 5 days. Skip the line and get their
             finished song in the next{" "}
-            <span className="font-semibold text-foreground">24 hours</span> —
-            perfect if the gift moment is coming up — for just{" "}
+            <span className="font-semibold text-foreground">24 hours</span>,
+            perfect if the gift moment is coming up, for just{" "}
             <span className="font-semibold text-foreground">$29.99</span>.
           </>
         }
         highlights={[
-          "Front of the queue — we start producing within the hour",
+          "Front of the queue, we start producing within the hour",
           "Personally reviewed by our team before it reaches you",
           "Emailed the moment it's ready, day or night",
         ]}

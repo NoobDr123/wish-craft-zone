@@ -40,8 +40,8 @@ export function UpsellShell({
         <div className="mx-auto flex max-w-2xl items-center justify-center gap-2 px-4 py-2.5 text-center">
           <AlertTriangle className="h-4 w-4 shrink-0 text-red-600" />
           <p className="text-xs font-semibold text-red-600 md:text-sm">
-            We are completing your payment. Don't close or refresh this page —
-            it can cause double charges.
+            We are completing your payment. Don't close or refresh this page.
+            It can cause double charges.
           </p>
         </div>
       </div>
@@ -63,8 +63,8 @@ export function UpsellShell({
         <div className="mb-4 flex items-start gap-2.5 rounded-xl border border-success/30 bg-success/5 px-3.5 py-2.5 sm:mb-5 sm:items-center sm:gap-3 sm:rounded-2xl sm:px-4 sm:py-3">
           <Gift className="mt-0.5 h-4 w-4 shrink-0 text-success sm:mt-0 sm:h-5 sm:w-5" />
           <p className="text-[13px] font-medium leading-snug text-foreground sm:text-sm">
-            Make their gift even more meaningful — one-time offer, only
-            available right now.
+            Make their gift even more meaningful. One-time offer, only available
+            right now.
           </p>
         </div>
 
@@ -136,7 +136,7 @@ export function UpsellShell({
 
             <p className="flex items-center justify-center gap-1.5 text-center text-[11px] text-muted-foreground sm:text-xs">
               <ShieldCheck className="h-3 w-3 text-success sm:h-3.5 sm:w-3.5" />
-              No new card needed — billed to the card you just used.
+              No new card needed. Billed to the card you just used.
             </p>
 
             <button

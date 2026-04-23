@@ -52,13 +52,13 @@ function Upsell1() {
     <UpsellShell
       step={1}
       badge="Make their song unforgettable"
-      headline="Add a heartfelt bridge & a 3rd verse"
+      headline="Add a heartfelt bridge and a 3rd verse"
       description={
         <>
           Your song already comes with two verses and a chorus. Add a tender
-          bridge and a third verse — about{" "}
+          bridge and a third verse, about{" "}
           <span className="font-semibold text-foreground">90 extra seconds</span>{" "}
-          of music — for only{" "}
+          of music, for only{" "}
           <span className="font-semibold text-foreground">$19.99</span>. This is
           where most people say the tears start.
         </>

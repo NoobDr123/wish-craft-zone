@@ -60,7 +60,7 @@ export function Delivery48Downsell({
         <div className="flex items-center gap-2 border-b border-primary/20 bg-primary/10 px-4 py-2.5 sm:px-5">
           <Clock className="h-3.5 w-3.5 text-primary" />
           <p className="text-[10px] font-bold uppercase tracking-[0.16em] text-primary sm:text-[11px]">
-            Wait — better deal inside
+            Wait, better deal inside
           </p>
         </div>
 
@@ -76,7 +76,7 @@ export function Delivery48Downsell({
           <p className="mt-2.5 text-sm leading-relaxed text-muted-foreground">
             Not in a rush, but still don't want to wait 5 days? Skip ahead and
             get their song in{" "}
-            <span className="font-semibold text-foreground">2 days</span> — at
+            <span className="font-semibold text-foreground">2 days</span>, at
             two-thirds off the 24-hour price.
           </p>
 
@@ -91,7 +91,7 @@ export function Delivery48Downsell({
             </li>
             <li className="flex items-start gap-2.5">
               <span className="mt-1.5 h-1.5 w-1.5 shrink-0 rounded-full bg-success" />
-              <span>One-time price — no subscriptions, no extras</span>
+              <span>One-time price, no subscriptions, no extras</span>
             </li>
           </ul>
 
