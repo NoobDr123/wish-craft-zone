@@ -431,12 +431,53 @@ function ThankYouPage() {
             </li>
           </ul>
 
-          <Link
-            to="/dashboard"
-            className="mt-5 flex w-full items-center justify-center gap-2 rounded-xl bg-primary px-5 py-3.5 text-[15px] font-bold text-primary-foreground shadow-glow transition-all hover:brightness-95 active:scale-[0.99] sm:mt-6 sm:rounded-2xl sm:px-6 sm:py-4 sm:text-base"
-          >
-            Go to my dashboard
-          </Link>
+          {magicLinkStatus === "sent" ? (
+            <div className="mt-5 rounded-xl border border-success/30 bg-success/10 p-4 text-center sm:mt-6 sm:rounded-2xl sm:p-5">
+              <div className="mx-auto flex h-10 w-10 items-center justify-center rounded-full bg-success/20">
+                <Mail className="h-5 w-5 text-success" />
+              </div>
+              <p className="mt-2.5 font-display text-base font-bold text-foreground sm:text-lg">
+                Check your inbox
+              </p>
+              <p className="mt-1 text-[13px] leading-relaxed text-muted-foreground sm:text-sm">
+                We just sent a one-tap sign-in link to{" "}
+                <span className="break-all font-semibold text-foreground">
+                  {buyerEmail}
+                </span>
+                . Open it on this device to land in your dashboard instantly.
+              </p>
+            </div>
+          ) : (
+            <button
+              type="button"
+              onClick={() => sendMagicLink(buyerEmail)}
+              disabled={magicLinkStatus === "sending" || !buyerEmail}
+              className="mt-5 flex w-full items-center justify-center gap-2 rounded-xl bg-primary px-5 py-3.5 text-[15px] font-bold text-primary-foreground shadow-glow transition-all hover:brightness-95 active:scale-[0.99] disabled:cursor-not-allowed disabled:opacity-60 disabled:shadow-none sm:mt-6 sm:rounded-2xl sm:px-6 sm:py-4 sm:text-base"
+            >
+              {magicLinkStatus === "sending" ? (
+                <>
+                  <Loader2 className="h-4 w-4 animate-spin" /> Sending sign-in
+                  link…
+                </>
+              ) : (
+                <>
+                  Go to my dashboard <ArrowRight className="h-4 w-4" />
+                </>
+              )}
+            </button>
+          )}
+          {magicLinkStatus === "error" && magicLinkError && (
+            <p className="mt-2 text-center text-xs font-medium text-destructive">
+              {magicLinkError}
+            </p>
+          )}
+          {magicLinkStatus !== "sent" && buyerEmail && (
+            <p className="mt-2 text-center text-[11px] text-muted-foreground sm:text-xs">
+              We'll email a one-tap sign-in link to{" "}
+              <span className="font-semibold text-foreground">{buyerEmail}</span>
+              . No password needed.
+            </p>
+          )}
         </section>
       </main>
     </div>
