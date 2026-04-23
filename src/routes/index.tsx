@@ -673,9 +673,14 @@ function LandingPage() {
           }}
         />
         <div className="mx-auto max-w-[1200px] px-5 sm:px-6">
+          <div className="mb-8 flex w-full justify-center text-center sm:mb-10 md:mb-12">
+            <div className="inline-flex items-center gap-2.5 text-[13px] font-semibold uppercase tracking-[0.18em] text-[#8D6FAF] sm:text-[15px] md:text-[17px]">
+              <span className="h-2 w-2 rounded-full bg-[#8D6FAF]" />
+              The Most Meaningful Gift For Someone You Love Fighting Cancer
+            </div>
+          </div>
           <div className="grid items-center gap-8 md:grid-cols-[1.15fr_1fr] md:gap-[60px]">
             <div className="order-2 md:order-1">
-              <Eyebrow center className="flex w-full">The Most Meaningful Gift For Someone You Love Fighting Cancer</Eyebrow>
               <h1 className="mb-[22px] max-w-[700px] font-display text-[clamp(28px,7.5vw,64px)] font-medium italic leading-[1.08] tracking-[-0.025em] text-[#1F1B16] md:mb-[26px]">
                 <span className="font-display text-[1.05em] font-semibold not-italic text-[#8D6FAF]">
                   &ldquo;
