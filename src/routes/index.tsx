@@ -665,13 +665,6 @@ function LandingPage() {
 
       {/* HERO */}
       <section className="relative overflow-hidden px-0 py-[40px] pb-[40px] sm:py-[70px] sm:pb-[60px]">
-        <div
-          className="pointer-events-none absolute -right-[120px] -top-[100px] h-[420px] w-[420px] rounded-full opacity-60"
-          style={{
-            background:
-              "radial-gradient(circle, #E5D9EF 0%, transparent 70%)",
-          }}
-        />
         <div className="mx-auto max-w-[1200px] px-5 sm:px-6">
           <div className="mb-8 flex w-full justify-center text-center sm:mb-10 md:mb-12">
             <div className="inline-flex items-center gap-2.5 text-[13px] font-semibold uppercase tracking-[0.18em] text-[#8D6FAF] sm:text-[15px] md:text-[17px]">
