@@ -478,27 +478,10 @@ function LandingPage() {
               <div className="mb-7 flex w-full flex-col items-stretch gap-3 sm:w-auto sm:flex-row sm:flex-wrap sm:items-center sm:gap-4">
                 <PrimaryBtn large fullWidth>Start My Custom Song ❤️</PrimaryBtn>
               </div>
-              <div className="text-[13px] leading-[1.4] text-[#5A5148] md:text-[13.5px]">
-                Delivered With Love, Prayer, & Care In 7 Days
-              </div>
-              <div className="mt-8 flex items-center gap-3.5 pt-2 md:mt-9">
-                <div className="flex shrink-0">
-                  {[47, 32, 26, 44, 16].map((id, i) => (
-                    <img
-                      key={id}
-                      src={`https://i.pravatar.cc/80?img=${id}`}
-                      alt=""
-                      className={`h-9 w-9 rounded-full border-[2.5px] border-[#F6F0E6] object-cover ${
-                        i === 0 ? "" : "-ml-2.5"
-                      }`}
-                    />
-                  ))}
-                </div>
-                <div className="text-[13px] leading-[1.4] text-[#5A5148] md:text-[13.5px]">
-                  Loved by{" "}
-                  <strong className="text-[#1F1B16]">2,400+ families</strong>{" "}
-                  fighting, surviving, and remembering
-                </div>
+              <div className="text-center text-[13px] leading-[1.4] text-[#5A5148] md:text-[13.5px]">
+                Loved by{" "}
+                <strong className="text-[#1F1B16]">2,400+ families</strong>{" "}
+                fighting, surviving, and remembering
               </div>
             </div>
 
