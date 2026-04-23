@@ -189,6 +189,9 @@ function ScratchPage() {
       }
     }
     fireConfetti();
+    // High-intent moment: warm Stripe.js + create the order/PaymentIntent in
+    // the background so /checkout can mount the form instantly on arrival.
+    prefetchCheckout();
     // Auto-advance to claim screen after a short delay
     setTimeout(() => setStage("claim"), 1400);
   };
@@ -416,6 +419,9 @@ function ScratchPage() {
           {/* CTA */}
           <button
             onClick={() => navigate({ to: "/checkout" })}
+            onMouseEnter={() => prefetchCheckout()}
+            onTouchStart={() => prefetchCheckout()}
+            onFocus={() => prefetchCheckout()}
             className="mt-6 flex w-full items-center justify-center gap-2 rounded-full bg-primary px-8 py-5 text-base font-bold text-primary-foreground shadow-glow transition-all hover:bg-primary-hover active:scale-[0.99]"
           >
             <Gift className="h-5 w-5" />
