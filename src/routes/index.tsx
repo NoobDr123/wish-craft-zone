@@ -338,7 +338,7 @@ function PrimaryBtn({
       to={to}
       className={`group inline-flex items-center justify-center gap-2.5 rounded-full bg-[#8D6FAF] font-semibold text-[#FFF7EE] tracking-[0.005em] shadow-[0_6px_16px_rgba(141,111,175,0.28)] transition-all hover:-translate-y-px hover:bg-[#6B4F8A] hover:shadow-[0_10px_24px_rgba(141,111,175,0.35)] ${
         large ? "px-[34px] py-[18px] text-[16.5px]" : "px-[26px] py-[14px] text-[15px]"
-      } ${fullWidth ? "w-full sm:w-auto" : ""}`}
+      } ${fullWidth ? "w-full" : ""}`}
     >
       {children}
       <span className="transition-transform group-hover:translate-x-1">→</span>
@@ -475,7 +475,7 @@ function LandingPage() {
                   inbox.
                 </strong>
               </p>
-              <div className="mb-7 flex w-full flex-col items-stretch gap-3 sm:w-auto sm:flex-row sm:flex-wrap sm:items-center sm:gap-4">
+              <div className="mb-7 flex w-full flex-col items-stretch gap-3 sm:max-w-[420px]">
                 <PrimaryBtn large fullWidth>Start My Custom Song ❤️</PrimaryBtn>
               </div>
               <div className="text-center text-[13px] leading-[1.4] text-[#5A5148] md:text-[13.5px]">
