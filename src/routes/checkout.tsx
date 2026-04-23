@@ -295,6 +295,8 @@ function CheckoutPage() {
       </main>
 
       <CheckoutFooter />
+
+      <ReviewSurveyModal open={reviewOpen} onClose={() => setReviewOpen(false)} />
     </div>
   );
 }
