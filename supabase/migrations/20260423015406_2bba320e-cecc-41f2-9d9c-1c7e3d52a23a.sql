@@ -1,0 +1,1 @@
+GRANT SELECT ON TABLE public.featured_samples TO anon, authenticated;
