@@ -15,9 +15,7 @@ serve(async (req) => {
     if (!orderId || typeof orderId !== "string") {
       return json({ error: "Missing orderId" }, 400);
     }
-    if (!email || typeof email !== "string") {
-      return json({ error: "Missing email" }, 400);
-    }
+    const emailStr = typeof email === "string" && email.trim() ? email.trim() : null;
 
     const env = (environment || "sandbox") as StripeEnv;
     const stripe = createStripeClient(env);
