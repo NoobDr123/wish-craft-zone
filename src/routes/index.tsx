@@ -610,18 +610,48 @@ function LandingPage() {
                         src={s.cover_image_url}
                         alt=""
                         loading="lazy"
-                        className="h-full w-full object-cover transition-transform duration-700 group-hover:scale-[1.03]"
+                        className={`h-full w-full object-cover transition-all duration-700 ${
+                          isPlaying
+                            ? "scale-110 blur-md brightness-[0.55]"
+                            : "group-hover:scale-[1.03]"
+                        }`}
                       />
                     )}
+
+                    {/* Spinning vinyl when playing */}
+                    {isPlaying && s.cover_image_url && (
+                      <div className="pointer-events-none absolute inset-0 flex items-center justify-center">
+                        <div className="relative aspect-square h-[78%] animate-vinyl-spin">
+                          {/* Disc grooves */}
+                          <div className="absolute inset-0 rounded-full bg-[radial-gradient(circle_at_center,#1a1a1a_0%,#0a0a0a_45%,#1a1a1a_50%,#0a0a0a_55%,#1a1a1a_60%,#0a0a0a_65%,#1a1a1a_70%,#0a0a0a_75%,#1a1a1a_80%,#0a0a0a_85%,#1a1a1a_100%)] shadow-[0_20px_50px_-15px_rgba(0,0,0,0.6)]" />
+                          {/* Sheen */}
+                          <div className="absolute inset-0 rounded-full bg-[conic-gradient(from_120deg,transparent_0deg,rgba(255,255,255,0.08)_45deg,transparent_90deg,transparent_360deg)]" />
+                          {/* Cover photo as label */}
+                          <div className="absolute left-1/2 top-1/2 aspect-square w-[46%] -translate-x-1/2 -translate-y-1/2 overflow-hidden rounded-full ring-2 ring-[#1F1B16]/40">
+                            <img
+                              src={s.cover_image_url}
+                              alt=""
+                              className="h-full w-full object-cover"
+                            />
+                            <div className="absolute left-1/2 top-1/2 h-2.5 w-2.5 -translate-x-1/2 -translate-y-1/2 rounded-full bg-[#F6F0E6] ring-1 ring-black/30" />
+                          </div>
+                        </div>
+                      </div>
+                    )}
+
                     {s.audio_url ? (
                       <div
                         className={`absolute inset-0 flex items-center justify-center transition-colors ${
                           isPlaying
-                            ? "bg-[rgba(31,27,22,0.25)]"
+                            ? "bg-transparent"
                             : "bg-[rgba(31,27,22,0.0)] group-hover:bg-[rgba(31,27,22,0.25)]"
                         }`}
                       >
-                        <span className="flex h-14 w-14 items-center justify-center rounded-full bg-[#8D6FAF] shadow-[0_6px_18px_rgba(141,111,175,0.45)] transition-transform group-hover:scale-110">
+                        <span
+                          className={`relative z-10 flex h-14 w-14 items-center justify-center rounded-full bg-[#8D6FAF] shadow-[0_6px_18px_rgba(141,111,175,0.45)] transition-transform group-hover:scale-110 ${
+                            isPlaying ? "opacity-0 group-hover:opacity-100" : ""
+                          }`}
+                        >
                           {isPlaying ? (
                             <span className="flex gap-[4px]">
                               <span className="block h-4 w-[4px] rounded-sm bg-white" />
@@ -647,7 +677,7 @@ function LandingPage() {
                       </div>
                     )}
                     {isPlaying && (
-                      <div className="absolute left-3 top-3 flex items-center gap-1.5 rounded-full bg-[rgba(31,27,22,0.7)] px-2.5 py-1 text-[10px] font-semibold uppercase tracking-[0.12em] text-[#F6F0E6]">
+                      <div className="absolute left-3 top-3 z-10 flex items-center gap-1.5 rounded-full bg-[rgba(31,27,22,0.75)] px-2.5 py-1 text-[10px] font-semibold uppercase tracking-[0.12em] text-[#F6F0E6]">
                         <span className="flex h-1.5 w-1.5 animate-pulse rounded-full bg-[#E8C547]" />
                         Now playing
                       </div>
