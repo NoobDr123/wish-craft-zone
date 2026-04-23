@@ -19,7 +19,7 @@ import { AdminMfaChallenge } from "@/components/admin/AdminMfaChallenge";
 import { supabase } from "@/integrations/supabase/client";
 import { verifyAdminSlug } from "@/config/admin";
 
-export const Route = createFileRoute("/_admin/$slug")({
+export const Route = createFileRoute("/admin")({
   // Server-side gate — runs before component mounts, on every navigation.
   // If the slug doesn't match ADMIN_SLUG, we throw notFound() so the user
   // sees the standard 404 (no signal that this URL means anything).
