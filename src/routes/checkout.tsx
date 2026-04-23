@@ -337,7 +337,6 @@ function CheckoutPage() {
             {clientSecret && paymentIntentId && (
               <CustomPaymentForm
                 clientSecret={clientSecret}
-                paymentIntentId={paymentIntentId}
                 email={email.trim().toLowerCase()}
                 amountLabel="$49.99"
                 returnUrl={`${window.location.origin}/checkout/return?payment_intent_id=${paymentIntentId}`}
