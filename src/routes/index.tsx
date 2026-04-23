@@ -766,60 +766,7 @@ function LandingPage() {
         </div>
       </section>
 
-      {/* HOW IT WORKS */}
-      <section id="how" className="px-0 py-[64px] md:py-[100px]">
-        <div className="mx-auto max-w-[1200px] px-5 sm:px-6">
-          <div className="mx-auto mb-10 max-w-[720px] text-center md:mb-14">
-            <Eyebrow center>How it works</Eyebrow>
-            <h2 className="mb-3.5 font-display text-[clamp(28px,7vw,48px)] font-medium leading-[1.1] tracking-[-0.022em] text-[#1F1B16]">
-              Three gentle steps. <em className="italic text-[#8D6FAF]">Five days.</em>
-            </h2>
-            <p className="mx-auto mt-3.5 max-w-[560px] text-[17px] leading-[1.55] text-[#5A5148]">
-              You don't have to know music. You don't have to know what to say.
-              You just have to know them.
-            </p>
-          </div>
-
-          <div className="grid grid-cols-1 gap-8 md:grid-cols-3">
-            {[
-              {
-                n: "01",
-                h: "Tell their story.",
-                p: "A guided, unhurried conversation. Written, not a call. We ask the kinds of questions that bring the right memories up without you having to dig for them.",
-                m: "Takes about ten minutes. Families tell us this part alone is already a gift.",
-              },
-              {
-                n: "02",
-                h: "We write and record.",
-                p: "You pick the genre, the tempo, and the voice. Or let us recommend based on the story you shared. Acoustic folk, country, gospel, worship, uplifting pop, or cinematic strings.",
-                m: "Real production. Real arrangement. Built to be played, not just heard.",
-              },
-              {
-                n: "03",
-                h: "Delivered to your inbox.",
-                p: "In five days. Streaming and downloadable, yours forever. Share it, give it, play it at the bedside, the church, the memorial, or the kitchen sink.",
-                m: "If it doesn't feel right, we rewrite it free. Or refund you in full. No questions.",
-              },
-            ].map((s) => (
-              <div key={s.n} className="relative">
-                <div className="mb-4 font-display text-[44px] font-light leading-none text-[#8D6FAF] md:text-[52px]">
-                  {s.n}
-                </div>
-                <h3 className="mb-2.5 font-display text-[22px] font-medium leading-[1.2] tracking-[-0.01em] text-[#1F1B16] md:text-[24px]">
-                  {s.h}
-                </h3>
-                <p className="mb-3 text-[15px] leading-[1.6] text-[#5A5148] md:text-[15.5px]">
-                  {s.p}
-                </p>
-                <p className="text-[13.5px] italic leading-[1.55] text-[#8A8175]">
-                  {s.m}
-                </p>
-              </div>
-            ))}
-          </div>
-        </div>
-      </section>
-
+      {/* HOW IT WORKS moved up — see after PRESS STRIP */}
       {/* TESTIMONIALS */}
       <section id="stories" className="bg-[#ECE2D0] px-0 py-[64px] md:py-[100px]">
         <div className="mx-auto max-w-[1200px] px-5 sm:px-6">
