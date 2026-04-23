@@ -1,12 +1,12 @@
 import { createFileRoute, useNavigate, Link } from "@tanstack/react-router";
-import { useEffect, useMemo, useState } from "react";
-import { EmbeddedCheckoutProvider, EmbeddedCheckout } from "@stripe/react-stripe-js";
+import { useEffect, useState } from "react";
 import { Logo } from "@/components/Logo";
 import { PaymentTestModeBanner } from "@/components/PaymentTestModeBanner";
 import { AudioPlayer } from "@/components/AudioPlayer";
+import { CustomPaymentForm } from "@/components/CustomPaymentForm";
 import { useQuizStore, journeyStageOf, tenseOf } from "@/stores/quizStore";
 import { supabase } from "@/integrations/supabase/client";
-import { getStripe, stripeEnvironment } from "@/lib/stripe";
+import { stripeEnvironment } from "@/lib/stripe";
 import {
   ArrowLeft,
   CheckCircle2,
@@ -59,6 +59,7 @@ function CheckoutPage() {
   const [stage, setStage] = useState<"contact" | "payment">("contact");
   const [creating, setCreating] = useState(false);
   const [clientSecret, setClientSecret] = useState<string | null>(null);
+  const [paymentIntentId, setPaymentIntentId] = useState<string | null>(null);
   const [error, setError] = useState<string | null>(null);
 
   useEffect(() => {
@@ -174,12 +175,11 @@ function CheckoutPage() {
 
       q.set("orderId", newOrderId);
 
-      // 2. Ask the edge function to create the embedded checkout session
+      // 2. Ask the edge function to create a PaymentIntent
       const { data, error: fnError } = await supabase.functions.invoke("create-checkout", {
         body: {
           orderId: newOrderId,
           email: email.trim().toLowerCase(),
-          returnUrl: `${window.location.origin}/checkout/return?session_id={CHECKOUT_SESSION_ID}`,
           environment: stripeEnvironment,
         },
       });
@@ -192,6 +192,7 @@ function CheckoutPage() {
       }
 
       setClientSecret(data.clientSecret);
+      setPaymentIntentId(data.paymentIntentId);
       setStage("payment");
     } catch (e) {
       console.error("Checkout error:", e);
@@ -200,11 +201,6 @@ function CheckoutPage() {
       setCreating(false);
     }
   };
-
-  const checkoutOptions = useMemo(
-    () => (clientSecret ? { clientSecret } : null),
-    [clientSecret],
-  );
 
   return (
     <div className="min-h-screen bg-gradient-warm pb-32 lg:pb-16">
@@ -337,11 +333,15 @@ function CheckoutPage() {
             </p>
           </section>
         ) : (
-          <section className="mt-6 rounded-3xl border border-peach/70 bg-card p-2 shadow-card md:p-3">
-            {checkoutOptions && (
-              <EmbeddedCheckoutProvider stripe={getStripe()} options={checkoutOptions}>
-                <EmbeddedCheckout />
-              </EmbeddedCheckoutProvider>
+          <section className="mt-6 overflow-hidden rounded-3xl border border-peach/70 bg-card shadow-card">
+            {clientSecret && paymentIntentId && (
+              <CustomPaymentForm
+                clientSecret={clientSecret}
+                email={email.trim().toLowerCase()}
+                amountLabel="$49.99"
+                returnUrl={`${window.location.origin}/checkout/return?payment_intent_id=${paymentIntentId}`}
+                onError={(msg) => setError(msg)}
+              />
             )}
           </section>
         )}

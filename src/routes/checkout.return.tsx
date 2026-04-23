@@ -8,6 +8,12 @@ import { useQuizStore } from "@/stores/quizStore";
 export const Route = createFileRoute("/checkout/return")({
   component: CheckoutReturnPage,
   validateSearch: (search: Record<string, unknown>) => ({
+    payment_intent_id:
+      typeof search.payment_intent_id === "string" ? search.payment_intent_id : undefined,
+    payment_intent:
+      typeof search.payment_intent === "string" ? search.payment_intent : undefined,
+    // Legacy: keep accepting session_id so any in-flight redirect from the
+    // old embedded-checkout flow still resolves correctly.
     session_id: typeof search.session_id === "string" ? search.session_id : undefined,
   }),
   head: () => ({ meta: [{ title: "Payment confirmed · RibbonSong" }] }),
@@ -15,12 +21,17 @@ export const Route = createFileRoute("/checkout/return")({
 
 function CheckoutReturnPage() {
   const navigate = useNavigate();
-  const { session_id } = Route.useSearch();
+  const search = Route.useSearch();
   const q = useQuizStore();
   const [status, setStatus] = useState<"checking" | "ready" | "error">("checking");
 
+  // Prefer payment_intent_id (we set it explicitly), fall back to Stripe's
+  // standard payment_intent param, then to legacy session_id.
+  const paymentIntentId = search.payment_intent_id || search.payment_intent;
+  const sessionId = search.session_id;
+
   useEffect(() => {
-    if (!session_id) {
+    if (!paymentIntentId && !sessionId) {
       setStatus("error");
       return;
     }
@@ -28,23 +39,25 @@ function CheckoutReturnPage() {
     let cancelled = false;
     let attempts = 0;
 
-    // Poll the order until the webhook flips it to payment_status='paid'.
-    // Webhook usually arrives within 1–3s, but we'll wait up to ~15s.
     const poll = async () => {
       attempts += 1;
-      const { data: order } = await supabase
+
+      const query = supabase
         .from("orders")
-        .select("id, payment_status, status, amount_paid_cents, amount_cents, currency")
-        .eq("stripe_checkout_session_id", session_id)
-        .maybeSingle();
+        .select("id, payment_status, status, amount_paid_cents, amount_cents, currency, stripe_payment_intent_id");
+
+      const { data: order } = paymentIntentId
+        ? await query.eq("stripe_payment_intent_id", paymentIntentId).maybeSingle()
+        : await query.eq("stripe_checkout_session_id", sessionId!).maybeSingle();
 
       if (cancelled) return;
 
       if (order?.payment_status === "paid") {
         q.set("orderId", order.id);
-        q.set("checkoutSessionId", session_id);
+        if (paymentIntentId) q.set("checkoutSessionId", paymentIntentId);
+        else if (sessionId) q.set("checkoutSessionId", sessionId);
 
-        // Fire Meta Pixel Purchase event ONCE, before upsells, with real first-order value.
+        // Fire Meta Pixel Purchase event ONCE
         try {
           const fbq = (window as any).fbq;
           if (typeof fbq === "function" && !localStorage.getItem("rs_px_fired")) {
@@ -62,17 +75,14 @@ function CheckoutReturnPage() {
         }
 
         setStatus("ready");
-        // Tiny pause so the user sees the success state, then to the first upsell.
         setTimeout(() => navigate({ to: "/upsell-1" }), 800);
         return;
       }
 
       if (attempts > 15) {
-        // Webhook took too long — still send them to upsell-1 anyway. Worst case
-        // upsell charges fail silently and they just see the standard pipeline.
         if (order?.id) {
           q.set("orderId", order.id);
-          q.set("checkoutSessionId", session_id);
+          if (paymentIntentId) q.set("checkoutSessionId", paymentIntentId);
         }
         setStatus("ready");
         setTimeout(() => navigate({ to: "/upsell-1" }), 600);
@@ -86,7 +96,7 @@ function CheckoutReturnPage() {
     return () => {
       cancelled = true;
     };
-  }, [session_id, navigate, q]);
+  }, [paymentIntentId, sessionId, navigate, q]);
 
   return (
     <div className="min-h-screen bg-gradient-warm">
