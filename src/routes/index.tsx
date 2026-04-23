@@ -845,7 +845,7 @@ function LandingPage() {
               {
                 n: "01",
                 h: "Share their story.",
-                p: "Answer a few simple questions in writing — no calls, no pressure. Our prompts gently surface the right memories for you.",
+                p: "Answer a few simple questions in writing. No calls, no pressure. Our prompts gently surface the right memories for you.",
                 m: "Takes about 10 minutes. Families say this part alone already feels like a gift.",
                 icon: (
                   <svg viewBox="0 0 24 24" fill="none" className="h-5 w-5" stroke="currentColor" strokeWidth="1.7" strokeLinecap="round" strokeLinejoin="round">
