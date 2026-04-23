@@ -856,7 +856,7 @@ function LandingPage() {
               {
                 n: "02",
                 h: "We write & record it.",
-                p: "Pick the genre, tempo, and voice — or let us suggest. Folk, country, gospel, pop, or cinematic strings, fully produced in studio.",
+                p: "Pick the genre, tempo, and voice. Or let us suggest. Folk, country, gospel, pop, or cinematic strings, fully produced in studio.",
                 m: "Real songwriting. Real arrangement. Built to be played, not just heard.",
                 icon: (
                   <svg viewBox="0 0 24 24" fill="none" className="h-5 w-5" stroke="currentColor" strokeWidth="1.7" strokeLinecap="round" strokeLinejoin="round">
