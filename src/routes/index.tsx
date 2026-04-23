@@ -607,13 +607,13 @@ function LandingPage() {
                   )}
                   {s.audio_url ? (
                     <div className="absolute inset-0 flex items-center justify-center bg-[rgba(31,27,22,0.0)] transition-colors group-hover:bg-[rgba(31,27,22,0.25)]">
-                      <span className="flex h-14 w-14 items-center justify-center rounded-full bg-[rgba(246,240,230,0.95)] shadow-[0_6px_18px_rgba(0,0,0,0.25)] transition-transform group-hover:scale-110">
+                      <span className="flex h-14 w-14 items-center justify-center rounded-full bg-[#8D6FAF] shadow-[0_6px_18px_rgba(141,111,175,0.45)] transition-transform group-hover:scale-110">
                         <span
                           className="ml-1 inline-block"
                           style={{
                             width: 0,
                             height: 0,
-                            borderLeft: "13px solid #8D6FAF",
+                            borderLeft: "13px solid #FFFFFF",
                             borderTop: "8px solid transparent",
                             borderBottom: "8px solid transparent",
                           }}
