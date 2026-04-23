@@ -1,7 +1,7 @@
 import { createFileRoute, useNavigate } from "@tanstack/react-router";
 import { useState } from "react";
 import { UpsellShell } from "@/components/UpsellShell";
-import { RibbonClubDownsell } from "@/components/RibbonClubDownsell";
+import { Delivery48Downsell } from "@/components/Delivery48Downsell";
 import { useQuizStore } from "@/stores/quizStore";
 import { supabase } from "@/integrations/supabase/client";
 import { stripeEnvironment } from "@/lib/stripe";
@@ -35,30 +35,31 @@ function Upsell2() {
     navigate({ to: "/upsell-3" });
   };
 
-  // Decline rush → open the slim RibbonSong Club downsell.
+  // Decline 24h rush → open the slim 48-hour downsell.
   const decline = () => setShowDownsell(true);
 
-  const acceptClub = async () => {
+  const accept48 = async () => {
     if (!q.orderId) {
       setShowDownsell(false);
       navigate({ to: "/upsell-3" });
       return;
     }
     setDownsellProcessing(true);
-    await supabase.functions.invoke("charge-upsell", {
+    const { data } = await supabase.functions.invoke("charge-upsell", {
       body: {
         orderId: q.orderId,
-        upsellType: "ribbon_club",
+        upsellType: "delivery_48h",
         environment: stripeEnvironment,
         sessionId: q.checkoutSessionId,
       },
     });
+    if (data?.success) q.set("is_rush", true);
     setDownsellProcessing(false);
     setShowDownsell(false);
     navigate({ to: "/upsell-3" });
   };
 
-  const declineClub = () => {
+  const decline48 = () => {
     setShowDownsell(false);
     navigate({ to: "/upsell-3" });
   };
@@ -68,14 +69,14 @@ function Upsell2() {
       <UpsellShell
         step={2}
         badge="Priority gift delivery"
-        headline="Need their song sooner?"
+        headline="Need their song in 24 hours?"
         description={
           <>
             Standard delivery takes up to 5 days. Skip the line and get their
             finished song in the next{" "}
-            <span className="font-semibold text-foreground">24 hours</span> — perfect
-            if the gift moment is coming up — for just{" "}
-            <span className="font-semibold text-foreground">$59.00</span>.
+            <span className="font-semibold text-foreground">24 hours</span> —
+            perfect if the gift moment is coming up — for just{" "}
+            <span className="font-semibold text-foreground">$29.99</span>.
           </>
         }
         highlights={[
@@ -83,18 +84,18 @@ function Upsell2() {
           "Personally reviewed by our team before it reaches you",
           "Emailed the moment it's ready, day or night",
         ]}
-        priceLabel="$59.00"
+        priceLabel="$29.99"
         declineLabel="No thanks, I can wait 5 days"
         onAccept={accept}
         onDecline={decline}
         processing={processing}
       />
 
-      <RibbonClubDownsell
+      <Delivery48Downsell
         open={showDownsell}
         processing={downsellProcessing}
-        onAccept={acceptClub}
-        onDecline={declineClub}
+        onAccept={accept48}
+        onDecline={decline48}
       />
     </>
   );

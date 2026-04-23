@@ -10,10 +10,10 @@ const supabase = createClient(
 // Upsell catalog. Server is the source of truth — never trust client amounts.
 const UPSELL_PRICES: Record<string, { amount: number; flagColumn: string | null }> = {
   extra_verse: { amount: 1999, flagColumn: "has_3rd_verse" },
-  rush_delivery: { amount: 5900, flagColumn: "is_rush" },
+  rush_delivery: { amount: 2999, flagColumn: "is_rush" },
   unlimited_edits: { amount: 3299, flagColumn: "has_unlimited_edits" },
-  // Downsell after declining rush — RibbonSong Club, one-time trust price.
-  ribbon_club: { amount: 4800, flagColumn: null },
+  // Downsell after declining the 24h rush — 48h delivery for $19.99.
+  delivery_48h: { amount: 1999, flagColumn: "is_rush" },
 };
 
 serve(async (req) => {
