@@ -10,7 +10,6 @@ import { stripeEnvironment } from "@/lib/stripe";
 import {
   ArrowLeft,
   CheckCircle2,
-  Gift,
   Music2,
   Pencil,
   ShieldCheck,
