@@ -857,7 +857,7 @@ function LandingPage() {
                 n: "02",
                 h: "We write & record it.",
                 p: "Pick the genre, tempo, and voice. Or let us suggest. Folk, country, gospel, pop, or cinematic strings, fully produced in studio.",
-                m: "Real songwriting. Real arrangement. Built to be played, not just heard.",
+                m: "Built to be played, not just heard.",
                 icon: (
                   <svg viewBox="0 0 24 24" fill="none" className="h-5 w-5" stroke="currentColor" strokeWidth="1.7" strokeLinecap="round" strokeLinejoin="round">
                     <path d="M9 18V5l12-2v13"/><circle cx="6" cy="18" r="3"/><circle cx="18" cy="16" r="3"/>
@@ -868,7 +868,7 @@ function LandingPage() {
                 n: "03",
                 h: "Delivered in 5 days.",
                 p: "Straight to your inbox. Streamable and downloadable, yours forever to share, gift, or play at the bedside.",
-                m: "Don't love it? We'll rewrite it free, or refund you in full. No questions.",
+                m: "Don't love it? You get one free rewrite, or a full refund. No questions.",
                 icon: (
                   <svg viewBox="0 0 24 24" fill="none" className="h-5 w-5" stroke="currentColor" strokeWidth="1.7" strokeLinecap="round" strokeLinejoin="round">
                     <path d="M4 4h16c1.1 0 2 .9 2 2v12c0 1.1-.9 2-2 2H4c-1.1 0-2-.9-2-2V6c0-1.1.9-2 2-2z"/><polyline points="22,6 12,13 2,6"/>
