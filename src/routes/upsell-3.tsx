@@ -17,10 +17,16 @@ function Upsell3() {
   const finishAndAdvance = async () => {
     // Tell the backend upsell decisions are done — this flips status to
     // upsells_complete which fires the trigger that enqueues brief generation.
+    // Swallow any error (e.g. order not yet paid in test flows) so the user
+    // always reaches the thank-you page instead of a blank-screen crash.
     if (q.orderId) {
-      await supabase.functions.invoke("mark-upsells-complete", {
-        body: { orderId: q.orderId },
-      });
+      try {
+        await supabase.functions.invoke("mark-upsells-complete", {
+          body: { orderId: q.orderId },
+        });
+      } catch (err) {
+        console.warn("mark-upsells-complete failed (non-fatal):", err);
+      }
     }
     navigate({ to: "/processing" });
   };
