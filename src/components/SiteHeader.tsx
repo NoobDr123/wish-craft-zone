@@ -28,7 +28,7 @@ export function SiteHeader() {
           to="/create"
           className="ml-2 border-b border-current text-[#C9A85A]"
         >
-          Start My Custom Song ❤️
+          Start My Song ❤️
         </Link>
       </div>
 
