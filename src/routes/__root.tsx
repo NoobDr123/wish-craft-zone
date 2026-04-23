@@ -62,6 +62,11 @@ export const Route = createRootRoute({
       { rel: "manifest", href: "/site.webmanifest" },
       { rel: "preconnect", href: "https://fonts.googleapis.com" },
       { rel: "preconnect", href: "https://fonts.gstatic.com", crossOrigin: "anonymous" },
+      // Warm Stripe TLS handshakes early so the checkout page mounts faster.
+      { rel: "preconnect", href: "https://js.stripe.com" },
+      { rel: "preconnect", href: "https://api.stripe.com" },
+      { rel: "preconnect", href: "https://m.stripe.network" },
+      { rel: "dns-prefetch", href: "https://hooks.stripe.com" },
       {
         rel: "stylesheet",
         href: "https://fonts.googleapis.com/css2?family=Playfair+Display:wght@400;500;600;700&family=Inter:wght@300;400;500;600;700&display=swap",
