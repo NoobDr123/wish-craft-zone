@@ -3,6 +3,7 @@ import { lazy, Suspense, useEffect, useRef, useState } from "react";
 import { Logo } from "@/components/Logo";
 import { PaymentTestModeBanner } from "@/components/PaymentTestModeBanner";
 import { CustomPaymentForm } from "@/components/CustomPaymentForm";
+import { ReviewSurveyModal } from "@/components/ReviewSurveyModal";
 import { useQuizStore } from "@/stores/quizStore";
 import { supabase } from "@/integrations/supabase/client";
 import {
@@ -57,6 +58,7 @@ function CheckoutPage() {
   const [paymentIntentId, setPaymentIntentId] = useState<string | null>(null);
   const [orderId, setOrderId] = useState<string | null>(q.orderId || null);
   const [error, setError] = useState<string | null>(null);
+  const [reviewOpen, setReviewOpen] = useState(false);
 
   useEffect(() => {
     if (!q.recipient_name) navigate({ to: "/create" });
@@ -190,7 +192,7 @@ function CheckoutPage() {
 
           <button
             type="button"
-            onClick={(e) => e.preventDefault()}
+            onClick={() => setReviewOpen(true)}
             className="mt-4 flex w-full items-center justify-center gap-2 rounded-xl border-2 border-dashed border-primary/40 bg-primary/5 px-4 py-3 text-sm font-semibold text-primary transition-colors hover:bg-primary/10"
           >
             <Pencil className="h-4 w-4" /> Review or Edit Survey
@@ -293,6 +295,8 @@ function CheckoutPage() {
       </main>
 
       <CheckoutFooter />
+
+      <ReviewSurveyModal open={reviewOpen} onClose={() => setReviewOpen(false)} />
     </div>
   );
 }
