@@ -408,7 +408,73 @@ function CheckoutPage() {
           </ul>
         </section>
       </main>
+
+      <CheckoutFooter />
     </div>
+  );
+}
+
+function CheckoutFooter() {
+  const year = new Date().getFullYear();
+  return (
+    <footer className="mt-10 border-t border-peach/70 bg-background/60 backdrop-blur">
+      <div className="mx-auto max-w-2xl px-5 py-8 text-sm text-muted-foreground">
+        {/* Trust row */}
+        <div className="flex flex-wrap items-center justify-center gap-x-5 gap-y-2 text-xs font-medium">
+          <span className="inline-flex items-center gap-1.5">
+            <ShieldCheck className="h-3.5 w-3.5 text-primary" /> Secure SSL Checkout
+          </span>
+          <span className="inline-flex items-center gap-1.5">
+            <CheckCircle2 className="h-3.5 w-3.5 text-success" /> 30-Day Money Back Guarantee
+          </span>
+          <span className="inline-flex items-center gap-1.5">
+            Powered by Stripe
+          </span>
+        </div>
+
+        {/* Accepted methods */}
+        <p className="mt-4 text-center text-[11px] uppercase tracking-wider text-muted-foreground/70">
+          We accept Visa · Mastercard · Amex · Discover · Apple Pay · Google Pay · Link
+        </p>
+
+        {/* Policy links */}
+        <nav className="mt-5 flex flex-wrap items-center justify-center gap-x-5 gap-y-2 text-sm">
+          <Link to="/terms" className="hover:text-foreground hover:underline">Terms of Service</Link>
+          <Link to="/privacy" className="hover:text-foreground hover:underline">Privacy Policy</Link>
+          <Link to="/terms" hash="refunds" className="hover:text-foreground hover:underline">Refund Policy</Link>
+          <a href="mailto:hello@ribbonsong.com" className="hover:text-foreground hover:underline">Contact Support</a>
+        </nav>
+
+        {/* Compliance copy */}
+        <div className="mt-6 space-y-3 text-center text-xs leading-relaxed text-muted-foreground/80">
+          <p>
+            By completing this purchase, you agree to our{" "}
+            <Link to="/terms" className="underline hover:text-foreground">Terms of Service</Link>{" "}
+            and{" "}
+            <Link to="/privacy" className="underline hover:text-foreground">Privacy Policy</Link>.
+            Your card will be charged <span className="font-semibold text-foreground">$49.99 USD</span>{" "}
+            today as a one-time payment to RibbonSong. No subscription, no recurring charges.
+          </p>
+          <p>
+            Your payment information is encrypted and processed securely by Stripe.
+            RibbonSong never stores your card details. All transactions are billed in U.S. Dollars.
+          </p>
+          <p>
+            Need help? Email{" "}
+            <a href="mailto:hello@ribbonsong.com" className="underline hover:text-foreground">
+              hello@ribbonsong.com
+            </a>{" "}
+            and we'll respond within 24 hours.
+          </p>
+        </div>
+
+        {/* Legal address + copyright */}
+        <div className="mt-6 border-t border-peach/60 pt-5 text-center text-[11px] text-muted-foreground/70">
+          <p>© {year} RibbonSong. All rights reserved.</p>
+          <p className="mt-1">RibbonSong is a registered trademark. Songs are created for personal, non-commercial use.</p>
+        </div>
+      </div>
+    </footer>
   );
 }
 
