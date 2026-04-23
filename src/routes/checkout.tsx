@@ -1,12 +1,15 @@
 import { createFileRoute, useNavigate, Link } from "@tanstack/react-router";
-import { useEffect, useRef, useState } from "react";
+import { lazy, Suspense, useEffect, useRef, useState } from "react";
 import { Logo } from "@/components/Logo";
 import { PaymentTestModeBanner } from "@/components/PaymentTestModeBanner";
-import { AudioPlayer } from "@/components/AudioPlayer";
 import { CustomPaymentForm } from "@/components/CustomPaymentForm";
-import { useQuizStore, journeyStageOf, tenseOf } from "@/stores/quizStore";
+import { useQuizStore } from "@/stores/quizStore";
 import { supabase } from "@/integrations/supabase/client";
-import { stripeEnvironment } from "@/lib/stripe";
+import {
+  prefetchCheckout,
+  getPrefetchedCheckout,
+  type PrefetchedCheckout,
+} from "@/lib/checkoutPrefetch";
 import {
   ArrowLeft,
   CheckCircle2,
@@ -14,6 +17,10 @@ import {
   Pencil,
   ShieldCheck,
 } from "lucide-react";
+
+// Code-split the samples block so the SDK and AudioPlayer don't enter the
+// critical path. Mounted only when scrolled into view.
+const SamplesSection = lazy(() => import("@/components/CheckoutSamples"));
 
 interface SampleSong {
   id: string;
@@ -29,16 +36,8 @@ export const Route = createFileRoute("/checkout")({
   head: () => ({
     meta: [{ title: "Almost There · RibbonSong" }],
   }),
-  loader: async () => {
-    const { data } = await supabase
-      .from("featured_samples")
-      .select("id,title,for_text,quote,audio_url,recipient_name")
-      .eq("published", true)
-      .not("audio_url", "is", null)
-      .order("sort_order", { ascending: true })
-      .limit(3);
-    return { samples: (data ?? []) as SampleSong[] };
-  },
+  // Samples are no longer fetched in the SSR loader — they were blocking the
+  // critical path. They now load lazily after the payment form is ready.
 });
 
 const emailRe = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
