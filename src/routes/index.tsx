@@ -675,7 +675,7 @@ function LandingPage() {
         <div className="mx-auto max-w-[1200px] px-5 sm:px-6">
           <div className="grid items-center gap-8 md:grid-cols-[1.15fr_1fr] md:gap-[60px]">
             <div className="order-2 md:order-1">
-              <Eyebrow>The Most Meaningful Gift For Someone You Love Fighting Cancer</Eyebrow>
+              <Eyebrow center className="flex w-full">The Most Meaningful Gift For Someone You Love Fighting Cancer</Eyebrow>
               <h1 className="mb-[22px] max-w-[700px] font-display text-[clamp(28px,7.5vw,64px)] font-medium italic leading-[1.08] tracking-[-0.025em] text-[#1F1B16] md:mb-[26px]">
                 <span className="font-display text-[1.05em] font-semibold not-italic text-[#8D6FAF]">
                   &ldquo;
