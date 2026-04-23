@@ -60,7 +60,7 @@ export function Delivery48Downsell({
         <div className="flex items-center gap-2 border-b border-primary/20 bg-primary/10 px-4 py-2.5 sm:px-5">
           <Clock className="h-3.5 w-3.5 text-primary" />
           <p className="text-[10px] font-bold uppercase tracking-[0.16em] text-primary sm:text-[11px]">
-            Wait — better deal inside
+            Wait, better deal inside
           </p>
         </div>
 
