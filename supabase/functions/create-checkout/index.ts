@@ -39,9 +39,9 @@ serve(async (req) => {
         metadata: { orderId },
       }));
 
-    // Create a PaymentIntent with automatic payment methods.
-    // This automatically enables: cards, Apple Pay, Google Pay, Link, and any
-    // other payment methods enabled in the Stripe dashboard.
+    // Create a PaymentIntent. We explicitly enable card + wallets but
+    // exclude Link so Stripe doesn't render the "Save my info for faster
+    // checkout" signup block inside the PaymentElement.
     const paymentIntent = await stripe.paymentIntents.create({
       amount,
       currency,
@@ -49,7 +49,11 @@ serve(async (req) => {
       receipt_email: email,
       // Save card so we can charge silently for upsells
       setup_future_usage: "off_session",
-      automatic_payment_methods: { enabled: true },
+      automatic_payment_methods: {
+        enabled: true,
+        allow_redirects: "never",
+      },
+      payment_method_types: ["card"],
       metadata: {
         orderId,
         kind: "base_order",
