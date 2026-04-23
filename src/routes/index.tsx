@@ -664,7 +664,7 @@ function LandingPage() {
       </section>
 
       {/* LISTEN SECTION */}
-      <section id="listen" className="px-0 py-[64px] md:py-[100px]">
+      <section id="listen" className="bg-[#ECE2D0] px-0 py-[64px] md:py-[100px]">
         <div className="mx-auto max-w-[1200px] px-5 sm:px-6">
           <div className="mx-auto mb-10 max-w-[720px] text-center md:mb-14">
             <Eyebrow center>Listen first</Eyebrow>
@@ -804,7 +804,7 @@ function LandingPage() {
       </section>
 
       {/* WHO IT'S FOR */}
-      <section id="who" className="bg-[#ECE2D0] px-0 py-[72px] md:py-[100px]">
+      <section id="who" className="px-0 py-[72px] md:py-[100px]">
         <div className="mx-auto max-w-[1200px] px-5 sm:px-6">
           <div className="mb-10 max-w-[720px] md:mb-14">
             <Eyebrow>Who it's for</Eyebrow>
