@@ -2,8 +2,6 @@ User-agent: *
 Allow: /$
 Allow: /create
 Allow: /listen/
-Disallow: /_admin
-Disallow: /_admin/
 Disallow: /staff
 Disallow: /admin
 Disallow: /account
