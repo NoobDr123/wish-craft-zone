@@ -107,7 +107,7 @@ function InnerForm({ returnUrl, email, amountLabel, onError }: CustomPaymentForm
           options={{
             buttonHeight: 48,
             buttonTheme: { applePay: "black", googlePay: "black" },
-            paymentMethods: { applePay: "always", googlePay: "always", link: "auto" },
+            paymentMethods: { applePay: "always", googlePay: "always", link: "never" },
           }}
         />
         <div className="my-4 flex items-center gap-3">
