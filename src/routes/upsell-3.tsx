@@ -63,14 +63,14 @@ function Upsell3() {
           After you hear the first version, want to tweak a lyric, try a
           different genre, or swap the voice? Unlock{" "}
           <span className="font-semibold text-foreground">unlimited edits</span>{" "}
-          for 14 full days — only{" "}
+          for 14 full days, only{" "}
           <span className="font-semibold text-foreground">$32.99</span>.
         </>
       }
       highlights={[
-        "Unlimited lyric & tone refinements until it's perfect",
+        "Unlimited lyric and tone refinements until it's perfect",
         "Try a different genre, voice, or tempo anytime",
-        "14 days from delivery — no rush, no extra fees",
+        "14 days from delivery, no rush, no extra fees",
       ]}
       priceLabel="$32.99"
       declineLabel="No thanks, I trust the first version"

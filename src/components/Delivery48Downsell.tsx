@@ -76,7 +76,7 @@ export function Delivery48Downsell({
           <p className="mt-2.5 text-sm leading-relaxed text-muted-foreground">
             Not in a rush, but still don't want to wait 5 days? Skip ahead and
             get their song in{" "}
-            <span className="font-semibold text-foreground">2 days</span> — at
+            <span className="font-semibold text-foreground">2 days</span>, at
             two-thirds off the 24-hour price.
           </p>
 
@@ -91,7 +91,7 @@ export function Delivery48Downsell({
             </li>
             <li className="flex items-start gap-2.5">
               <span className="mt-1.5 h-1.5 w-1.5 shrink-0 rounded-full bg-success" />
-              <span>One-time price — no subscriptions, no extras</span>
+              <span>One-time price, no subscriptions, no extras</span>
             </li>
           </ul>
 
