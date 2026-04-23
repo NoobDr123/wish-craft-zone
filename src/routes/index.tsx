@@ -189,6 +189,7 @@ const useCases = [
 ];
 
 const testimonials: Array<{
+  slug: string;
   quote: string;
   name: string;
   meta: string;
