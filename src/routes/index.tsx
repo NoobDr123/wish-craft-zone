@@ -476,7 +476,7 @@ function LandingPage() {
                 </strong>
               </p>
               <div className="mb-7 flex w-full flex-col items-stretch gap-3 sm:w-auto sm:flex-row sm:flex-wrap sm:items-center sm:gap-4">
-                <PrimaryBtn large fullWidth>Start their song</PrimaryBtn>
+                <PrimaryBtn large fullWidth>Start My Custom Song ❤️</PrimaryBtn>
               </div>
               <div className="flex flex-col items-center gap-2 text-center text-[13px] text-[#5A5148] sm:flex-row sm:flex-wrap sm:items-center sm:gap-x-3 sm:gap-y-2 sm:text-left sm:gap-3.5">
                 <div className="flex items-center gap-2">
@@ -707,7 +707,7 @@ function LandingPage() {
           </div>
 
           <div className="mt-12 text-center md:mt-14">
-            <PrimaryBtn large>Start their song</PrimaryBtn>
+            <PrimaryBtn large>Start My Custom Song ❤️</PrimaryBtn>
           </div>
         </div>
       </section>
@@ -847,7 +847,7 @@ function LandingPage() {
           </div>
 
           <div className="mt-12 text-center">
-            <PrimaryBtn large>Start their song</PrimaryBtn>
+            <PrimaryBtn large>Start My Custom Song ❤️</PrimaryBtn>
           </div>
         </div>
       </section>
@@ -901,7 +901,7 @@ function LandingPage() {
           </div>
 
           <div className="mt-10 text-center md:mt-12">
-            <PrimaryBtn large>Start their song</PrimaryBtn>
+            <PrimaryBtn large>Start My Custom Song ❤️</PrimaryBtn>
           </div>
         </div>
       </section>
@@ -1017,7 +1017,7 @@ function LandingPage() {
             give someone a song that says everything you couldn't. There's just
             now.
           </p>
-          <PrimaryBtn large>Start their song</PrimaryBtn>
+          <PrimaryBtn large>Start My Custom Song ❤️</PrimaryBtn>
           <div className="mt-6 text-[13px] text-[rgba(246,240,230,0.55)]">
             Delivered in 5 days · Free revisions · Money back guarantee
           </div>
