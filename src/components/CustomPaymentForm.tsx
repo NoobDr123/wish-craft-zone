@@ -153,16 +153,16 @@ function InnerForm({ returnUrl, email, amountLabel, onError, disabled, disabledR
         type="button"
         onClick={handleConfirm}
         disabled={!stripe || !elements || submitting || disabled}
-        className="flex w-full items-center justify-center gap-2.5 rounded-2xl bg-primary px-6 py-5 text-base font-bold text-primary-foreground shadow-glow transition-all hover:brightness-95 active:scale-[0.99] disabled:cursor-not-allowed disabled:opacity-60 disabled:shadow-none md:text-lg"
+        className="flex w-full items-center justify-center gap-2.5 rounded-2xl bg-success px-6 py-5 text-base font-bold text-success-foreground shadow-glow transition-all hover:brightness-95 active:scale-[0.99] disabled:cursor-not-allowed disabled:opacity-60 disabled:shadow-none md:text-lg"
       >
         {submitting ? (
           <>
-            <span className="h-5 w-5 animate-spin rounded-full border-2 border-primary-foreground/30 border-t-primary-foreground" />
+            <span className="h-5 w-5 animate-spin rounded-full border-2 border-success-foreground/30 border-t-success-foreground" />
             Processing payment…
           </>
         ) : (
           <>
-            <Gift className="h-5 w-5" /> Pay {amountLabel}
+            <Gift className="h-5 w-5" /> Complete My Order — {amountLabel}
           </>
         )}
       </button>
