@@ -333,11 +333,16 @@ function CheckoutPage() {
             </p>
           </section>
         ) : (
-          <section className="mt-6 rounded-3xl border border-peach/70 bg-card p-2 shadow-card md:p-3">
-            {checkoutOptions && (
-              <EmbeddedCheckoutProvider stripe={getStripe()} options={checkoutOptions}>
-                <EmbeddedCheckout />
-              </EmbeddedCheckoutProvider>
+          <section className="mt-6 overflow-hidden rounded-3xl border border-peach/70 bg-card shadow-card">
+            {clientSecret && paymentIntentId && (
+              <CustomPaymentForm
+                clientSecret={clientSecret}
+                paymentIntentId={paymentIntentId}
+                email={email.trim().toLowerCase()}
+                amountLabel="$49.99"
+                returnUrl={`${window.location.origin}/checkout/return?payment_intent_id=${paymentIntentId}`}
+                onError={(msg) => setError(msg)}
+              />
             )}
           </section>
         )}
