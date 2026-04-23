@@ -346,6 +346,166 @@ const testimonials: Array<{
     meta: "Portland, OR  ·  Daughter, for her mother newly diagnosed",
     avatar: "https://i.pravatar.cc/80?img=5",
   },
+  {
+    slug: "emma-c",
+    quote:
+      '"My twin brother and I lost our mom last spring. We played the song at her wake. People who never met her told us they felt like they had."',
+    name: "Emma C.",
+    meta: "Burlington, VT  ·  Daughter, in loving memory",
+    avatar: "https://i.pravatar.cc/80?img=10",
+  },
+  {
+    slug: "raj-p",
+    quote:
+      '"My father is from India and rarely shows emotion. He listened with his eyes closed, then asked me to play it again. Three times. He still plays it on Sundays."',
+    name: "Raj P.",
+    meta: "Edison, NJ  ·  Son, for his father in remission",
+    avatar: "https://i.pravatar.cc/80?img=60",
+  },
+  {
+    slug: "lauren-b",
+    quote:
+      '"I gave it to my best friend on her last day of radiation. She walked into her appointment with my voice in her ears. She rang the bell to our song."',
+    name: "Lauren B.",
+    meta: "Kansas City, MO  ·  Best friend, for a survivor",
+    avatar: "https://i.pravatar.cc/80?img=32",
+  },
+  {
+    slug: "javier-m",
+    quote:
+      '"Mi abuela barely spoke English at the end. The song was in Spanish. She held my hand the whole way through. She passed two days later."',
+    name: "Javier M.",
+    meta: "El Paso, TX  ·  Grandson, in loving memory",
+    avatar: "https://i.pravatar.cc/80?img=11",
+  },
+  {
+    slug: "kelly-d",
+    quote:
+      '"Stage IV. They told us six months. We made it eighteen. Our song played at every milestone. We still play it for the kids on her birthday."',
+    name: "Kelly D.",
+    meta: "Cleveland, OH  ·  Husband, in loving memory",
+    avatar: "https://i.pravatar.cc/80?img=14",
+  },
+  {
+    slug: "maya-h",
+    quote:
+      '"I am eleven years old. My dad has cancer. I ordered the song with my allowance and gave it to him for Father\'s Day. He cried. Mom helped me write this."',
+    name: "Maya H.",
+    meta: "Madison, WI  ·  Daughter, for her dad in treatment",
+    avatar: "https://i.pravatar.cc/80?img=16",
+  },
+  {
+    slug: "william-t",
+    quote:
+      '"I am 78. My wife of 54 years has Alzheimer\'s and is now in palliative care. The song talks about a beach we honeymooned on. She squeezed my hand at the chorus."',
+    name: "William T.",
+    meta: "Sarasota, FL  ·  Husband, for his wife in hospice",
+    avatar: "https://i.pravatar.cc/80?img=51",
+  },
+  {
+    slug: "tasha-w",
+    quote:
+      '"I am a nurse on the oncology floor. A patient\'s family played their song for the room. Three of us cried at the nurses\' station. I ordered one for my own mom that night."',
+    name: "Tasha W.",
+    meta: "Detroit, MI  ·  Oncology nurse · Daughter",
+    avatar: "https://i.pravatar.cc/80?img=48",
+  },
+  {
+    slug: "henry-and-paul",
+    quote:
+      '"My husband Paul was diagnosed at 41. We have two boys. The song is so they remember his laugh, his stupid jokes, the way he sang in the kitchen. They will."',
+    name: "Henry & Paul",
+    meta: "Brooklyn, NY  ·  Husband, in loving memory",
+    avatar: "https://i.pravatar.cc/80?img=33",
+  },
+  {
+    slug: "grace-l",
+    quote:
+      '"Pediatric oncology unit. My daughter is six. They wheeled in a portable speaker so the whole hallway could hear. Even the doctors stopped working."',
+    name: "Grace L.",
+    meta: "Cincinnati, OH  ·  Mother, for her daughter in treatment",
+    avatar: "https://i.pravatar.cc/80?img=26",
+  },
+  {
+    slug: "moshe-k",
+    quote:
+      '"We played it at my father\'s shiva. The rabbi asked who wrote it. When I said it was custom, half the room asked for the link. Dad would have loved that."',
+    name: "Moshe K.",
+    meta: "Baltimore, MD  ·  Son, in loving memory",
+    avatar: "https://i.pravatar.cc/80?img=58",
+  },
+  {
+    slug: "amelia-f",
+    quote:
+      '"I am a hospice chaplain. I have officiated 200+ services. Three families have used your songs and they have all been the most powerful moment of the room. Thank you."',
+    name: "Rev. Amelia F.",
+    meta: "Asheville, NC  ·  Hospice chaplain",
+    avatar: "https://i.pravatar.cc/80?img=22",
+  },
+  {
+    slug: "darnell-j",
+    quote:
+      '"My pops fought cancer for nine years. Nine. We played the song the morning he passed. The hospice nurse said it was the most peaceful goodbye she has ever witnessed."',
+    name: "Darnell J.",
+    meta: "Chicago, IL  ·  Son, in loving memory",
+    avatar: "https://i.pravatar.cc/80?img=59",
+  },
+  {
+    slug: "linda-and-ray",
+    quote:
+      '"Ray and I have been married 41 years. Breast cancer twice, both times beat. The song is our second wedding gift to each other. We dance to it in the kitchen."',
+    name: "Linda & Ray",
+    meta: "Des Moines, IA  ·  Wife, two-time survivor",
+    avatar: "https://i.pravatar.cc/80?img=24",
+  },
+  {
+    slug: "aiyana-r",
+    quote:
+      '"My grandfather was Lakota. The song honored his name and the prayers he taught us. My family said it sounded like home. He passed wearing the headphones."',
+    name: "Aiyana R.",
+    meta: "Rapid City, SD  ·  Granddaughter, in loving memory",
+    avatar: "https://i.pravatar.cc/80?img=35",
+  },
+  {
+    slug: "sergeant-m",
+    quote:
+      '"My sister is a Marine. Glioblastoma at 34. She did not cry once during treatment. She cried when we played her the song. That is when I knew it was right."',
+    name: "Sgt. Marcus T.",
+    meta: "San Antonio, TX  ·  Brother, for his sister in treatment",
+    avatar: "https://i.pravatar.cc/80?img=64",
+  },
+  {
+    slug: "yuki-h",
+    quote:
+      '"My mother does not speak English. The song was instrumental but used a melody she sang to me as a child. She recognized it instantly. We held each other and wept."',
+    name: "Yuki H.",
+    meta: "San Francisco, CA  ·  Daughter, for her mother in remission",
+    avatar: "https://i.pravatar.cc/80?img=19",
+  },
+  {
+    slug: "father-and-twins",
+    quote:
+      '"Our twins were born during my wife\'s chemo. We played her song in the delivery room while she was pumped full of medicine. They are two now. Mom is cancer-free."',
+    name: "Anthony R.",
+    meta: "Phoenix, AZ  ·  Husband, for his wife in remission",
+    avatar: "https://i.pravatar.cc/80?img=65",
+  },
+  {
+    slug: "claire-and-mom",
+    quote:
+      '"Mom is 92. Lung cancer, stage IV, refused treatment. She wanted dignity. We played her song as her last wish. She mouthed thank you. It will haunt me forever in the best way."',
+    name: "Claire D.",
+    meta: "Boise, ID  ·  Daughter, in loving memory",
+    avatar: "https://i.pravatar.cc/80?img=36",
+  },
+  {
+    slug: "iris-and-jamal",
+    quote:
+      '"My husband Jamal beat throat cancer last year. He lost his singing voice for nine months. The song uses his old recordings. He cried when he heard himself again."',
+    name: "Iris W.",
+    meta: "New Orleans, LA  ·  Wife, for her husband in remission",
+    avatar: "https://i.pravatar.cc/80?img=43",
+  },
 ];
 
 const faqs = [
