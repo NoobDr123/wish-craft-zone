@@ -8,7 +8,6 @@ import { SiteHeader } from "@/components/SiteHeader";
 import { SiteFooter } from "@/components/SiteFooter";
 import { supabase } from "@/integrations/supabase/client";
 import { AudioPlayer } from "@/components/AudioPlayer";
-import { Dialog, DialogContent, DialogTitle } from "@/components/ui/dialog";
 import heroImg from "@/assets/hero-ribbon.jpg";
 import whoNewlyDiagnosed from "@/assets/who-newly-diagnosed.png";
 import whoInTreatment from "@/assets/who-in-treatment.png";
