@@ -196,6 +196,7 @@ const testimonials: Array<{
   avatar: string;
 }> = [
   {
+    slug: "david-k",
     quote:
       '"I almost didn\'t order because it felt like too much. I was wrong. It\'s the only thing I gave him during the whole fight that he asked to hear again."',
     name: "David K.",
@@ -203,6 +204,7 @@ const testimonials: Array<{
     avatar: "https://i.pravatar.cc/80?img=67",
   },
   {
+    slug: "sarah-r",
     quote:
       '"My mom played it in her earbuds during infusions. She said the nurses asked her what she was listening to every single week."',
     name: "Sarah R.",
@@ -210,6 +212,7 @@ const testimonials: Array<{
     avatar: "https://i.pravatar.cc/80?img=45",
   },
   {
+    slug: "priya-sam",
     quote:
       '"Two years free of cancer, and this song still plays at every birthday. It became our family\'s anthem. Our daughter asks for it by name now."',
     name: "Priya & Sam",
@@ -217,6 +220,7 @@ const testimonials: Array<{
     avatar: "https://i.pravatar.cc/80?img=39",
   },
   {
+    slug: "marcus-d",
     quote:
       '"We played it at his bedside the night before he passed. The chorus said the things we couldn\'t. The most precious thing our family owns."',
     name: "Marcus D.",
@@ -224,6 +228,7 @@ const testimonials: Array<{
     avatar: "https://i.pravatar.cc/80?img=52",
   },
   {
+    slug: "patricia-m",
     quote:
       '"He heard it twice before we lost him. Thank you will never cover it."',
     name: "Patricia M.",
@@ -231,6 +236,7 @@ const testimonials: Array<{
     avatar: "https://i.pravatar.cc/80?img=23",
   },
   {
+    slug: "jenna-l",
     quote:
       '"It captured something I couldn\'t put into words for fifteen years. The first time I played it for her, we both just sat in the car and cried."',
     name: "Jenna L.",
@@ -238,6 +244,7 @@ const testimonials: Array<{
     avatar: "https://i.pravatar.cc/80?img=29",
   },
   {
+    slug: "elena-v",
     quote:
       '"My dad isn\'t a crier. He listened once, walked out to the porch, and stayed there for an hour. When he came back in he just hugged me. That was everything."',
     name: "Elena V.",
@@ -245,6 +252,7 @@ const testimonials: Array<{
     avatar: "https://i.pravatar.cc/80?img=47",
   },
   {
+    slug: "trevor-h",
     quote:
       '"We played it at her celebration of life. Three hundred people went silent. My aunt said it sounded like Mom wrote it herself."',
     name: "Trevor H.",
@@ -252,6 +260,7 @@ const testimonials: Array<{
     avatar: "https://i.pravatar.cc/80?img=15",
   },
   {
+    slug: "diane-w",
     quote:
       '"I was skeptical until I heard it. They used the nickname only my husband called me. I sobbed in the kitchen for twenty minutes. Worth every penny."',
     name: "Diane W.",
@@ -259,6 +268,7 @@ const testimonials: Array<{
     avatar: "https://i.pravatar.cc/80?img=31",
   },
   {
+    slug: "rebecca-t",
     quote:
       '"Our oncology nurses asked for a copy. They wanted to share it with another family. That\'s when I knew it wasn\'t just ours anymore."',
     name: "Rebecca T.",
@@ -266,6 +276,7 @@ const testimonials: Array<{
     avatar: "https://i.pravatar.cc/80?img=44",
   },
   {
+    slug: "aisha-m",
     quote:
       '"My grandmother kept asking us to play it again. She said it was the first time in months she felt like herself. We played it the morning she passed."',
     name: "Aisha M.",
@@ -273,6 +284,7 @@ const testimonials: Array<{
     avatar: "https://i.pravatar.cc/80?img=49",
   },
   {
+    slug: "michael-b",
     quote:
       '"I gave it to him on his last birthday. He played it on repeat in the hospital and made the staff listen. He died proud of the life this song described."',
     name: "Michael B.",
@@ -280,11 +292,36 @@ const testimonials: Array<{
     avatar: "https://i.pravatar.cc/80?img=53",
   },
   {
+    slug: "carlos-r",
     quote:
       '"Five years cancer-free this month. We still play our song on the anniversary. It\'s become how our kids understand what their mom went through."',
     name: "Carlos R.",
     meta: "Miami, FL  ·  Husband, for his wife in remission",
     avatar: "https://i.pravatar.cc/80?img=12",
+  },
+  {
+    slug: "naomi-k",
+    quote:
+      '"I gave it to my sister on day one of chemo. She made it her playlist for every infusion. She told me the song carried her through the worst weeks of her life."',
+    name: "Naomi K.",
+    meta: "Brooklyn, NY  ·  Sister, for her sister in treatment",
+    avatar: "https://i.pravatar.cc/80?img=20",
+  },
+  {
+    slug: "thomas-r",
+    quote:
+      '"My wife passed in March. We played our song at her service and again on what would have been her birthday. Our kids know her voice through the lyrics now."',
+    name: "Thomas R.",
+    meta: "Charleston, SC  ·  Husband, in loving memory",
+    avatar: "https://i.pravatar.cc/80?img=68",
+  },
+  {
+    slug: "olivia-w",
+    quote:
+      '"I ordered it the day my mom got the diagnosis. She listened on the drive to her first appointment. She said it gave her something to hold onto when she had nothing."',
+    name: "Olivia W.",
+    meta: "Portland, OR  ·  Daughter, for her mother newly diagnosed",
+    avatar: "https://i.pravatar.cc/80?img=5",
   },
 ];
 
