@@ -285,62 +285,54 @@ function CheckoutPage() {
           </button>
         </section>
 
-        {/* Contact form OR Stripe embedded checkout */}
-        {stage === "contact" ? (
-          <section className="mt-6 rounded-3xl border border-peach/70 bg-card p-6 shadow-card md:p-8">
-            <h2 className="font-display text-xl font-bold text-foreground">Contact</h2>
-            <p className="mt-1 text-sm text-muted-foreground">
-              We'll send your song here when it's ready.
-            </p>
-            <div className="mt-4 space-y-3">
-              <Field
-                label="Email Address"
-                type="email"
-                value={email}
-                onChange={setEmail}
-                placeholder="you@email.com"
-                valid={email.length === 0 || emailValid}
-              />
-              <Field
-                label="Full Name"
-                value={name}
-                onChange={setName}
-                placeholder="Jane Doe"
-                valid={name.length === 0 || nameValid}
-              />
-            </div>
+        {/* Contact form — payment form mounts inline below as soon as fields are valid */}
+        <section className="mt-6 rounded-3xl border border-peach/70 bg-card p-6 shadow-card md:p-8">
+          <h2 className="font-display text-xl font-bold text-foreground">Contact</h2>
+          <p className="mt-1 text-sm text-muted-foreground">
+            We'll send your song here when it's ready.
+          </p>
+          <div className="mt-4 space-y-3">
+            <Field
+              label="Email Address"
+              type="email"
+              value={email}
+              onChange={setEmail}
+              placeholder="you@email.com"
+              valid={email.length === 0 || emailValid}
+            />
+            <Field
+              label="Full Name"
+              value={name}
+              onChange={setName}
+              placeholder="Jane Doe"
+              valid={name.length === 0 || nameValid}
+            />
+          </div>
 
-            {error && (
-              <p className="mt-4 rounded-xl bg-destructive/10 px-4 py-3 text-sm text-destructive">
-                {error}
+          {error && (
+            <p className="mt-4 rounded-xl bg-destructive/10 px-4 py-3 text-sm text-destructive">
+              {error}
+            </p>
+          )}
+
+          {/* Inline payment form — appears as soon as email + name are valid */}
+          <div className="mt-6 -mx-6 md:-mx-8 border-t border-peach/70">
+            {!ready && (
+              <p className="px-6 py-8 text-center text-sm text-muted-foreground md:px-8">
+                Enter your email and name above to see payment options.
               </p>
             )}
 
-            <button
-              onClick={handleStartCheckout}
-              disabled={!canContinue}
-              className="mt-6 flex w-full items-center justify-center gap-2.5 rounded-2xl bg-primary px-6 py-5 text-base font-bold text-primary-foreground shadow-glow transition-all hover:brightness-95 active:scale-[0.99] disabled:cursor-not-allowed disabled:opacity-60 disabled:shadow-none md:text-lg"
-            >
-              {creating ? (
-                <>
-                  <span className="h-5 w-5 animate-spin rounded-full border-2 border-primary-foreground/30 border-t-primary-foreground" />
-                  Preparing checkout…
-                </>
-              ) : (
-                <>
-                  <Gift className="h-5 w-5" /> Continue to Payment · $49.99
-                </>
-              )}
-            </button>
+            {ready && creating && !clientSecret && (
+              <p className="flex items-center justify-center gap-2 px-6 py-8 text-sm text-muted-foreground md:px-8">
+                <span className="h-4 w-4 animate-spin rounded-full border-2 border-primary/30 border-t-primary" />
+                Loading secure payment…
+              </p>
+            )}
 
-            <p className="mt-4 flex items-center justify-center gap-1.5 text-sm font-semibold text-success">
-              <CheckCircle2 className="h-4 w-4" /> 30-Day Money Back Guarantee
-            </p>
-          </section>
-        ) : (
-          <section className="mt-6 overflow-hidden rounded-3xl border border-peach/70 bg-card shadow-card">
             {clientSecret && paymentIntentId && (
               <CustomPaymentForm
+                key={paymentIntentId}
                 clientSecret={clientSecret}
                 email={email.trim().toLowerCase()}
                 amountLabel="$49.99"
@@ -348,8 +340,8 @@ function CheckoutPage() {
                 onError={(msg) => setError(msg)}
               />
             )}
-          </section>
-        )}
+          </div>
+        </section>
 
         {/* Samples */}
         {samples.length > 0 && (
