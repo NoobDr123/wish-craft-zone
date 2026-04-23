@@ -85,14 +85,10 @@ serve(async (req) => {
       auth: { persistSession: false, autoRefreshToken: false },
     });
 
-    // Confirm the user has the admin role server-side
-    const { data: roleRow } = await admin
-      .from("user_roles")
-      .select("role")
-      .eq("user_id", user.id)
-      .eq("role", "admin")
-      .maybeSingle();
-    if (!roleRow) {
+    // Confirm the user is an allow-listed admin email
+    const ADMIN_EMAILS = ["sylwester@flowscommerce.com"];
+    const userEmail = (user.email ?? "").toLowerCase();
+    if (!ADMIN_EMAILS.includes(userEmail)) {
       return json({ error: "Forbidden" }, 403);
     }
 
