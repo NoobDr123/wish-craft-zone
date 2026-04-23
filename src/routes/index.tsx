@@ -539,10 +539,10 @@ function LandingPage() {
                   inbox.
                 </strong>
               </p>
-              <div className="mx-auto mb-7 flex w-full max-w-[420px] flex-col items-stretch gap-3">
+              <div className="mb-7 flex w-full flex-col items-stretch gap-3">
                 <PrimaryBtn large fullWidth>Start My Custom Song ❤️</PrimaryBtn>
               </div>
-              <div className="mx-auto max-w-[420px] text-center text-[13px] leading-[1.4] text-[#5A5148] md:text-[13.5px]">
+              <div className="w-full text-center text-[13px] leading-[1.4] text-[#5A5148] md:text-[13.5px]">
                 Loved by{" "}
                 <strong className="text-[#1F1B16]">2,400+ families</strong>{" "}
                 fighting, surviving, and remembering
