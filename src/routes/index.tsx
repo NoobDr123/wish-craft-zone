@@ -357,6 +357,32 @@ function LandingPage() {
   const [heroPlaying, setHeroPlaying] = useState(false);
   const [heroEverPlayed, setHeroEverPlayed] = useState(false);
 
+  // Inline sample playback — one audio at a time, no modal
+  const sampleAudioRef = useRef<HTMLAudioElement | null>(null);
+  const [playingSampleId, setPlayingSampleId] = useState<string | null>(null);
+
+  const handleSamplePlay = (s: FeaturedSample) => {
+    if (!s.audio_url) return;
+    const a = sampleAudioRef.current;
+    if (!a) return;
+    // Toggle off if same one is already playing
+    if (playingSampleId === s.id) {
+      a.pause();
+      setPlayingSampleId(null);
+      return;
+    }
+    // Pause hero if it's playing
+    if (heroAudioRef.current && heroPlaying) {
+      heroAudioRef.current.pause();
+      setHeroPlaying(false);
+    }
+    a.src = s.audio_url;
+    a.currentTime = 0;
+    a.play()
+      .then(() => setPlayingSampleId(s.id))
+      .catch(() => setPlayingSampleId(null));
+  };
+
   const handleHeroPlay = () => {
     const a = heroAudioRef.current;
     if (!a) return;
@@ -364,6 +390,11 @@ function LandingPage() {
       a.pause();
       setHeroPlaying(false);
       return;
+    }
+    // Pause any playing sample
+    if (sampleAudioRef.current && playingSampleId) {
+      sampleAudioRef.current.pause();
+      setPlayingSampleId(null);
     }
     setHeroEverPlayed(true);
     a.currentTime = 0;
