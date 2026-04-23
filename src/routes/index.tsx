@@ -803,65 +803,30 @@ function LandingPage() {
           </div>
 
           <div className="grid grid-cols-1 gap-5 sm:grid-cols-2 lg:grid-cols-3">
-            {testimonials.map((t, i) =>
-              t.type === "text" ? (
-                <div
-                  key={i}
-                  className="flex flex-col rounded-[16px] border border-[#D9CEB9] bg-[#FBF6EC] p-[26px_24px]"
-                >
-                  <p className="mb-5 flex-1 text-[15px] leading-[1.6] text-[#1F1B16]">
-                    {t.quote}
-                  </p>
-                  <div className="flex items-center gap-3 border-t border-[#D9CEB9] pt-4">
-                    <img
-                      src={t.avatar}
-                      alt=""
-                      loading="lazy"
-                      className="h-10 w-10 rounded-full object-cover"
-                    />
-                    <div>
-                      <div className="text-[13.5px] font-semibold text-[#1F1B16]">
-                        {t.name}
-                      </div>
-                      <div className="text-[12px] text-[#8A8175]">{t.meta}</div>
-                    </div>
-                  </div>
-                </div>
-              ) : (
-                <div
-                  key={i}
-                  className="relative aspect-[4/5] overflow-hidden rounded-[16px] bg-[#1F1B16]"
-                >
+            {testimonials.map((t, i) => (
+              <div
+                key={i}
+                className="flex flex-col rounded-[16px] border border-[#D9CEB9] bg-[#FBF6EC] p-[26px_24px]"
+              >
+                <p className="mb-5 flex-1 text-[15px] leading-[1.6] text-[#1F1B16]">
+                  {t.quote}
+                </p>
+                <div className="flex items-center gap-3 border-t border-[#D9CEB9] pt-4">
                   <img
-                    src={t.img}
+                    src={t.avatar}
                     alt=""
                     loading="lazy"
-                    className="h-full w-full object-cover opacity-90"
+                    className="h-10 w-10 rounded-full object-cover"
                   />
-                  <button
-                    aria-label="Play video"
-                    className="absolute left-1/2 top-1/2 flex h-14 w-14 -translate-x-1/2 -translate-y-1/2 items-center justify-center rounded-full bg-[#8D6FAF] shadow-[0_8px_24px_rgba(141,111,175,0.5)]"
-                  >
-                    <span
-                      className="ml-1 inline-block"
-                      style={{
-                        width: 0,
-                        height: 0,
-                        borderLeft: "13px solid #FFFFFF",
-                        borderTop: "8px solid transparent",
-                        borderBottom: "8px solid transparent",
-                      }}
-                    />
-                  </button>
-                  <div className="absolute inset-x-4 bottom-4 text-[13px] leading-[1.4] text-[#F6F0E6]">
-                    <strong className="block text-[10.5px] font-semibold uppercase tracking-[0.12em] text-[#E5D9EF]">
-                      {t.song}
-                    </strong>
-                    {t.who}
+                  <div>
+                    <div className="text-[13.5px] font-semibold text-[#1F1B16]">
+                      {t.name}
+                    </div>
+                    <div className="text-[12px] text-[#8A8175]">{t.meta}</div>
                   </div>
                 </div>
-              ),
-            )}
+              </div>
+            ))}
           </div>
         </div>
       </section>
