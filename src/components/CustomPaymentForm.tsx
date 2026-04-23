@@ -16,6 +16,8 @@ interface CustomPaymentFormProps {
   email: string;
   amountLabel: string;
   onError?: (msg: string) => void;
+  disabled?: boolean;
+  disabledReason?: string;
 }
 
 /**
