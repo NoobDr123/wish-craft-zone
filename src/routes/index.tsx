@@ -22,20 +22,43 @@ import whoYourself from "@/assets/who-yourself.png";
 export const Route = createFileRoute("/")({
   component: LandingPage,
   loader: async () => {
-    const { data, error } = await supabase
-      .from("featured_samples")
-      .select(
-        "id,title,quote,for_text,genre_label,cover_image_url,audio_url,lyrics",
-      )
-      .eq("published", true)
-      .not("audio_url", "is", null)
-      .order("sort_order", { ascending: true })
-      .limit(6);
-    if (error) {
-      console.error("[index loader] featured_samples error", error);
-      return { samples: [] as FeaturedSample[] };
+    const [featuredRes, testimonialRes] = await Promise.all([
+      supabase
+        .from("featured_samples")
+        .select(
+          "id,title,quote,for_text,genre_label,cover_image_url,audio_url,lyrics,testimonial_slug",
+        )
+        .eq("published", true)
+        .is("testimonial_slug", null)
+        .not("audio_url", "is", null)
+        .order("sort_order", { ascending: true })
+        .limit(6),
+      supabase
+        .from("featured_samples")
+        .select("id,testimonial_slug,audio_url,title")
+        .eq("published", true)
+        .not("testimonial_slug", "is", null),
+    ]);
+    if (featuredRes.error) {
+      console.error("[index loader] featured_samples error", featuredRes.error);
     }
-    return { samples: (data ?? []) as FeaturedSample[] };
+    if (testimonialRes.error) {
+      console.error("[index loader] testimonial samples error", testimonialRes.error);
+    }
+    const testimonialSongs: Record<string, { id: string; audio_url: string | null; title: string }> = {};
+    for (const row of testimonialRes.data ?? []) {
+      if (row.testimonial_slug) {
+        testimonialSongs[row.testimonial_slug] = {
+          id: row.id,
+          audio_url: row.audio_url,
+          title: row.title,
+        };
+      }
+    }
+    return {
+      samples: (featuredRes.data ?? []) as FeaturedSample[],
+      testimonialSongs,
+    };
   },
   head: () => ({
     meta: [
@@ -406,7 +429,10 @@ function Eyebrow({
 }
 
 function LandingPage() {
-  const { samples } = Route.useLoaderData() as { samples: FeaturedSample[] };
+  const { samples, testimonialSongs } = Route.useLoaderData() as {
+    samples: FeaturedSample[];
+    testimonialSongs: Record<string, { id: string; audio_url: string | null; title: string }>;
+  };
   // (sample modal removed — playback is now inline on each card)
   const heroAudioRef = useRef<HTMLAudioElement | null>(null);
   const [heroPlaying, setHeroPlaying] = useState(false);
