@@ -188,23 +188,13 @@ const useCases = [
   },
 ];
 
-const testimonials: Array<
-  | {
-      type: "text";
-      quote: string;
-      name: string;
-      meta: string;
-      avatar: string;
-    }
-  | {
-      type: "video";
-      song: string;
-      who: string;
-      img: string;
-    }
-> = [
+const testimonials: Array<{
+  quote: string;
+  name: string;
+  meta: string;
+  avatar: string;
+}> = [
   {
-    type: "text",
     quote:
       '"I almost didn\'t order because it felt like too much. I was wrong. It\'s the only thing I gave him during the whole fight that he asked to hear again."',
     name: "David K.",
@@ -212,13 +202,6 @@ const testimonials: Array<
     avatar: "https://i.pravatar.cc/80?img=67",
   },
   {
-    type: "video",
-    song: '"God Gave Me You"',
-    who: "Watch Wendy's story",
-    img: "https://images.unsplash.com/photo-1544005313-94ddf0286df2?auto=format&fit=crop&w=500&q=80",
-  },
-  {
-    type: "text",
     quote:
       '"My mom played it in her earbuds during infusions. She said the nurses asked her what she was listening to every single week."',
     name: "Sarah R.",
@@ -226,13 +209,6 @@ const testimonials: Array<
     avatar: "https://i.pravatar.cc/80?img=45",
   },
   {
-    type: "video",
-    song: '"The Promise (For Dad)"',
-    who: "Watch Marcus's story",
-    img: "https://images.unsplash.com/photo-1518976024611-28bf4b48222e?auto=format&fit=crop&w=500&q=80",
-  },
-  {
-    type: "text",
     quote:
       '"Two years free of cancer, and this song still plays at every birthday. It became our family\'s anthem. Our daughter asks for it by name now."',
     name: "Priya & Sam",
@@ -240,13 +216,6 @@ const testimonials: Array<
     avatar: "https://i.pravatar.cc/80?img=39",
   },
   {
-    type: "video",
-    song: '"Quiet Light (In Memory)"',
-    who: "Watch Eleanor's family's story",
-    img: "https://images.unsplash.com/photo-1511895426328-dc8714191300?auto=format&fit=crop&w=500&q=80",
-  },
-  {
-    type: "text",
     quote:
       '"We played it at his bedside the night before he passed. The chorus said the things we couldn\'t. The most precious thing our family owns."',
     name: "Marcus D.",
@@ -254,18 +223,18 @@ const testimonials: Array<
     avatar: "https://i.pravatar.cc/80?img=52",
   },
   {
-    type: "video",
-    song: '"Stronger Than the Storm"',
-    who: "Watch James ring the bell",
-    img: "https://images.unsplash.com/photo-1503454537195-1dcabb73ffb9?auto=format&fit=crop&w=500&q=80",
-  },
-  {
-    type: "text",
     quote:
       '"He heard it twice before we lost him. Thank you will never cover it."',
     name: "Patricia M.",
     meta: "Tampa, FL  ·  Wife, for her husband in hospice",
     avatar: "https://i.pravatar.cc/80?img=23",
+  },
+  {
+    quote:
+      '"It captured something I couldn\'t put into words for fifteen years. The first time I played it for her, we both just sat in the car and cried."',
+    name: "Jenna L.",
+    meta: "Denver, CO  ·  Daughter, for her mother in remission",
+    avatar: "https://i.pravatar.cc/80?img=29",
   },
 ];
 
@@ -641,18 +610,48 @@ function LandingPage() {
                         src={s.cover_image_url}
                         alt=""
                         loading="lazy"
-                        className="h-full w-full object-cover transition-transform duration-700 group-hover:scale-[1.03]"
+                        className={`h-full w-full object-cover transition-all duration-700 ${
+                          isPlaying
+                            ? "scale-110 blur-md brightness-[0.55]"
+                            : "group-hover:scale-[1.03]"
+                        }`}
                       />
                     )}
+
+                    {/* Spinning vinyl when playing */}
+                    {isPlaying && s.cover_image_url && (
+                      <div className="pointer-events-none absolute inset-0 flex items-center justify-center">
+                        <div className="relative aspect-square h-[78%] animate-vinyl-spin">
+                          {/* Disc grooves */}
+                          <div className="absolute inset-0 rounded-full bg-[radial-gradient(circle_at_center,#1a1a1a_0%,#0a0a0a_45%,#1a1a1a_50%,#0a0a0a_55%,#1a1a1a_60%,#0a0a0a_65%,#1a1a1a_70%,#0a0a0a_75%,#1a1a1a_80%,#0a0a0a_85%,#1a1a1a_100%)] shadow-[0_20px_50px_-15px_rgba(0,0,0,0.6)]" />
+                          {/* Sheen */}
+                          <div className="absolute inset-0 rounded-full bg-[conic-gradient(from_120deg,transparent_0deg,rgba(255,255,255,0.08)_45deg,transparent_90deg,transparent_360deg)]" />
+                          {/* Cover photo as label */}
+                          <div className="absolute left-1/2 top-1/2 aspect-square w-[46%] -translate-x-1/2 -translate-y-1/2 overflow-hidden rounded-full ring-2 ring-[#1F1B16]/40">
+                            <img
+                              src={s.cover_image_url}
+                              alt=""
+                              className="h-full w-full object-cover"
+                            />
+                            <div className="absolute left-1/2 top-1/2 h-2.5 w-2.5 -translate-x-1/2 -translate-y-1/2 rounded-full bg-[#F6F0E6] ring-1 ring-black/30" />
+                          </div>
+                        </div>
+                      </div>
+                    )}
+
                     {s.audio_url ? (
                       <div
                         className={`absolute inset-0 flex items-center justify-center transition-colors ${
                           isPlaying
-                            ? "bg-[rgba(31,27,22,0.25)]"
+                            ? "bg-transparent"
                             : "bg-[rgba(31,27,22,0.0)] group-hover:bg-[rgba(31,27,22,0.25)]"
                         }`}
                       >
-                        <span className="flex h-14 w-14 items-center justify-center rounded-full bg-[#8D6FAF] shadow-[0_6px_18px_rgba(141,111,175,0.45)] transition-transform group-hover:scale-110">
+                        <span
+                          className={`relative z-10 flex h-14 w-14 items-center justify-center rounded-full bg-[#8D6FAF] shadow-[0_6px_18px_rgba(141,111,175,0.45)] transition-transform group-hover:scale-110 ${
+                            isPlaying ? "opacity-0 group-hover:opacity-100" : ""
+                          }`}
+                        >
                           {isPlaying ? (
                             <span className="flex gap-[4px]">
                               <span className="block h-4 w-[4px] rounded-sm bg-white" />
@@ -678,7 +677,7 @@ function LandingPage() {
                       </div>
                     )}
                     {isPlaying && (
-                      <div className="absolute left-3 top-3 flex items-center gap-1.5 rounded-full bg-[rgba(31,27,22,0.7)] px-2.5 py-1 text-[10px] font-semibold uppercase tracking-[0.12em] text-[#F6F0E6]">
+                      <div className="absolute left-3 top-3 z-10 flex items-center gap-1.5 rounded-full bg-[rgba(31,27,22,0.75)] px-2.5 py-1 text-[10px] font-semibold uppercase tracking-[0.12em] text-[#F6F0E6]">
                         <span className="flex h-1.5 w-1.5 animate-pulse rounded-full bg-[#E8C547]" />
                         Now playing
                       </div>
@@ -834,65 +833,30 @@ function LandingPage() {
           </div>
 
           <div className="grid grid-cols-1 gap-5 sm:grid-cols-2 lg:grid-cols-3">
-            {testimonials.map((t, i) =>
-              t.type === "text" ? (
-                <div
-                  key={i}
-                  className="flex flex-col rounded-[16px] border border-[#D9CEB9] bg-[#FBF6EC] p-[26px_24px]"
-                >
-                  <p className="mb-5 flex-1 text-[15px] leading-[1.6] text-[#1F1B16]">
-                    {t.quote}
-                  </p>
-                  <div className="flex items-center gap-3 border-t border-[#D9CEB9] pt-4">
-                    <img
-                      src={t.avatar}
-                      alt=""
-                      loading="lazy"
-                      className="h-10 w-10 rounded-full object-cover"
-                    />
-                    <div>
-                      <div className="text-[13.5px] font-semibold text-[#1F1B16]">
-                        {t.name}
-                      </div>
-                      <div className="text-[12px] text-[#8A8175]">{t.meta}</div>
-                    </div>
-                  </div>
-                </div>
-              ) : (
-                <div
-                  key={i}
-                  className="relative aspect-[4/5] overflow-hidden rounded-[16px] bg-[#1F1B16]"
-                >
+            {testimonials.map((t, i) => (
+              <div
+                key={i}
+                className="flex flex-col rounded-[16px] border border-[#D9CEB9] bg-[#FBF6EC] p-[26px_24px]"
+              >
+                <p className="mb-5 flex-1 text-[15px] leading-[1.6] text-[#1F1B16]">
+                  {t.quote}
+                </p>
+                <div className="flex items-center gap-3 border-t border-[#D9CEB9] pt-4">
                   <img
-                    src={t.img}
+                    src={t.avatar}
                     alt=""
                     loading="lazy"
-                    className="h-full w-full object-cover opacity-90"
+                    className="h-10 w-10 rounded-full object-cover"
                   />
-                  <button
-                    aria-label="Play video"
-                    className="absolute left-1/2 top-1/2 flex h-14 w-14 -translate-x-1/2 -translate-y-1/2 items-center justify-center rounded-full bg-[#8D6FAF] shadow-[0_8px_24px_rgba(141,111,175,0.5)]"
-                  >
-                    <span
-                      className="ml-1 inline-block"
-                      style={{
-                        width: 0,
-                        height: 0,
-                        borderLeft: "13px solid #FFFFFF",
-                        borderTop: "8px solid transparent",
-                        borderBottom: "8px solid transparent",
-                      }}
-                    />
-                  </button>
-                  <div className="absolute inset-x-4 bottom-4 text-[13px] leading-[1.4] text-[#F6F0E6]">
-                    <strong className="block text-[10.5px] font-semibold uppercase tracking-[0.12em] text-[#E5D9EF]">
-                      {t.song}
-                    </strong>
-                    {t.who}
+                  <div>
+                    <div className="text-[13.5px] font-semibold text-[#1F1B16]">
+                      {t.name}
+                    </div>
+                    <div className="text-[12px] text-[#8A8175]">{t.meta}</div>
                   </div>
                 </div>
-              ),
-            )}
+              </div>
+            ))}
           </div>
         </div>
       </section>
