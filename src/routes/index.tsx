@@ -236,6 +236,55 @@ const testimonials: Array<{
     meta: "Denver, CO  ·  Daughter, for her mother in remission",
     avatar: "https://i.pravatar.cc/80?img=29",
   },
+  {
+    quote:
+      '"My dad isn\'t a crier. He listened once, walked out to the porch, and stayed there for an hour. When he came back in he just hugged me. That was everything."',
+    name: "Elena V.",
+    meta: "San Diego, CA  ·  Daughter, for her father after surgery",
+    avatar: "https://i.pravatar.cc/80?img=47",
+  },
+  {
+    quote:
+      '"We played it at her celebration of life. Three hundred people went silent. My aunt said it sounded like Mom wrote it herself."',
+    name: "Trevor H.",
+    meta: "Nashville, TN  ·  Son, in loving memory",
+    avatar: "https://i.pravatar.cc/80?img=15",
+  },
+  {
+    quote:
+      '"I was skeptical until I heard it. They used the nickname only my husband called me. I sobbed in the kitchen for twenty minutes. Worth every penny."',
+    name: "Diane W.",
+    meta: "Pittsburgh, PA  ·  Wife, after her husband\'s remission",
+    avatar: "https://i.pravatar.cc/80?img=31",
+  },
+  {
+    quote:
+      '"Our oncology nurses asked for a copy. They wanted to share it with another family. That\'s when I knew it wasn\'t just ours anymore."',
+    name: "Rebecca T.",
+    meta: "Minneapolis, MN  ·  Sister, for her brother in treatment",
+    avatar: "https://i.pravatar.cc/80?img=44",
+  },
+  {
+    quote:
+      '"My grandmother kept asking us to play it again. She said it was the first time in months she felt like herself. We played it the morning she passed."',
+    name: "Aisha M.",
+    meta: "Atlanta, GA  ·  Granddaughter, for her grandmother in hospice",
+    avatar: "https://i.pravatar.cc/80?img=49",
+  },
+  {
+    quote:
+      '"I gave it to him on his last birthday. He played it on repeat in the hospital and made the staff listen. He died proud of the life this song described."',
+    name: "Michael B.",
+    meta: "Boston, MA  ·  Son, for his father in loving memory",
+    avatar: "https://i.pravatar.cc/80?img=53",
+  },
+  {
+    quote:
+      '"Five years cancer-free this month. We still play our song on the anniversary. It\'s become how our kids understand what their mom went through."',
+    name: "Carlos R.",
+    meta: "Miami, FL  ·  Husband, for his wife in remission",
+    avatar: "https://i.pravatar.cc/80?img=12",
+  },
 ];
 
 const faqs = [
