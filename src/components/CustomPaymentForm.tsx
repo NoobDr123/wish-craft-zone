@@ -162,7 +162,7 @@ function InnerForm({ returnUrl, email, amountLabel, onError, disabled, disabledR
           </>
         ) : (
           <>
-            <Gift className="h-5 w-5" /> Complete My Order — {amountLabel}
+            <Gift className="h-5 w-5" /> Complete My Order
           </>
         )}
       </button>
