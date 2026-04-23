@@ -295,39 +295,41 @@ function CheckoutPage() {
           </button>
         </section>
 
-        {/* Contact form — payment form mounts inline below as soon as fields are valid */}
-        <section className="mt-6 rounded-3xl border border-peach/70 bg-card p-6 shadow-card md:p-8">
-          <h2 className="font-display text-xl font-bold text-foreground">Contact</h2>
-          <p className="mt-1 text-sm text-muted-foreground">
-            We'll send your song here when it's ready.
-          </p>
-          <div className="mt-4 space-y-3">
-            <Field
-              label="Email Address"
-              type="email"
-              value={email}
-              onChange={setEmail}
-              placeholder="you@email.com"
-              valid={email.length === 0 || emailValid}
-            />
-            <Field
-              label="Full Name"
-              value={name}
-              onChange={setName}
-              placeholder="Jane Doe"
-              valid={name.length === 0 || nameValid}
-            />
+        {/* Payment form — mounts immediately. Express checkout (Apple/Google Pay/Link) shows up top, card form below. */}
+        <section className="mt-6 overflow-hidden rounded-3xl border border-peach/70 bg-card shadow-card">
+          <div className="px-6 pt-6 md:px-8 md:pt-7">
+            <h2 className="font-display text-xl font-bold text-foreground">Contact &amp; Payment</h2>
+            <p className="mt-1 text-sm text-muted-foreground">
+              We'll send your song here when it's ready.
+            </p>
+            <div className="mt-4 space-y-3">
+              <Field
+                label="Email Address"
+                type="email"
+                value={email}
+                onChange={setEmail}
+                placeholder="you@email.com"
+                valid={email.length === 0 || emailValid}
+              />
+              <Field
+                label="Full Name"
+                value={name}
+                onChange={setName}
+                placeholder="Jane Doe"
+                valid={name.length === 0 || nameValid}
+              />
+            </div>
+
+            {error && (
+              <p className="mt-4 rounded-xl bg-destructive/10 px-4 py-3 text-sm text-destructive">
+                {error}
+              </p>
+            )}
           </div>
 
-          {error && (
-            <p className="mt-4 rounded-xl bg-destructive/10 px-4 py-3 text-sm text-destructive">
-              {error}
-            </p>
-          )}
-
           {/* Inline payment form — mounted as soon as the PaymentIntent is ready */}
-          <div className="mt-6 -mx-6 md:-mx-8 border-t border-peach/70">
-            {clientSecret && paymentIntentId && (
+          <div className="mt-6 border-t border-peach/70">
+            {clientSecret && paymentIntentId ? (
               <CustomPaymentForm
                 key={paymentIntentId}
                 clientSecret={clientSecret}
@@ -338,6 +340,12 @@ function CheckoutPage() {
                 disabled={!ready}
                 disabledReason="Enter your email and name above to continue"
               />
+            ) : (
+              <div className="space-y-3 p-4 md:p-6">
+                <div className="h-12 animate-pulse rounded-xl bg-peach/40" />
+                <div className="h-32 animate-pulse rounded-xl bg-peach/30" />
+                <div className="h-14 animate-pulse rounded-2xl bg-peach/40" />
+              </div>
             )}
           </div>
         </section>
