@@ -356,7 +356,7 @@ function LandingPage() {
   const heroAudioRef = useRef<HTMLAudioElement | null>(null);
   const [heroPlaying, setHeroPlaying] = useState(false);
   const [heroEverPlayed, setHeroEverPlayed] = useState(false);
-  const [showPlayMe, setShowPlayMe] = useState(true);
+  const [heroEverPlayed, setHeroEverPlayed] = useState(false);
 
   const handleHeroPlay = () => {
     const a = heroAudioRef.current;
@@ -366,7 +366,6 @@ function LandingPage() {
       setHeroPlaying(false);
       return;
     }
-    setShowPlayMe(false);
     setHeroEverPlayed(true);
     a.currentTime = 0;
     a.play()
