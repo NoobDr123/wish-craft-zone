@@ -106,25 +106,50 @@ function AlmostTherePage() {
         {/* Guarantee */}
         <div className="mt-8 rounded-2xl border border-success/30 bg-success/5 p-5">
           <div className="flex items-center gap-3">
-            <ShieldCheck className="h-5 w-5 shrink-0 text-success" />
-            <p className="font-medium text-foreground">
+            <div className="flex h-9 w-9 shrink-0 items-center justify-center rounded-full bg-success/15">
+              <ShieldCheck className="h-5 w-5 text-success" />
+            </div>
+            <p className="font-display text-lg font-semibold text-foreground">
               30-Day Money-Back Guarantee
             </p>
           </div>
-          <p className="mt-2 text-sm text-muted-foreground">
-            If your song doesn't move you, email us within 30 days for a full
-            refund. No questions asked.
+          <p className="mt-3 text-center text-[15px] leading-relaxed text-muted-foreground">
+            We're confident you'll love your RibbonSong. If you're not satisfied,
+            email us and we'll give you a full refund.
           </p>
         </div>
 
         {/* CTA */}
         <button
           onClick={() => navigate({ to: "/scratch" })}
-          className="mt-8 flex w-full items-center justify-center gap-2 rounded-full bg-primary px-8 py-4 text-base font-semibold text-primary-foreground shadow-glow transition-all hover:bg-primary-hover"
+          className="mt-8 flex w-full items-center justify-center gap-3 rounded-2xl border-2 border-primary bg-[#C45A2F] px-8 py-5 text-lg font-semibold text-white shadow-glow transition-all hover:brightness-95 active:scale-[0.99]"
         >
-          Continue <ArrowRight className="h-5 w-5" />
+          Continue to checkout <ArrowRight className="h-5 w-5" />
         </button>
-        <p className="mt-3 text-center text-xs text-muted-foreground">
+
+        {/* Featured on local news */}
+        <div className="mt-10 text-center">
+          <p className="text-xs font-semibold uppercase tracking-[0.2em] text-muted-foreground">
+            Featured on Local News
+          </p>
+          <div className="mt-5 flex flex-wrap items-center justify-center gap-x-8 gap-y-4">
+            <span className="font-display text-base font-bold tracking-tight text-foreground">
+              <span className="inline-block h-4 w-4 rounded-full bg-foreground align-middle ring-2 ring-foreground ring-offset-2 ring-offset-background" />{" "}
+              CBS NEWS
+            </span>
+            <span className="font-display text-2xl font-extrabold italic text-[#1d3aa8]">
+              FOX
+            </span>
+            <span className="rounded-md bg-[#FFD43B] px-2 py-1 font-display text-sm font-extrabold text-foreground">
+              AOL
+            </span>
+            <span className="font-display text-xl font-extrabold lowercase text-[#5f01d2]">
+              yahoo!<span className="text-foreground">life</span>
+            </span>
+          </div>
+        </div>
+
+        <p className="mt-6 text-center text-xs text-muted-foreground">
           Secure checkout · One-time payment · No subscription
         </p>
       </main>
