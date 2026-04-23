@@ -1173,10 +1173,7 @@ function LandingPage() {
                       {/* Play/pause icon overlay */}
                       {!isPlaying && (
                         <div className="absolute inset-0 flex items-center justify-center">
-                          <div className="flex h-7 w-7 items-center justify-center rounded-full bg-[#FBF6EC]/95 shadow-[0_2px_6px_rgba(0,0,0,0.4)]">
-                            <svg
-                              width="11"
-                              height="12"
+                          <div className="flex h-5 w-5 items-center justify-center rounded-full bg-[#FBF6EC]/95 shadow-[0_2px_6px_rgba(0,0,0,0.4)] sm:h-6 sm:w-6 md:h-7 md:w-7">
                               viewBox="0 0 11 12"
                               fill="none"
                               className="ml-[1px]"
@@ -1188,8 +1185,7 @@ function LandingPage() {
                       )}
                       {isPlaying && (
                         <div className="absolute inset-0 flex items-center justify-center">
-                          <div className="flex h-7 w-7 items-center justify-center rounded-full bg-[#FBF6EC]/95 shadow-[0_2px_6px_rgba(0,0,0,0.4)]">
-                            <svg width="10" height="12" viewBox="0 0 10 12" fill="none">
+                          <div className="flex h-5 w-5 items-center justify-center rounded-full bg-[#FBF6EC]/95 shadow-[0_2px_6px_rgba(0,0,0,0.4)] sm:h-6 sm:w-6 md:h-7 md:w-7">
                               <rect x="0" y="0" width="3" height="12" fill="#1F1B16" />
                               <rect x="7" y="0" width="3" height="12" fill="#1F1B16" />
                             </svg>
