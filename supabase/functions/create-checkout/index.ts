@@ -26,7 +26,10 @@ serve(async (req) => {
     const prices = await stripe.prices.list({ lookup_keys: ["ribbonsong_base"] });
     if (!prices.data.length) return json({ error: "Base price not found" }, 404);
 
-    const origin = req.headers.get("origin") || "";
+    const origin =
+      req.headers.get("origin") ||
+      req.headers.get("referer")?.replace(/\/[^/]*$/, "") ||
+      "https://ribbonsong.com";
 
     const session = await stripe.checkout.sessions.create({
       line_items: [{ price: prices.data[0].id, quantity: 1 }],
