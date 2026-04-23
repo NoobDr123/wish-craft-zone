@@ -499,7 +499,7 @@ function LandingPage() {
                   onClick={handleHeroPlay}
                   className="absolute bottom-3 right-3 z-20 flex items-center gap-2 rounded-full bg-[rgba(246,240,230,0.97)] py-2 pl-2 pr-3.5 shadow-[0_8px_24px_rgba(0,0,0,0.28)] ring-1 ring-black/5 transition-all hover:-translate-y-px hover:shadow-[0_10px_28px_rgba(0,0,0,0.32)] sm:bottom-4 sm:right-4 sm:py-2.5 sm:pl-2.5 sm:pr-4"
                 >
-                  <span className="flex h-7 w-7 items-center justify-center rounded-full bg-[#C7572E] sm:h-8 sm:w-8">
+                  <span className="flex h-7 w-7 items-center justify-center rounded-full bg-[#8D6FAF] sm:h-8 sm:w-8">
                     {heroPlaying ? (
                       <span className="flex gap-[3px]">
                         <span className="block h-2.5 w-[3px] rounded-sm bg-white sm:h-3" />
