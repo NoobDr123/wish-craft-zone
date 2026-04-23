@@ -51,22 +51,24 @@ function Upsell1() {
   return (
     <UpsellShell
       step={1}
-      badge="Make it unforgettable"
-      headline="Wait, make it even more emotional."
+      badge="Make their song unforgettable"
+      headline="Add a heartfelt bridge & a 3rd verse"
       description={
         <>
-          Your song comes with two beautiful verses. For just{" "}
-          <span className="font-semibold text-foreground">$19.99</span>, add a
-          tender bridge and a third verse. This is usually where the tears start
-          flowing.
+          Your song already comes with two verses and a chorus. Add a tender
+          bridge and a third verse — about{" "}
+          <span className="font-semibold text-foreground">90 extra seconds</span>{" "}
+          of music — for only{" "}
+          <span className="font-semibold text-foreground">$19.99</span>. This is
+          where most people say the tears start.
         </>
       }
       highlights={[
-        "A reflective bridge that names what matters most",
-        "A third verse that brings the story home",
-        "About 90 extra seconds of music to sit with",
+        "A reflective bridge that names what matters most about them",
+        "A third verse that brings their story full circle",
+        "About 90 extra seconds of music to sit in together",
       ]}
-      acceptLabel="Yes, add the bridge & 3rd verse · $19.99"
+      priceLabel="$19.99"
       declineLabel="No thanks, two verses is enough"
       onAccept={accept}
       onDecline={decline}
