@@ -867,7 +867,7 @@ function LandingPage() {
               {
                 n: "03",
                 h: "Delivered in 5 days.",
-                p: "Straight to your inbox — streamable and downloadable, yours forever to share, gift, or play at the bedside.",
+                p: "Straight to your inbox. Streamable and downloadable, yours forever to share, gift, or play at the bedside.",
                 m: "Don't love it? We'll rewrite it free, or refund you in full. No questions.",
                 icon: (
                   <svg viewBox="0 0 24 24" fill="none" className="h-5 w-5" stroke="currentColor" strokeWidth="1.7" strokeLinecap="round" strokeLinejoin="round">
