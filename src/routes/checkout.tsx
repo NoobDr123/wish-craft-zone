@@ -50,11 +50,9 @@ function formatDeliveryDate() {
 
 function CheckoutPage() {
   const navigate = useNavigate();
-  const { samples } = Route.useLoaderData() as { samples: SampleSong[] };
   const q = useQuizStore();
   const [email, setEmail] = useState(q.buyer_email || "");
   const [name, setName] = useState(q.buyer_name || "");
-  const [creating, setCreating] = useState(false);
   const [clientSecret, setClientSecret] = useState<string | null>(null);
   const [paymentIntentId, setPaymentIntentId] = useState<string | null>(null);
   const [orderId, setOrderId] = useState<string | null>(q.orderId || null);
@@ -75,134 +73,49 @@ function CheckoutPage() {
   }, []);
   const recipient = q.recipient_name || "your loved one";
 
-  const startCheckout = async () => {
-    setCreating(true);
-    setError(null);
-
-    try {
-      const { data: authData } = await supabase.auth.getUser();
-      const userId = authData.user?.id ?? null;
-
-      const journey = journeyStageOf(q.stage);
-      const tense = tenseOf(q.stage);
-      const relationshipResolved =
-        q.relationship === "Other" && q.relationship_other.trim()
-          ? q.relationship_other.trim()
-          : (q.relationship ?? null);
-
-      const newOrderId =
-        typeof crypto !== "undefined" && "randomUUID" in crypto
-          ? crypto.randomUUID()
-          : `${Date.now()}-${Math.random().toString(36).slice(2)}`;
-
-      // Use a placeholder email until the buyer enters one. We patch it
-      // before payment confirmation (and via PaymentElement billing details).
-      const placeholderEmail = `pending+${newOrderId}@ribbonsong.com`;
-
-      const { error: insertError } = await supabase
-        .from("orders")
-        .insert({
-          id: newOrderId,
-          user_id: userId,
-          buyer_email: placeholderEmail,
-          buyer_name: null,
-          recipient_name: q.recipient_name,
-          relationship: relationshipResolved,
-          genre: q.genre ?? null,
-          tempo: q.tempo ?? null,
-          voice: q.voice ?? null,
-          song_title_idea: q.song_title_idea || null,
-          is_gift: q.is_gift,
-          recipient_email: q.recipient_email || null,
-          delivery_date: q.delivery_date || null,
-          personal_note: q.personal_note || null,
-          amount_cents: 4999,
-          currency: "USD",
-          status: "pending_payment",
-          payment_status: "pending",
-          priority: journey === "hospice" ? "hospice" : "standard",
-          quiz_payload: {
-            q1_relationship: q.relationship,
-            q1_relationship_other: q.relationship_other || null,
-            q1_recipient_name: q.recipient_name,
-            q1_pronunciation: q.pronunciation || null,
-            q1_age_range: q.age_range || null,
-            q3_journey: q.stage,
-            q3_journey_stage: journey,
-            q3_tense: tense,
-            q4_fighting_for: q.fighting_for,
-            q5_qualities: q.qualities,
-            q6_shared_memory: q.shared_memory,
-            q7_theme: q.message,
-            q8_letter: q.personal_words,
-            q9_genre: q.genre,
-            q9_tempo: q.tempo,
-            q9_voice: q.voice,
-            q9_song_title_idea: q.song_title_idea || null,
-
-            stage: q.stage,
-            cancer_type: q.cancer_type,
-            message: q.message,
-            fighting_for: q.fighting_for,
-            signature_strength: q.signature_strength,
-            hardest_moment: q.hardest_moment,
-            what_helps_most: q.what_helps_most,
-            qualities: q.qualities,
-            inside_joke: q.inside_joke,
-            shared_memory: q.shared_memory,
-            little_things: q.little_things,
-            faith_or_beliefs: q.faith_or_beliefs,
-            personal_words: q.personal_words,
-            hope_for_them: q.hope_for_them,
-            relationship: relationshipResolved,
-            journey_stage: journey,
-            tense,
-          },
-        });
-
-      if (insertError) {
-        console.error("Order insert failed:", insertError);
-        setError("Could not start your order. Please try again.");
-        return;
-      }
-
-      q.set("orderId", newOrderId);
-      setOrderId(newOrderId);
-
-      const { data, error: fnError } = await supabase.functions.invoke("create-checkout", {
-        body: {
-          orderId: newOrderId,
-          environment: stripeEnvironment,
-        },
-      });
-
-      if (fnError || !data?.clientSecret) {
-        console.error("create-checkout failed:", fnError, data);
-        setError(data?.error || "Could not start payment. Please try again.");
-        return;
-      }
-
-      setClientSecret(data.clientSecret);
-      setPaymentIntentId(data.paymentIntentId);
-    } catch (e) {
-      console.error("Checkout error:", e);
-      setError("Something went wrong. Please try again.");
-    } finally {
-      setCreating(false);
-    }
-  };
-
-  // Create the PaymentIntent immediately on mount — payment form shows right away.
-  // useRef lock prevents StrictMode double-invocation and re-render races from
-  // firing multiple create-checkout calls (which was creating duplicate orders).
+  // Single-shot kick: use the prefetched checkout from /scratch if it exists,
+  // otherwise prefetchCheckout() runs the full flow now. Either way the form
+  // mounts as soon as the clientSecret resolves.
   const startedRef = useRef(false);
   useEffect(() => {
     if (!q.recipient_name) return;
     if (startedRef.current) return;
     startedRef.current = true;
-    startCheckout();
+
+    const apply = (pf: PrefetchedCheckout | null) => {
+      if (!pf) {
+        setError("Could not start payment. Please try again.");
+        return;
+      }
+      q.set("orderId", pf.orderId);
+      setOrderId(pf.orderId);
+      setClientSecret(pf.clientSecret);
+      setPaymentIntentId(pf.paymentIntentId);
+    };
+
+    const cached = getPrefetchedCheckout();
+    if (cached) {
+      apply(cached);
+    } else {
+      prefetchCheckout().then(apply);
+    }
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [q.recipient_name]);
+
+  // Persist buyer email/name to the order as they type (debounced).
+  useEffect(() => {
+    if (!orderId || !ready) return;
+    const t = setTimeout(async () => {
+      const trimmedEmail = email.trim().toLowerCase();
+      q.set("buyer_email", trimmedEmail);
+      q.set("buyer_name", name);
+      await supabase
+        .from("orders")
+        .update({ buyer_email: trimmedEmail, buyer_name: name })
+        .eq("id", orderId);
+    }, 600);
+    return () => clearTimeout(t);
+    // eslint-disable-next-line react-hooks/exhaustive-deps
 
   // Persist buyer email/name to the order as they type (debounced).
   useEffect(() => {
