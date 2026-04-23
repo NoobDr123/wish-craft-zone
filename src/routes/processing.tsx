@@ -201,49 +201,49 @@ function ThankYouPage() {
     : [];
 
   return (
-    <div className="min-h-screen bg-gradient-warm pb-24">
-      {/* Themed progress: Payment ✓ → Bonus ✓ → Log in (current) */}
+    <div className="min-h-screen bg-gradient-warm pb-16 sm:pb-24">
+      {/* Themed progress: Payment ✓, Bonus ✓, Final confirmation (current) */}
       <CheckoutProgress current={3} />
 
       <header className="border-b border-peach/60 bg-background/60 backdrop-blur">
-        <div className="mx-auto flex max-w-3xl items-center justify-between px-5 py-4">
+        <div className="mx-auto flex max-w-3xl items-center justify-between gap-2 px-4 py-3 sm:px-5 sm:py-4">
           <Logo />
-          <span className="inline-flex items-center gap-1.5 text-xs text-muted-foreground">
+          <span className="inline-flex items-center gap-1.5 text-[11px] text-muted-foreground sm:text-xs">
             <ShieldCheck className="h-3.5 w-3.5" /> Order confirmed
           </span>
         </div>
       </header>
 
-      <main className="mx-auto max-w-2xl px-5 py-10">
+      <main className="mx-auto max-w-2xl px-4 py-6 sm:px-5 sm:py-10">
         {/* Hero confirmation */}
         <section className="text-center">
-          <div className="mx-auto flex h-20 w-20 items-center justify-center rounded-full bg-success/10 ring-8 ring-success/5">
-            <CheckCircle2 className="h-12 w-12 text-success" />
+          <div className="mx-auto flex h-14 w-14 items-center justify-center rounded-full bg-success/10 ring-4 ring-success/5 sm:h-20 sm:w-20 sm:ring-8">
+            <CheckCircle2 className="h-8 w-8 text-success sm:h-12 sm:w-12" />
           </div>
-          <h1 className="mt-6 text-balance font-display text-4xl font-bold leading-[1.05] text-foreground md:text-5xl">
+          <h1 className="mt-4 text-balance font-display text-3xl font-bold leading-[1.05] text-foreground sm:mt-6 sm:text-4xl md:text-5xl">
             Thank you{buyerName ? `, ${buyerName.split(" ")[0]}` : ""}!
           </h1>
-          <p className="mx-auto mt-4 max-w-lg text-balance text-base leading-relaxed text-muted-foreground md:text-lg">
+          <p className="mx-auto mt-3 max-w-lg text-balance text-[15px] leading-relaxed text-muted-foreground sm:mt-4 sm:text-base md:text-lg">
             Your order is confirmed. We've started crafting{" "}
             <span className="font-semibold text-primary">{recipient}</span>'s
             personalized RibbonSong.
           </p>
 
           {orderRef && (
-            <p className="mt-4 inline-flex items-center gap-2 rounded-full border border-peach bg-card px-4 py-1.5 text-xs font-semibold tracking-wider text-muted-foreground">
+            <p className="mt-3 inline-flex items-center gap-2 rounded-full border border-peach bg-card px-3 py-1 text-[10px] font-semibold tracking-wider text-muted-foreground sm:mt-4 sm:px-4 sm:py-1.5 sm:text-xs">
               ORDER #{orderRef}
             </p>
           )}
         </section>
 
         {/* Order summary */}
-        <section className="mt-8 rounded-3xl border border-peach/70 bg-card p-6 shadow-card md:p-8">
-          <h2 className="flex items-center gap-2 font-display text-2xl font-bold text-foreground">
-            <Music2 className="h-5 w-5 text-primary" /> Order Summary
+        <section className="mt-6 rounded-2xl border border-peach/70 bg-card p-4 shadow-card sm:mt-8 sm:rounded-3xl sm:p-6 md:p-8">
+          <h2 className="flex items-center gap-2 font-display text-xl font-bold text-foreground sm:text-2xl">
+            <Music2 className="h-5 w-5 text-primary" /> Order summary
           </h2>
 
           {loading ? (
-            <div className="mt-6 space-y-3">
+            <div className="mt-5 space-y-3 sm:mt-6">
               {[0, 1, 2, 3].map((i) => (
                 <div
                   key={i}
@@ -253,7 +253,7 @@ function ThankYouPage() {
             </div>
           ) : (
             <>
-              <dl className="mt-6 space-y-3 text-[15px]">
+              <dl className="mt-5 space-y-2.5 text-[14px] sm:mt-6 sm:space-y-3 sm:text-[15px]">
                 <Row label="Song for" value={recipient} highlight />
                 {order?.relationship && (
                   <Row label="Relationship" value={order.relationship} />
@@ -269,14 +269,14 @@ function ThankYouPage() {
                 )}
               </dl>
 
-              <div className="my-5 border-t border-dashed border-peach" />
+              <div className="my-4 border-t border-dashed border-peach sm:my-5" />
 
-              <div className="space-y-3 text-[15px]">
+              <div className="space-y-2.5 text-[14px] sm:space-y-3 sm:text-[15px]">
                 <div className="flex items-start justify-between gap-3">
                   <span className="inline-flex items-center gap-2 text-muted-foreground">
-                    <Mail className="h-4 w-4" /> Confirmation sent to
+                    <Mail className="h-4 w-4 shrink-0" /> Confirmation sent to
                   </span>
-                  <span className="text-right font-semibold text-foreground">
+                  <span className="break-all text-right font-semibold text-foreground">
                     {buyerEmail}
                   </span>
                 </div>
@@ -284,9 +284,9 @@ function ThankYouPage() {
                 {order?.is_gift && order.recipient_email && (
                   <div className="flex items-start justify-between gap-3">
                     <span className="inline-flex items-center gap-2 text-muted-foreground">
-                      <Send className="h-4 w-4" /> Gift delivery to
+                      <Send className="h-4 w-4 shrink-0" /> Gift delivery to
                     </span>
-                    <span className="text-right font-semibold text-foreground">
+                    <span className="break-all text-right font-semibold text-foreground">
                       {order.recipient_email}
                     </span>
                   </div>
@@ -294,22 +294,31 @@ function ThankYouPage() {
 
                 <div className="flex items-start justify-between gap-3">
                   <span className="inline-flex items-center gap-2 text-muted-foreground">
-                    <Calendar className="h-4 w-4" /> Expected delivery
+                    <Calendar className="h-4 w-4 shrink-0" /> Expected delivery
                   </span>
                   <span className="text-right font-semibold text-primary">
-                    {deliveryLabel}
+                    {deliveryDate}
+                  </span>
+                </div>
+
+                <div className="flex items-start justify-between gap-3">
+                  <span className="inline-flex items-center gap-2 text-muted-foreground">
+                    <Sparkles className="h-4 w-4 shrink-0" /> Delivery speed
+                  </span>
+                  <span className="text-right font-semibold text-foreground">
+                    {deliveryWindow}
                   </span>
                 </div>
               </div>
 
               {amountPaid && (
                 <>
-                  <div className="my-5 border-t border-dashed border-peach" />
+                  <div className="my-4 border-t border-dashed border-peach sm:my-5" />
                   <div className="flex items-baseline justify-between">
                     <span className="font-semibold text-foreground">
                       Total paid
                     </span>
-                    <span className="font-display text-2xl font-bold text-primary">
+                    <span className="font-display text-xl font-bold text-primary sm:text-2xl">
                       {amountPaid}
                     </span>
                   </div>
@@ -320,54 +329,54 @@ function ThankYouPage() {
         </section>
 
         {/* What happens next */}
-        <section className="mt-6 rounded-3xl border border-peach/70 bg-card p-6 shadow-soft md:p-8">
-          <h2 className="flex items-center gap-2 font-display text-2xl font-bold text-foreground">
-            <Sparkles className="h-5 w-5 text-primary" /> What Happens Next
+        <section className="mt-5 rounded-2xl border border-peach/70 bg-card p-4 shadow-soft sm:mt-6 sm:rounded-3xl sm:p-6 md:p-8">
+          <h2 className="flex items-center gap-2 font-display text-xl font-bold text-foreground sm:text-2xl">
+            <Sparkles className="h-5 w-5 text-primary" /> What happens next
           </h2>
 
-          <ol className="mt-6 space-y-5">
+          <ol className="mt-5 space-y-4 sm:mt-6 sm:space-y-5">
             <Step
-              icon={<Sparkles className="h-5 w-5" />}
+              icon={<Sparkles className="h-4 w-4 sm:h-5 sm:w-5" />}
               title="We're writing the lyrics now"
               description="Our team is turning your story into a heartfelt song concept and lyric draft."
               eta="Today"
               active
             />
             <Step
-              icon={<Music2 className="h-5 w-5" />}
+              icon={<Music2 className="h-4 w-4 sm:h-5 sm:w-5" />}
               title="Recording your song"
               description={`We bring it to life in the ${order?.genre ?? "style"} you chose, with the voice and tempo you picked.`}
-              eta="Within 48 hours"
+              eta={deliveryWindow}
             />
             <Step
-              icon={<Headphones className="h-5 w-5" />}
+              icon={<Headphones className="h-4 w-4 sm:h-5 sm:w-5" />}
               title="Quality check"
-              description="A real human listens to every song before it goes out — no shortcuts."
+              description="A real human listens to every song before it goes out. No shortcuts."
               eta="Before delivery"
             />
             <Step
-              icon={<Send className="h-5 w-5" />}
+              icon={<Send className="h-4 w-4 sm:h-5 sm:w-5" />}
               title="Delivered to your inbox"
               description={`We'll email ${buyerEmail || "you"} a private link to listen, share, and download.`}
-              eta={deliveryLabel}
+              eta={deliveryDate}
               last
             />
           </ol>
         </section>
 
         {/* Reassurance */}
-        <section className="mt-6 rounded-3xl border border-peach/70 bg-card p-6 shadow-soft md:p-8">
-          <h3 className="flex items-center gap-2 font-display text-xl font-bold text-foreground">
+        <section className="mt-5 rounded-2xl border border-peach/70 bg-card p-4 shadow-soft sm:mt-6 sm:rounded-3xl sm:p-6 md:p-8">
+          <h3 className="flex items-center gap-2 font-display text-lg font-bold text-foreground sm:text-xl">
             <Heart className="h-5 w-5 text-primary" /> You're in good hands
           </h3>
-          <ul className="mt-4 space-y-3 text-sm text-muted-foreground">
+          <ul className="mt-3 space-y-2.5 text-[13px] text-muted-foreground sm:mt-4 sm:space-y-3 sm:text-sm">
             <li className="flex gap-2.5">
               <CheckCircle2 className="mt-0.5 h-4 w-4 shrink-0 text-success" />
               <span>
                 <span className="font-semibold text-foreground">
-                  30-day money-back guarantee
+                  30-day money-back guarantee.
                 </span>{" "}
-                — if you're not happy, we'll refund you, no questions asked.
+                If you're not happy, we'll refund you, no questions asked.
               </span>
             </li>
             <li className="flex gap-2.5">
@@ -376,7 +385,7 @@ function ThankYouPage() {
                 <span className="font-semibold text-foreground">
                   Need to add or change something?
                 </span>{" "}
-                Just reply to your confirmation email — we read every one.
+                Just reply to your confirmation email. We read every one.
               </span>
             </li>
             <li className="flex gap-2.5">
@@ -392,7 +401,7 @@ function ThankYouPage() {
 
           <Link
             to="/dashboard"
-            className="mt-6 flex w-full items-center justify-center gap-2 rounded-2xl bg-primary px-6 py-4 text-base font-bold text-primary-foreground shadow-glow transition-all hover:brightness-95 active:scale-[0.99]"
+            className="mt-5 flex w-full items-center justify-center gap-2 rounded-xl bg-primary px-5 py-3.5 text-[15px] font-bold text-primary-foreground shadow-glow transition-all hover:brightness-95 active:scale-[0.99] sm:mt-6 sm:rounded-2xl sm:px-6 sm:py-4 sm:text-base"
           >
             Go to my dashboard
           </Link>
