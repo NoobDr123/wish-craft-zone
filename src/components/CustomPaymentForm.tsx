@@ -119,12 +119,12 @@ function InnerForm({ returnUrl, email, amountLabel, onError }: CustomPaymentForm
         </div>
       </div>
 
-      {/* Card / bank / wallet form — Link signup UI hidden, Link still available via Express row */}
+      {/* Card form — Link signup panel hidden, Link still available via Express row above */}
       <PaymentElement
         options={{
           layout: { type: "tabs", defaultCollapsed: false },
           defaultValues: { billingDetails: { email } },
-          wallets: { applePay: "auto", googlePay: "auto" },
+          wallets: { applePay: "never", googlePay: "never", link: "never" } as any,
         }}
       />
 
