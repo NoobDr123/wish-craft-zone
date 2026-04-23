@@ -12,6 +12,7 @@ import {
   ShieldCheck,
 } from "lucide-react";
 import { Logo } from "@/components/Logo";
+import { CheckoutProgress } from "@/components/CheckoutProgress";
 import { useQuizStore } from "@/stores/quizStore";
 import { supabase } from "@/integrations/supabase/client";
 
@@ -147,6 +148,9 @@ function ThankYouPage() {
 
   return (
     <div className="min-h-screen bg-gradient-warm pb-24">
+      {/* Themed progress: Payment ✓ → Bonus ✓ → Log in (current) */}
+      <CheckoutProgress current={3} />
+
       <header className="border-b border-peach/60 bg-background/60 backdrop-blur">
         <div className="mx-auto flex max-w-3xl items-center justify-between px-5 py-4">
           <Logo />
