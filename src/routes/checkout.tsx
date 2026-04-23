@@ -189,7 +189,8 @@ function CheckoutPage() {
           </div>
 
           <button
-            onClick={() => navigate({ to: "/create" })}
+            type="button"
+            onClick={(e) => e.preventDefault()}
             className="mt-4 flex w-full items-center justify-center gap-2 rounded-xl border-2 border-dashed border-primary/40 bg-primary/5 px-4 py-3 text-sm font-semibold text-primary transition-colors hover:bg-primary/10"
           >
             <Pencil className="h-4 w-4" /> Review or Edit Survey
