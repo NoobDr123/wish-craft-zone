@@ -188,23 +188,13 @@ const useCases = [
   },
 ];
 
-const testimonials: Array<
-  | {
-      type: "text";
-      quote: string;
-      name: string;
-      meta: string;
-      avatar: string;
-    }
-  | {
-      type: "video";
-      song: string;
-      who: string;
-      img: string;
-    }
-> = [
+const testimonials: Array<{
+  quote: string;
+  name: string;
+  meta: string;
+  avatar: string;
+}> = [
   {
-    type: "text",
     quote:
       '"I almost didn\'t order because it felt like too much. I was wrong. It\'s the only thing I gave him during the whole fight that he asked to hear again."',
     name: "David K.",
@@ -212,13 +202,6 @@ const testimonials: Array<
     avatar: "https://i.pravatar.cc/80?img=67",
   },
   {
-    type: "video",
-    song: '"God Gave Me You"',
-    who: "Watch Wendy's story",
-    img: "https://images.unsplash.com/photo-1544005313-94ddf0286df2?auto=format&fit=crop&w=500&q=80",
-  },
-  {
-    type: "text",
     quote:
       '"My mom played it in her earbuds during infusions. She said the nurses asked her what she was listening to every single week."',
     name: "Sarah R.",
@@ -226,13 +209,6 @@ const testimonials: Array<
     avatar: "https://i.pravatar.cc/80?img=45",
   },
   {
-    type: "video",
-    song: '"The Promise (For Dad)"',
-    who: "Watch Marcus's story",
-    img: "https://images.unsplash.com/photo-1518976024611-28bf4b48222e?auto=format&fit=crop&w=500&q=80",
-  },
-  {
-    type: "text",
     quote:
       '"Two years free of cancer, and this song still plays at every birthday. It became our family\'s anthem. Our daughter asks for it by name now."',
     name: "Priya & Sam",
@@ -240,13 +216,6 @@ const testimonials: Array<
     avatar: "https://i.pravatar.cc/80?img=39",
   },
   {
-    type: "video",
-    song: '"Quiet Light (In Memory)"',
-    who: "Watch Eleanor's family's story",
-    img: "https://images.unsplash.com/photo-1511895426328-dc8714191300?auto=format&fit=crop&w=500&q=80",
-  },
-  {
-    type: "text",
     quote:
       '"We played it at his bedside the night before he passed. The chorus said the things we couldn\'t. The most precious thing our family owns."',
     name: "Marcus D.",
@@ -254,18 +223,18 @@ const testimonials: Array<
     avatar: "https://i.pravatar.cc/80?img=52",
   },
   {
-    type: "video",
-    song: '"Stronger Than the Storm"',
-    who: "Watch James ring the bell",
-    img: "https://images.unsplash.com/photo-1503454537195-1dcabb73ffb9?auto=format&fit=crop&w=500&q=80",
-  },
-  {
-    type: "text",
     quote:
       '"He heard it twice before we lost him. Thank you will never cover it."',
     name: "Patricia M.",
     meta: "Tampa, FL  ·  Wife, for her husband in hospice",
     avatar: "https://i.pravatar.cc/80?img=23",
+  },
+  {
+    quote:
+      '"It captured something I couldn\'t put into words for fifteen years. The first time I played it for her, we both just sat in the car and cried."',
+    name: "Jenna L.",
+    meta: "Denver, CO  ·  Daughter, for her mother in remission",
+    avatar: "https://i.pravatar.cc/80?img=29",
   },
 ];
 
