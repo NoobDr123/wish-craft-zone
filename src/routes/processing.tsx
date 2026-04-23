@@ -130,7 +130,7 @@ function ThankYouPage() {
         const { data } = await supabase
           .from("orders")
           .select(
-            "id, buyer_email, buyer_name, recipient_name, relationship, genre, tempo, voice, song_title_idea, amount_cents, amount_paid_cents, currency, has_3rd_verse, is_rush, has_unlimited_edits, delivery_date, is_gift, recipient_email, created_at"
+            "id, buyer_email, buyer_name, recipient_name, relationship, genre, tempo, voice, song_title_idea, amount_cents, amount_paid_cents, currency, has_3rd_verse, is_rush, has_unlimited_edits, delivery_date, is_gift, recipient_email, created_at, product_config"
           )
           .eq("id", orderId)
           .maybeSingle();
@@ -141,7 +141,7 @@ function ThankYouPage() {
         const { data } = await supabase
           .from("orders")
           .select(
-            "id, buyer_email, buyer_name, recipient_name, relationship, genre, tempo, voice, song_title_idea, amount_cents, amount_paid_cents, currency, has_3rd_verse, is_rush, has_unlimited_edits, delivery_date, is_gift, recipient_email, created_at"
+            "id, buyer_email, buyer_name, recipient_name, relationship, genre, tempo, voice, song_title_idea, amount_cents, amount_paid_cents, currency, has_3rd_verse, is_rush, has_unlimited_edits, delivery_date, is_gift, recipient_email, created_at, product_config"
           )
           .eq("buyer_email", email)
           .order("created_at", { ascending: false })
@@ -167,11 +167,17 @@ function ThankYouPage() {
   const buyerEmail = order?.buyer_email || q.buyer_email || "";
   const buyerName = order?.buyer_name || q.buyer_name || "";
 
-  const deliveryLabel = useMemo(() => {
+  const deliverySpeed: DeliverySpeed = order
+    ? getDeliverySpeed(order)
+    : "standard";
+
+  const deliveryDate = useMemo(() => {
     if (order?.delivery_date) return order.delivery_date;
-    if (order) return formatDeliveryDate(order.created_at, order.is_rush);
-    return formatDeliveryDate(new Date().toISOString(), false);
-  }, [order]);
+    if (order) return formatDeliveryDate(order.created_at, deliverySpeed);
+    return formatDeliveryDate(new Date().toISOString(), "standard");
+  }, [order, deliverySpeed]);
+
+  const deliveryWindow = deliveryLabelFor(deliverySpeed);
 
   const amountPaid = order
     ? formatMoney(order.amount_paid_cents || order.amount_cents, order.currency)
@@ -179,12 +185,19 @@ function ThankYouPage() {
 
   const orderRef = order ? order.id.slice(0, 8).toUpperCase() : null;
 
+  const deliveryAddOnLabel: string | false =
+    deliverySpeed === "24h"
+      ? "24-hour delivery"
+      : deliverySpeed === "48h"
+        ? "48-hour delivery"
+        : false;
+
   const upgrades = order
-    ? [
+    ? ([
         order.has_3rd_verse && "Extra verse",
-        order.is_rush && "Rush delivery",
+        deliveryAddOnLabel,
         order.has_unlimited_edits && "Unlimited edits",
-      ].filter(Boolean) as string[]
+      ].filter(Boolean) as string[])
     : [];
 
   return (
