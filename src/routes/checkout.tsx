@@ -69,7 +69,11 @@ function CheckoutPage() {
   const nameValid = name.trim().length > 1;
   const canContinue = emailValid && nameValid && !creating;
 
-  const deliveryDate = useMemo(() => formatDeliveryDate(), []);
+  // Compute delivery date only on client to avoid SSR/CSR hydration mismatch
+  const [deliveryDate, setDeliveryDate] = useState<string>("");
+  useEffect(() => {
+    setDeliveryDate(formatDeliveryDate());
+  }, []);
   const recipient = q.recipient_name || "your loved one";
 
   const handleStartCheckout = async () => {
