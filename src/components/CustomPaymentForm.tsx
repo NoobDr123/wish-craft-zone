@@ -119,7 +119,7 @@ function InnerForm({ returnUrl, email, amountLabel, onError }: CustomPaymentForm
         </div>
       </div>
 
-      {/* Card / bank / wallet form — Link auto-appears when enabled in Stripe dashboard */}
+      {/* Card / bank / wallet form — Link signup UI hidden, Link still available via Express row */}
       <PaymentElement
         options={{
           layout: { type: "tabs", defaultCollapsed: false },
