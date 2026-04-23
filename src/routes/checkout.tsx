@@ -1,5 +1,5 @@
 import { createFileRoute, useNavigate, Link } from "@tanstack/react-router";
-import { useEffect, useState } from "react";
+import { useEffect, useRef, useState } from "react";
 import { Logo } from "@/components/Logo";
 import { PaymentTestModeBanner } from "@/components/PaymentTestModeBanner";
 import { AudioPlayer } from "@/components/AudioPlayer";
@@ -194,9 +194,13 @@ function CheckoutPage() {
   };
 
   // Create the PaymentIntent immediately on mount — payment form shows right away.
+  // useRef lock prevents StrictMode double-invocation and re-render races from
+  // firing multiple create-checkout calls (which was creating duplicate orders).
+  const startedRef = useRef(false);
   useEffect(() => {
     if (!q.recipient_name) return;
-    if (clientSecret || creating) return;
+    if (startedRef.current) return;
+    startedRef.current = true;
     startCheckout();
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [q.recipient_name]);
