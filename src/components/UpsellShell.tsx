@@ -35,8 +35,8 @@ export function UpsellShell({
 
   return (
     <div className="min-h-screen bg-background">
-      {/* Payment-in-progress warning bar — sticky purple background, red text */}
-      <div className="sticky top-0 z-50 w-full border-b border-primary/40 bg-primary/15 backdrop-blur-md">
+      {/* Payment-in-progress warning bar — purple background, red text (not sticky) */}
+      <div className="w-full border-b border-primary/40 bg-primary/15">
         <div className="mx-auto flex max-w-2xl items-center justify-center gap-2 px-4 py-2.5 text-center">
           <AlertTriangle className="h-4 w-4 shrink-0 text-red-600" />
           <p className="text-xs font-semibold text-red-600 md:text-sm">
