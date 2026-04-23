@@ -22,20 +22,43 @@ import whoYourself from "@/assets/who-yourself.png";
 export const Route = createFileRoute("/")({
   component: LandingPage,
   loader: async () => {
-    const { data, error } = await supabase
-      .from("featured_samples")
-      .select(
-        "id,title,quote,for_text,genre_label,cover_image_url,audio_url,lyrics",
-      )
-      .eq("published", true)
-      .not("audio_url", "is", null)
-      .order("sort_order", { ascending: true })
-      .limit(6);
-    if (error) {
-      console.error("[index loader] featured_samples error", error);
-      return { samples: [] as FeaturedSample[] };
+    const [featuredRes, testimonialRes] = await Promise.all([
+      supabase
+        .from("featured_samples")
+        .select(
+          "id,title,quote,for_text,genre_label,cover_image_url,audio_url,lyrics,testimonial_slug",
+        )
+        .eq("published", true)
+        .is("testimonial_slug", null)
+        .not("audio_url", "is", null)
+        .order("sort_order", { ascending: true })
+        .limit(6),
+      supabase
+        .from("featured_samples")
+        .select("id,testimonial_slug,audio_url,title")
+        .eq("published", true)
+        .not("testimonial_slug", "is", null),
+    ]);
+    if (featuredRes.error) {
+      console.error("[index loader] featured_samples error", featuredRes.error);
     }
-    return { samples: (data ?? []) as FeaturedSample[] };
+    if (testimonialRes.error) {
+      console.error("[index loader] testimonial samples error", testimonialRes.error);
+    }
+    const testimonialSongs: Record<string, { id: string; audio_url: string | null; title: string }> = {};
+    for (const row of testimonialRes.data ?? []) {
+      if (row.testimonial_slug) {
+        testimonialSongs[row.testimonial_slug] = {
+          id: row.id,
+          audio_url: row.audio_url,
+          title: row.title,
+        };
+      }
+    }
+    return {
+      samples: (featuredRes.data ?? []) as FeaturedSample[],
+      testimonialSongs,
+    };
   },
   head: () => ({
     meta: [
@@ -189,12 +212,14 @@ const useCases = [
 ];
 
 const testimonials: Array<{
+  slug: string;
   quote: string;
   name: string;
   meta: string;
   avatar: string;
 }> = [
   {
+    slug: "david-k",
     quote:
       '"I almost didn\'t order because it felt like too much. I was wrong. It\'s the only thing I gave him during the whole fight that he asked to hear again."',
     name: "David K.",
@@ -202,6 +227,7 @@ const testimonials: Array<{
     avatar: "https://i.pravatar.cc/80?img=67",
   },
   {
+    slug: "sarah-r",
     quote:
       '"My mom played it in her earbuds during infusions. She said the nurses asked her what she was listening to every single week."',
     name: "Sarah R.",
@@ -209,6 +235,7 @@ const testimonials: Array<{
     avatar: "https://i.pravatar.cc/80?img=45",
   },
   {
+    slug: "priya-sam",
     quote:
       '"Two years free of cancer, and this song still plays at every birthday. It became our family\'s anthem. Our daughter asks for it by name now."',
     name: "Priya & Sam",
@@ -216,6 +243,7 @@ const testimonials: Array<{
     avatar: "https://i.pravatar.cc/80?img=39",
   },
   {
+    slug: "marcus-d",
     quote:
       '"We played it at his bedside the night before he passed. The chorus said the things we couldn\'t. The most precious thing our family owns."',
     name: "Marcus D.",
@@ -223,6 +251,7 @@ const testimonials: Array<{
     avatar: "https://i.pravatar.cc/80?img=52",
   },
   {
+    slug: "patricia-m",
     quote:
       '"He heard it twice before we lost him. Thank you will never cover it."',
     name: "Patricia M.",
@@ -230,6 +259,7 @@ const testimonials: Array<{
     avatar: "https://i.pravatar.cc/80?img=23",
   },
   {
+    slug: "jenna-l",
     quote:
       '"It captured something I couldn\'t put into words for fifteen years. The first time I played it for her, we both just sat in the car and cried."',
     name: "Jenna L.",
@@ -237,6 +267,7 @@ const testimonials: Array<{
     avatar: "https://i.pravatar.cc/80?img=29",
   },
   {
+    slug: "elena-v",
     quote:
       '"My dad isn\'t a crier. He listened once, walked out to the porch, and stayed there for an hour. When he came back in he just hugged me. That was everything."',
     name: "Elena V.",
@@ -244,6 +275,7 @@ const testimonials: Array<{
     avatar: "https://i.pravatar.cc/80?img=47",
   },
   {
+    slug: "trevor-h",
     quote:
       '"We played it at her celebration of life. Three hundred people went silent. My aunt said it sounded like Mom wrote it herself."',
     name: "Trevor H.",
@@ -251,6 +283,7 @@ const testimonials: Array<{
     avatar: "https://i.pravatar.cc/80?img=15",
   },
   {
+    slug: "diane-w",
     quote:
       '"I was skeptical until I heard it. They used the nickname only my husband called me. I sobbed in the kitchen for twenty minutes. Worth every penny."',
     name: "Diane W.",
@@ -258,6 +291,7 @@ const testimonials: Array<{
     avatar: "https://i.pravatar.cc/80?img=31",
   },
   {
+    slug: "rebecca-t",
     quote:
       '"Our oncology nurses asked for a copy. They wanted to share it with another family. That\'s when I knew it wasn\'t just ours anymore."',
     name: "Rebecca T.",
@@ -265,6 +299,7 @@ const testimonials: Array<{
     avatar: "https://i.pravatar.cc/80?img=44",
   },
   {
+    slug: "aisha-m",
     quote:
       '"My grandmother kept asking us to play it again. She said it was the first time in months she felt like herself. We played it the morning she passed."',
     name: "Aisha M.",
@@ -272,6 +307,7 @@ const testimonials: Array<{
     avatar: "https://i.pravatar.cc/80?img=49",
   },
   {
+    slug: "michael-b",
     quote:
       '"I gave it to him on his last birthday. He played it on repeat in the hospital and made the staff listen. He died proud of the life this song described."',
     name: "Michael B.",
@@ -279,11 +315,36 @@ const testimonials: Array<{
     avatar: "https://i.pravatar.cc/80?img=53",
   },
   {
+    slug: "carlos-r",
     quote:
       '"Five years cancer-free this month. We still play our song on the anniversary. It\'s become how our kids understand what their mom went through."',
     name: "Carlos R.",
     meta: "Miami, FL  ·  Husband, for his wife in remission",
     avatar: "https://i.pravatar.cc/80?img=12",
+  },
+  {
+    slug: "naomi-k",
+    quote:
+      '"I gave it to my sister on day one of chemo. She made it her playlist for every infusion. She told me the song carried her through the worst weeks of her life."',
+    name: "Naomi K.",
+    meta: "Brooklyn, NY  ·  Sister, for her sister in treatment",
+    avatar: "https://i.pravatar.cc/80?img=20",
+  },
+  {
+    slug: "thomas-r",
+    quote:
+      '"My wife passed in March. We played our song at her service and again on what would have been her birthday. Our kids know her voice through the lyrics now."',
+    name: "Thomas R.",
+    meta: "Charleston, SC  ·  Husband, in loving memory",
+    avatar: "https://i.pravatar.cc/80?img=68",
+  },
+  {
+    slug: "olivia-w",
+    quote:
+      '"I ordered it the day my mom got the diagnosis. She listened on the drive to her first appointment. She said it gave her something to hold onto when she had nothing."',
+    name: "Olivia W.",
+    meta: "Portland, OR  ·  Daughter, for her mother newly diagnosed",
+    avatar: "https://i.pravatar.cc/80?img=5",
   },
 ];
 
@@ -368,7 +429,10 @@ function Eyebrow({
 }
 
 function LandingPage() {
-  const { samples } = Route.useLoaderData() as { samples: FeaturedSample[] };
+  const { samples, testimonialSongs } = Route.useLoaderData() as {
+    samples: FeaturedSample[];
+    testimonialSongs: Record<string, { id: string; audio_url: string | null; title: string }>;
+  };
   // (sample modal removed — playback is now inline on each card)
   const heroAudioRef = useRef<HTMLAudioElement | null>(null);
   const [heroPlaying, setHeroPlaying] = useState(false);
@@ -894,30 +958,105 @@ function LandingPage() {
           </div>
 
           <div className="grid grid-cols-1 gap-5 sm:grid-cols-2 lg:grid-cols-3">
-            {testimonials.map((t, i) => (
-              <div
-                key={i}
-                className="flex flex-col rounded-[16px] border border-[#D9CEB9] bg-[#FBF6EC] p-[26px_24px]"
-              >
-                <p className="mb-5 flex-1 text-[15px] leading-[1.6] text-[#1F1B16]">
-                  {t.quote}
-                </p>
-                <div className="flex items-center gap-3 border-t border-[#D9CEB9] pt-4">
-                  <img
-                    src={t.avatar}
-                    alt=""
-                    loading="lazy"
-                    className="h-10 w-10 rounded-full object-cover"
-                  />
-                  <div>
-                    <div className="text-[13.5px] font-semibold text-[#1F1B16]">
-                      {t.name}
+            {testimonials.map((t, i) => {
+              const song = testimonialSongs[t.slug];
+              const hasAudio = !!song?.audio_url;
+              const isPlaying = hasAudio && playingSampleId === song!.id;
+              return (
+                <div
+                  key={i}
+                  className="flex flex-col rounded-[16px] border border-[#D9CEB9] bg-[#FBF6EC] p-[24px_22px]"
+                >
+                  <div className="flex items-start gap-4">
+                    <div className="min-w-0 flex-1">
+                      <p className="mb-4 text-[14.5px] leading-[1.55] text-[#1F1B16]">
+                        {t.quote}
+                      </p>
                     </div>
-                    <div className="text-[12px] text-[#8A8175]">{t.meta}</div>
+                    {/* Vinyl */}
+                    <button
+                      type="button"
+                      onClick={() => {
+                        if (!hasAudio) return;
+                        handleSamplePlay({
+                          id: song!.id,
+                          title: song!.title,
+                          quote: null,
+                          for_text: null,
+                          genre_label: "",
+                          cover_image_url: null,
+                          audio_url: song!.audio_url,
+                          lyrics: null,
+                        });
+                      }}
+                      aria-label={
+                        hasAudio
+                          ? isPlaying
+                            ? `Pause song for ${t.name}`
+                            : `Play song for ${t.name}`
+                          : `Song for ${t.name} is being prepared`
+                      }
+                      className={`group relative flex h-[72px] w-[72px] shrink-0 items-center justify-center rounded-full transition-transform ${
+                        hasAudio ? "cursor-pointer hover:scale-[1.04]" : "cursor-default opacity-60"
+                      }`}
+                    >
+                      {/* Vinyl disc */}
+                      <div
+                        className={`absolute inset-0 rounded-full bg-[radial-gradient(circle_at_center,#1a1a1a_0%,#0a0a0a_45%,#1a1a1a_50%,#0a0a0a_55%,#1a1a1a_60%,#0a0a0a_65%,#1a1a1a_70%,#0a0a0a_75%,#1a1a1a_80%,#0a0a0a_85%,#1a1a1a_100%)] shadow-[0_6px_14px_rgba(31,27,22,0.25)] ${
+                          isPlaying ? "animate-vinyl-spin" : ""
+                        }`}
+                      />
+                      {/* Center label */}
+                      <div className="absolute left-1/2 top-1/2 flex h-[34%] w-[34%] -translate-x-1/2 -translate-y-1/2 items-center justify-center rounded-full bg-[#8D6FAF]">
+                        <div className="h-[6px] w-[6px] rounded-full bg-[#FBF6EC]" />
+                      </div>
+                      {/* Play/pause icon overlay */}
+                      {!isPlaying && (
+                        <div className="absolute inset-0 flex items-center justify-center">
+                          <div className="flex h-7 w-7 items-center justify-center rounded-full bg-[#FBF6EC]/95 shadow-[0_2px_6px_rgba(0,0,0,0.4)]">
+                            <svg
+                              width="11"
+                              height="12"
+                              viewBox="0 0 11 12"
+                              fill="none"
+                              className="ml-[1px]"
+                            >
+                              <path d="M0 0L11 6L0 12V0Z" fill="#1F1B16" />
+                            </svg>
+                          </div>
+                        </div>
+                      )}
+                      {isPlaying && (
+                        <div className="absolute inset-0 flex items-center justify-center">
+                          <div className="flex h-7 w-7 items-center justify-center rounded-full bg-[#FBF6EC]/95 shadow-[0_2px_6px_rgba(0,0,0,0.4)]">
+                            <svg width="10" height="12" viewBox="0 0 10 12" fill="none">
+                              <rect x="0" y="0" width="3" height="12" fill="#1F1B16" />
+                              <rect x="7" y="0" width="3" height="12" fill="#1F1B16" />
+                            </svg>
+                          </div>
+                        </div>
+                      )}
+                    </button>
+                  </div>
+                  <div className="mt-4 flex items-center gap-3 border-t border-[#D9CEB9] pt-4">
+                    <img
+                      src={t.avatar}
+                      alt=""
+                      loading="lazy"
+                      className="h-10 w-10 rounded-full object-cover"
+                    />
+                    <div className="min-w-0">
+                      <div className="text-[13.5px] font-semibold text-[#1F1B16]">
+                        {t.name}
+                      </div>
+                      <div className="truncate text-[12px] text-[#8A8175]">
+                        {t.meta}
+                      </div>
+                    </div>
                   </div>
                 </div>
-              </div>
-            ))}
+              );
+            })}
           </div>
         </div>
       </section>
