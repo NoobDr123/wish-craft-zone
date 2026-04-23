@@ -845,7 +845,7 @@ function LandingPage() {
               {
                 n: "01",
                 h: "Share their story.",
-                p: "Answer a few simple questions in writing — no calls, no pressure. Our prompts gently surface the right memories for you.",
+                p: "Answer a few simple questions in writing. No calls, no pressure. Our prompts gently surface the right memories for you.",
                 m: "Takes about 10 minutes. Families say this part alone already feels like a gift.",
                 icon: (
                   <svg viewBox="0 0 24 24" fill="none" className="h-5 w-5" stroke="currentColor" strokeWidth="1.7" strokeLinecap="round" strokeLinejoin="round">
@@ -856,7 +856,7 @@ function LandingPage() {
               {
                 n: "02",
                 h: "We write & record it.",
-                p: "Pick the genre, tempo, and voice — or let us suggest. Folk, country, gospel, pop, or cinematic strings, fully produced in studio.",
+                p: "Pick the genre, tempo, and voice. Or let us suggest. Folk, country, gospel, pop, or cinematic strings, fully produced in studio.",
                 m: "Real songwriting. Real arrangement. Built to be played, not just heard.",
                 icon: (
                   <svg viewBox="0 0 24 24" fill="none" className="h-5 w-5" stroke="currentColor" strokeWidth="1.7" strokeLinecap="round" strokeLinejoin="round">
@@ -867,7 +867,7 @@ function LandingPage() {
               {
                 n: "03",
                 h: "Delivered in 5 days.",
-                p: "Straight to your inbox — streamable and downloadable, yours forever to share, gift, or play at the bedside.",
+                p: "Straight to your inbox. Streamable and downloadable, yours forever to share, gift, or play at the bedside.",
                 m: "Don't love it? We'll rewrite it free, or refund you in full. No questions.",
                 icon: (
                   <svg viewBox="0 0 24 24" fill="none" className="h-5 w-5" stroke="currentColor" strokeWidth="1.7" strokeLinecap="round" strokeLinejoin="round">
