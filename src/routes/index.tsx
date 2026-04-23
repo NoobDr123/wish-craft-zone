@@ -958,30 +958,105 @@ function LandingPage() {
           </div>
 
           <div className="grid grid-cols-1 gap-5 sm:grid-cols-2 lg:grid-cols-3">
-            {testimonials.map((t, i) => (
-              <div
-                key={i}
-                className="flex flex-col rounded-[16px] border border-[#D9CEB9] bg-[#FBF6EC] p-[26px_24px]"
-              >
-                <p className="mb-5 flex-1 text-[15px] leading-[1.6] text-[#1F1B16]">
-                  {t.quote}
-                </p>
-                <div className="flex items-center gap-3 border-t border-[#D9CEB9] pt-4">
-                  <img
-                    src={t.avatar}
-                    alt=""
-                    loading="lazy"
-                    className="h-10 w-10 rounded-full object-cover"
-                  />
-                  <div>
-                    <div className="text-[13.5px] font-semibold text-[#1F1B16]">
-                      {t.name}
+            {testimonials.map((t, i) => {
+              const song = testimonialSongs[t.slug];
+              const hasAudio = !!song?.audio_url;
+              const isPlaying = hasAudio && playingSampleId === song!.id;
+              return (
+                <div
+                  key={i}
+                  className="flex flex-col rounded-[16px] border border-[#D9CEB9] bg-[#FBF6EC] p-[24px_22px]"
+                >
+                  <div className="flex items-start gap-4">
+                    <div className="min-w-0 flex-1">
+                      <p className="mb-4 text-[14.5px] leading-[1.55] text-[#1F1B16]">
+                        {t.quote}
+                      </p>
                     </div>
-                    <div className="text-[12px] text-[#8A8175]">{t.meta}</div>
+                    {/* Vinyl */}
+                    <button
+                      type="button"
+                      onClick={() => {
+                        if (!hasAudio) return;
+                        handleSamplePlay({
+                          id: song!.id,
+                          title: song!.title,
+                          quote: null,
+                          for_text: null,
+                          genre_label: "",
+                          cover_image_url: null,
+                          audio_url: song!.audio_url,
+                          lyrics: null,
+                        });
+                      }}
+                      aria-label={
+                        hasAudio
+                          ? isPlaying
+                            ? `Pause song for ${t.name}`
+                            : `Play song for ${t.name}`
+                          : `Song for ${t.name} is being prepared`
+                      }
+                      className={`group relative flex h-[72px] w-[72px] shrink-0 items-center justify-center rounded-full transition-transform ${
+                        hasAudio ? "cursor-pointer hover:scale-[1.04]" : "cursor-default opacity-60"
+                      }`}
+                    >
+                      {/* Vinyl disc */}
+                      <div
+                        className={`absolute inset-0 rounded-full bg-[radial-gradient(circle_at_center,#1a1a1a_0%,#0a0a0a_45%,#1a1a1a_50%,#0a0a0a_55%,#1a1a1a_60%,#0a0a0a_65%,#1a1a1a_70%,#0a0a0a_75%,#1a1a1a_80%,#0a0a0a_85%,#1a1a1a_100%)] shadow-[0_6px_14px_rgba(31,27,22,0.25)] ${
+                          isPlaying ? "animate-vinyl-spin" : ""
+                        }`}
+                      />
+                      {/* Center label */}
+                      <div className="absolute left-1/2 top-1/2 flex h-[34%] w-[34%] -translate-x-1/2 -translate-y-1/2 items-center justify-center rounded-full bg-[#8D6FAF]">
+                        <div className="h-[6px] w-[6px] rounded-full bg-[#FBF6EC]" />
+                      </div>
+                      {/* Play/pause icon overlay */}
+                      {!isPlaying && (
+                        <div className="absolute inset-0 flex items-center justify-center">
+                          <div className="flex h-7 w-7 items-center justify-center rounded-full bg-[#FBF6EC]/95 shadow-[0_2px_6px_rgba(0,0,0,0.4)]">
+                            <svg
+                              width="11"
+                              height="12"
+                              viewBox="0 0 11 12"
+                              fill="none"
+                              className="ml-[1px]"
+                            >
+                              <path d="M0 0L11 6L0 12V0Z" fill="#1F1B16" />
+                            </svg>
+                          </div>
+                        </div>
+                      )}
+                      {isPlaying && (
+                        <div className="absolute inset-0 flex items-center justify-center">
+                          <div className="flex h-7 w-7 items-center justify-center rounded-full bg-[#FBF6EC]/95 shadow-[0_2px_6px_rgba(0,0,0,0.4)]">
+                            <svg width="10" height="12" viewBox="0 0 10 12" fill="none">
+                              <rect x="0" y="0" width="3" height="12" fill="#1F1B16" />
+                              <rect x="7" y="0" width="3" height="12" fill="#1F1B16" />
+                            </svg>
+                          </div>
+                        </div>
+                      )}
+                    </button>
+                  </div>
+                  <div className="mt-4 flex items-center gap-3 border-t border-[#D9CEB9] pt-4">
+                    <img
+                      src={t.avatar}
+                      alt=""
+                      loading="lazy"
+                      className="h-10 w-10 rounded-full object-cover"
+                    />
+                    <div className="min-w-0">
+                      <div className="text-[13.5px] font-semibold text-[#1F1B16]">
+                        {t.name}
+                      </div>
+                      <div className="truncate text-[12px] text-[#8A8175]">
+                        {t.meta}
+                      </div>
+                    </div>
                   </div>
                 </div>
-              </div>
-            ))}
+              );
+            })}
           </div>
         </div>
       </section>
