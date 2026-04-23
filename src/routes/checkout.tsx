@@ -58,9 +58,8 @@ function CheckoutPage() {
   const [creating, setCreating] = useState(false);
   const [clientSecret, setClientSecret] = useState<string | null>(null);
   const [paymentIntentId, setPaymentIntentId] = useState<string | null>(null);
+  const [orderId, setOrderId] = useState<string | null>(q.orderId || null);
   const [error, setError] = useState<string | null>(null);
-  // Track which (email,name) combination produced the current PaymentIntent
-  const [intentKey, setIntentKey] = useState<string | null>(null);
 
   useEffect(() => {
     if (!q.recipient_name) navigate({ to: "/create" });
@@ -77,11 +76,9 @@ function CheckoutPage() {
   }, []);
   const recipient = q.recipient_name || "your loved one";
 
-  const startCheckout = async (emailArg: string, nameArg: string) => {
+  const startCheckout = async () => {
     setCreating(true);
     setError(null);
-    q.set("buyer_email", emailArg);
-    q.set("buyer_name", nameArg);
 
     try {
       const { data: authData } = await supabase.auth.getUser();
@@ -99,13 +96,17 @@ function CheckoutPage() {
           ? crypto.randomUUID()
           : `${Date.now()}-${Math.random().toString(36).slice(2)}`;
 
+      // Use a placeholder email until the buyer enters one. We patch it
+      // before payment confirmation (and via PaymentElement billing details).
+      const placeholderEmail = `pending+${newOrderId}@ribbonsong.com`;
+
       const { error: insertError } = await supabase
         .from("orders")
         .insert({
           id: newOrderId,
           user_id: userId,
-          buyer_email: emailArg.trim().toLowerCase(),
-          buyer_name: nameArg,
+          buyer_email: placeholderEmail,
+          buyer_name: null,
           recipient_name: q.recipient_name,
           relationship: relationshipResolved,
           genre: q.genre ?? null,
@@ -167,11 +168,11 @@ function CheckoutPage() {
       }
 
       q.set("orderId", newOrderId);
+      setOrderId(newOrderId);
 
       const { data, error: fnError } = await supabase.functions.invoke("create-checkout", {
         body: {
           orderId: newOrderId,
-          email: emailArg.trim().toLowerCase(),
           environment: stripeEnvironment,
         },
       });
@@ -192,19 +193,29 @@ function CheckoutPage() {
     }
   };
 
-  // Auto-create the PaymentIntent once contact info is valid (debounced).
-  // The card form mounts as soon as clientSecret is set — no extra click needed.
+  // Create the PaymentIntent immediately on mount — payment form shows right away.
   useEffect(() => {
-    if (!ready) return;
-    const key = `${email.trim().toLowerCase()}|${name.trim()}`;
-    if (key === intentKey) return;
-    const t = setTimeout(() => {
-      setIntentKey(key);
-      startCheckout(email, name);
+    if (!q.recipient_name) return;
+    if (clientSecret || creating) return;
+    startCheckout();
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [q.recipient_name]);
+
+  // Persist buyer email/name to the order as they type (debounced).
+  useEffect(() => {
+    if (!orderId || !ready) return;
+    const t = setTimeout(async () => {
+      const trimmedEmail = email.trim().toLowerCase();
+      q.set("buyer_email", trimmedEmail);
+      q.set("buyer_name", name);
+      await supabase
+        .from("orders")
+        .update({ buyer_email: trimmedEmail, buyer_name: name })
+        .eq("id", orderId);
     }, 600);
     return () => clearTimeout(t);
     // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [email, name, ready]);
+  }, [email, name, ready, orderId]);
 
   return (
     <div className="min-h-screen bg-gradient-warm pb-32 lg:pb-16">
@@ -314,15 +325,9 @@ function CheckoutPage() {
             </p>
           )}
 
-          {/* Inline payment form — appears as soon as email + name are valid */}
+          {/* Inline payment form — mounted as soon as the PaymentIntent is ready */}
           <div className="mt-6 -mx-6 md:-mx-8 border-t border-peach/70">
-            {!ready && (
-              <p className="px-6 py-8 text-center text-sm text-muted-foreground md:px-8">
-                Enter your email and name above to see payment options.
-              </p>
-            )}
-
-            {ready && creating && !clientSecret && (
+            {creating && !clientSecret && (
               <p className="flex items-center justify-center gap-2 px-6 py-8 text-sm text-muted-foreground md:px-8">
                 <span className="h-4 w-4 animate-spin rounded-full border-2 border-primary/30 border-t-primary" />
                 Loading secure payment…
@@ -337,6 +342,8 @@ function CheckoutPage() {
                 amountLabel="$49.99"
                 returnUrl={`${window.location.origin}/checkout/return?payment_intent_id=${paymentIntentId}`}
                 onError={(msg) => setError(msg)}
+                disabled={!ready}
+                disabledReason="Enter your email and name above to continue"
               />
             )}
           </div>

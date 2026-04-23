@@ -16,6 +16,8 @@ interface CustomPaymentFormProps {
   email: string;
   amountLabel: string;
   onError?: (msg: string) => void;
+  disabled?: boolean;
+  disabledReason?: string;
 }
 
 /**
@@ -50,7 +52,7 @@ export function CustomPaymentForm(props: CustomPaymentFormProps) {
   );
 }
 
-function InnerForm({ returnUrl, email, amountLabel, onError }: CustomPaymentFormProps) {
+function InnerForm({ returnUrl, email, amountLabel, onError, disabled, disabledReason }: CustomPaymentFormProps) {
   const stripe = useStripe();
   const elements = useElements();
   const [submitting, setSubmitting] = useState(false);
@@ -59,6 +61,12 @@ function InnerForm({ returnUrl, email, amountLabel, onError }: CustomPaymentForm
 
   const handleConfirm = async () => {
     if (!stripe || !elements) return;
+    if (disabled) {
+      const msg = disabledReason || "Please complete the form above first.";
+      setErrorMsg(msg);
+      onError?.(msg);
+      return;
+    }
     setSubmitting(true);
     setErrorMsg(null);
 
@@ -79,8 +87,15 @@ function InnerForm({ returnUrl, email, amountLabel, onError }: CustomPaymentForm
     }
   };
 
-  const handleExpressConfirm = async () => {
+  const handleExpressConfirm = async (event: { resolve: () => void; reject: () => void } | any) => {
     if (!stripe || !elements) return;
+    if (disabled) {
+      const msg = disabledReason || "Please enter your email and name above first.";
+      setErrorMsg(msg);
+      onError?.(msg);
+      event?.reject?.();
+      return;
+    }
     const { error } = await stripe.confirmPayment({
       elements,
       confirmParams: {
@@ -137,7 +152,7 @@ function InnerForm({ returnUrl, email, amountLabel, onError }: CustomPaymentForm
       <button
         type="button"
         onClick={handleConfirm}
-        disabled={!stripe || !elements || submitting}
+        disabled={!stripe || !elements || submitting || disabled}
         className="flex w-full items-center justify-center gap-2.5 rounded-2xl bg-primary px-6 py-5 text-base font-bold text-primary-foreground shadow-glow transition-all hover:brightness-95 active:scale-[0.99] disabled:cursor-not-allowed disabled:opacity-60 disabled:shadow-none md:text-lg"
       >
         {submitting ? (
@@ -151,6 +166,12 @@ function InnerForm({ returnUrl, email, amountLabel, onError }: CustomPaymentForm
           </>
         )}
       </button>
+
+      {disabled && disabledReason && (
+        <p className="text-center text-xs font-medium text-muted-foreground">
+          {disabledReason}
+        </p>
+      )}
 
       <div className="flex flex-col items-center gap-1.5 text-xs text-muted-foreground">
         <span className="inline-flex items-center gap-1.5">
