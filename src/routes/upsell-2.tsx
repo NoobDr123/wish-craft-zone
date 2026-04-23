@@ -1,6 +1,7 @@
 import { createFileRoute, useNavigate } from "@tanstack/react-router";
 import { useState } from "react";
 import { UpsellShell } from "@/components/UpsellShell";
+import { RibbonClubDownsell } from "@/components/RibbonClubDownsell";
 import { useQuizStore } from "@/stores/quizStore";
 import { supabase } from "@/integrations/supabase/client";
 import { stripeEnvironment } from "@/lib/stripe";
@@ -13,6 +14,8 @@ function Upsell2() {
   const navigate = useNavigate();
   const q = useQuizStore();
   const [processing, setProcessing] = useState(false);
+  const [showDownsell, setShowDownsell] = useState(false);
+  const [downsellProcessing, setDownsellProcessing] = useState(false);
 
   const accept = async () => {
     if (!q.orderId) {
@@ -32,32 +35,67 @@ function Upsell2() {
     navigate({ to: "/upsell-3" });
   };
 
-  const decline = () => navigate({ to: "/upsell-3" });
+  // Decline rush → open the slim RibbonSong Club downsell.
+  const decline = () => setShowDownsell(true);
+
+  const acceptClub = async () => {
+    if (!q.orderId) {
+      setShowDownsell(false);
+      navigate({ to: "/upsell-3" });
+      return;
+    }
+    setDownsellProcessing(true);
+    await supabase.functions.invoke("charge-upsell", {
+      body: {
+        orderId: q.orderId,
+        upsellType: "ribbon_club",
+        environment: stripeEnvironment,
+        sessionId: q.checkoutSessionId,
+      },
+    });
+    setDownsellProcessing(false);
+    setShowDownsell(false);
+    navigate({ to: "/upsell-3" });
+  };
+
+  const declineClub = () => {
+    setShowDownsell(false);
+    navigate({ to: "/upsell-3" });
+  };
 
   return (
-    <UpsellShell
-      step={2}
-      badge="Priority gift delivery"
-      headline="Need their song sooner?"
-      description={
-        <>
-          Standard delivery takes up to 5 days. Skip the line and get their
-          finished song in the next{" "}
-          <span className="font-semibold text-foreground">24 hours</span> — perfect
-          if the gift moment is coming up — for just{" "}
-          <span className="font-semibold text-foreground">$59.00</span>.
-        </>
-      }
-      highlights={[
-        "Front of the queue — we start producing within the hour",
-        "Personally reviewed by our team before it reaches you",
-        "Emailed the moment it's ready, day or night",
-      ]}
-      priceLabel="$59.00"
-      declineLabel="No thanks, I can wait 5 days"
-      onAccept={accept}
-      onDecline={decline}
-      processing={processing}
-    />
+    <>
+      <UpsellShell
+        step={2}
+        badge="Priority gift delivery"
+        headline="Need their song sooner?"
+        description={
+          <>
+            Standard delivery takes up to 5 days. Skip the line and get their
+            finished song in the next{" "}
+            <span className="font-semibold text-foreground">24 hours</span> — perfect
+            if the gift moment is coming up — for just{" "}
+            <span className="font-semibold text-foreground">$59.00</span>.
+          </>
+        }
+        highlights={[
+          "Front of the queue — we start producing within the hour",
+          "Personally reviewed by our team before it reaches you",
+          "Emailed the moment it's ready, day or night",
+        ]}
+        priceLabel="$59.00"
+        declineLabel="No thanks, I can wait 5 days"
+        onAccept={accept}
+        onDecline={decline}
+        processing={processing}
+      />
+
+      <RibbonClubDownsell
+        open={showDownsell}
+        processing={downsellProcessing}
+        onAccept={acceptClub}
+        onDecline={declineClub}
+      />
+    </>
   );
 }

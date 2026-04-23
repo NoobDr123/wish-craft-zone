@@ -8,10 +8,12 @@ const supabase = createClient(
 );
 
 // Upsell catalog. Server is the source of truth — never trust client amounts.
-const UPSELL_PRICES: Record<string, { amount: number; flagColumn: string }> = {
+const UPSELL_PRICES: Record<string, { amount: number; flagColumn: string | null }> = {
   extra_verse: { amount: 1999, flagColumn: "has_3rd_verse" },
   rush_delivery: { amount: 5900, flagColumn: "is_rush" },
   unlimited_edits: { amount: 3299, flagColumn: "has_unlimited_edits" },
+  // Downsell after declining rush — RibbonSong Club, one-time trust price.
+  ribbon_club: { amount: 4800, flagColumn: null },
 };
 
 serve(async (req) => {
@@ -94,13 +96,9 @@ serve(async (req) => {
       // but we also update optimistically so the next page sees it immediately.
       if (pi.status === "succeeded") {
         productConfig[upsellType] = true;
-        await supabase
-          .from("orders")
-          .update({
-            [upsell.flagColumn]: true,
-            product_config: productConfig,
-          })
-          .eq("id", orderId);
+        const updates: Record<string, unknown> = { product_config: productConfig };
+        if (upsell.flagColumn) updates[upsell.flagColumn] = true;
+        await supabase.from("orders").update(updates).eq("id", orderId);
 
         return json({ success: true });
       }
