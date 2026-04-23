@@ -257,46 +257,31 @@ function CheckoutPage() {
                 disabledReason="Enter your email and name above to continue"
               />
             ) : (
-              <div className="space-y-3 p-4 md:p-6">
-                <div className="h-12 animate-pulse rounded-xl bg-peach/40" />
-                <div className="h-32 animate-pulse rounded-xl bg-peach/30" />
-                <div className="h-14 animate-pulse rounded-2xl bg-peach/40" />
+              <div className="space-y-4 p-4 md:p-6">
+                {/* Skeleton matching the real form footprint to avoid layout shift */}
+                <div className="h-12 animate-pulse rounded-2xl bg-foreground/10" />
+                <div className="flex gap-2">
+                  <div className="h-12 flex-1 animate-pulse rounded-2xl bg-foreground/10" />
+                  <div className="h-12 flex-1 animate-pulse rounded-2xl bg-foreground/10" />
+                </div>
+                <div className="my-2 flex items-center gap-3">
+                  <div className="h-px flex-1 bg-border" />
+                  <span className="text-xs font-medium uppercase tracking-wider text-muted-foreground/60">
+                    Or pay with card
+                  </span>
+                  <div className="h-px flex-1 bg-border" />
+                </div>
+                <div className="h-32 animate-pulse rounded-xl bg-foreground/5" />
+                <div className="h-14 animate-pulse rounded-2xl bg-primary/30" />
               </div>
             )}
           </div>
         </section>
 
-        {/* Samples */}
-        {samples.length > 0 && (
-          <section className="mt-6 rounded-3xl border border-peach/70 bg-card p-6 shadow-soft md:p-7">
-            <h2 className="flex items-center gap-2 font-display text-2xl font-bold text-foreground">
-              <Music2 className="h-5 w-5 text-primary" /> Hear Other RibbonSongs We Made
-            </h2>
-            <div className="mt-5 space-y-5">
-              {samples.map((s) => (
-                <article
-                  key={s.id}
-                  className="rounded-2xl border border-peach/60 bg-background/60 p-4"
-                >
-                  <p className="font-semibold text-foreground">{s.title}</p>
-                  {s.for_text && (
-                    <p className="mt-0.5 text-xs text-muted-foreground">{s.for_text}</p>
-                  )}
-                  {s.audio_url && (
-                    <div className="mt-3">
-                      <AudioPlayer src={s.audio_url} title={s.title} variant="compact" />
-                    </div>
-                  )}
-                  {s.quote && (
-                    <p className="mt-3 text-sm italic leading-relaxed text-foreground/80">
-                      &ldquo;{s.quote}&rdquo;
-                    </p>
-                  )}
-                </article>
-              ))}
-            </div>
-          </section>
-        )}
+        {/* Samples — lazy-loaded below the fold */}
+        <Suspense fallback={null}>
+          <SamplesSection />
+        </Suspense>
 
         {/* Money-back guarantee */}
         <section className="mt-6 rounded-3xl border border-peach/70 bg-card p-6 shadow-soft md:p-7">
