@@ -1,7 +1,7 @@
-import { Gift, ShieldCheck, X, Sparkles } from "lucide-react";
+import { Gift, ShieldCheck, X, Clock } from "lucide-react";
 import { useEffect } from "react";
 
-interface RibbonClubDownsellProps {
+interface Delivery48DownsellProps {
   open: boolean;
   processing?: boolean;
   onAccept: () => void;
@@ -9,15 +9,16 @@ interface RibbonClubDownsellProps {
 }
 
 /**
- * Slim "last chance" downsell modal shown after a user declines a higher-priced
- * upsell. Pitches the RibbonSong Club at a one-time, trust-based price.
+ * Slim "last chance" downsell shown when a user declines the 24-hour rush
+ * upsell. Offers a cheaper middle option: 48-hour delivery for $19.99 — faster
+ * than the 5-day standard, half the price of the 24-hour rush.
  */
-export function RibbonClubDownsell({
+export function Delivery48Downsell({
   open,
   processing,
   onAccept,
   onDecline,
-}: RibbonClubDownsellProps) {
+}: Delivery48DownsellProps) {
   // Lock body scroll while open
   useEffect(() => {
     if (!open) return;
@@ -34,8 +35,8 @@ export function RibbonClubDownsell({
     <div
       role="dialog"
       aria-modal="true"
-      aria-labelledby="club-downsell-title"
-      className="fixed inset-0 z-[60] flex items-center justify-center px-4"
+      aria-labelledby="delivery-48-title"
+      className="fixed inset-0 z-[60] flex items-end justify-center px-3 pb-3 sm:items-center sm:px-4 sm:pb-0"
     >
       {/* Backdrop */}
       <div
@@ -43,79 +44,80 @@ export function RibbonClubDownsell({
         onClick={processing ? undefined : onDecline}
       />
 
-      {/* Slim popup */}
+      {/* Slim popup — bottom sheet on mobile, centered on desktop */}
       <div className="relative w-full max-w-md overflow-hidden rounded-2xl border border-border bg-card shadow-lg">
         {/* Close */}
         <button
           onClick={onDecline}
           disabled={processing}
           aria-label="Close"
-          className="absolute right-3 top-3 rounded-full p-1.5 text-muted-foreground transition hover:bg-muted hover:text-foreground disabled:opacity-50"
+          className="absolute right-2.5 top-2.5 rounded-full p-1.5 text-muted-foreground transition hover:bg-muted hover:text-foreground disabled:opacity-50"
         >
           <X className="h-4 w-4" />
         </button>
 
         {/* Slim header band */}
-        <div className="flex items-center gap-2 border-b border-primary/20 bg-primary/10 px-5 py-2.5">
-          <Sparkles className="h-3.5 w-3.5 text-primary" />
-          <p className="text-[11px] font-bold uppercase tracking-[0.18em] text-primary">
-            One spot just opened
+        <div className="flex items-center gap-2 border-b border-primary/20 bg-primary/10 px-4 py-2.5 sm:px-5">
+          <Clock className="h-3.5 w-3.5 text-primary" />
+          <p className="text-[10px] font-bold uppercase tracking-[0.16em] text-primary sm:text-[11px]">
+            Wait — better deal inside
           </p>
         </div>
 
-        <div className="px-6 pb-6 pt-5">
+        <div className="px-5 pb-5 pt-4 sm:px-6 sm:pb-6 sm:pt-5">
           <h2
-            id="club-downsell-title"
-            className="font-display text-2xl font-semibold leading-tight text-foreground"
+            id="delivery-48-title"
+            className="font-display text-xl font-semibold leading-tight text-foreground sm:text-2xl"
           >
-            Wait — join the RibbonSong Club for just{" "}
-            <span className="text-primary">$48</span>
+            Get it in 48 hours for just{" "}
+            <span className="text-primary">$19.99</span>
           </h2>
 
-          <p className="mt-3 text-sm leading-relaxed text-muted-foreground">
-            Because you trusted us today, we'd love to keep you close. We have{" "}
-            <span className="font-semibold text-foreground">one spot ready</span>{" "}
-            in the Club at a one-time price — normally $120/year.
+          <p className="mt-2.5 text-sm leading-relaxed text-muted-foreground">
+            Not in a rush, but still don't want to wait 5 days? Skip ahead and
+            get their song in{" "}
+            <span className="font-semibold text-foreground">2 days</span> — at
+            two-thirds off the 24-hour price.
           </p>
 
-          <ul className="mt-4 space-y-2 text-sm text-foreground">
+          <ul className="mt-3.5 space-y-2 text-sm text-foreground">
             <li className="flex items-start gap-2.5">
               <span className="mt-1.5 h-1.5 w-1.5 shrink-0 rounded-full bg-success" />
-              <span>One new song every month — for any moment that matters</span>
+              <span>Delivered within 48 hours, not 5 days</span>
             </li>
             <li className="flex items-start gap-2.5">
               <span className="mt-1.5 h-1.5 w-1.5 shrink-0 rounded-full bg-success" />
-              <span>Priority production — always front of the queue</span>
+              <span>Same human quality check before delivery</span>
             </li>
             <li className="flex items-start gap-2.5">
               <span className="mt-1.5 h-1.5 w-1.5 shrink-0 rounded-full bg-success" />
-              <span>Cancel anytime, keep every song you've made</span>
+              <span>One-time price — no subscriptions, no extras</span>
             </li>
           </ul>
 
-          <div className="mt-5 flex items-baseline justify-between border-t border-border/60 pt-4">
+          <div className="mt-4 flex items-baseline justify-between border-t border-border/60 pt-3.5">
             <span className="text-xs font-medium uppercase tracking-wider text-muted-foreground">
-              Today only
+              48-hour delivery
             </span>
             <span className="font-display text-2xl font-semibold text-foreground">
-              $48.00
+              $19.99
             </span>
           </div>
 
           <button
             onClick={onAccept}
             disabled={processing}
-            className="mt-4 flex w-full items-center justify-center gap-2 rounded-xl bg-success px-6 py-4 text-sm font-bold text-success-foreground shadow-glow transition-all hover:brightness-95 active:scale-[0.99] disabled:cursor-not-allowed disabled:opacity-60 md:text-base"
+            className="mt-3.5 flex w-full items-center justify-center gap-2 rounded-xl bg-success px-5 py-3.5 text-sm font-bold text-success-foreground shadow-glow transition-all hover:brightness-95 active:scale-[0.99] disabled:cursor-not-allowed disabled:opacity-60 sm:py-4 sm:text-base"
           >
             {processing ? (
               <>
                 <span className="h-4 w-4 animate-spin rounded-full border-2 border-success-foreground/30 border-t-success-foreground" />
-                Reserving your spot…
+                Adding to your order…
               </>
             ) : (
               <>
                 <Gift className="h-4 w-4" />
-                Yes, claim my spot
+                Yes, deliver in 48 hours
               </>
             )}
           </button>
@@ -130,7 +132,7 @@ export function RibbonClubDownsell({
             disabled={processing}
             className="mt-1 w-full px-4 py-2 text-xs text-muted-foreground underline-offset-4 transition hover:text-foreground hover:underline"
           >
-            No thanks, skip this offer
+            No thanks, I can wait 5 days
           </button>
         </div>
       </div>
