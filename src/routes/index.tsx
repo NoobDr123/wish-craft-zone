@@ -478,19 +478,10 @@ function LandingPage() {
               <div className="mb-7 flex w-full flex-col items-stretch gap-3 sm:w-auto sm:flex-row sm:flex-wrap sm:items-center sm:gap-4">
                 <PrimaryBtn large fullWidth>Start My Custom Song ❤️</PrimaryBtn>
               </div>
-              <div className="flex flex-col items-center gap-2 text-center text-[13px] text-[#5A5148] sm:flex-row sm:flex-wrap sm:items-center sm:gap-x-3 sm:gap-y-2 sm:text-left sm:gap-3.5">
-                <div className="flex items-center gap-2">
-                  <span className="tracking-[1px] text-[#C9A85A]">★★★★★</span>
-                  <span>
-                    <strong className="text-[#1F1B16]">4.9</strong> from 2,400+ families
-                  </span>
-                </div>
-                <span className="hidden sm:inline-block h-[3px] w-[3px] rounded-full bg-[#8A8175]" />
-                <span className="hidden sm:inline">Free revisions</span>
-                <span className="hidden sm:inline-block h-[3px] w-[3px] rounded-full bg-[#8A8175]" />
-                <span className="hidden sm:inline">Money back guarantee</span>
+              <div className="text-[13px] leading-[1.4] text-[#5A5148] md:text-[13.5px]">
+                Delivered With Love, Prayer, & Care In 7 Days
               </div>
-              <div className="mt-8 flex items-center gap-3.5 border-t border-[#D9CEB9] pt-6 md:mt-9 md:pt-7">
+              <div className="mt-8 flex items-center gap-3.5 pt-2 md:mt-9">
                 <div className="flex shrink-0">
                   {[47, 32, 26, 44, 16].map((id, i) => (
                     <img
