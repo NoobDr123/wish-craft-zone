@@ -356,7 +356,6 @@ function LandingPage() {
   const heroAudioRef = useRef<HTMLAudioElement | null>(null);
   const [heroPlaying, setHeroPlaying] = useState(false);
   const [heroEverPlayed, setHeroEverPlayed] = useState(false);
-  const [showPlayMe, setShowPlayMe] = useState(true);
 
   const handleHeroPlay = () => {
     const a = heroAudioRef.current;
@@ -366,7 +365,6 @@ function LandingPage() {
       setHeroPlaying(false);
       return;
     }
-    setShowPlayMe(false);
     setHeroEverPlayed(true);
     a.currentTime = 0;
     a.play()
@@ -467,28 +465,6 @@ function LandingPage() {
 
             {/* Hero photo + song */}
             <div className="relative order-1 md:order-2">
-              {showPlayMe && !heroPlaying && (
-                <div className="pointer-events-none absolute -top-4 left-1/2 z-20 -translate-x-1/2 sm:-top-5">
-                  <div className="relative animate-bounce rounded-full bg-[#C7572E] px-3.5 py-1.5 shadow-[0_8px_20px_rgba(0,0,0,0.25)] sm:px-4 sm:py-2">
-                    <span className="flex items-center gap-1.5 whitespace-nowrap text-[11px] font-bold uppercase tracking-[0.12em] text-white sm:text-[12px]">
-                      <span aria-hidden>▶</span>
-                      Play me
-                    </span>
-                    <span
-                      aria-hidden
-                      className="absolute left-1/2 -translate-x-1/2"
-                      style={{
-                        bottom: -5,
-                        width: 0,
-                        height: 0,
-                        borderLeft: "6px solid transparent",
-                        borderRight: "6px solid transparent",
-                        borderTop: "6px solid #C7572E",
-                      }}
-                    />
-                  </div>
-                </div>
-              )}
               <div className="group relative aspect-[4/5] overflow-hidden rounded-[18px] bg-[#ECE2D0] shadow-[0_20px_60px_rgba(31,27,22,0.12)]">
                 {heroPlaying ? (
                   <video
@@ -519,33 +495,36 @@ function LandingPage() {
                 />
 
                 <button
-                  aria-label={heroPlaying ? "Pause song" : "Play Rachel's song"}
+                  aria-label={heroPlaying ? "Pause song" : "Listen to Example"}
                   onClick={handleHeroPlay}
-                  className={`absolute left-1/2 top-1/2 flex h-16 w-16 -translate-x-1/2 -translate-y-1/2 items-center justify-center rounded-full bg-[rgba(246,240,230,0.95)] shadow-[0_8px_32px_rgba(0,0,0,0.35)] transition-all hover:scale-110 sm:h-20 sm:w-20 ${
-                    heroPlaying ? "opacity-0 group-hover:opacity-100" : "opacity-100"
-                  }`}
+                  className="absolute bottom-3 right-3 z-20 flex items-center gap-2 rounded-full bg-[rgba(246,240,230,0.97)] py-2 pl-2 pr-3.5 shadow-[0_8px_24px_rgba(0,0,0,0.28)] ring-1 ring-black/5 transition-all hover:-translate-y-px hover:shadow-[0_10px_28px_rgba(0,0,0,0.32)] sm:bottom-4 sm:right-4 sm:py-2.5 sm:pl-2.5 sm:pr-4"
                 >
-                  {heroPlaying ? (
-                    <span className="flex gap-[5px]">
-                      <span className="block h-5 w-[5px] rounded-sm bg-[#8D6FAF] sm:h-6" />
-                      <span className="block h-5 w-[5px] rounded-sm bg-[#8D6FAF] sm:h-6" />
-                    </span>
-                  ) : (
-                    <span
-                      className="ml-1 inline-block"
-                      style={{
-                        width: 0,
-                        height: 0,
-                        borderLeft: "16px solid #8D6FAF",
-                        borderTop: "10px solid transparent",
-                        borderBottom: "10px solid transparent",
-                      }}
-                    />
-                  )}
+                  <span className="flex h-7 w-7 items-center justify-center rounded-full bg-[#C7572E] sm:h-8 sm:w-8">
+                    {heroPlaying ? (
+                      <span className="flex gap-[3px]">
+                        <span className="block h-2.5 w-[3px] rounded-sm bg-white sm:h-3" />
+                        <span className="block h-2.5 w-[3px] rounded-sm bg-white sm:h-3" />
+                      </span>
+                    ) : (
+                      <span
+                        className="ml-[2px] inline-block"
+                        style={{
+                          width: 0,
+                          height: 0,
+                          borderLeft: "8px solid #ffffff",
+                          borderTop: "5px solid transparent",
+                          borderBottom: "5px solid transparent",
+                        }}
+                      />
+                    )}
+                  </span>
+                  <span className="text-[13px] font-semibold tracking-[0.005em] text-[#1F1B16] sm:text-[14px]">
+                    {heroPlaying ? "Pause" : "Listen to Example"}
+                  </span>
                 </button>
 
                 {heroPlaying && (
-                  <div className="absolute bottom-3 left-3 right-3 flex items-center gap-2 rounded-full bg-black/40 px-3 py-1.5 backdrop-blur-sm">
+                  <div className="absolute left-3 top-3 flex items-center gap-2 rounded-full bg-black/45 px-3 py-1.5 backdrop-blur-sm sm:left-4 sm:top-4">
                     <span className="flex h-2 w-2 animate-pulse rounded-full bg-[#E8C547]" />
                     <span className="text-[11px] font-medium uppercase tracking-[0.12em] text-white/95">
                       For My Mother — Now playing
