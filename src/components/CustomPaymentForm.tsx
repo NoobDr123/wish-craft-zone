@@ -119,11 +119,12 @@ function InnerForm({ returnUrl, email, amountLabel, onError }: CustomPaymentForm
         </div>
       </div>
 
-      {/* Card / bank / wallet form */}
+      {/* Card / bank / wallet form — Link auto-appears when enabled in Stripe dashboard */}
       <PaymentElement
         options={{
           layout: { type: "tabs", defaultCollapsed: false },
           defaultValues: { billingDetails: { email } },
+          wallets: { applePay: "auto", googlePay: "auto" },
         }}
       />
 
