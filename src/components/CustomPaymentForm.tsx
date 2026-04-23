@@ -152,7 +152,7 @@ function InnerForm({ returnUrl, email, amountLabel, onError, disabled, disabledR
       <button
         type="button"
         onClick={handleConfirm}
-        disabled={!stripe || !elements || submitting}
+        disabled={!stripe || !elements || submitting || disabled}
         className="flex w-full items-center justify-center gap-2.5 rounded-2xl bg-primary px-6 py-5 text-base font-bold text-primary-foreground shadow-glow transition-all hover:brightness-95 active:scale-[0.99] disabled:cursor-not-allowed disabled:opacity-60 disabled:shadow-none md:text-lg"
       >
         {submitting ? (
@@ -166,6 +166,12 @@ function InnerForm({ returnUrl, email, amountLabel, onError, disabled, disabledR
           </>
         )}
       </button>
+
+      {disabled && disabledReason && (
+        <p className="text-center text-xs font-medium text-muted-foreground">
+          {disabledReason}
+        </p>
+      )}
 
       <div className="flex flex-col items-center gap-1.5 text-xs text-muted-foreground">
         <span className="inline-flex items-center gap-1.5">
