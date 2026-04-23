@@ -28,23 +28,29 @@ serve(async (req) => {
     const currency = price.currency;
     if (!amount) return json({ error: "Base price has no unit amount" }, 500);
 
-    // Create (or reuse) a Customer so we can save the payment method for upsells
-    const existing = await stripe.customers.list({ email, limit: 1 });
-    const customer =
-      existing.data[0] ??
-      (await stripe.customers.create({
-        email,
-        metadata: { orderId },
-      }));
+    // Create (or reuse) a Customer so we can save the payment method for upsells.
+    // Email is optional at this point — the customer is updated when the user fills it in
+    // (the PaymentElement collects billing details and Stripe attaches them on confirm).
+    let customerId: string | undefined;
+    if (emailStr) {
+      const existing = await stripe.customers.list({ email: emailStr, limit: 1 });
+      const customer =
+        existing.data[0] ??
+        (await stripe.customers.create({
+          email: emailStr,
+          metadata: { orderId },
+        }));
+      customerId = customer.id;
+    } else {
+      const customer = await stripe.customers.create({ metadata: { orderId } });
+      customerId = customer.id;
+    }
 
-    // Create a PaymentIntent with automatic payment methods so Link, Apple Pay,
-    // Google Pay, and cards are all available. The Link "Save my info" signup
-    // panel inside the PaymentElement is hidden client-side via wallets.link.
     const paymentIntent = await stripe.paymentIntents.create({
       amount,
       currency,
-      customer: customer.id,
-      receipt_email: email,
+      customer: customerId,
+      ...(emailStr ? { receipt_email: emailStr } : {}),
       // Save card so we can charge silently for upsells
       setup_future_usage: "off_session",
       automatic_payment_methods: {
