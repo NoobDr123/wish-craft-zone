@@ -5,6 +5,8 @@ import { useEffect, useState } from "react";
 import { supabase } from "@/integrations/supabase/client";
 import { useAuth } from "./useAuth";
 
+const ADMIN_EMAILS = ["sylwester@flowscommerce.com"];
+
 export type AdminGuardState =
   | "loading"
   | "anonymous"
@@ -28,37 +30,32 @@ export function useAdminGuard() {
       return;
     }
 
+    const email = (user.email ?? "").toLowerCase();
+    if (!ADMIN_EMAILS.includes(email)) {
+      setState("not_admin");
+      return;
+    }
+
     let cancelled = false;
     (async () => {
-      const [{ data: roleRow }, { data: mfaRow }, { data: verif }] =
-        await Promise.all([
-          supabase
-            .from("user_roles")
-            .select("role")
-            .eq("user_id", user.id)
-            .eq("role", "admin")
-            .maybeSingle(),
-          supabase
-            .from("user_mfa")
-            .select("enrolled")
-            .eq("user_id", user.id)
-            .maybeSingle(),
-          supabase
-            .from("mfa_verifications")
-            .select("expires_at")
-            .eq("user_id", user.id)
-            .gt("expires_at", new Date().toISOString())
-            .order("verified_at", { ascending: false })
-            .limit(1)
-            .maybeSingle(),
-        ]);
+      const [{ data: mfaRow }, { data: verif }] = await Promise.all([
+        supabase
+          .from("user_mfa")
+          .select("enrolled")
+          .eq("user_id", user.id)
+          .maybeSingle(),
+        supabase
+          .from("mfa_verifications")
+          .select("expires_at")
+          .eq("user_id", user.id)
+          .gt("expires_at", new Date().toISOString())
+          .order("verified_at", { ascending: false })
+          .limit(1)
+          .maybeSingle(),
+      ]);
 
       if (cancelled) return;
 
-      if (!roleRow) {
-        setState("not_admin");
-        return;
-      }
       if (!mfaRow?.enrolled) {
         setState("needs_enrollment");
         return;
