@@ -116,21 +116,6 @@ function CheckoutPage() {
     }, 600);
     return () => clearTimeout(t);
     // eslint-disable-next-line react-hooks/exhaustive-deps
-
-  // Persist buyer email/name to the order as they type (debounced).
-  useEffect(() => {
-    if (!orderId || !ready) return;
-    const t = setTimeout(async () => {
-      const trimmedEmail = email.trim().toLowerCase();
-      q.set("buyer_email", trimmedEmail);
-      q.set("buyer_name", name);
-      await supabase
-        .from("orders")
-        .update({ buyer_email: trimmedEmail, buyer_name: name })
-        .eq("id", orderId);
-    }, 600);
-    return () => clearTimeout(t);
-    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [email, name, ready, orderId]);
 
   return (
