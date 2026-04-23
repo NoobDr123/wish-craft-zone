@@ -1156,7 +1156,7 @@ function LandingPage() {
                             : `Play song for ${t.name}`
                           : `Song for ${t.name} is being prepared`
                       }
-                      className={`group relative flex h-[72px] w-[72px] shrink-0 items-center justify-center rounded-full transition-transform ${
+                      className={`group relative flex h-[52px] w-[52px] shrink-0 items-center justify-center rounded-full transition-transform sm:h-[60px] sm:w-[60px] md:h-[72px] md:w-[72px] ${
                         hasAudio ? "cursor-pointer hover:scale-[1.04]" : "cursor-default opacity-60"
                       }`}
                     >
