@@ -1,12 +1,15 @@
 import { createFileRoute, useNavigate, Link } from "@tanstack/react-router";
-import { useEffect, useRef, useState } from "react";
+import { lazy, Suspense, useEffect, useRef, useState } from "react";
 import { Logo } from "@/components/Logo";
 import { PaymentTestModeBanner } from "@/components/PaymentTestModeBanner";
-import { AudioPlayer } from "@/components/AudioPlayer";
 import { CustomPaymentForm } from "@/components/CustomPaymentForm";
-import { useQuizStore, journeyStageOf, tenseOf } from "@/stores/quizStore";
+import { useQuizStore } from "@/stores/quizStore";
 import { supabase } from "@/integrations/supabase/client";
-import { stripeEnvironment } from "@/lib/stripe";
+import {
+  prefetchCheckout,
+  getPrefetchedCheckout,
+  type PrefetchedCheckout,
+} from "@/lib/checkoutPrefetch";
 import {
   ArrowLeft,
   CheckCircle2,
@@ -14,6 +17,10 @@ import {
   Pencil,
   ShieldCheck,
 } from "lucide-react";
+
+// Code-split the samples block so the SDK and AudioPlayer don't enter the
+// critical path. Mounted only when scrolled into view.
+const SamplesSection = lazy(() => import("@/components/CheckoutSamples"));
 
 interface SampleSong {
   id: string;
@@ -29,16 +36,8 @@ export const Route = createFileRoute("/checkout")({
   head: () => ({
     meta: [{ title: "Almost There · RibbonSong" }],
   }),
-  loader: async () => {
-    const { data } = await supabase
-      .from("featured_samples")
-      .select("id,title,for_text,quote,audio_url,recipient_name")
-      .eq("published", true)
-      .not("audio_url", "is", null)
-      .order("sort_order", { ascending: true })
-      .limit(3);
-    return { samples: (data ?? []) as SampleSong[] };
-  },
+  // Samples are no longer fetched in the SSR loader — they were blocking the
+  // critical path. They now load lazily after the payment form is ready.
 });
 
 const emailRe = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
@@ -51,11 +50,9 @@ function formatDeliveryDate() {
 
 function CheckoutPage() {
   const navigate = useNavigate();
-  const { samples } = Route.useLoaderData() as { samples: SampleSong[] };
   const q = useQuizStore();
   const [email, setEmail] = useState(q.buyer_email || "");
   const [name, setName] = useState(q.buyer_name || "");
-  const [creating, setCreating] = useState(false);
   const [clientSecret, setClientSecret] = useState<string | null>(null);
   const [paymentIntentId, setPaymentIntentId] = useState<string | null>(null);
   const [orderId, setOrderId] = useState<string | null>(q.orderId || null);
@@ -76,134 +73,49 @@ function CheckoutPage() {
   }, []);
   const recipient = q.recipient_name || "your loved one";
 
-  const startCheckout = async () => {
-    setCreating(true);
-    setError(null);
-
-    try {
-      const { data: authData } = await supabase.auth.getUser();
-      const userId = authData.user?.id ?? null;
-
-      const journey = journeyStageOf(q.stage);
-      const tense = tenseOf(q.stage);
-      const relationshipResolved =
-        q.relationship === "Other" && q.relationship_other.trim()
-          ? q.relationship_other.trim()
-          : (q.relationship ?? null);
-
-      const newOrderId =
-        typeof crypto !== "undefined" && "randomUUID" in crypto
-          ? crypto.randomUUID()
-          : `${Date.now()}-${Math.random().toString(36).slice(2)}`;
-
-      // Use a placeholder email until the buyer enters one. We patch it
-      // before payment confirmation (and via PaymentElement billing details).
-      const placeholderEmail = `pending+${newOrderId}@ribbonsong.com`;
-
-      const { error: insertError } = await supabase
-        .from("orders")
-        .insert({
-          id: newOrderId,
-          user_id: userId,
-          buyer_email: placeholderEmail,
-          buyer_name: null,
-          recipient_name: q.recipient_name,
-          relationship: relationshipResolved,
-          genre: q.genre ?? null,
-          tempo: q.tempo ?? null,
-          voice: q.voice ?? null,
-          song_title_idea: q.song_title_idea || null,
-          is_gift: q.is_gift,
-          recipient_email: q.recipient_email || null,
-          delivery_date: q.delivery_date || null,
-          personal_note: q.personal_note || null,
-          amount_cents: 4999,
-          currency: "USD",
-          status: "pending_payment",
-          payment_status: "pending",
-          priority: journey === "hospice" ? "hospice" : "standard",
-          quiz_payload: {
-            q1_relationship: q.relationship,
-            q1_relationship_other: q.relationship_other || null,
-            q1_recipient_name: q.recipient_name,
-            q1_pronunciation: q.pronunciation || null,
-            q1_age_range: q.age_range || null,
-            q3_journey: q.stage,
-            q3_journey_stage: journey,
-            q3_tense: tense,
-            q4_fighting_for: q.fighting_for,
-            q5_qualities: q.qualities,
-            q6_shared_memory: q.shared_memory,
-            q7_theme: q.message,
-            q8_letter: q.personal_words,
-            q9_genre: q.genre,
-            q9_tempo: q.tempo,
-            q9_voice: q.voice,
-            q9_song_title_idea: q.song_title_idea || null,
-
-            stage: q.stage,
-            cancer_type: q.cancer_type,
-            message: q.message,
-            fighting_for: q.fighting_for,
-            signature_strength: q.signature_strength,
-            hardest_moment: q.hardest_moment,
-            what_helps_most: q.what_helps_most,
-            qualities: q.qualities,
-            inside_joke: q.inside_joke,
-            shared_memory: q.shared_memory,
-            little_things: q.little_things,
-            faith_or_beliefs: q.faith_or_beliefs,
-            personal_words: q.personal_words,
-            hope_for_them: q.hope_for_them,
-            relationship: relationshipResolved,
-            journey_stage: journey,
-            tense,
-          },
-        });
-
-      if (insertError) {
-        console.error("Order insert failed:", insertError);
-        setError("Could not start your order. Please try again.");
-        return;
-      }
-
-      q.set("orderId", newOrderId);
-      setOrderId(newOrderId);
-
-      const { data, error: fnError } = await supabase.functions.invoke("create-checkout", {
-        body: {
-          orderId: newOrderId,
-          environment: stripeEnvironment,
-        },
-      });
-
-      if (fnError || !data?.clientSecret) {
-        console.error("create-checkout failed:", fnError, data);
-        setError(data?.error || "Could not start payment. Please try again.");
-        return;
-      }
-
-      setClientSecret(data.clientSecret);
-      setPaymentIntentId(data.paymentIntentId);
-    } catch (e) {
-      console.error("Checkout error:", e);
-      setError("Something went wrong. Please try again.");
-    } finally {
-      setCreating(false);
-    }
-  };
-
-  // Create the PaymentIntent immediately on mount — payment form shows right away.
-  // useRef lock prevents StrictMode double-invocation and re-render races from
-  // firing multiple create-checkout calls (which was creating duplicate orders).
+  // Single-shot kick: use the prefetched checkout from /scratch if it exists,
+  // otherwise prefetchCheckout() runs the full flow now. Either way the form
+  // mounts as soon as the clientSecret resolves.
   const startedRef = useRef(false);
   useEffect(() => {
     if (!q.recipient_name) return;
     if (startedRef.current) return;
     startedRef.current = true;
-    startCheckout();
+
+    const apply = (pf: PrefetchedCheckout | null) => {
+      if (!pf) {
+        setError("Could not start payment. Please try again.");
+        return;
+      }
+      q.set("orderId", pf.orderId);
+      setOrderId(pf.orderId);
+      setClientSecret(pf.clientSecret);
+      setPaymentIntentId(pf.paymentIntentId);
+    };
+
+    const cached = getPrefetchedCheckout();
+    if (cached) {
+      apply(cached);
+    } else {
+      prefetchCheckout().then(apply);
+    }
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [q.recipient_name]);
+
+  // Persist buyer email/name to the order as they type (debounced).
+  useEffect(() => {
+    if (!orderId || !ready) return;
+    const t = setTimeout(async () => {
+      const trimmedEmail = email.trim().toLowerCase();
+      q.set("buyer_email", trimmedEmail);
+      q.set("buyer_name", name);
+      await supabase
+        .from("orders")
+        .update({ buyer_email: trimmedEmail, buyer_name: name })
+        .eq("id", orderId);
+    }, 600);
+    return () => clearTimeout(t);
+    // eslint-disable-next-line react-hooks/exhaustive-deps
 
   // Persist buyer email/name to the order as they type (debounced).
   useEffect(() => {
@@ -345,46 +257,31 @@ function CheckoutPage() {
                 disabledReason="Enter your email and name above to continue"
               />
             ) : (
-              <div className="space-y-3 p-4 md:p-6">
-                <div className="h-12 animate-pulse rounded-xl bg-peach/40" />
-                <div className="h-32 animate-pulse rounded-xl bg-peach/30" />
-                <div className="h-14 animate-pulse rounded-2xl bg-peach/40" />
+              <div className="space-y-4 p-4 md:p-6">
+                {/* Skeleton matching the real form footprint to avoid layout shift */}
+                <div className="h-12 animate-pulse rounded-2xl bg-foreground/10" />
+                <div className="flex gap-2">
+                  <div className="h-12 flex-1 animate-pulse rounded-2xl bg-foreground/10" />
+                  <div className="h-12 flex-1 animate-pulse rounded-2xl bg-foreground/10" />
+                </div>
+                <div className="my-2 flex items-center gap-3">
+                  <div className="h-px flex-1 bg-border" />
+                  <span className="text-xs font-medium uppercase tracking-wider text-muted-foreground/60">
+                    Or pay with card
+                  </span>
+                  <div className="h-px flex-1 bg-border" />
+                </div>
+                <div className="h-32 animate-pulse rounded-xl bg-foreground/5" />
+                <div className="h-14 animate-pulse rounded-2xl bg-primary/30" />
               </div>
             )}
           </div>
         </section>
 
-        {/* Samples */}
-        {samples.length > 0 && (
-          <section className="mt-6 rounded-3xl border border-peach/70 bg-card p-6 shadow-soft md:p-7">
-            <h2 className="flex items-center gap-2 font-display text-2xl font-bold text-foreground">
-              <Music2 className="h-5 w-5 text-primary" /> Hear Other RibbonSongs We Made
-            </h2>
-            <div className="mt-5 space-y-5">
-              {samples.map((s) => (
-                <article
-                  key={s.id}
-                  className="rounded-2xl border border-peach/60 bg-background/60 p-4"
-                >
-                  <p className="font-semibold text-foreground">{s.title}</p>
-                  {s.for_text && (
-                    <p className="mt-0.5 text-xs text-muted-foreground">{s.for_text}</p>
-                  )}
-                  {s.audio_url && (
-                    <div className="mt-3">
-                      <AudioPlayer src={s.audio_url} title={s.title} variant="compact" />
-                    </div>
-                  )}
-                  {s.quote && (
-                    <p className="mt-3 text-sm italic leading-relaxed text-foreground/80">
-                      &ldquo;{s.quote}&rdquo;
-                    </p>
-                  )}
-                </article>
-              ))}
-            </div>
-          </section>
-        )}
+        {/* Samples — lazy-loaded below the fold */}
+        <Suspense fallback={null}>
+          <SamplesSection />
+        </Suspense>
 
         {/* Money-back guarantee */}
         <section className="mt-6 rounded-3xl border border-peach/70 bg-card p-6 shadow-soft md:p-7">
