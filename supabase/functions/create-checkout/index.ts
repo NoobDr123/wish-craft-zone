@@ -11,7 +11,7 @@ serve(async (req) => {
   if (req.method === "OPTIONS") return new Response(null, { headers: corsHeaders });
 
   try {
-    const { orderId, email, returnUrl, environment } = await req.json();
+    const { orderId, email, environment } = await req.json();
     if (!orderId || typeof orderId !== "string") {
       return json({ error: "Missing orderId" }, 400);
     }
@@ -22,41 +22,57 @@ serve(async (req) => {
     const env = (environment || "sandbox") as StripeEnv;
     const stripe = createStripeClient(env);
 
-    // Resolve the human-readable price ID to a real Stripe price
+    // Resolve the human-readable price ID to the real Stripe price (for amount + currency)
     const prices = await stripe.prices.list({ lookup_keys: ["ribbonsong_base"] });
     if (!prices.data.length) return json({ error: "Base price not found" }, 404);
+    const price = prices.data[0];
+    const amount = price.unit_amount;
+    const currency = price.currency;
+    if (!amount) return json({ error: "Base price has no unit amount" }, 500);
 
-    const fallbackOrigin =
-      safeOrigin(req.headers.get("origin")) ||
-      safeOrigin(req.headers.get("referer")) ||
-      "https://ribbonsong.com";
-
-    const safeReturnUrl = safeAbsoluteUrl(returnUrl) || `${fallbackOrigin}/checkout/return?session_id={CHECKOUT_SESSION_ID}`;
-
-    const session = await stripe.checkout.sessions.create({
-      line_items: [{ price: prices.data[0].id, quantity: 1 }],
-      mode: "payment",
-      ui_mode: "embedded",
-      customer_email: email,
-      // Save card so we can charge silently for upsells
-      payment_intent_data: {
-        setup_future_usage: "off_session",
+    // Create (or reuse) a Customer so we can save the payment method for upsells
+    const existing = await stripe.customers.list({ email, limit: 1 });
+    const customer =
+      existing.data[0] ??
+      (await stripe.customers.create({
+        email,
         metadata: { orderId },
+      }));
+
+    // Create a PaymentIntent with automatic payment methods.
+    // This automatically enables: cards, Apple Pay, Google Pay, Link, and any
+    // other payment methods enabled in the Stripe dashboard.
+    const paymentIntent = await stripe.paymentIntents.create({
+      amount,
+      currency,
+      customer: customer.id,
+      receipt_email: email,
+      // Save card so we can charge silently for upsells
+      setup_future_usage: "off_session",
+      automatic_payment_methods: { enabled: true },
+      metadata: {
+        orderId,
+        kind: "base_order",
       },
-      metadata: { orderId },
-      return_url: safeReturnUrl,
+      description: "RibbonSong personalized song",
     });
 
-    // Stash the session id on the order so the webhook can find it fast
+    // Stash on the order so the return page + webhook can find it
     await supabase
       .from("orders")
       .update({
-        stripe_checkout_session_id: session.id,
+        stripe_payment_intent_id: paymentIntent.id,
+        stripe_customer_id: customer.id,
         payment_status: "checkout_started",
       })
       .eq("id", orderId);
 
-    return json({ clientSecret: session.client_secret });
+    return json({
+      clientSecret: paymentIntent.client_secret,
+      paymentIntentId: paymentIntent.id,
+      amount,
+      currency,
+    });
   } catch (e: any) {
     console.error("create-checkout error:", e);
     return json({ error: e.message || "Internal error" }, 500);
@@ -68,24 +84,4 @@ function json(body: unknown, status = 200) {
     status,
     headers: { ...corsHeaders, "Content-Type": "application/json" },
   });
-}
-
-function safeOrigin(value: string | null) {
-  if (!value) return null;
-
-  try {
-    return new URL(value).origin;
-  } catch {
-    return null;
-  }
-}
-
-function safeAbsoluteUrl(value: unknown) {
-  if (typeof value !== "string") return null;
-
-  try {
-    return new URL(value).toString();
-  } catch {
-    return null;
-  }
 }
