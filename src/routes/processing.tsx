@@ -117,6 +117,36 @@ function ThankYouPage() {
   const [order, setOrder] = useState<OrderRow | null>(null);
   const [loading, setLoading] = useState(true);
 
+  // Magic-link sender state — auto-emails the buyer a passwordless sign-in
+  // link straight to /dashboard so they can land in their account in one tap.
+  const [magicLinkStatus, setMagicLinkStatus] = useState<
+    "idle" | "sending" | "sent" | "error"
+  >("idle");
+  const [magicLinkError, setMagicLinkError] = useState<string | null>(null);
+
+  const sendMagicLink = async (email: string) => {
+    if (!email) {
+      setMagicLinkError("We couldn't find an email on this order.");
+      setMagicLinkStatus("error");
+      return;
+    }
+    setMagicLinkStatus("sending");
+    setMagicLinkError(null);
+    const { error } = await supabase.auth.signInWithOtp({
+      email: email.trim().toLowerCase(),
+      options: {
+        emailRedirectTo: `${window.location.origin}/auth/callback?redirect=/dashboard`,
+        shouldCreateUser: true,
+      },
+    });
+    if (error) {
+      setMagicLinkError(error.message);
+      setMagicLinkStatus("error");
+      return;
+    }
+    setMagicLinkStatus("sent");
+  };
+
   // Try several lookup keys. We may have orderId from the store, or we may
   // need to fall back to the most recent order for this email.
   useEffect(() => {
