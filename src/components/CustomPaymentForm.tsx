@@ -61,6 +61,12 @@ function InnerForm({ returnUrl, email, amountLabel, onError, disabled, disabledR
 
   const handleConfirm = async () => {
     if (!stripe || !elements) return;
+    if (disabled) {
+      const msg = disabledReason || "Please complete the form above first.";
+      setErrorMsg(msg);
+      onError?.(msg);
+      return;
+    }
     setSubmitting(true);
     setErrorMsg(null);
 
@@ -81,8 +87,15 @@ function InnerForm({ returnUrl, email, amountLabel, onError, disabled, disabledR
     }
   };
 
-  const handleExpressConfirm = async () => {
+  const handleExpressConfirm = async (event: { resolve: () => void; reject: () => void } | any) => {
     if (!stripe || !elements) return;
+    if (disabled) {
+      const msg = disabledReason || "Please enter your email and name above first.";
+      setErrorMsg(msg);
+      onError?.(msg);
+      event?.reject?.();
+      return;
+    }
     const { error } = await stripe.confirmPayment({
       elements,
       confirmParams: {
