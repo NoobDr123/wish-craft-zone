@@ -10,7 +10,6 @@ import { stripeEnvironment } from "@/lib/stripe";
 import {
   ArrowLeft,
   CheckCircle2,
-  Gift,
   Music2,
   Pencil,
   ShieldCheck,
@@ -56,11 +55,12 @@ function CheckoutPage() {
   const q = useQuizStore();
   const [email, setEmail] = useState(q.buyer_email || "");
   const [name, setName] = useState(q.buyer_name || "");
-  const [stage, setStage] = useState<"contact" | "payment">("contact");
   const [creating, setCreating] = useState(false);
   const [clientSecret, setClientSecret] = useState<string | null>(null);
   const [paymentIntentId, setPaymentIntentId] = useState<string | null>(null);
   const [error, setError] = useState<string | null>(null);
+  // Track which (email,name) combination produced the current PaymentIntent
+  const [intentKey, setIntentKey] = useState<string | null>(null);
 
   useEffect(() => {
     if (!q.recipient_name) navigate({ to: "/create" });
@@ -68,7 +68,7 @@ function CheckoutPage() {
 
   const emailValid = emailRe.test(email);
   const nameValid = name.trim().length > 1;
-  const canContinue = emailValid && nameValid && !creating;
+  const ready = emailValid && nameValid;
 
   // Compute delivery date only on client to avoid SSR/CSR hydration mismatch
   const [deliveryDate, setDeliveryDate] = useState<string>("");
@@ -77,15 +77,13 @@ function CheckoutPage() {
   }, []);
   const recipient = q.recipient_name || "your loved one";
 
-  const handleStartCheckout = async () => {
-    if (!canContinue) return;
+  const startCheckout = async (emailArg: string, nameArg: string) => {
     setCreating(true);
     setError(null);
-    q.set("buyer_email", email);
-    q.set("buyer_name", name);
+    q.set("buyer_email", emailArg);
+    q.set("buyer_name", nameArg);
 
     try {
-      // 1. Create the order row in our DB first so we have an orderId for Stripe metadata
       const { data: authData } = await supabase.auth.getUser();
       const userId = authData.user?.id ?? null;
 
@@ -96,8 +94,6 @@ function CheckoutPage() {
           ? q.relationship_other.trim()
           : (q.relationship ?? null);
 
-      // Generate the order id client-side so we don't need a SELECT-after-INSERT
-      // (RLS would block reading the row back as a guest with no matching email/uid).
       const newOrderId =
         typeof crypto !== "undefined" && "randomUUID" in crypto
           ? crypto.randomUUID()
@@ -108,8 +104,8 @@ function CheckoutPage() {
         .insert({
           id: newOrderId,
           user_id: userId,
-          buyer_email: email.trim().toLowerCase(),
-          buyer_name: name,
+          buyer_email: emailArg.trim().toLowerCase(),
+          buyer_name: nameArg,
           recipient_name: q.recipient_name,
           relationship: relationshipResolved,
           genre: q.genre ?? null,
@@ -126,7 +122,6 @@ function CheckoutPage() {
           payment_status: "pending",
           priority: journey === "hospice" ? "hospice" : "standard",
           quiz_payload: {
-            // Spec keys (new)
             q1_relationship: q.relationship,
             q1_relationship_other: q.relationship_other || null,
             q1_recipient_name: q.recipient_name,
@@ -145,7 +140,6 @@ function CheckoutPage() {
             q9_voice: q.voice,
             q9_song_title_idea: q.song_title_idea || null,
 
-            // Legacy keys (kept so existing edge fn keeps working)
             stage: q.stage,
             cancer_type: q.cancer_type,
             message: q.message,
@@ -169,17 +163,15 @@ function CheckoutPage() {
       if (insertError) {
         console.error("Order insert failed:", insertError);
         setError("Could not start your order. Please try again.");
-        setCreating(false);
         return;
       }
 
       q.set("orderId", newOrderId);
 
-      // 2. Ask the edge function to create a PaymentIntent
       const { data, error: fnError } = await supabase.functions.invoke("create-checkout", {
         body: {
           orderId: newOrderId,
-          email: email.trim().toLowerCase(),
+          email: emailArg.trim().toLowerCase(),
           environment: stripeEnvironment,
         },
       });
@@ -187,13 +179,11 @@ function CheckoutPage() {
       if (fnError || !data?.clientSecret) {
         console.error("create-checkout failed:", fnError, data);
         setError(data?.error || "Could not start payment. Please try again.");
-        setCreating(false);
         return;
       }
 
       setClientSecret(data.clientSecret);
       setPaymentIntentId(data.paymentIntentId);
-      setStage("payment");
     } catch (e) {
       console.error("Checkout error:", e);
       setError("Something went wrong. Please try again.");
@@ -201,6 +191,20 @@ function CheckoutPage() {
       setCreating(false);
     }
   };
+
+  // Auto-create the PaymentIntent once contact info is valid (debounced).
+  // The card form mounts as soon as clientSecret is set — no extra click needed.
+  useEffect(() => {
+    if (!ready) return;
+    const key = `${email.trim().toLowerCase()}|${name.trim()}`;
+    if (key === intentKey) return;
+    const t = setTimeout(() => {
+      setIntentKey(key);
+      startCheckout(email, name);
+    }, 600);
+    return () => clearTimeout(t);
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [email, name, ready]);
 
   return (
     <div className="min-h-screen bg-gradient-warm pb-32 lg:pb-16">
@@ -280,62 +284,54 @@ function CheckoutPage() {
           </button>
         </section>
 
-        {/* Contact form OR Stripe embedded checkout */}
-        {stage === "contact" ? (
-          <section className="mt-6 rounded-3xl border border-peach/70 bg-card p-6 shadow-card md:p-8">
-            <h2 className="font-display text-xl font-bold text-foreground">Contact</h2>
-            <p className="mt-1 text-sm text-muted-foreground">
-              We'll send your song here when it's ready.
-            </p>
-            <div className="mt-4 space-y-3">
-              <Field
-                label="Email Address"
-                type="email"
-                value={email}
-                onChange={setEmail}
-                placeholder="you@email.com"
-                valid={email.length === 0 || emailValid}
-              />
-              <Field
-                label="Full Name"
-                value={name}
-                onChange={setName}
-                placeholder="Jane Doe"
-                valid={name.length === 0 || nameValid}
-              />
-            </div>
+        {/* Contact form — payment form mounts inline below as soon as fields are valid */}
+        <section className="mt-6 rounded-3xl border border-peach/70 bg-card p-6 shadow-card md:p-8">
+          <h2 className="font-display text-xl font-bold text-foreground">Contact</h2>
+          <p className="mt-1 text-sm text-muted-foreground">
+            We'll send your song here when it's ready.
+          </p>
+          <div className="mt-4 space-y-3">
+            <Field
+              label="Email Address"
+              type="email"
+              value={email}
+              onChange={setEmail}
+              placeholder="you@email.com"
+              valid={email.length === 0 || emailValid}
+            />
+            <Field
+              label="Full Name"
+              value={name}
+              onChange={setName}
+              placeholder="Jane Doe"
+              valid={name.length === 0 || nameValid}
+            />
+          </div>
 
-            {error && (
-              <p className="mt-4 rounded-xl bg-destructive/10 px-4 py-3 text-sm text-destructive">
-                {error}
+          {error && (
+            <p className="mt-4 rounded-xl bg-destructive/10 px-4 py-3 text-sm text-destructive">
+              {error}
+            </p>
+          )}
+
+          {/* Inline payment form — appears as soon as email + name are valid */}
+          <div className="mt-6 -mx-6 md:-mx-8 border-t border-peach/70">
+            {!ready && (
+              <p className="px-6 py-8 text-center text-sm text-muted-foreground md:px-8">
+                Enter your email and name above to see payment options.
               </p>
             )}
 
-            <button
-              onClick={handleStartCheckout}
-              disabled={!canContinue}
-              className="mt-6 flex w-full items-center justify-center gap-2.5 rounded-2xl bg-primary px-6 py-5 text-base font-bold text-primary-foreground shadow-glow transition-all hover:brightness-95 active:scale-[0.99] disabled:cursor-not-allowed disabled:opacity-60 disabled:shadow-none md:text-lg"
-            >
-              {creating ? (
-                <>
-                  <span className="h-5 w-5 animate-spin rounded-full border-2 border-primary-foreground/30 border-t-primary-foreground" />
-                  Preparing checkout…
-                </>
-              ) : (
-                <>
-                  <Gift className="h-5 w-5" /> Continue to Payment · $49.99
-                </>
-              )}
-            </button>
+            {ready && creating && !clientSecret && (
+              <p className="flex items-center justify-center gap-2 px-6 py-8 text-sm text-muted-foreground md:px-8">
+                <span className="h-4 w-4 animate-spin rounded-full border-2 border-primary/30 border-t-primary" />
+                Loading secure payment…
+              </p>
+            )}
 
-            <p className="mt-4 flex items-center justify-center gap-1.5 text-sm font-semibold text-success">
-              <CheckCircle2 className="h-4 w-4" /> 30-Day Money Back Guarantee
-            </p>
-          </section>
-        ) : (
-          <section className="mt-6 overflow-hidden rounded-3xl border border-peach/70 bg-card shadow-card">
             {clientSecret && paymentIntentId && (
               <CustomPaymentForm
+                key={paymentIntentId}
                 clientSecret={clientSecret}
                 email={email.trim().toLowerCase()}
                 amountLabel="$49.99"
@@ -343,8 +339,8 @@ function CheckoutPage() {
                 onError={(msg) => setError(msg)}
               />
             )}
-          </section>
-        )}
+          </div>
+        </section>
 
         {/* Samples */}
         {samples.length > 0 && (
