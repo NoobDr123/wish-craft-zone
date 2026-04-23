@@ -95,9 +95,17 @@ function CheckoutPage() {
           ? q.relationship_other.trim()
           : (q.relationship ?? null);
 
-      const { data: order, error: insertError } = await supabase
+      // Generate the order id client-side so we don't need a SELECT-after-INSERT
+      // (RLS would block reading the row back as a guest with no matching email/uid).
+      const newOrderId =
+        typeof crypto !== "undefined" && "randomUUID" in crypto
+          ? crypto.randomUUID()
+          : `${Date.now()}-${Math.random().toString(36).slice(2)}`;
+
+      const { error: insertError } = await supabase
         .from("orders")
         .insert({
+          id: newOrderId,
           user_id: userId,
           buyer_email: email.trim().toLowerCase(),
           buyer_name: name,
@@ -155,23 +163,21 @@ function CheckoutPage() {
             journey_stage: journey,
             tense,
           },
-        })
-        .select("id")
-        .single();
+        });
 
-      if (insertError || !order) {
+      if (insertError) {
         console.error("Order insert failed:", insertError);
         setError("Could not start your order. Please try again.");
         setCreating(false);
         return;
       }
 
-      q.set("orderId", order.id);
+      q.set("orderId", newOrderId);
 
       // 2. Ask the edge function to create the embedded checkout session
       const { data, error: fnError } = await supabase.functions.invoke("create-checkout", {
         body: {
-          orderId: order.id,
+          orderId: newOrderId,
           email: email.trim().toLowerCase(),
           returnUrl: `${window.location.origin}/checkout/return?session_id={CHECKOUT_SESSION_ID}`,
           environment: stripeEnvironment,
