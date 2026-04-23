@@ -844,9 +844,9 @@ function LandingPage() {
             {[
               {
                 n: "01",
-                h: "Tell their story.",
-                p: "A guided, unhurried conversation. Written, not a call. We ask the kinds of questions that bring the right memories up without you having to dig for them.",
-                m: "Takes about ten minutes. Families tell us this part alone is already a gift.",
+                h: "Share their story.",
+                p: "Answer a few simple questions in writing — no calls, no pressure. Our prompts gently surface the right memories for you.",
+                m: "Takes about 10 minutes. Families say this part alone already feels like a gift.",
                 icon: (
                   <svg viewBox="0 0 24 24" fill="none" className="h-5 w-5" stroke="currentColor" strokeWidth="1.7" strokeLinecap="round" strokeLinejoin="round">
                     <path d="M21 11.5a8.38 8.38 0 0 1-.9 3.8 8.5 8.5 0 0 1-7.6 4.7 8.38 8.38 0 0 1-3.8-.9L3 21l1.9-5.7a8.38 8.38 0 0 1-.9-3.8 8.5 8.5 0 0 1 4.7-7.6 8.38 8.38 0 0 1 3.8-.9h.5a8.48 8.48 0 0 1 8 8v.5z"/>
@@ -855,9 +855,9 @@ function LandingPage() {
               },
               {
                 n: "02",
-                h: "We write and record.",
-                p: "You pick the genre, the tempo, and the voice. Or let us recommend based on the story you shared. Acoustic folk, country, gospel, worship, uplifting pop, or cinematic strings.",
-                m: "Real production. Real arrangement. Built to be played, not just heard.",
+                h: "We write & record it.",
+                p: "Pick the genre, tempo, and voice — or let us suggest. Folk, country, gospel, pop, or cinematic strings, fully produced in studio.",
+                m: "Real songwriting. Real arrangement. Built to be played, not just heard.",
                 icon: (
                   <svg viewBox="0 0 24 24" fill="none" className="h-5 w-5" stroke="currentColor" strokeWidth="1.7" strokeLinecap="round" strokeLinejoin="round">
                     <path d="M9 18V5l12-2v13"/><circle cx="6" cy="18" r="3"/><circle cx="18" cy="16" r="3"/>
@@ -866,9 +866,9 @@ function LandingPage() {
               },
               {
                 n: "03",
-                h: "Delivered to your inbox.",
-                p: "In five days. Streaming and downloadable, yours forever. Share it, give it, play it at the bedside, the church, the memorial, or the kitchen sink.",
-                m: "If it doesn't feel right, we rewrite it free. Or refund you in full. No questions.",
+                h: "Delivered in 5 days.",
+                p: "Straight to your inbox — streamable and downloadable, yours forever to share, gift, or play at the bedside.",
+                m: "Don't love it? We'll rewrite it free, or refund you in full. No questions.",
                 icon: (
                   <svg viewBox="0 0 24 24" fill="none" className="h-5 w-5" stroke="currentColor" strokeWidth="1.7" strokeLinecap="round" strokeLinejoin="round">
                     <path d="M4 4h16c1.1 0 2 .9 2 2v12c0 1.1-.9 2-2 2H4c-1.1 0-2-.9-2-2V6c0-1.1.9-2 2-2z"/><polyline points="22,6 12,13 2,6"/>
