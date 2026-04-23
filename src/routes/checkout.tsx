@@ -169,6 +169,7 @@ function CheckoutPage() {
         body: {
           orderId: order.id,
           email: email.trim().toLowerCase(),
+          returnUrl: `${window.location.origin}/checkout/return?session_id={CHECKOUT_SESSION_ID}`,
           environment: stripeEnvironment,
         },
       });

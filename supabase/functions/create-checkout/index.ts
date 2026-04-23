@@ -11,7 +11,7 @@ serve(async (req) => {
   if (req.method === "OPTIONS") return new Response(null, { headers: corsHeaders });
 
   try {
-    const { orderId, email, environment } = await req.json();
+    const { orderId, email, returnUrl, environment } = await req.json();
     if (!orderId || typeof orderId !== "string") {
       return json({ error: "Missing orderId" }, 400);
     }
@@ -26,10 +26,12 @@ serve(async (req) => {
     const prices = await stripe.prices.list({ lookup_keys: ["ribbonsong_base"] });
     if (!prices.data.length) return json({ error: "Base price not found" }, 404);
 
-    const origin =
-      req.headers.get("origin") ||
-      req.headers.get("referer")?.replace(/\/[^/]*$/, "") ||
+    const fallbackOrigin =
+      safeOrigin(req.headers.get("origin")) ||
+      safeOrigin(req.headers.get("referer")) ||
       "https://ribbonsong.com";
+
+    const safeReturnUrl = safeAbsoluteUrl(returnUrl) || `${fallbackOrigin}/checkout/return?session_id={CHECKOUT_SESSION_ID}`;
 
     const session = await stripe.checkout.sessions.create({
       line_items: [{ price: prices.data[0].id, quantity: 1 }],
@@ -42,7 +44,7 @@ serve(async (req) => {
         metadata: { orderId },
       },
       metadata: { orderId },
-      return_url: `${origin}/checkout/return?session_id={CHECKOUT_SESSION_ID}`,
+      return_url: safeReturnUrl,
     });
 
     // Stash the session id on the order so the webhook can find it fast
@@ -66,4 +68,24 @@ function json(body: unknown, status = 200) {
     status,
     headers: { ...corsHeaders, "Content-Type": "application/json" },
   });
+}
+
+function safeOrigin(value: string | null) {
+  if (!value) return null;
+
+  try {
+    return new URL(value).origin;
+  } catch {
+    return null;
+  }
+}
+
+function safeAbsoluteUrl(value: unknown) {
+  if (typeof value !== "string") return null;
+
+  try {
+    return new URL(value).toString();
+  } catch {
+    return null;
+  }
 }
