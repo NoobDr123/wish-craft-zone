@@ -572,6 +572,97 @@ function LandingPage() {
         </div>
       </div>
 
+      {/* HOW IT WORKS */}
+      <section id="how" className="relative overflow-hidden px-0 py-[72px] md:py-[110px]">
+        <div
+          aria-hidden
+          className="pointer-events-none absolute inset-0 bg-[radial-gradient(ellipse_at_top,rgba(141,111,175,0.08),transparent_60%),radial-gradient(ellipse_at_bottom,rgba(232,197,71,0.06),transparent_55%)]"
+        />
+        <div className="relative mx-auto max-w-[1200px] px-5 sm:px-6">
+          <div className="mx-auto mb-12 max-w-[760px] text-center md:mb-16">
+            <Eyebrow center>How it works</Eyebrow>
+            <h2 className="mb-4 font-display text-[clamp(30px,7.4vw,52px)] font-medium leading-[1.05] tracking-[-0.024em] text-[#1F1B16]">
+              How <em className="italic text-[#8D6FAF]">RibbonSong</em> Works
+            </h2>
+            <p className="mx-auto mt-4 max-w-[560px] text-[17px] leading-[1.55] text-[#5A5148]">
+              You don't have to know music. You don't have to know what to say.
+              You just have to know them.
+            </p>
+          </div>
+
+          <div className="relative grid grid-cols-1 gap-6 md:grid-cols-3 md:gap-7">
+            <div
+              aria-hidden
+              className="pointer-events-none absolute left-0 right-0 top-[44px] hidden h-px bg-gradient-to-r from-transparent via-[#D9CEB9] to-transparent md:block"
+            />
+
+            {[
+              {
+                n: "01",
+                h: "Tell their story.",
+                p: "A guided, unhurried conversation. Written, not a call. We ask the kinds of questions that bring the right memories up without you having to dig for them.",
+                m: "Takes about ten minutes. Families tell us this part alone is already a gift.",
+                icon: (
+                  <svg viewBox="0 0 24 24" fill="none" className="h-5 w-5" stroke="currentColor" strokeWidth="1.7" strokeLinecap="round" strokeLinejoin="round">
+                    <path d="M21 11.5a8.38 8.38 0 0 1-.9 3.8 8.5 8.5 0 0 1-7.6 4.7 8.38 8.38 0 0 1-3.8-.9L3 21l1.9-5.7a8.38 8.38 0 0 1-.9-3.8 8.5 8.5 0 0 1 4.7-7.6 8.38 8.38 0 0 1 3.8-.9h.5a8.48 8.48 0 0 1 8 8v.5z"/>
+                  </svg>
+                ),
+              },
+              {
+                n: "02",
+                h: "We write and record.",
+                p: "You pick the genre, the tempo, and the voice. Or let us recommend based on the story you shared. Acoustic folk, country, gospel, worship, uplifting pop, or cinematic strings.",
+                m: "Real production. Real arrangement. Built to be played, not just heard.",
+                icon: (
+                  <svg viewBox="0 0 24 24" fill="none" className="h-5 w-5" stroke="currentColor" strokeWidth="1.7" strokeLinecap="round" strokeLinejoin="round">
+                    <path d="M9 18V5l12-2v13"/><circle cx="6" cy="18" r="3"/><circle cx="18" cy="16" r="3"/>
+                  </svg>
+                ),
+              },
+              {
+                n: "03",
+                h: "Delivered to your inbox.",
+                p: "In five days. Streaming and downloadable, yours forever. Share it, give it, play it at the bedside, the church, the memorial, or the kitchen sink.",
+                m: "If it doesn't feel right, we rewrite it free. Or refund you in full. No questions.",
+                icon: (
+                  <svg viewBox="0 0 24 24" fill="none" className="h-5 w-5" stroke="currentColor" strokeWidth="1.7" strokeLinecap="round" strokeLinejoin="round">
+                    <path d="M4 4h16c1.1 0 2 .9 2 2v12c0 1.1-.9 2-2 2H4c-1.1 0-2-.9-2-2V6c0-1.1.9-2 2-2z"/><polyline points="22,6 12,13 2,6"/>
+                  </svg>
+                ),
+              },
+            ].map((s) => (
+              <div
+                key={s.n}
+                className="group relative flex flex-col rounded-[20px] border border-[#D9CEB9] bg-[#FBF6EC]/80 p-7 backdrop-blur-sm transition-all duration-300 hover:-translate-y-[4px] hover:border-[#8D6FAF]/40 hover:bg-[#FBF6EC] hover:shadow-[0_14px_40px_-12px_rgba(141,111,175,0.25)] md:p-8"
+              >
+                <div className="relative mb-5 flex items-center gap-3">
+                  <div className="flex h-[56px] w-[56px] items-center justify-center rounded-full border border-[#D9CEB9] bg-[#F6F0E6] font-display text-[20px] font-medium text-[#8D6FAF] shadow-[inset_0_1px_2px_rgba(255,255,255,0.6),0_2px_8px_rgba(31,27,22,0.04)] transition-all group-hover:border-[#8D6FAF]/50 group-hover:bg-white">
+                    {s.n}
+                  </div>
+                  <span className="text-[#8D6FAF]/70 transition-colors group-hover:text-[#8D6FAF]">
+                    {s.icon}
+                  </span>
+                </div>
+
+                <h3 className="mb-3 font-display text-[22px] font-medium leading-[1.2] tracking-[-0.012em] text-[#1F1B16] md:text-[24px]">
+                  {s.h}
+                </h3>
+                <p className="mb-4 text-[15px] leading-[1.6] text-[#5A5148] md:text-[15.5px]">
+                  {s.p}
+                </p>
+                <p className="mt-auto border-t border-[#D9CEB9]/60 pt-4 text-[13.5px] italic leading-[1.55] text-[#8A8175]">
+                  {s.m}
+                </p>
+              </div>
+            ))}
+          </div>
+
+          <div className="mt-12 text-center md:mt-14">
+            <PrimaryBtn large>Start their song</PrimaryBtn>
+          </div>
+        </div>
+      </section>
+
       {/* LISTEN SECTION */}
       <section id="listen" className="px-0 py-[64px] md:py-[100px]">
         <div className="mx-auto max-w-[1200px] px-5 sm:px-6">
@@ -766,60 +857,7 @@ function LandingPage() {
         </div>
       </section>
 
-      {/* HOW IT WORKS */}
-      <section id="how" className="px-0 py-[64px] md:py-[100px]">
-        <div className="mx-auto max-w-[1200px] px-5 sm:px-6">
-          <div className="mx-auto mb-10 max-w-[720px] text-center md:mb-14">
-            <Eyebrow center>How it works</Eyebrow>
-            <h2 className="mb-3.5 font-display text-[clamp(28px,7vw,48px)] font-medium leading-[1.1] tracking-[-0.022em] text-[#1F1B16]">
-              Three gentle steps. <em className="italic text-[#8D6FAF]">Five days.</em>
-            </h2>
-            <p className="mx-auto mt-3.5 max-w-[560px] text-[17px] leading-[1.55] text-[#5A5148]">
-              You don't have to know music. You don't have to know what to say.
-              You just have to know them.
-            </p>
-          </div>
-
-          <div className="grid grid-cols-1 gap-8 md:grid-cols-3">
-            {[
-              {
-                n: "01",
-                h: "Tell their story.",
-                p: "A guided, unhurried conversation. Written, not a call. We ask the kinds of questions that bring the right memories up without you having to dig for them.",
-                m: "Takes about ten minutes. Families tell us this part alone is already a gift.",
-              },
-              {
-                n: "02",
-                h: "We write and record.",
-                p: "You pick the genre, the tempo, and the voice. Or let us recommend based on the story you shared. Acoustic folk, country, gospel, worship, uplifting pop, or cinematic strings.",
-                m: "Real production. Real arrangement. Built to be played, not just heard.",
-              },
-              {
-                n: "03",
-                h: "Delivered to your inbox.",
-                p: "In five days. Streaming and downloadable, yours forever. Share it, give it, play it at the bedside, the church, the memorial, or the kitchen sink.",
-                m: "If it doesn't feel right, we rewrite it free. Or refund you in full. No questions.",
-              },
-            ].map((s) => (
-              <div key={s.n} className="relative">
-                <div className="mb-4 font-display text-[44px] font-light leading-none text-[#8D6FAF] md:text-[52px]">
-                  {s.n}
-                </div>
-                <h3 className="mb-2.5 font-display text-[22px] font-medium leading-[1.2] tracking-[-0.01em] text-[#1F1B16] md:text-[24px]">
-                  {s.h}
-                </h3>
-                <p className="mb-3 text-[15px] leading-[1.6] text-[#5A5148] md:text-[15.5px]">
-                  {s.p}
-                </p>
-                <p className="text-[13.5px] italic leading-[1.55] text-[#8A8175]">
-                  {s.m}
-                </p>
-              </div>
-            ))}
-          </div>
-        </div>
-      </section>
-
+      {/* HOW IT WORKS moved up — see after PRESS STRIP */}
       {/* TESTIMONIALS */}
       <section id="stories" className="bg-[#ECE2D0] px-0 py-[64px] md:py-[100px]">
         <div className="mx-auto max-w-[1200px] px-5 sm:px-6">
