@@ -39,9 +39,11 @@ serve(async (req) => {
         metadata: { orderId },
       }));
 
-    // Create a PaymentIntent. We explicitly enable card + wallets but
-    // exclude Link so Stripe doesn't render the "Save my info for faster
-    // checkout" signup block inside the PaymentElement.
+    // Create a PaymentIntent restricted to card only.
+    // Apple Pay and Google Pay are sub-types of card and ride along
+    // automatically on supported devices via the ExpressCheckoutElement.
+    // Link is intentionally excluded so Stripe doesn't render the
+    // "Save my info for faster checkout" signup block.
     const paymentIntent = await stripe.paymentIntents.create({
       amount,
       currency,
@@ -49,10 +51,6 @@ serve(async (req) => {
       receipt_email: email,
       // Save card so we can charge silently for upsells
       setup_future_usage: "off_session",
-      automatic_payment_methods: {
-        enabled: true,
-        allow_redirects: "never",
-      },
       payment_method_types: ["card"],
       metadata: {
         orderId,
