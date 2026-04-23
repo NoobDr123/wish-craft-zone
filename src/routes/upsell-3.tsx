@@ -51,22 +51,23 @@ function Upsell3() {
     <UpsellShell
       step={3}
       badge="The Perfectionist Pass"
-      headline="Want to keep refining it?"
+      headline="Make their song exactly right"
       description={
         <>
-          Want to tweak the lyrics or try a different genre after you hear it?
-          Unlock <span className="font-semibold text-foreground">unlimited edits</span>{" "}
-          for 14 days for{" "}
+          After you hear the first version, want to tweak a lyric, try a
+          different genre, or swap the voice? Unlock{" "}
+          <span className="font-semibold text-foreground">unlimited edits</span>{" "}
+          for 14 full days — only{" "}
           <span className="font-semibold text-foreground">$32.99</span>.
         </>
       }
       highlights={[
-        "Unlimited lyric and tone refinements",
-        "Try a different genre or voice anytime",
-        "14 days from delivery, no rush",
+        "Unlimited lyric & tone refinements until it's perfect",
+        "Try a different genre, voice, or tempo anytime",
+        "14 days from delivery — no rush, no extra fees",
       ]}
-      acceptLabel="Yes, add unlimited edits · $32.99"
-      declineLabel="No thanks, I trust the song you'll create"
+      priceLabel="$32.99"
+      declineLabel="No thanks, I trust the first version"
       onAccept={accept}
       onDecline={decline}
       processing={processing}
