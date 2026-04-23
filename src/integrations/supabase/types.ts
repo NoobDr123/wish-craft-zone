@@ -127,6 +127,7 @@ export type Database = {
           status: string
           story_prompt: string
           tempo: string
+          testimonial_slug: string | null
           title: string
           updated_at: string
           voice: string
@@ -156,6 +157,7 @@ export type Database = {
           status?: string
           story_prompt: string
           tempo?: string
+          testimonial_slug?: string | null
           title: string
           updated_at?: string
           voice?: string
@@ -185,6 +187,7 @@ export type Database = {
           status?: string
           story_prompt?: string
           tempo?: string
+          testimonial_slug?: string | null
           title?: string
           updated_at?: string
           voice?: string

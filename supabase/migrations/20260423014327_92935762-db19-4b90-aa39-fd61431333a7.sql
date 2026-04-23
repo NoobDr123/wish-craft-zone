@@ -1,0 +1,2 @@
+ALTER TABLE public.featured_samples ADD COLUMN IF NOT EXISTS testimonial_slug text UNIQUE;
+CREATE INDEX IF NOT EXISTS idx_featured_samples_testimonial_slug ON public.featured_samples(testimonial_slug);
