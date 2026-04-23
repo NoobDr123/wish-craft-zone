@@ -812,14 +812,14 @@ function LandingPage() {
                   />
                   <button
                     aria-label="Play video"
-                    className="absolute left-1/2 top-1/2 flex h-14 w-14 -translate-x-1/2 -translate-y-1/2 items-center justify-center rounded-full bg-[rgba(246,240,230,0.95)] shadow-[0_8px_24px_rgba(0,0,0,0.35)]"
+                    className="absolute left-1/2 top-1/2 flex h-14 w-14 -translate-x-1/2 -translate-y-1/2 items-center justify-center rounded-full bg-[#8D6FAF] shadow-[0_8px_24px_rgba(141,111,175,0.5)]"
                   >
                     <span
                       className="ml-1 inline-block"
                       style={{
                         width: 0,
                         height: 0,
-                        borderLeft: "13px solid #8D6FAF",
+                        borderLeft: "13px solid #FFFFFF",
                         borderTop: "8px solid transparent",
                         borderBottom: "8px solid transparent",
                       }}
