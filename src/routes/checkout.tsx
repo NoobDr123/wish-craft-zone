@@ -59,6 +59,7 @@ function CheckoutPage() {
   const [stage, setStage] = useState<"contact" | "payment">("contact");
   const [creating, setCreating] = useState(false);
   const [clientSecret, setClientSecret] = useState<string | null>(null);
+  const [paymentIntentId, setPaymentIntentId] = useState<string | null>(null);
   const [error, setError] = useState<string | null>(null);
 
   useEffect(() => {
