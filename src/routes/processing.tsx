@@ -50,7 +50,10 @@ interface OrderRow {
   is_gift: boolean;
   recipient_email: string | null;
   created_at: string;
+  product_config: Record<string, boolean> | null;
 }
+
+type DeliverySpeed = "24h" | "48h" | "standard";
 
 function formatMoney(cents: number, currency: string) {
   return new Intl.NumberFormat("en-US", {
@@ -59,9 +62,47 @@ function formatMoney(cents: number, currency: string) {
   }).format(cents / 100);
 }
 
-function formatDeliveryDate(orderDateIso: string, isRush: boolean) {
+/**
+ * Compute the delivery speed the user actually purchased.
+ * `delivery_48h` and `rush_delivery` both flip `is_rush`, so we look at
+ * `product_config` to disambiguate. Falls back to standard 5-day delivery.
+ */
+function getDeliverySpeed(order: OrderRow): DeliverySpeed {
+  const cfg = order.product_config || {};
+  if (cfg.rush_delivery) return "24h";
+  if (cfg.delivery_48h) return "48h";
+  // Legacy orders may only have is_rush set — treat as 24h for compatibility.
+  if (order.is_rush) return "24h";
+  return "standard";
+}
+
+function deliveryDaysFor(speed: DeliverySpeed): number {
+  switch (speed) {
+    case "24h":
+      return 1;
+    case "48h":
+      return 2;
+    case "standard":
+    default:
+      return 5;
+  }
+}
+
+function deliveryLabelFor(speed: DeliverySpeed): string {
+  switch (speed) {
+    case "24h":
+      return "Within 24 hours";
+    case "48h":
+      return "Within 48 hours";
+    case "standard":
+    default:
+      return "Within 5 days";
+  }
+}
+
+function formatDeliveryDate(orderDateIso: string, speed: DeliverySpeed) {
   const d = new Date(orderDateIso);
-  d.setDate(d.getDate() + (isRush ? 2 : 5));
+  d.setDate(d.getDate() + deliveryDaysFor(speed));
   return d.toLocaleDateString("en-US", {
     weekday: "long",
     month: "long",
