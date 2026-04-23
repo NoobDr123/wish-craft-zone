@@ -325,15 +325,9 @@ function CheckoutPage() {
             </p>
           )}
 
-          {/* Inline payment form — appears as soon as email + name are valid */}
+          {/* Inline payment form — mounted as soon as the PaymentIntent is ready */}
           <div className="mt-6 -mx-6 md:-mx-8 border-t border-peach/70">
-            {!ready && (
-              <p className="px-6 py-8 text-center text-sm text-muted-foreground md:px-8">
-                Enter your email and name above to see payment options.
-              </p>
-            )}
-
-            {ready && creating && !clientSecret && (
+            {creating && !clientSecret && (
               <p className="flex items-center justify-center gap-2 px-6 py-8 text-sm text-muted-foreground md:px-8">
                 <span className="h-4 w-4 animate-spin rounded-full border-2 border-primary/30 border-t-primary" />
                 Loading secure payment…
@@ -348,6 +342,8 @@ function CheckoutPage() {
                 amountLabel="$49.99"
                 returnUrl={`${window.location.origin}/checkout/return?payment_intent_id=${paymentIntentId}`}
                 onError={(msg) => setError(msg)}
+                disabled={!ready}
+                disabledReason="Enter your email and name above to continue"
               />
             )}
           </div>
