@@ -7,7 +7,7 @@ const RACHEL_SONG_URL =
 import { SiteHeader } from "@/components/SiteHeader";
 import { SiteFooter } from "@/components/SiteFooter";
 import { supabase } from "@/integrations/supabase/client";
-import { AudioPlayer } from "@/components/AudioPlayer";
+
 import heroImg from "@/assets/hero-ribbon.jpg";
 import whoNewlyDiagnosed from "@/assets/who-newly-diagnosed.png";
 import whoInTreatment from "@/assets/who-in-treatment.png";
@@ -351,7 +351,7 @@ function Eyebrow({
 
 function LandingPage() {
   const { samples } = Route.useLoaderData() as { samples: FeaturedSample[] };
-  const [activeSample, setActiveSample] = useState<FeaturedSample | null>(null);
+  // (sample modal removed — playback is now inline on each card)
   const heroAudioRef = useRef<HTMLAudioElement | null>(null);
   const [heroPlaying, setHeroPlaying] = useState(false);
   const [heroEverPlayed, setHeroEverPlayed] = useState(false);
