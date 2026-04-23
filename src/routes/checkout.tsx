@@ -175,12 +175,11 @@ function CheckoutPage() {
 
       q.set("orderId", newOrderId);
 
-      // 2. Ask the edge function to create the embedded checkout session
+      // 2. Ask the edge function to create a PaymentIntent
       const { data, error: fnError } = await supabase.functions.invoke("create-checkout", {
         body: {
           orderId: newOrderId,
           email: email.trim().toLowerCase(),
-          returnUrl: `${window.location.origin}/checkout/return?session_id={CHECKOUT_SESSION_ID}`,
           environment: stripeEnvironment,
         },
       });
@@ -193,6 +192,7 @@ function CheckoutPage() {
       }
 
       setClientSecret(data.clientSecret);
+      setPaymentIntentId(data.paymentIntentId);
       setStage("payment");
     } catch (e) {
       console.error("Checkout error:", e);
@@ -201,11 +201,6 @@ function CheckoutPage() {
       setCreating(false);
     }
   };
-
-  const checkoutOptions = useMemo(
-    () => (clientSecret ? { clientSecret } : null),
-    [clientSecret],
-  );
 
   return (
     <div className="min-h-screen bg-gradient-warm pb-32 lg:pb-16">
