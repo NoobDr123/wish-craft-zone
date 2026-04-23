@@ -620,63 +620,92 @@ function LandingPage() {
           </div>
 
           <div className="grid grid-cols-1 gap-5 sm:grid-cols-2 lg:grid-cols-3">
-            {displaySamples.map((s) => (
-              <button
-                key={s.id}
-                onClick={() => s.audio_url && setActiveSample(s)}
-                disabled={!s.audio_url}
-                className="group relative flex flex-col overflow-hidden rounded-[16px] border border-[#D9CEB9] bg-[#FBF6EC] text-left transition-all hover:-translate-y-[3px] hover:shadow-[0_8px_24px_rgba(31,27,22,0.08)] disabled:cursor-default"
-              >
-                <div className="relative aspect-[5/4] overflow-hidden bg-[#ECE2D0]">
-                  {s.cover_image_url && (
-                    <img
-                      src={s.cover_image_url}
-                      alt=""
-                      loading="lazy"
-                      className="h-full w-full object-cover transition-transform duration-700 group-hover:scale-[1.03]"
-                    />
-                  )}
-                  {s.audio_url ? (
-                    <div className="absolute inset-0 flex items-center justify-center bg-[rgba(31,27,22,0.0)] transition-colors group-hover:bg-[rgba(31,27,22,0.25)]">
-                      <span className="flex h-14 w-14 items-center justify-center rounded-full bg-[#8D6FAF] shadow-[0_6px_18px_rgba(141,111,175,0.45)] transition-transform group-hover:scale-110">
-                        <span
-                          className="ml-1 inline-block"
-                          style={{
-                            width: 0,
-                            height: 0,
-                            borderLeft: "13px solid #FFFFFF",
-                            borderTop: "8px solid transparent",
-                            borderBottom: "8px solid transparent",
-                          }}
-                        />
-                      </span>
-                    </div>
-                  ) : (
-                    <div className="absolute right-3 top-3 rounded-full bg-[rgba(31,27,22,0.7)] px-2.5 py-1 text-[10px] font-semibold uppercase tracking-[0.12em] text-[#F6F0E6]">
-                      Coming soon
-                    </div>
-                  )}
-                </div>
-                <div className="flex flex-1 flex-col p-[20px_22px_22px]">
-                  <h3 className="mb-2 font-display text-[19px] font-medium leading-[1.25] tracking-[-0.01em] text-[#1F1B16] md:text-[20px]">
-                    {s.title}
-                  </h3>
-                  {s.quote && (
-                    <p className="mb-3 text-[14px] italic leading-[1.55] text-[#5A5148]">
-                      {s.quote}
-                    </p>
-                  )}
-                  {s.for_text && (
-                    <div className="mt-auto pt-2 text-[12px] leading-[1.5] text-[#8A8175]">
-                      {s.for_text}
-                    </div>
-                  )}
-                  <div className="mt-2 text-[11px] font-semibold uppercase tracking-[0.12em] text-[#8D6FAF]">
-                    {s.genre_label}
+            {displaySamples.map((s) => {
+              const isPlaying = playingSampleId === s.id;
+              return (
+                <button
+                  key={s.id}
+                  onClick={() => handleSamplePlay(s)}
+                  disabled={!s.audio_url}
+                  aria-label={
+                    !s.audio_url
+                      ? `${s.title} — coming soon`
+                      : isPlaying
+                        ? `Pause ${s.title}`
+                        : `Play ${s.title}`
+                  }
+                  className="group relative flex flex-col overflow-hidden rounded-[16px] border border-[#D9CEB9] bg-[#FBF6EC] text-left transition-all hover:-translate-y-[3px] hover:shadow-[0_8px_24px_rgba(31,27,22,0.08)] disabled:cursor-default"
+                >
+                  <div className="relative aspect-[5/4] overflow-hidden bg-[#ECE2D0]">
+                    {s.cover_image_url && (
+                      <img
+                        src={s.cover_image_url}
+                        alt=""
+                        loading="lazy"
+                        className="h-full w-full object-cover transition-transform duration-700 group-hover:scale-[1.03]"
+                      />
+                    )}
+                    {s.audio_url ? (
+                      <div
+                        className={`absolute inset-0 flex items-center justify-center transition-colors ${
+                          isPlaying
+                            ? "bg-[rgba(31,27,22,0.25)]"
+                            : "bg-[rgba(31,27,22,0.0)] group-hover:bg-[rgba(31,27,22,0.25)]"
+                        }`}
+                      >
+                        <span className="flex h-14 w-14 items-center justify-center rounded-full bg-[#8D6FAF] shadow-[0_6px_18px_rgba(141,111,175,0.45)] transition-transform group-hover:scale-110">
+                          {isPlaying ? (
+                            <span className="flex gap-[4px]">
+                              <span className="block h-4 w-[4px] rounded-sm bg-white" />
+                              <span className="block h-4 w-[4px] rounded-sm bg-white" />
+                            </span>
+                          ) : (
+                            <span
+                              className="ml-1 inline-block"
+                              style={{
+                                width: 0,
+                                height: 0,
+                                borderLeft: "13px solid #FFFFFF",
+                                borderTop: "8px solid transparent",
+                                borderBottom: "8px solid transparent",
+                              }}
+                            />
+                          )}
+                        </span>
+                      </div>
+                    ) : (
+                      <div className="absolute right-3 top-3 rounded-full bg-[rgba(31,27,22,0.7)] px-2.5 py-1 text-[10px] font-semibold uppercase tracking-[0.12em] text-[#F6F0E6]">
+                        Coming soon
+                      </div>
+                    )}
+                    {isPlaying && (
+                      <div className="absolute left-3 top-3 flex items-center gap-1.5 rounded-full bg-[rgba(31,27,22,0.7)] px-2.5 py-1 text-[10px] font-semibold uppercase tracking-[0.12em] text-[#F6F0E6]">
+                        <span className="flex h-1.5 w-1.5 animate-pulse rounded-full bg-[#E8C547]" />
+                        Now playing
+                      </div>
+                    )}
                   </div>
-                </div>
-              </button>
-            ))}
+                  <div className="flex flex-1 flex-col p-[20px_22px_22px]">
+                    <h3 className="mb-2 font-display text-[19px] font-medium leading-[1.25] tracking-[-0.01em] text-[#1F1B16] md:text-[20px]">
+                      {s.title}
+                    </h3>
+                    {s.quote && (
+                      <p className="mb-3 text-[14px] italic leading-[1.55] text-[#5A5148]">
+                        {s.quote}
+                      </p>
+                    )}
+                    {s.for_text && (
+                      <div className="mt-auto pt-2 text-[12px] leading-[1.5] text-[#8A8175]">
+                        {s.for_text}
+                      </div>
+                    )}
+                    <div className="mt-2 text-[11px] font-semibold uppercase tracking-[0.12em] text-[#8D6FAF]">
+                      {s.genre_label}
+                    </div>
+                  </div>
+                </button>
+              );
+            })}
           </div>
 
           <div className="mt-12 text-center">
