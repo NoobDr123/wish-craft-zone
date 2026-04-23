@@ -976,77 +976,19 @@ function LandingPage() {
 
       <SiteFooter />
 
-      {/* PLAYER MODAL */}
-      <Dialog
-        open={!!activeSample}
-        onOpenChange={(open) => !open && setActiveSample(null)}
-      >
-        <DialogContent className="max-w-[640px] border-[#D9CEB9] bg-[#FBF6EC] p-0 [&>button]:text-[#5A5148]">
-          {activeSample && (
-            <div className="overflow-hidden rounded-lg">
-              {activeSample.cover_image_url && (
-                <div className="relative aspect-[16/9] w-full overflow-hidden bg-[#ECE2D0]">
-                  <img
-                    src={activeSample.cover_image_url}
-                    alt=""
-                    className="h-full w-full object-cover"
-                  />
-                  <div
-                    className="absolute inset-0"
-                    style={{
-                      background:
-                        "linear-gradient(to top, rgba(31,27,22,0.6), transparent 60%)",
-                    }}
-                  />
-                </div>
-              )}
-              <div className="p-6 sm:p-7">
-                <div className="mb-1 text-[11px] font-semibold uppercase tracking-[0.14em] text-[#8D6FAF]">
-                  {activeSample.genre_label}
-                </div>
-                <DialogTitle className="font-display text-[24px] font-medium leading-[1.2] tracking-[-0.01em] text-[#1F1B16] sm:text-[26px]">
-                  {activeSample.title}
-                </DialogTitle>
-                {activeSample.for_text && (
-                  <div className="mt-1 text-[13px] text-[#8A8175]">
-                    {activeSample.for_text}
-                  </div>
-                )}
-
-                {activeSample.audio_url && (
-                  <div className="mt-5">
-                    <AudioPlayer
-                      src={activeSample.audio_url}
-                      title={activeSample.title}
-                      variant="compact"
-                    />
-                  </div>
-                )}
-
-                {activeSample.quote && (
-                  <p className="mt-5 border-l-2 border-[#8D6FAF] pl-4 text-[14.5px] italic leading-[1.6] text-[#5A5148]">
-                    {activeSample.quote}
-                  </p>
-                )}
-
-                {activeSample.lyrics && (
-                  <details className="mt-5 group">
-                    <summary className="flex cursor-pointer list-none items-center gap-2 text-[12px] font-semibold uppercase tracking-[0.14em] text-[#8D6FAF]">
-                      Lyrics
-                      <span className="text-[#5A5148] transition-transform group-open:rotate-45">
-                        +
-                      </span>
-                    </summary>
-                    <pre className="mt-3 max-h-[260px] overflow-auto whitespace-pre-wrap font-sans text-[13.5px] leading-[1.65] text-[#5A5148]">
-                      {activeSample.lyrics}
-                    </pre>
-                  </details>
-                )}
-              </div>
-            </div>
-          )}
-        </DialogContent>
-      </Dialog>
+      {/* Inline sample audio player (no modal) */}
+      <audio
+        ref={sampleAudioRef}
+        preload="none"
+        onEnded={() => setPlayingSampleId(null)}
+        onPause={() => {
+          // If paused via system controls, reflect state
+          if (sampleAudioRef.current && sampleAudioRef.current.paused) {
+            // Only clear if not transitioning to a new src
+            // (handled in handleSamplePlay)
+          }
+        }}
+      />
     </div>
   );
 }
