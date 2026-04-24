@@ -31,6 +31,8 @@ export const Route = createFileRoute("/")({
         .eq("published", true)
         .is("testimonial_slug", null)
         .not("audio_url", "is", null)
+        // Exclude the current hero song so it doesn't repeat in the grid
+        .neq("id", "d14f8ca3-ec11-45c7-b52d-a2671284357c")
         .order("sort_order", { ascending: true })
         .limit(6),
       supabase
