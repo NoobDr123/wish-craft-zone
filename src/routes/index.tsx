@@ -697,7 +697,9 @@ function LandingPage() {
   // The hero "Listen to Example" button plays the first published, regenerated
   // sample (Margaret/Gospel) so it always reflects the latest admin regen.
   // Falls back to the hardcoded constant if no samples loaded.
-  const heroSongUrl = samples[0]?.audio_url || RACHEL_SONG_URL;
+  const heroSample = samples[0];
+  const heroSongUrl = heroSample?.audio_url || RACHEL_SONG_URL;
+  const heroSyncedLyrics = heroSample?.synced_lyrics ?? [];
   const heroAudioRef = useRef<HTMLAudioElement | null>(null);
   const [heroPlaying, setHeroPlaying] = useState(false);
   const [heroEverPlayed, setHeroEverPlayed] = useState(false);
@@ -835,6 +837,12 @@ function LandingPage() {
                   />
                 )}
                 <div className="pointer-events-none absolute inset-x-0 bottom-0 h-1/3 bg-gradient-to-t from-black/55 via-black/15 to-transparent" />
+
+                <KaraokeOverlay
+                  audioRef={heroAudioRef}
+                  lines={heroSyncedLyrics}
+                  visible={heroPlaying}
+                />
 
                 <audio
                   ref={heroAudioRef}
