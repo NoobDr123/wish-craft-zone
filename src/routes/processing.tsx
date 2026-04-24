@@ -237,6 +237,17 @@ function ThankYouPage() {
       {/* Themed progress: Payment ✓, Bonus ✓, Final confirmation (current) */}
       <CheckoutProgress current={3} />
 
+      {/* Success bar — mirrors the warning bar on upsell pages */}
+      <div className="w-full border-b border-success/40 bg-success/15">
+        <div className="mx-auto flex max-w-2xl items-center justify-center gap-2 px-4 py-2.5 text-center">
+          <CheckCircle2 className="h-4 w-4 shrink-0 text-success" />
+          <p className="text-xs font-semibold text-success md:text-sm">
+            Your order is processed. We took your confirmation and sent it to
+            production.
+          </p>
+        </div>
+      </div>
+
       <header className="border-b border-peach/60 bg-background/60 backdrop-blur">
         <div className="mx-auto flex max-w-3xl items-center justify-between gap-2 px-4 py-3 sm:px-5 sm:py-4">
           <Logo />
