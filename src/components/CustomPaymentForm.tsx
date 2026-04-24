@@ -15,6 +15,10 @@ interface CustomPaymentFormProps {
   returnUrl: string;
   email: string;
   amountLabel: string;
+  /** Current amount in cents — used to keep Apple/Google Pay sheet in sync after promo edits. */
+  amountCents: number;
+  /** Bumped every time the server-side PI amount changes (e.g. after a promo applies). */
+  promoVersion?: number;
   onError?: (msg: string) => void;
   disabled?: boolean;
   disabledReason?: string;
