@@ -8,9 +8,11 @@ import { ArrowLeft, Lock, CheckCircle2, Loader2, ShieldCheck } from "lucide-reac
 import { Logo } from "@/components/Logo";
 import { supabase } from "@/integrations/supabase/client";
 import { useAuth } from "@/hooks/useAuth";
+import { AdminIpGate } from "@/components/admin/AdminIpGate";
+import { AdminIpBootstrap } from "@/components/admin/AdminIpBootstrap";
 
 export const Route = createFileRoute("/admin/login")({
-  component: AdminLoginPage,
+  component: AdminLoginRoute,
   head: () => ({
     meta: [
       { title: "Staff sign-in · RibbonSong" },
@@ -20,6 +22,18 @@ export const Route = createFileRoute("/admin/login")({
     ],
   }),
 });
+
+function AdminLoginRoute() {
+  return (
+    <AdminIpGate
+      bootstrap={({ ip, onAdded }) => (
+        <AdminIpBootstrap ip={ip} onAdded={onAdded} />
+      )}
+    >
+      <AdminLoginPage />
+    </AdminIpGate>
+  );
+}
 
 function AdminLoginPage() {
   const navigate = useNavigate();
