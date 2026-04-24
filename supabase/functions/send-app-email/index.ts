@@ -89,9 +89,147 @@ function render(template: string, d: Record<string, any>) {
   switch (template) {
     case "song-delivered":
       return songDelivered(d);
+    case "order_confirmation":
+      return orderConfirmation(d);
     default:
       return null;
   }
+}
+
+function orderConfirmation(d: Record<string, any>) {
+  const buyerFirstName =
+    typeof d.buyer_name === "string" && d.buyer_name.trim()
+      ? d.buyer_name.split(/\s+/)[0]
+      : "";
+  const recipient = escape(d.recipient_name ?? "your loved one");
+  const orderRef = escape(d.order_ref ?? "");
+  const dashboardUrl = String(d.dashboard_url ?? "https://ribbonsong.com/login");
+
+  const speed = d.delivery_speed ?? "standard";
+  const speedLabel =
+    speed === "24h"
+      ? "Within 24 hours"
+      : speed === "48h"
+        ? "Within 48 hours"
+        : "Within 5 days";
+
+  // Compute expected delivery date.
+  const created = d.created_at ? new Date(String(d.created_at)) : new Date();
+  const days = speed === "24h" ? 1 : speed === "48h" ? 2 : 5;
+  const expected = new Date(created);
+  expected.setDate(expected.getDate() + days);
+  const expectedLabel = expected.toLocaleDateString("en-US", {
+    weekday: "long",
+    month: "long",
+    day: "numeric",
+  });
+
+  const cents = Number(d.amount_paid_cents || d.amount_cents || 0);
+  const currency = String(d.currency || "USD").toUpperCase();
+  const total = new Intl.NumberFormat("en-US", {
+    style: "currency",
+    currency,
+  }).format(cents / 100);
+
+  const addons: string[] = [];
+  if (d.has_3rd_verse) addons.push("Extra verse");
+  if (speed === "24h") addons.push("24 hour delivery");
+  else if (speed === "48h") addons.push("48 hour delivery");
+  if (d.has_unlimited_edits) addons.push("Unlimited edits");
+
+  const subject = `Order confirmed${orderRef ? ` · #${orderRef}` : ""} · We're starting on ${recipient}'s song`;
+
+  const heading = buyerFirstName
+    ? `Thank you, ${escape(buyerFirstName)}.`
+    : `Thank you for your order.`;
+
+  const detailsRows = [
+    ["Song for", recipient],
+    d.relationship ? ["Relationship", escape(String(d.relationship))] : null,
+    d.genre ? ["Genre", escape(String(d.genre))] : null,
+    d.tempo ? ["Tempo", escape(String(d.tempo))] : null,
+    d.voice ? ["Voice", escape(String(d.voice))] : null,
+    d.song_title_idea ? ["Title idea", escape(String(d.song_title_idea))] : null,
+    addons.length ? ["Add ons", addons.join(" · ")] : null,
+    ["Delivery speed", speedLabel],
+    ["Expected delivery", expectedLabel],
+    d.is_gift && d.recipient_email
+      ? ["Gift delivery to", escape(String(d.recipient_email))]
+      : null,
+  ].filter(Boolean) as [string, string][];
+
+  const rowsHtml = detailsRows
+    .map(
+      ([label, value]) => `
+    <tr>
+      <td style="padding:10px 0;font-size:14px;color:#7A716C;border-bottom:1px solid #EBDFCF;">${label}</td>
+      <td style="padding:10px 0;font-size:14px;color:#2D2B2A;font-weight:600;text-align:right;border-bottom:1px solid #EBDFCF;">${value}</td>
+    </tr>`,
+    )
+    .join("");
+
+  const html = `<!doctype html>
+<html><body style="margin:0;padding:0;background:#ffffff;font-family:Inter,Arial,sans-serif;">
+  <table width="100%" cellpadding="0" cellspacing="0"><tr><td align="center" style="padding:40px 20px;">
+    <table width="560" cellpadding="0" cellspacing="0" style="background:#FBF6EE;border-radius:0;padding:40px 28px;max-width:560px;">
+      <tr><td>
+        <p style="font-family:'Playfair Display',Georgia,serif;font-size:26px;font-weight:700;color:#2D2B2A;margin:0 0 4px;letter-spacing:-0.01em;">RibbonSong</p>
+        <p style="font-size:12px;font-weight:500;letter-spacing:0.16em;text-transform:uppercase;color:#D9614C;margin:0 0 32px;">Order confirmed</p>
+        <h1 style="font-family:'Playfair Display',Georgia,serif;font-size:30px;font-weight:600;line-height:1.15;color:#2D2B2A;margin:0 0 16px;">${escape(heading)}</h1>
+        <p style="font-size:16px;line-height:1.6;color:#2D2B2A;margin:0 0 22px;">
+          We've started crafting <strong>${recipient}</strong>'s personalized RibbonSong.
+          Below is a summary of your order. Save this email — your order reference is
+          <strong>#${orderRef}</strong>.
+        </p>
+
+        <table width="100%" cellpadding="0" cellspacing="0" style="margin:0 0 18px;">
+          ${rowsHtml}
+          <tr>
+            <td style="padding:14px 0 0;font-size:15px;color:#2D2B2A;font-weight:700;">Total paid</td>
+            <td style="padding:14px 0 0;font-size:18px;color:#D9614C;font-weight:700;text-align:right;">${total}</td>
+          </tr>
+        </table>
+
+        <p style="margin:24px 0;text-align:center;">
+          <a href="${dashboardUrl}" style="background:#D9614C;color:#ffffff;font-size:15px;font-weight:600;border-radius:999px;padding:14px 28px;text-decoration:none;display:inline-block;">View my dashboard</a>
+        </p>
+        <p style="font-size:13px;color:#7A716C;line-height:1.55;margin:0 0 8px;text-align:center;">
+          Sign in with this email address (${escape(String(d.buyer_email ?? ""))}) to track progress, request edits, and download your song.
+        </p>
+
+        <div style="border-top:1px solid #EBDFCF;margin:32px 0 20px;"></div>
+
+        <p style="font-size:14px;line-height:1.6;color:#2D2B2A;margin:0 0 12px;font-weight:600;">What happens next</p>
+        <ol style="font-size:14px;line-height:1.6;color:#2D2B2A;margin:0 0 16px;padding-left:18px;">
+          <li>We turn your story into lyrics, today.</li>
+          <li>We record the song in the ${escape(String(d.genre ?? "style"))} you chose.</li>
+          <li>A real human listens to every track before delivery.</li>
+          <li>You'll receive a private link to listen, share, and download by <strong>${expectedLabel}</strong>.</li>
+        </ol>
+
+        <p style="font-size:13px;color:#7A716C;line-height:1.55;margin:16px 0 0;">
+          Need to add or change something? Just reply to this email — we read every one. 30 day money back guarantee, no questions asked.
+        </p>
+        <p style="font-size:12px;line-height:1.6;color:#7A716C;margin:18px 0 0;">Sent from RibbonSong — turning love into songs.</p>
+      </td></tr>
+    </table>
+  </td></tr></table>
+</body></html>`;
+
+  const text = [
+    heading,
+    ``,
+    `Order #${orderRef}`,
+    `Song for: ${recipient}`,
+    ...detailsRows.map(([l, v]) => `${l}: ${v.replace(/<[^>]+>/g, "")}`),
+    `Total paid: ${total}`,
+    ``,
+    `Track your order: ${dashboardUrl}`,
+    ``,
+    `— RibbonSong`,
+  ].join("\n");
+
+  return { subject, html, text };
 }
 
 function songDelivered(d: Record<string, any>) {

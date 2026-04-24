@@ -90,6 +90,14 @@ async function handlePaymentSucceeded(pi: any) {
         amount: pi.amount_received ?? pi.amount,
       },
     });
+
+    // Fire-and-forget: send the order confirmation email with all details.
+    // Done here (vs. on the client) so it sends even if the buyer closes the
+    // tab right after payment.
+    sendOrderConfirmation(orderId).catch((e) =>
+      console.error("sendOrderConfirmation failed:", e),
+    );
+
     return;
   }
 
@@ -138,4 +146,79 @@ function ok() {
     status: 200,
     headers: { "Content-Type": "application/json" },
   });
+}
+
+/**
+ * Loads the full order and asks send-app-email to dispatch the
+ * "order_confirmation" template. Idempotent — guarded by
+ * confirmation_email_sent_at so we never double-send.
+ */
+async function sendOrderConfirmation(orderId: string) {
+  const { data: order } = await supabase
+    .from("orders")
+    .select(
+      "id, buyer_email, buyer_name, recipient_name, relationship, genre, tempo, voice, song_title_idea, amount_cents, amount_paid_cents, currency, has_3rd_verse, is_rush, has_unlimited_edits, delivery_date, is_gift, recipient_email, created_at, product_config, confirmation_email_sent_at",
+    )
+    .eq("id", orderId)
+    .maybeSingle();
+
+  if (!order) return;
+  if (order.confirmation_email_sent_at) return;
+  if (!order.buyer_email) return;
+
+  const cfg = (order.product_config as Record<string, boolean>) || {};
+  const deliverySpeed = cfg.rush_delivery
+    ? "24h"
+    : cfg.delivery_48h
+      ? "48h"
+      : order.is_rush
+        ? "24h"
+        : "standard";
+
+  const supabaseUrl = Deno.env.get("SUPABASE_URL")!;
+  const serviceKey = Deno.env.get("SUPABASE_SERVICE_ROLE_KEY")!;
+
+  const res = await fetch(`${supabaseUrl}/functions/v1/send-app-email`, {
+    method: "POST",
+    headers: {
+      "Content-Type": "application/json",
+      Authorization: `Bearer ${serviceKey}`,
+    },
+    body: JSON.stringify({
+      template: "order_confirmation",
+      to: order.buyer_email,
+      data: {
+        buyer_name: order.buyer_name,
+        buyer_email: order.buyer_email,
+        recipient_name: order.recipient_name,
+        relationship: order.relationship,
+        genre: order.genre,
+        tempo: order.tempo,
+        voice: order.voice,
+        song_title_idea: order.song_title_idea,
+        is_gift: order.is_gift,
+        recipient_email: order.recipient_email,
+        amount_paid_cents: order.amount_paid_cents,
+        amount_cents: order.amount_cents,
+        currency: order.currency,
+        order_id: order.id,
+        order_ref: order.id.slice(0, 8).toUpperCase(),
+        delivery_speed: deliverySpeed,
+        has_3rd_verse: order.has_3rd_verse,
+        has_unlimited_edits: order.has_unlimited_edits,
+        created_at: order.created_at,
+        dashboard_url: "https://ribbonsong.com/login?redirect=/dashboard",
+      },
+    }),
+  });
+
+  if (!res.ok) {
+    console.error("send-app-email returned", res.status, await res.text());
+    return;
+  }
+
+  await supabase
+    .from("orders")
+    .update({ confirmation_email_sent_at: new Date().toISOString() })
+    .eq("id", orderId);
 }
