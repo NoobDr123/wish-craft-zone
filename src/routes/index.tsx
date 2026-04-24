@@ -897,7 +897,7 @@ function LandingPage() {
                   <div className="absolute left-3 top-3 flex items-center gap-2 rounded-full bg-black/45 px-3 py-1.5 backdrop-blur-sm sm:left-4 sm:top-4">
                     <span className="flex h-2 w-2 animate-pulse rounded-full bg-[#E8C547]" />
                     <span className="text-[11px] font-medium uppercase tracking-[0.12em] text-white/95">
-                      For My Mother — Now playing
+                      We Made It — Now playing
                     </span>
                   </div>
                 )}
