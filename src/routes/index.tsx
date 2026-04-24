@@ -692,10 +692,9 @@ function LandingPage() {
                 &nbsp;·&nbsp; Daughter, for her mother in treatment
               </div>
               <p className="mb-7 max-w-[540px] text-[16px] leading-[1.55] text-[#5A5148] md:mb-8 md:text-[18px]">
-                When cancer takes the words away, give them a song.{" "}
+                When cancer takes the words away, give them a personalized song that says what you can't, and reminds them they're loved on the hardest days.{" "}
                 <strong className="font-semibold text-[#1F1B16]">
-                  Written with care. Produced in studio. Delivered to your
-                  inbox.
+                  Written just for them. Produced with care. Theirs to keep forever.
                 </strong>
               </p>
               <div className="mb-7 flex w-full flex-col items-stretch gap-3">
