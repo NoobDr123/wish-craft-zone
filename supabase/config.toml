@@ -44,3 +44,6 @@ verify_jwt = false
 
 [functions.apply-promo-code]
 verify_jwt = false
+
+[functions.transcribe-sample]
+verify_jwt = false
