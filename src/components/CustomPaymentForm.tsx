@@ -128,17 +128,22 @@ function InnerForm({ returnUrl, email, amountLabel, amountCents, promoVersion, o
       event?.reject?.();
       return;
     }
-    const { error } = await stripe.confirmPayment({
+    const { error, paymentIntent } = await stripe.confirmPayment({
       elements,
       confirmParams: {
         return_url: returnUrl,
         receipt_email: email,
       },
+      redirect: "if_required",
     });
     if (error) {
       const msg = error.message || "Payment failed.";
       setErrorMsg(msg);
       onError?.(msg);
+      return;
+    }
+    if (paymentIntent && (paymentIntent.status === "succeeded" || paymentIntent.status === "processing" || paymentIntent.status === "requires_capture")) {
+      window.location.assign(returnUrl);
     }
   };
 
