@@ -473,8 +473,26 @@ function CreatePage() {
   const valid = step.isValid(q);
 
   const next = () => {
+    const elapsed = Date.now() - stepEnteredAt.current;
+    void track({
+      type: "question_answer",
+      stepIndex: safeIndex,
+      timeOnStepMs: elapsed,
+      buyerEmail: q.buyer_email || undefined,
+    });
     if (safeIndex < total - 1) setIndex(safeIndex + 1);
-    else navigate({ to: "/almost-there" });
+    else {
+      const totalTime = quizStartedAt.current
+        ? Date.now() - quizStartedAt.current
+        : null;
+      void track({
+        type: "quiz_complete",
+        stepIndex: total,
+        timeOnStepMs: totalTime ?? undefined,
+        buyerEmail: q.buyer_email || undefined,
+      });
+      navigate({ to: "/almost-there" });
+    }
   };
   const back = () => setIndex(Math.max(0, safeIndex - 1));
 
