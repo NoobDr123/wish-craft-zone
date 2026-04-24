@@ -1105,3 +1105,262 @@ function Field({ label, children }: { label: string; children: React.ReactNode }
     </label>
   );
 }
+
+/* ---------- Emails ---------- */
+
+interface EmailRow {
+  id: string;
+  message_id: string | null;
+  template_name: string;
+  recipient_email: string;
+  status: string;
+  error_message: string | null;
+  created_at: string;
+  metadata: Record<string, unknown> | null;
+}
+
+type EmailRange = "24h" | "7d" | "30d" | "all";
+
+function EmailsPanel() {
+  const [rows, setRows] = useState<EmailRow[]>([]);
+  const [loading, setLoading] = useState(true);
+  const [range, setRange] = useState<EmailRange>("7d");
+  const [templateFilter, setTemplateFilter] = useState<string>("all");
+  const [statusFilter, setStatusFilter] = useState<string>("all");
+  const [search, setSearch] = useState("");
+
+  useEffect(() => {
+    let active = true;
+    (async () => {
+      setLoading(true);
+      // Pull last 1000 records, filter and dedupe client-side.
+      let q = supabase
+        .from("email_send_log")
+        .select("id, message_id, template_name, recipient_email, status, error_message, created_at, metadata")
+        .order("created_at", { ascending: false })
+        .limit(1000);
+
+      if (range !== "all") {
+        const since = new Date();
+        if (range === "24h") since.setHours(since.getHours() - 24);
+        if (range === "7d") since.setDate(since.getDate() - 7);
+        if (range === "30d") since.setDate(since.getDate() - 30);
+        q = q.gte("created_at", since.toISOString());
+      }
+
+      const { data, error } = await q;
+      if (!active) return;
+      if (error) {
+        console.error("[admin/emails] load failed", error);
+        setRows([]);
+      } else {
+        setRows((data ?? []) as EmailRow[]);
+      }
+      setLoading(false);
+    })();
+    return () => {
+      active = false;
+    };
+  }, [range]);
+
+  // Deduplicate by message_id — keep latest row per email.
+  const deduped = (() => {
+    const seen = new Map<string, EmailRow>();
+    for (const r of rows) {
+      const key = r.message_id ?? `__noid_${r.id}`;
+      if (!seen.has(key)) seen.set(key, r); // rows are already DESC by created_at
+    }
+    return Array.from(seen.values());
+  })();
+
+  const templates = Array.from(new Set(deduped.map((r) => r.template_name))).sort();
+
+  const filtered = deduped.filter((r) => {
+    if (templateFilter !== "all" && r.template_name !== templateFilter) return false;
+    if (statusFilter !== "all" && r.status !== statusFilter) return false;
+    if (search) {
+      const s = search.toLowerCase();
+      if (
+        !r.recipient_email.toLowerCase().includes(s) &&
+        !r.template_name.toLowerCase().includes(s)
+      ) {
+        return false;
+      }
+    }
+    return true;
+  });
+
+  const stats = {
+    total: filtered.length,
+    sent: filtered.filter((r) => r.status === "sent").length,
+    failed: filtered.filter((r) => r.status === "dlq" || r.status === "failed" || r.status === "bounced").length,
+    suppressed: filtered.filter((r) => r.status === "suppressed" || r.status === "complained").length,
+    pending: filtered.filter((r) => r.status === "pending").length,
+  };
+
+  return (
+    <>
+      <div className="mb-6 flex items-center justify-between gap-4 flex-wrap">
+        <h2 className="font-display text-2xl">Email log</h2>
+        <div className="flex gap-2">
+          {(["24h", "7d", "30d", "all"] as EmailRange[]).map((r) => (
+            <button
+              key={r}
+              onClick={() => setRange(r)}
+              className={`rounded-md border px-3 py-1.5 text-xs transition-colors ${
+                range === r
+                  ? "border-primary bg-primary text-primary-foreground"
+                  : "border-border bg-card hover:border-primary/40"
+              }`}
+            >
+              {r === "24h" ? "Last 24h" : r === "7d" ? "7 days" : r === "30d" ? "30 days" : "All time"}
+            </button>
+          ))}
+        </div>
+      </div>
+
+      <div className="mb-6 grid grid-cols-2 gap-3 md:grid-cols-5">
+        <StatCard label="Total" value={stats.total} />
+        <StatCard label="Sent" value={stats.sent} tone="success" />
+        <StatCard label="Failed" value={stats.failed} tone="danger" />
+        <StatCard label="Suppressed" value={stats.suppressed} tone="warn" />
+        <StatCard label="Pending" value={stats.pending} tone="muted" />
+      </div>
+
+      <div className="mb-4 flex flex-wrap gap-3">
+        <select
+          value={templateFilter}
+          onChange={(e) => setTemplateFilter(e.target.value)}
+          className="rounded-md border border-border bg-card px-3 py-2 text-sm"
+        >
+          <option value="all">All templates</option>
+          {templates.map((t) => (
+            <option key={t} value={t}>
+              {t}
+            </option>
+          ))}
+        </select>
+        <select
+          value={statusFilter}
+          onChange={(e) => setStatusFilter(e.target.value)}
+          className="rounded-md border border-border bg-card px-3 py-2 text-sm"
+        >
+          <option value="all">All statuses</option>
+          <option value="sent">Sent</option>
+          <option value="pending">Pending</option>
+          <option value="dlq">Failed (DLQ)</option>
+          <option value="failed">Failed</option>
+          <option value="bounced">Bounced</option>
+          <option value="suppressed">Suppressed</option>
+          <option value="complained">Complained</option>
+        </select>
+        <input
+          value={search}
+          onChange={(e) => setSearch(e.target.value)}
+          placeholder="Search recipient or template…"
+          className="flex-1 min-w-[200px] rounded-md border border-border bg-card px-3 py-2 text-sm"
+        />
+      </div>
+
+      <div className="overflow-hidden rounded-lg border border-border bg-card">
+        <table className="w-full text-sm">
+          <thead className="bg-muted/40 text-xs uppercase tracking-wide text-muted-foreground">
+            <tr>
+              <th className="p-3 text-left">Sent at</th>
+              <th className="p-3 text-left">Template</th>
+              <th className="p-3 text-left">Recipient</th>
+              <th className="p-3 text-left">Status</th>
+              <th className="p-3 text-left">Details</th>
+            </tr>
+          </thead>
+          <tbody>
+            {loading && (
+              <tr>
+                <td colSpan={5} className="p-6 text-center text-muted-foreground">
+                  Loading…
+                </td>
+              </tr>
+            )}
+            {!loading && filtered.length === 0 && (
+              <tr>
+                <td colSpan={5} className="p-6 text-center text-muted-foreground">
+                  No emails match these filters.
+                </td>
+              </tr>
+            )}
+            {!loading &&
+              filtered.slice(0, 200).map((r) => (
+                <tr key={r.id} className="border-t border-border/60 align-top">
+                  <td className="p-3 text-xs whitespace-nowrap text-muted-foreground">
+                    {new Date(r.created_at).toLocaleString()}
+                  </td>
+                  <td className="p-3 font-mono text-xs">{r.template_name}</td>
+                  <td className="p-3">{r.recipient_email}</td>
+                  <td className="p-3">
+                    <EmailStatusBadge status={r.status} />
+                  </td>
+                  <td className="p-3 text-xs text-muted-foreground max-w-md">
+                    {r.error_message ? (
+                      <span className="text-destructive">{r.error_message}</span>
+                    ) : (
+                      <span className="text-muted-foreground/70">—</span>
+                    )}
+                  </td>
+                </tr>
+              ))}
+          </tbody>
+        </table>
+        {filtered.length > 200 && (
+          <div className="border-t border-border/60 p-3 text-center text-xs text-muted-foreground">
+            Showing first 200 of {filtered.length}. Narrow your filters to see more.
+          </div>
+        )}
+      </div>
+    </>
+  );
+}
+
+function StatCard({
+  label,
+  value,
+  tone = "default",
+}: {
+  label: string;
+  value: number;
+  tone?: "default" | "success" | "danger" | "warn" | "muted";
+}) {
+  const toneClass =
+    tone === "success"
+      ? "text-emerald-600"
+      : tone === "danger"
+        ? "text-destructive"
+        : tone === "warn"
+          ? "text-amber-600"
+          : tone === "muted"
+            ? "text-muted-foreground"
+            : "text-foreground";
+  return (
+    <div className="rounded-lg border border-border bg-card p-4">
+      <div className="text-xs uppercase tracking-wide text-muted-foreground">{label}</div>
+      <div className={`mt-1 font-display text-2xl font-semibold ${toneClass}`}>{value}</div>
+    </div>
+  );
+}
+
+function EmailStatusBadge({ status }: { status: string }) {
+  const map: Record<string, string> = {
+    sent: "bg-emerald-500/10 text-emerald-700 border-emerald-500/30",
+    pending: "bg-muted text-muted-foreground border-border",
+    dlq: "bg-destructive/10 text-destructive border-destructive/30",
+    failed: "bg-destructive/10 text-destructive border-destructive/30",
+    bounced: "bg-destructive/10 text-destructive border-destructive/30",
+    suppressed: "bg-amber-500/10 text-amber-700 border-amber-500/30",
+    complained: "bg-amber-500/10 text-amber-700 border-amber-500/30",
+  };
+  const cls = map[status] ?? "bg-muted text-muted-foreground border-border";
+  return (
+    <span className={`inline-flex items-center rounded-full border px-2 py-0.5 text-xs font-medium ${cls}`}>
+      {status}
+    </span>
+  );
+}
