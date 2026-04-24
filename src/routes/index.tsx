@@ -702,9 +702,9 @@ function LandingPage() {
                 <PrimaryBtn large fullWidth>Start My Custom Song ❤️</PrimaryBtn>
               </div>
               <div className="w-full text-center text-[13px] leading-[1.4] text-[#5A5148] md:text-[13.5px]">
-                Loved by{" "}
+                Trusted by{" "}
                 <strong className="text-[#1F1B16]">2,400+ families</strong>{" "}
-                fighting, surviving, and remembering
+                in hospitals, homes, and hospices
               </div>
             </div>
 
