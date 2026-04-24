@@ -38,7 +38,7 @@ function AdminRoute() {
   );
 }
 
-type Tab = "orders" | "refunds" | "reactions" | "revisions" | "samples" | "emails";
+type Tab = "orders" | "refunds" | "reactions" | "revisions" | "samples" | "emails" | "ips";
 
 function StaffPage() {
   const { state, user, refresh } = useAdminGuard();
