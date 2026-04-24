@@ -6,6 +6,7 @@ import {
   Head,
   Heading,
   Html,
+  Img,
   Preview,
   Text,
 } from "@react-email/components";
@@ -22,7 +23,7 @@ export const MagicLinkEmail = ({ confirmationUrl }: MagicLinkEmailProps) => (
     <Preview>Your one-tap sign-in for {BRAND.name}</Preview>
     <Body style={styles.main}>
       <Container style={styles.container}>
-        <Text style={styles.brand}>{BRAND.name}</Text>
+        <Img src={BRAND.logoUrl} alt={BRAND.name} width={120} style={styles.logo} />
         <Text style={styles.brandSub}>One-tap sign in</Text>
 
         <Heading style={styles.h1}>Your sign-in link is ready.</Heading>

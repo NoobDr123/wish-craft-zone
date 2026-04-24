@@ -6,6 +6,7 @@ import {
   Head,
   Heading,
   Html,
+  Img,
   Preview,
   Text,
 } from "@react-email/components";
@@ -27,7 +28,7 @@ export const SignupEmail = ({
     <Preview>Confirm your email — your songs are waiting at {BRAND.name}</Preview>
     <Body style={styles.main}>
       <Container style={styles.container}>
-        <Text style={styles.brand}>{BRAND.name}</Text>
+        <Img src={BRAND.logoUrl} alt={BRAND.name} width={120} style={styles.logo} />
         <Text style={styles.brandSub}>A song made with love</Text>
 
         <Heading style={styles.h1}>Welcome — let's confirm it's you.</Heading>

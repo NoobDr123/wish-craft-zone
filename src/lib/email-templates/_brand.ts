@@ -5,6 +5,8 @@ export const BRAND = {
   name: "RibbonSong",
   rootDomain: "ribbonsong.com",
   rootUrl: "https://ribbonsong.com",
+  logoUrl:
+    "https://tytxdnftsnspejnyfbmg.supabase.co/storage/v1/object/public/email-assets/ribbonsong-logo.png",
   // Warm cream + terracotta palette to match the app
   colors: {
     cream: "#FBF6EE",
@@ -32,13 +34,11 @@ export const styles = {
     margin: "0 auto",
     borderRadius: "0",
   },
-  brand: {
-    fontFamily: '"Playfair Display", Georgia, serif',
-    fontSize: "26px",
-    fontWeight: 700 as const,
-    color: BRAND.colors.foreground,
-    letterSpacing: "-0.01em",
-    margin: "0 0 4px",
+  logo: {
+    display: "block",
+    margin: "0 auto 8px",
+    width: "120px",
+    height: "auto",
   },
   brandSub: {
     fontSize: "12px",
@@ -47,6 +47,7 @@ export const styles = {
     textTransform: "uppercase" as const,
     color: BRAND.colors.primary,
     margin: "0 0 32px",
+    textAlign: "center" as const,
   },
   h1: {
     fontFamily: '"Playfair Display", Georgia, serif',

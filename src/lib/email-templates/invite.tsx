@@ -6,6 +6,7 @@ import {
   Head,
   Heading,
   Html,
+  Img,
   Preview,
   Text,
 } from "@react-email/components";
@@ -23,7 +24,7 @@ export const InviteEmail = ({ confirmationUrl }: InviteEmailProps) => (
     <Preview>You've been invited to {BRAND.name}</Preview>
     <Body style={styles.main}>
       <Container style={styles.container}>
-        <Text style={styles.brand}>{BRAND.name}</Text>
+        <Img src={BRAND.logoUrl} alt={BRAND.name} width={120} style={styles.logo} />
         <Text style={styles.brandSub}>You're invited</Text>
 
         <Heading style={styles.h1}>Someone wants to share with you.</Heading>

@@ -1272,7 +1272,9 @@ interface EmailRow {
 }
 
 function EmailsPanel() {
+  const [view, setView] = useState<"flows" | "logs" | "suppressions">("flows");
   const [rows, setRows] = useState<EmailRow[]>([]);
+  const [suppressed, setSuppressed] = useState<Array<{ id: string; email: string; reason: string; created_at: string }>>([]);
   const [loading, setLoading] = useState(true);
   const [range, setRange] = useState<Range>("7d");
   const [templateFilter, setTemplateFilter] = useState<string>("all");
@@ -1287,17 +1289,24 @@ function EmailsPanel() {
         .from("email_send_log")
         .select("id, message_id, template_name, recipient_email, status, error_message, created_at, metadata")
         .order("created_at", { ascending: false })
-        .limit(1000);
+        .limit(2000);
       const start = rangeStart(range);
       if (start) q = q.gte("created_at", start.toISOString());
       const { data } = await q;
+      const { data: sup } = await supabase
+        .from("suppressed_emails")
+        .select("id, email, reason, created_at")
+        .order("created_at", { ascending: false })
+        .limit(500);
       if (!active) return;
       setRows((data ?? []) as EmailRow[]);
+      setSuppressed((sup ?? []) as any);
       setLoading(false);
     })();
     return () => { active = false; };
   }, [range]);
 
+  // Dedupe to latest status per message_id
   const deduped = (() => {
     const seen = new Map<string, EmailRow>();
     for (const r of rows) {
@@ -1305,6 +1314,23 @@ function EmailsPanel() {
       if (!seen.has(key)) seen.set(key, r);
     }
     return Array.from(seen.values());
+  })();
+
+  // Per-template flow stats
+  const flowStats = (() => {
+    const map = new Map<string, { template: string; total: number; sent: number; failed: number; bounced: number; suppressed: number; pending: number }>();
+    for (const r of deduped) {
+      const k = r.template_name;
+      if (!map.has(k)) map.set(k, { template: k, total: 0, sent: 0, failed: 0, bounced: 0, suppressed: 0, pending: 0 });
+      const s = map.get(k)!;
+      s.total++;
+      if (r.status === "sent") s.sent++;
+      else if (r.status === "dlq" || r.status === "failed") s.failed++;
+      else if (r.status === "bounced") s.bounced++;
+      else if (r.status === "suppressed" || r.status === "complained") s.suppressed++;
+      else if (r.status === "pending") s.pending++;
+    }
+    return Array.from(map.values()).sort((a, b) => b.total - a.total);
   })();
 
   const templates = Array.from(new Set(deduped.map((r) => r.template_name))).sort();
@@ -1318,12 +1344,16 @@ function EmailsPanel() {
     return true;
   });
 
-  const stats = {
-    total: filtered.length,
-    sent: filtered.filter((r) => r.status === "sent").length,
-    failed: filtered.filter((r) => r.status === "dlq" || r.status === "failed" || r.status === "bounced").length,
-    suppressed: filtered.filter((r) => r.status === "suppressed" || r.status === "complained").length,
+  const overall = {
+    total: deduped.length,
+    sent: deduped.filter((r) => r.status === "sent").length,
+    failed: deduped.filter((r) => r.status === "dlq" || r.status === "failed").length,
+    bounced: deduped.filter((r) => r.status === "bounced").length,
+    suppressed: deduped.filter((r) => r.status === "suppressed" || r.status === "complained").length,
   };
+  const deliveryRate = overall.total > 0 ? ((overall.sent / overall.total) * 100).toFixed(1) : "0.0";
+  const failRate = overall.total > 0 ? (((overall.failed + overall.bounced) / overall.total) * 100).toFixed(1) : "0.0";
+  const bounceRate = overall.total > 0 ? ((overall.bounced / overall.total) * 100).toFixed(2) : "0.00";
 
   return (
     <>
@@ -1332,54 +1362,136 @@ function EmailsPanel() {
         <RangeSelector value={range} onChange={setRange} />
       </div>
 
-      <div className="grid grid-cols-2 gap-3 md:grid-cols-4 mb-6">
-        <StatCard label="Total" value={stats.total} />
-        <StatCard label="Sent" value={stats.sent} tone="success" />
-        <StatCard label="Failed" value={stats.failed} tone="danger" />
-        <StatCard label="Suppressed" value={stats.suppressed} tone="warn" />
+      {/* Deliverability KPIs — always shown */}
+      <div className="grid grid-cols-2 gap-3 md:grid-cols-5 mb-6">
+        <StatCard label="Total" value={overall.total} />
+        <StatCard label="Delivery rate" value={`${deliveryRate}%`} tone="success" />
+        <StatCard label="Fail rate" value={`${failRate}%`} tone="danger" />
+        <StatCard label="Bounce rate" value={`${bounceRate}%`} tone="warn" />
+        <StatCard label="Suppressed" value={overall.suppressed} tone="warn" />
       </div>
 
-      <div className="mb-4 flex flex-wrap gap-3">
-        <select value={templateFilter} onChange={(e) => setTemplateFilter(e.target.value)} className="rounded-md border border-border bg-card px-3 py-2 text-sm">
-          <option value="all">All templates</option>
-          {templates.map((t) => <option key={t} value={t}>{t}</option>)}
-        </select>
-        <select value={statusFilter} onChange={(e) => setStatusFilter(e.target.value)} className="rounded-md border border-border bg-card px-3 py-2 text-sm">
-          <option value="all">All statuses</option>
-          <option value="sent">Sent</option>
-          <option value="dlq">Failed</option>
-          <option value="suppressed">Suppressed</option>
-        </select>
-        <input value={search} onChange={(e) => setSearch(e.target.value)} placeholder="Search email or template" className="flex-1 min-w-[200px] rounded-md border border-border bg-card px-3 py-2 text-sm" />
+      {/* Sub-tabs */}
+      <div className="mb-4 flex gap-1 rounded-lg border border-border bg-card p-1 w-fit">
+        {(["flows", "logs", "suppressions"] as const).map((v) => (
+          <button
+            key={v}
+            onClick={() => setView(v)}
+            className={`px-4 py-1.5 text-sm rounded-md capitalize transition-colors ${view === v ? "bg-primary text-primary-foreground" : "text-muted-foreground hover:text-foreground"}`}
+          >
+            {v}
+          </button>
+        ))}
       </div>
 
       {loading ? <div className="text-muted-foreground">Loading…</div> : (
-        <div className="rounded-2xl border border-border bg-card overflow-hidden">
-          <table className="w-full text-sm">
-            <thead className="bg-muted/30 text-left">
-              <tr>
-                <th className="p-3">Template</th>
-                <th className="p-3">Recipient</th>
-                <th className="p-3">Status</th>
-                <th className="p-3">Sent</th>
-                <th className="p-3">Error</th>
-              </tr>
-            </thead>
-            <tbody>
-              {filtered.slice(0, 100).map((r) => (
-                <tr key={r.id} className="border-t border-border/40">
-                  <td className="p-3">{r.template_name}</td>
-                  <td className="p-3 text-xs">{r.recipient_email}</td>
-                  <td className="p-3">
-                    <Badge variant={r.status === "sent" ? "default" : r.status === "dlq" ? "destructive" : "outline"}>{r.status}</Badge>
-                  </td>
-                  <td className="p-3 text-xs">{new Date(r.created_at).toLocaleString()}</td>
-                  <td className="p-3 text-xs text-destructive max-w-md truncate">{r.error_message}</td>
-                </tr>
-              ))}
-            </tbody>
-          </table>
-        </div>
+        <>
+          {view === "flows" && (
+            <div className="rounded-2xl border border-border bg-card overflow-hidden">
+              <table className="w-full text-sm">
+                <thead className="bg-muted/30 text-left">
+                  <tr>
+                    <th className="p-3">Flow / template</th>
+                    <th className="p-3 text-right">Sent</th>
+                    <th className="p-3 text-right">Delivered</th>
+                    <th className="p-3 text-right">Failed</th>
+                    <th className="p-3 text-right">Bounced</th>
+                    <th className="p-3 text-right">Suppressed</th>
+                    <th className="p-3 text-right">Delivery %</th>
+                  </tr>
+                </thead>
+                <tbody>
+                  {flowStats.length === 0 ? (
+                    <tr><td colSpan={7} className="p-6 text-center text-muted-foreground">No emails sent in this range</td></tr>
+                  ) : flowStats.map((f) => {
+                    const dr = f.total > 0 ? ((f.sent / f.total) * 100).toFixed(1) : "0";
+                    return (
+                      <tr key={f.template} className="border-t border-border/40">
+                        <td className="p-3 font-medium">{f.template}</td>
+                        <td className="p-3 text-right">{f.total}</td>
+                        <td className="p-3 text-right text-emerald-600">{f.sent}</td>
+                        <td className="p-3 text-right text-destructive">{f.failed}</td>
+                        <td className="p-3 text-right text-amber-600">{f.bounced}</td>
+                        <td className="p-3 text-right text-muted-foreground">{f.suppressed}</td>
+                        <td className="p-3 text-right font-medium">{dr}%</td>
+                      </tr>
+                    );
+                  })}
+                </tbody>
+              </table>
+            </div>
+          )}
+
+          {view === "logs" && (
+            <>
+              <div className="mb-4 flex flex-wrap gap-3">
+                <select value={templateFilter} onChange={(e) => setTemplateFilter(e.target.value)} className="rounded-md border border-border bg-card px-3 py-2 text-sm">
+                  <option value="all">All templates</option>
+                  {templates.map((t) => <option key={t} value={t}>{t}</option>)}
+                </select>
+                <select value={statusFilter} onChange={(e) => setStatusFilter(e.target.value)} className="rounded-md border border-border bg-card px-3 py-2 text-sm">
+                  <option value="all">All statuses</option>
+                  <option value="sent">Sent</option>
+                  <option value="dlq">Failed</option>
+                  <option value="bounced">Bounced</option>
+                  <option value="suppressed">Suppressed</option>
+                </select>
+                <input value={search} onChange={(e) => setSearch(e.target.value)} placeholder="Search email or template" className="flex-1 min-w-[200px] rounded-md border border-border bg-card px-3 py-2 text-sm" />
+              </div>
+              <div className="rounded-2xl border border-border bg-card overflow-hidden">
+                <table className="w-full text-sm">
+                  <thead className="bg-muted/30 text-left">
+                    <tr>
+                      <th className="p-3">Template</th>
+                      <th className="p-3">Recipient</th>
+                      <th className="p-3">Status</th>
+                      <th className="p-3">Sent</th>
+                      <th className="p-3">Error</th>
+                    </tr>
+                  </thead>
+                  <tbody>
+                    {filtered.slice(0, 100).map((r) => (
+                      <tr key={r.id} className="border-t border-border/40">
+                        <td className="p-3">{r.template_name}</td>
+                        <td className="p-3 text-xs">{r.recipient_email}</td>
+                        <td className="p-3">
+                          <Badge variant={r.status === "sent" ? "default" : (r.status === "dlq" || r.status === "failed" || r.status === "bounced") ? "destructive" : "outline"}>{r.status}</Badge>
+                        </td>
+                        <td className="p-3 text-xs">{new Date(r.created_at).toLocaleString()}</td>
+                        <td className="p-3 text-xs text-destructive max-w-md truncate">{r.error_message}</td>
+                      </tr>
+                    ))}
+                  </tbody>
+                </table>
+              </div>
+            </>
+          )}
+
+          {view === "suppressions" && (
+            <div className="rounded-2xl border border-border bg-card overflow-hidden">
+              <table className="w-full text-sm">
+                <thead className="bg-muted/30 text-left">
+                  <tr>
+                    <th className="p-3">Email</th>
+                    <th className="p-3">Reason</th>
+                    <th className="p-3">Suppressed at</th>
+                  </tr>
+                </thead>
+                <tbody>
+                  {suppressed.length === 0 ? (
+                    <tr><td colSpan={3} className="p-6 text-center text-muted-foreground">No suppressed addresses — clean sender list.</td></tr>
+                  ) : suppressed.map((s) => (
+                    <tr key={s.id} className="border-t border-border/40">
+                      <td className="p-3">{s.email}</td>
+                      <td className="p-3"><Badge variant="outline">{s.reason}</Badge></td>
+                      <td className="p-3 text-xs">{new Date(s.created_at).toLocaleString()}</td>
+                    </tr>
+                  ))}
+                </tbody>
+              </table>
+            </div>
+          )}
+        </>
       )}
     </>
   );
