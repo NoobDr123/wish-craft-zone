@@ -146,3 +146,61 @@ function CheckoutReturnPage() {
     </div>
   );
 }
+
+/**
+ * Calls the redeem-login-token edge function which:
+ *   1) Verifies the PaymentIntent succeeded with Stripe.
+ *   2) Provisions/finds the buyer's auth account.
+ *   3) Returns a one-time magic-link action_link.
+ *
+ * We then put the action_link in a hidden iframe so Supabase's auth callback
+ * runs and sets the session in localStorage. By the time the buyer reaches
+ * /processing, supabase.auth.getSession() returns a real session and
+ * /dashboard works one-tap.
+ */
+async function autoLogin(paymentIntentId: string): Promise<void> {
+  // If we already have a session, skip — they're a returning customer who
+  // signed in before checking out.
+  const { data: existing } = await supabase.auth.getSession();
+  if (existing.session) return;
+
+  const { data, error } = await supabase.functions.invoke("redeem-login-token", {
+    body: {
+      paymentIntentId,
+      environment: stripeEnvironment,
+      redirectTo: "/dashboard",
+    },
+  });
+
+  if (error) {
+    console.warn("redeem-login-token error:", error.message);
+    return;
+  }
+  const actionLink = (data as { actionLink?: string } | null)?.actionLink;
+  if (!actionLink) return;
+
+  // Follow the magic-link silently in a hidden iframe. The auth callback
+  // page sets the Supabase session on our origin (localStorage), which is
+  // shared across all routes — so subsequent pages will see the session.
+  await new Promise<void>((resolve) => {
+    const iframe = document.createElement("iframe");
+    iframe.style.display = "none";
+    iframe.src = actionLink;
+    let settled = false;
+    const finish = () => {
+      if (settled) return;
+      settled = true;
+      try {
+        iframe.remove();
+      } catch {
+        // ignore
+      }
+      resolve();
+    };
+    iframe.onload = () => setTimeout(finish, 600);
+    iframe.onerror = finish;
+    document.body.appendChild(iframe);
+    // Hard timeout so we never hang the funnel.
+    setTimeout(finish, 4000);
+  });
+}
