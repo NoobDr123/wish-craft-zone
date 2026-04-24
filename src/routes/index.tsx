@@ -915,10 +915,9 @@ function LandingPage() {
               </div>
               <div className="mt-3 px-1 text-[13px] leading-[1.5] text-[#5A5148] sm:text-[13.5px]">
                 <strong className="mr-1.5 text-[11px] font-semibold uppercase tracking-[0.12em] text-[#8D6FAF]">
-                  Hear Rachel's song ·
+                  Hear Rachel's Song ·
                 </strong>
-                The song that played on the drive home from her mother's last
-                infusion.
+                Made for her mom 3 weeks after the diagnosis. She plays it before every infusion.
               </div>
             </div>
           </div>
