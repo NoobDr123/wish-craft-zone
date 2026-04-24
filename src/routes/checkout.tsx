@@ -131,6 +131,75 @@ function CheckoutPage() {
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [email, name, ready, orderId]);
 
+  // Apply promo code: validates server-side, applies discount, and if the
+  // discount brings the total to $0 we short-circuit straight to processing.
+  async function handleApplyPromo() {
+    setPromoError(null);
+    if (!orderId) {
+      setPromoError("Please wait — order is initializing.");
+      return;
+    }
+    const code = promoCode.trim();
+    if (!code) {
+      setPromoError("Enter a code first.");
+      return;
+    }
+    if (!ready) {
+      setPromoError("Enter your email and name above first.");
+      return;
+    }
+
+    setPromoApplying(true);
+    try {
+      // Make sure latest email/name are saved before we mark order paid
+      const trimmedEmail = email.trim().toLowerCase();
+      await supabase
+        .from("orders")
+        .update({ buyer_email: trimmedEmail, buyer_name: name })
+        .eq("id", orderId);
+
+      const { data, error: fnError } = await supabase.functions.invoke(
+        "apply-promo-code",
+        { body: { orderId, code } },
+      );
+
+      if (fnError || !data?.ok) {
+        const errCode = data?.error || fnError?.message || "invalid_code";
+        const friendly: Record<string, string> = {
+          invalid_code: "That code isn't valid.",
+          inactive_code: "That code is no longer active.",
+          expired_code: "That code has expired.",
+          max_uses_reached: "That code has already been fully used.",
+          order_already_paid: "This order is already paid.",
+          missing_code: "Enter a code first.",
+          missing_order_id: "Order not ready yet, try again in a moment.",
+          order_not_found: "Order not found — please refresh.",
+          internal_error: "Something went wrong. Please try again.",
+        };
+        setPromoError(friendly[errCode] || friendly.internal_error);
+        return;
+      }
+
+      setPromoApplied({
+        discount_pct: data.discount_pct,
+        discount_cents: data.discount_cents,
+        final_amount_cents: data.final_amount_cents,
+        free: data.free,
+      });
+
+      if (data.free) {
+        // Skip Stripe entirely — order is already marked paid + queued
+        navigate({ to: "/processing", search: { orderId } as any });
+      }
+    } catch (e) {
+      console.error("apply promo failed:", e);
+      setPromoError("Something went wrong. Please try again.");
+    } finally {
+      setPromoApplying(false);
+    }
+  }
+
+
   return (
     <div className="min-h-screen bg-gradient-warm pb-32 lg:pb-16">
       <PaymentTestModeBanner />
