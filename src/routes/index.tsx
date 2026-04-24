@@ -165,16 +165,19 @@ function KaraokeOverlay({
   }, [audioRef, visible]);
 
   if (!visible || !lines || lines.length === 0) return null;
-  if (t < Math.max(0, firstLineStart - 0.1)) return null;
+  const preRoll = t < Math.max(0, firstLineStart - 0.1);
 
   // Find the active line for the current playback window.
-  let activeIdx = lines.length - 1;
-  for (let i = 0; i < lines.length; i++) {
-    const line = lines[i];
-    const nextStart = lines[i + 1]?.start ?? Number.POSITIVE_INFINITY;
-    if (t >= line.start && t < nextStart) {
-      activeIdx = i;
-      break;
+  let activeIdx = 0;
+  if (!preRoll) {
+    activeIdx = lines.length - 1;
+    for (let i = 0; i < lines.length; i++) {
+      const line = lines[i];
+      const nextStart = lines[i + 1]?.start ?? Number.POSITIVE_INFINITY;
+      if (t >= line.start && t < nextStart) {
+        activeIdx = i;
+        break;
+      }
     }
   }
 
@@ -185,10 +188,9 @@ function KaraokeOverlay({
   // Word-level progress inside the active line
   const words = active.text.split(/\s+/).filter(Boolean);
   const lineDuration = Math.max(0.4, active.end - active.start);
-  const progress = Math.min(
-    1,
-    Math.max(0, (t - active.start) / lineDuration),
-  );
+  const progress = preRoll
+    ? 0
+    : Math.min(1, Math.max(0, (t - active.start) / lineDuration));
   const wordsHit = Math.floor(progress * words.length);
 
   return (
