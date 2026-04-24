@@ -870,6 +870,30 @@ function SamplesPanel() {
     load();
   };
 
+  const syncLyrics = async (id: string) => {
+    setBusy(id);
+    const { data: { session } } = await supabase.auth.getSession();
+    const res = await fetch(
+      `${import.meta.env.VITE_SUPABASE_URL}/functions/v1/transcribe-sample`,
+      {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+          Authorization: `Bearer ${session?.access_token}`,
+        },
+        body: JSON.stringify({ sampleId: id }),
+      },
+    );
+    const json = await res.json().catch(() => ({}));
+    setBusy(null);
+    if (!res.ok) {
+      alert(`Sync failed: ${json.error ?? res.statusText}`);
+      return;
+    }
+    alert(`Synced ${json.lineCount} lyric lines.`);
+    load();
+  };
+
   const togglePublish = async (s: SampleRow) => {
     setBusy(s.id);
     await supabase
@@ -1082,6 +1106,17 @@ function SamplesPanel() {
                         disabled={busy === s.id}
                       >
                         {busy === s.id ? "Generating…" : "Generate"}
+                      </Button>
+                    )}
+                    {s.audio_url && (
+                      <Button
+                        size="sm"
+                        variant="outline"
+                        onClick={() => syncLyrics(s.id)}
+                        disabled={busy === s.id}
+                        title="Auto-align lyrics to audio for karaoke display"
+                      >
+                        {busy === s.id ? "Syncing…" : "Sync Lyrics"}
                       </Button>
                     )}
                     <Button
