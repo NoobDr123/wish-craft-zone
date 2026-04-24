@@ -668,7 +668,7 @@ function LandingPage() {
         <div className="mx-auto max-w-[1200px] px-5 sm:px-6">
           <div className="mb-6 flex w-full flex-col items-center gap-3 text-center sm:mb-8 md:mb-12 md:gap-5">
             <span className="hidden h-px w-16 bg-[#8D6FAF]/50 md:block" />
-            <h2 className="font-display text-[15px] font-bold uppercase leading-[1.3] tracking-[0.16em] text-[#8D6FAF] sm:text-[18px] md:whitespace-nowrap md:text-[26px] md:tracking-[0.18em] lg:text-[30px]">
+            <h2 style={{ fontFamily: 'Nunito, system-ui, sans-serif', fontWeight: 800 }} className="text-[16px] uppercase leading-[1.3] tracking-[0.14em] text-[#8D6FAF] sm:text-[18px] md:whitespace-nowrap md:text-[26px] md:tracking-[0.16em] lg:text-[30px]">
               The Most Meaningful Gift For Someone You Love Fighting Cancer
             </h2>
             <span className="hidden h-px w-16 bg-[#8D6FAF]/50 md:block" />
