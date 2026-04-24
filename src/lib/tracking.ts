@@ -102,7 +102,7 @@ export async function track(input: TrackEventInput): Promise<void> {
       step_index: input.stepIndex ?? null,
       step_key: input.stepKey ?? null,
       time_on_step_ms: input.timeOnStepMs ?? null,
-      payload: input.payload ?? null,
+      payload: (input.payload ?? null) as never,
       buyer_email: input.buyerEmail?.toLowerCase() ?? null,
       order_id: input.orderId ?? null,
       upsell_type: input.upsellType ?? null,
