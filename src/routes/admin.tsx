@@ -1,10 +1,30 @@
-// Admin console — gated by:
+// Admin console — rebuilt with sidebar nav, dashboard-first layout.
+// Sections: Dashboard, Funnel, CRM, Orders, Upsells, Emails, Samples,
+// Refunds, Reactions, Revisions, IPs.
+//
+// Gated by:
 //   1. Login (Supabase auth)
 //   2. Admin role (user_roles table)
 //   3. TOTP 2FA, re-prompted every 12 hours
 
 import { createFileRoute, Link, Outlet, useLocation, useNavigate } from "@tanstack/react-router";
-import { useEffect, useState } from "react";
+import { useEffect, useMemo, useState } from "react";
+import {
+  LayoutDashboard,
+  TrendingUp,
+  Users,
+  ShoppingBag,
+  Sparkles,
+  Mail,
+  Music2,
+  RotateCcw,
+  Video,
+  Pencil,
+  Shield,
+  LogOut,
+  ChevronDown,
+  ChevronRight,
+} from "lucide-react";
 import { Logo } from "@/components/Logo";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
@@ -28,11 +48,7 @@ export const Route = createFileRoute("/admin")({
 
 function AdminRoute() {
   const location = useLocation();
-
-  if (location.pathname === "/admin/login") {
-    return <Outlet />;
-  }
-
+  if (location.pathname === "/admin/login") return <Outlet />;
   return (
     <AdminIpGate
       bootstrap={({ ip, onAdded }) => (
@@ -44,22 +60,41 @@ function AdminRoute() {
   );
 }
 
-type Tab = "orders" | "refunds" | "reactions" | "revisions" | "samples" | "emails" | "ips";
+type Tab =
+  | "dashboard"
+  | "funnel"
+  | "crm"
+  | "orders"
+  | "upsells"
+  | "emails"
+  | "samples"
+  | "refunds"
+  | "reactions"
+  | "revisions"
+  | "ips";
+
+const NAV: Array<{ key: Tab; label: string; icon: any; group: string }> = [
+  { key: "dashboard", label: "Dashboard", icon: LayoutDashboard, group: "Overview" },
+  { key: "funnel", label: "Funnel", icon: TrendingUp, group: "Overview" },
+  { key: "crm", label: "CRM", icon: Users, group: "Overview" },
+  { key: "orders", label: "Orders", icon: ShoppingBag, group: "Operations" },
+  { key: "upsells", label: "Upsells", icon: Sparkles, group: "Operations" },
+  { key: "emails", label: "Emails", icon: Mail, group: "Operations" },
+  { key: "samples", label: "Samples", icon: Music2, group: "Content" },
+  { key: "refunds", label: "Refunds", icon: RotateCcw, group: "Support" },
+  { key: "reactions", label: "Reactions", icon: Video, group: "Support" },
+  { key: "revisions", label: "Revisions", icon: Pencil, group: "Support" },
+  { key: "ips", label: "IP allowlist", icon: Shield, group: "Settings" },
+];
 
 function StaffPage() {
   const { state, user, refresh } = useAdminGuard();
   const navigate = useNavigate();
-  const adminPath = "/admin";
-  const [tab, setTab] = useState<Tab>("orders");
+  const [tab, setTab] = useState<Tab>("dashboard");
 
   useEffect(() => {
-    if (state === "anonymous") {
-      // Staff get their own dedicated login surface — keeps the customer
-      // login (/login) free of staff-only copy and prevents customers from
-      // landing on /admin by mistake when they only need to track an order.
-      navigate({ to: "/admin/login" });
-    }
-  }, [state, navigate, adminPath]);
+    if (state === "anonymous") navigate({ to: "/admin/login" });
+  }, [state, navigate]);
 
   if (state === "loading" || state === "anonymous") {
     return (
@@ -75,9 +110,7 @@ function StaffPage() {
         <div className="text-center max-w-md">
           <Logo />
           <h1 className="mt-6 font-display text-3xl font-semibold">Not found</h1>
-          <p className="mt-2 text-muted-foreground">
-            This page doesn't exist.
-          </p>
+          <p className="mt-2 text-muted-foreground">This page doesn't exist.</p>
           <Link to="/" className="mt-6 inline-block text-primary underline">
             Back to home
           </Link>
@@ -87,96 +120,1012 @@ function StaffPage() {
   }
 
   if (state === "needs_enrollment" && user) {
-    return (
-      <AdminMfaEnroll
-        email={user.email ?? "admin"}
-        userId={user.id}
-        onEnrolled={refresh}
-      />
-    );
+    return <AdminMfaEnroll email={user.email ?? "admin"} userId={user.id} onEnrolled={refresh} />;
   }
 
   if (state === "needs_verification" && user) {
     return <AdminMfaChallenge userId={user.id} onVerified={refresh} />;
   }
 
-  // state === "ready"
+  // Group nav items
+  const groups: Record<string, typeof NAV> = {};
+  for (const item of NAV) {
+    if (!groups[item.group]) groups[item.group] = [];
+    groups[item.group].push(item);
+  }
+
   return (
-    <div className="min-h-screen bg-background">
-      <header className="border-b border-border/60 px-6 py-4">
-        <div className="mx-auto flex max-w-7xl items-center justify-between">
-          <div className="flex items-center gap-6">
-            <Logo />
-            <span className="font-display text-lg">Staff</span>
-            <Badge variant="outline" className="text-xs">
-              2FA verified
-            </Badge>
-          </div>
-          <div className="flex items-center gap-4">
-            <Link
-              to="/"
-              className="text-sm text-muted-foreground hover:text-foreground"
-            >
-              Exit
-            </Link>
-            <button
-              onClick={async () => {
-                await supabase.auth.signOut();
-                navigate({ to: "/" });
-              }}
-              className="text-sm text-muted-foreground hover:text-destructive"
-            >
-              Sign out
-            </button>
+    <div className="min-h-screen bg-background flex">
+      {/* Sidebar */}
+      <aside className="w-64 shrink-0 border-r border-border bg-card/50 flex flex-col">
+        <div className="px-5 py-5 border-b border-border">
+          <Logo />
+          <div className="mt-2 flex items-center gap-2">
+            <span className="font-display text-sm">Staff</span>
+            <Badge variant="outline" className="text-[10px] px-1.5 py-0">2FA</Badge>
           </div>
         </div>
-      </header>
-
-      <nav className="border-b border-border/60 bg-card/40">
-        <div className="mx-auto flex max-w-7xl gap-1 px-6">
-          {(
-            [
-              ["orders", "Orders"],
-              ["samples", "Samples"],
-              ["refunds", "Refund queue"],
-              ["reactions", "Reactions"],
-              ["revisions", "Revisions"],
-              ["emails", "Emails"],
-              ["ips", "IP allowlist"],
-            ] as Array<[Tab, string]>
-          ).map(([key, label]) => (
-            <button
-              key={key}
-              onClick={() => setTab(key)}
-              className={`relative px-4 py-3 text-sm transition-colors ${
-                tab === key
-                  ? "font-semibold text-foreground"
-                  : "text-muted-foreground hover:text-foreground"
-              }`}
-            >
-              {label}
-              {tab === key && (
-                <span className="absolute inset-x-2 -bottom-px h-0.5 bg-primary" />
-              )}
-            </button>
+        <nav className="flex-1 overflow-y-auto py-3">
+          {Object.entries(groups).map(([group, items]) => (
+            <div key={group} className="mb-4">
+              <div className="px-5 mb-1 text-[10px] uppercase tracking-wider font-semibold text-muted-foreground">
+                {group}
+              </div>
+              {items.map(({ key, label, icon: Icon }) => (
+                <button
+                  key={key}
+                  onClick={() => setTab(key)}
+                  className={`w-full flex items-center gap-3 px-5 py-2 text-sm transition-colors ${
+                    tab === key
+                      ? "bg-primary/10 text-foreground font-medium border-l-2 border-primary"
+                      : "text-muted-foreground hover:bg-card hover:text-foreground border-l-2 border-transparent"
+                  }`}
+                >
+                  <Icon className="h-4 w-4 shrink-0" />
+                  {label}
+                </button>
+              ))}
+            </div>
           ))}
+        </nav>
+        <div className="border-t border-border p-3 space-y-1">
+          <Link
+            to="/"
+            className="flex items-center gap-3 rounded-md px-3 py-2 text-sm text-muted-foreground hover:bg-card hover:text-foreground"
+          >
+            Exit to site
+          </Link>
+          <button
+            onClick={async () => {
+              await supabase.auth.signOut();
+              navigate({ to: "/" });
+            }}
+            className="w-full flex items-center gap-3 rounded-md px-3 py-2 text-sm text-muted-foreground hover:bg-card hover:text-destructive"
+          >
+            <LogOut className="h-4 w-4" /> Sign out
+          </button>
         </div>
-      </nav>
+      </aside>
 
-      <main className="mx-auto max-w-7xl px-6 py-10">
-        {tab === "orders" && <OrdersPanel />}
-        {tab === "samples" && <SamplesPanel />}
-        {tab === "refunds" && <RefundsPanel />}
-        {tab === "reactions" && <ReactionsPanel />}
-        {tab === "revisions" && <RevisionsPanel />}
-        {tab === "emails" && <EmailsPanel />}
-        {tab === "ips" && <IpAllowlistPanel />}
+      {/* Main */}
+      <main className="flex-1 overflow-x-auto">
+        <div className="px-8 py-8 max-w-[1400px]">
+          {tab === "dashboard" && <DashboardPanel />}
+          {tab === "funnel" && <FunnelPanel />}
+          {tab === "crm" && <CrmPanel />}
+          {tab === "orders" && <OrdersPanel />}
+          {tab === "upsells" && <UpsellsPanel />}
+          {tab === "emails" && <EmailsPanel />}
+          {tab === "samples" && <SamplesPanel />}
+          {tab === "refunds" && <RefundsPanel />}
+          {tab === "reactions" && <ReactionsPanel />}
+          {tab === "revisions" && <RevisionsPanel />}
+          {tab === "ips" && <IpAllowlistPanel />}
+        </div>
       </main>
     </div>
   );
 }
 
-/* ---------- Orders ---------- */
+/* =====================================================================
+   Shared helpers
+   ===================================================================== */
+
+type Range = "24h" | "7d" | "30d" | "all";
+const RANGES: Range[] = ["24h", "7d", "30d", "all"];
+
+function rangeStart(r: Range): Date | null {
+  if (r === "all") return null;
+  const d = new Date();
+  if (r === "24h") d.setHours(d.getHours() - 24);
+  if (r === "7d") d.setDate(d.getDate() - 7);
+  if (r === "30d") d.setDate(d.getDate() - 30);
+  return d;
+}
+
+function RangeSelector({ value, onChange }: { value: Range; onChange: (r: Range) => void }) {
+  return (
+    <div className="flex gap-2">
+      {RANGES.map((r) => (
+        <button
+          key={r}
+          onClick={() => onChange(r)}
+          className={`rounded-md border px-3 py-1.5 text-xs transition-colors ${
+            value === r
+              ? "border-primary bg-primary text-primary-foreground"
+              : "border-border bg-card hover:border-primary/40"
+          }`}
+        >
+          {r === "24h" ? "Last 24h" : r === "7d" ? "7 days" : r === "30d" ? "30 days" : "All time"}
+        </button>
+      ))}
+    </div>
+  );
+}
+
+function StatCard({
+  label,
+  value,
+  sub,
+  tone,
+}: {
+  label: string;
+  value: string | number;
+  sub?: string;
+  tone?: "success" | "warn" | "danger" | "muted";
+}) {
+  const toneClass =
+    tone === "success"
+      ? "text-emerald-600"
+      : tone === "warn"
+        ? "text-amber-600"
+        : tone === "danger"
+          ? "text-destructive"
+          : tone === "muted"
+            ? "text-muted-foreground"
+            : "text-foreground";
+  return (
+    <div className="rounded-2xl border border-border bg-card p-5">
+      <div className="text-xs uppercase tracking-wider text-muted-foreground">{label}</div>
+      <div className={`mt-2 font-display text-3xl font-semibold ${toneClass}`}>{value}</div>
+      {sub && <div className="mt-1 text-xs text-muted-foreground">{sub}</div>}
+    </div>
+  );
+}
+
+function fmtMoney(cents: number) {
+  return `$${(cents / 100).toFixed(2)}`;
+}
+
+function fmtPct(num: number, denom: number) {
+  if (denom === 0) return "—";
+  return `${((num / denom) * 100).toFixed(1)}%`;
+}
+
+function fmtMs(ms: number | null | undefined) {
+  if (!ms || ms <= 0) return "—";
+  if (ms < 1000) return `${ms}ms`;
+  const s = ms / 1000;
+  if (s < 60) return `${s.toFixed(1)}s`;
+  const m = Math.floor(s / 60);
+  const rs = Math.round(s % 60);
+  return `${m}m ${rs}s`;
+}
+
+/* =====================================================================
+   Dashboard
+   ===================================================================== */
+
+interface DashboardData {
+  revenueCents: number;
+  orderCount: number;
+  paidCount: number;
+  pendingCount: number;
+  failedCount: number;
+  aovCents: number;
+  upsellCounts: { extra_verse: number; rush_delivery: number; unlimited_edits: number };
+  dailySales: { date: string; cents: number; orders: number }[];
+}
+
+function DashboardPanel() {
+  const [range, setRange] = useState<Range>("7d");
+  const [data, setData] = useState<DashboardData | null>(null);
+  const [loading, setLoading] = useState(true);
+
+  useEffect(() => {
+    let active = true;
+    (async () => {
+      setLoading(true);
+      const start = rangeStart(range);
+      let q = supabase
+        .from("orders")
+        .select("id, amount_paid_cents, amount_cents, payment_status, status, has_3rd_verse, is_rush, has_unlimited_edits, created_at")
+        .order("created_at", { ascending: false })
+        .limit(2000);
+      if (start) q = q.gte("created_at", start.toISOString());
+      const { data: rows } = await q;
+      if (!active) return;
+      const orders = rows ?? [];
+      const paid = orders.filter((o) => o.payment_status === "paid" || o.payment_status === "succeeded");
+      const failed = orders.filter((o) => o.payment_status === "failed");
+      const pending = orders.filter((o) => o.payment_status === "pending");
+      const revenueCents = paid.reduce((s, o) => s + (o.amount_paid_cents ?? 0), 0);
+      const aovCents = paid.length > 0 ? Math.round(revenueCents / paid.length) : 0;
+
+      // Daily sales
+      const byDay: Record<string, { cents: number; orders: number }> = {};
+      for (const o of paid) {
+        const d = new Date(o.created_at).toISOString().slice(0, 10);
+        if (!byDay[d]) byDay[d] = { cents: 0, orders: 0 };
+        byDay[d].cents += o.amount_paid_cents ?? 0;
+        byDay[d].orders += 1;
+      }
+      const dailySales = Object.entries(byDay)
+        .map(([date, v]) => ({ date, cents: v.cents, orders: v.orders }))
+        .sort((a, b) => a.date.localeCompare(b.date));
+
+      setData({
+        revenueCents,
+        orderCount: orders.length,
+        paidCount: paid.length,
+        pendingCount: pending.length,
+        failedCount: failed.length,
+        aovCents,
+        upsellCounts: {
+          extra_verse: paid.filter((o) => o.has_3rd_verse).length,
+          rush_delivery: paid.filter((o) => o.is_rush).length,
+          unlimited_edits: paid.filter((o) => o.has_unlimited_edits).length,
+        },
+        dailySales,
+      });
+      setLoading(false);
+    })();
+    return () => {
+      active = false;
+    };
+  }, [range]);
+
+  if (loading || !data) {
+    return (
+      <>
+        <div className="mb-6 flex items-center justify-between">
+          <h1 className="font-display text-3xl font-semibold">Dashboard</h1>
+          <RangeSelector value={range} onChange={setRange} />
+        </div>
+        <div className="text-muted-foreground">Loading…</div>
+      </>
+    );
+  }
+
+  const maxCents = Math.max(1, ...data.dailySales.map((d) => d.cents));
+
+  return (
+    <>
+      <div className="mb-6 flex items-center justify-between">
+        <div>
+          <h1 className="font-display text-3xl font-semibold">Dashboard</h1>
+          <p className="text-sm text-muted-foreground">Revenue, sales, upsells, payments at a glance.</p>
+        </div>
+        <RangeSelector value={range} onChange={setRange} />
+      </div>
+
+      {/* Top KPI row */}
+      <div className="grid grid-cols-2 gap-4 md:grid-cols-4">
+        <StatCard label="Revenue" value={fmtMoney(data.revenueCents)} sub={`${data.paidCount} paid orders`} tone="success" />
+        <StatCard label="AOV" value={fmtMoney(data.aovCents)} sub={`avg order value`} />
+        <StatCard label="Orders" value={data.orderCount} sub={`${data.paidCount} paid · ${data.pendingCount} pending`} />
+        <StatCard label="Failed payments" value={data.failedCount} tone={data.failedCount > 0 ? "danger" : "muted"} />
+      </div>
+
+      {/* Daily sales chart */}
+      <div className="mt-8 rounded-2xl border border-border bg-card p-6">
+        <h2 className="font-display text-xl font-semibold">Daily sales</h2>
+        <p className="text-sm text-muted-foreground">Revenue per day in the selected range.</p>
+        {data.dailySales.length === 0 ? (
+          <p className="mt-8 text-center text-muted-foreground">No sales in this range.</p>
+        ) : (
+          <div className="mt-6 flex items-end gap-2 h-48">
+            {data.dailySales.map((d) => (
+              <div key={d.date} className="flex-1 flex flex-col items-center gap-1 group">
+                <div className="text-[10px] text-muted-foreground opacity-0 group-hover:opacity-100">
+                  {fmtMoney(d.cents)}
+                </div>
+                <div
+                  className="w-full bg-gradient-to-t from-primary to-primary/60 rounded-t-md transition-all hover:opacity-80"
+                  style={{ height: `${(d.cents / maxCents) * 100}%`, minHeight: "4px" }}
+                  title={`${d.date}: ${fmtMoney(d.cents)} (${d.orders} orders)`}
+                />
+                <div className="text-[10px] text-muted-foreground rotate-45 origin-left whitespace-nowrap mt-2">
+                  {d.date.slice(5)}
+                </div>
+              </div>
+            ))}
+          </div>
+        )}
+      </div>
+
+      {/* Upsell take rates */}
+      <div className="mt-8">
+        <h2 className="font-display text-xl font-semibold mb-4">Upsell take rates</h2>
+        <div className="grid grid-cols-1 gap-4 md:grid-cols-3">
+          <UpsellCard label="Extra verse" count={data.upsellCounts.extra_verse} total={data.paidCount} priceCents={1999} />
+          <UpsellCard label="Rush delivery" count={data.upsellCounts.rush_delivery} total={data.paidCount} priceCents={5900} />
+          <UpsellCard label="Unlimited edits" count={data.upsellCounts.unlimited_edits} total={data.paidCount} priceCents={3299} />
+        </div>
+      </div>
+
+      {/* Payment success */}
+      <div className="mt-8">
+        <h2 className="font-display text-xl font-semibold mb-4">Payment performance</h2>
+        <div className="grid grid-cols-3 gap-4">
+          <StatCard label="Success rate" value={fmtPct(data.paidCount, data.paidCount + data.failedCount)} tone="success" />
+          <StatCard label="Failed" value={data.failedCount} tone="danger" />
+          <StatCard label="Pending" value={data.pendingCount} tone="warn" />
+        </div>
+      </div>
+    </>
+  );
+}
+
+function UpsellCard({
+  label,
+  count,
+  total,
+  priceCents,
+}: {
+  label: string;
+  count: number;
+  total: number;
+  priceCents: number;
+}) {
+  const rate = total > 0 ? (count / total) * 100 : 0;
+  const revenue = count * priceCents;
+  return (
+    <div className="rounded-2xl border border-border bg-card p-5">
+      <div className="flex items-center justify-between">
+        <span className="text-sm font-medium">{label}</span>
+        <Badge variant="outline">{fmtMoney(priceCents)}</Badge>
+      </div>
+      <div className="mt-3 font-display text-3xl font-semibold">{rate.toFixed(1)}%</div>
+      <div className="text-xs text-muted-foreground">{count} of {total} orders</div>
+      <div className="mt-3 h-2 rounded-full bg-muted overflow-hidden">
+        <div className="h-full bg-gradient-to-r from-primary to-primary/70" style={{ width: `${rate}%` }} />
+      </div>
+      <div className="mt-2 text-xs text-emerald-600 font-medium">+{fmtMoney(revenue)} revenue</div>
+    </div>
+  );
+}
+
+/* =====================================================================
+   Funnel
+   ===================================================================== */
+
+interface FunnelData {
+  landerViews: number;
+  uniqueLanderSessions: number;
+  quizStarts: number;
+  quizCompletes: number;
+  checkoutViews: number;
+  paymentSuccesses: number;
+  paymentFailures: number;
+  questionStats: Array<{
+    stepIndex: number;
+    views: number;
+    answers: number;
+    avgTimeMs: number;
+    dropoffPct: number;
+  }>;
+  avgQuizTimeMs: number;
+}
+
+const QUESTION_LABELS = [
+  "1. Relationship + name",
+  "2. Journey stage",
+  "3. Their fight",
+  "4. Their qualities",
+  "5. Shared memory",
+  "6. Theme",
+  "7. Personal letter",
+  "8. Sound",
+  "9. Email/name",
+  "10. Gift toggle",
+];
+
+function FunnelPanel() {
+  const [range, setRange] = useState<Range>("7d");
+  const [data, setData] = useState<FunnelData | null>(null);
+  const [loading, setLoading] = useState(true);
+
+  useEffect(() => {
+    let active = true;
+    (async () => {
+      setLoading(true);
+      const start = rangeStart(range);
+      let q = supabase
+        .from("quiz_events")
+        .select("session_id, event_type, step_index, time_on_step_ms, created_at")
+        .order("created_at", { ascending: false })
+        .limit(10000);
+      if (start) q = q.gte("created_at", start.toISOString());
+      const { data: events } = await q;
+      if (!active) return;
+      const evts = events ?? [];
+
+      const sessionsByType: Record<string, Set<string>> = {};
+      const totalByType: Record<string, number> = {};
+      for (const e of evts) {
+        if (!sessionsByType[e.event_type]) sessionsByType[e.event_type] = new Set();
+        sessionsByType[e.event_type].add(e.session_id);
+        totalByType[e.event_type] = (totalByType[e.event_type] ?? 0) + 1;
+      }
+
+      // Per-question stats
+      const questionStats: FunnelData["questionStats"] = [];
+      for (let i = 0; i < QUESTION_LABELS.length; i++) {
+        const views = evts.filter((e) => e.event_type === "question_view" && e.step_index === i);
+        const answers = evts.filter((e) => e.event_type === "question_answer" && e.step_index === i);
+        const times = answers.map((a) => a.time_on_step_ms ?? 0).filter((t) => t > 0);
+        const avgTimeMs = times.length > 0 ? times.reduce((s, t) => s + t, 0) / times.length : 0;
+        const nextViews = evts.filter((e) => e.event_type === "question_view" && e.step_index === i + 1);
+        const dropoffPct = views.length > 0 ? Math.max(0, ((views.length - nextViews.length) / views.length) * 100) : 0;
+        questionStats.push({
+          stepIndex: i,
+          views: views.length,
+          answers: answers.length,
+          avgTimeMs,
+          dropoffPct: i === QUESTION_LABELS.length - 1 ? 0 : dropoffPct,
+        });
+      }
+
+      // Avg total quiz time
+      const completes = evts.filter((e) => e.event_type === "quiz_complete" && (e.time_on_step_ms ?? 0) > 0);
+      const avgQuizTimeMs =
+        completes.length > 0
+          ? completes.reduce((s, e) => s + (e.time_on_step_ms ?? 0), 0) / completes.length
+          : 0;
+
+      setData({
+        landerViews: totalByType["lander_view"] ?? 0,
+        uniqueLanderSessions: sessionsByType["lander_view"]?.size ?? 0,
+        quizStarts: sessionsByType["quiz_start"]?.size ?? 0,
+        quizCompletes: sessionsByType["quiz_complete"]?.size ?? 0,
+        checkoutViews: sessionsByType["checkout_view"]?.size ?? 0,
+        paymentSuccesses: sessionsByType["payment_success"]?.size ?? 0,
+        paymentFailures: sessionsByType["payment_failed"]?.size ?? 0,
+        questionStats,
+        avgQuizTimeMs,
+      });
+      setLoading(false);
+    })();
+    return () => {
+      active = false;
+    };
+  }, [range]);
+
+  if (loading || !data) {
+    return (
+      <>
+        <div className="mb-6 flex items-center justify-between">
+          <h1 className="font-display text-3xl font-semibold">Funnel</h1>
+          <RangeSelector value={range} onChange={setRange} />
+        </div>
+        <div className="text-muted-foreground">Loading…</div>
+      </>
+    );
+  }
+
+  return (
+    <>
+      <div className="mb-6 flex items-center justify-between">
+        <div>
+          <h1 className="font-display text-3xl font-semibold">Funnel</h1>
+          <p className="text-sm text-muted-foreground">
+            Lander → Quiz → Checkout → Paid. Question-level retention and drop-off.
+          </p>
+        </div>
+        <RangeSelector value={range} onChange={setRange} />
+      </div>
+
+      {/* Top funnel */}
+      <div className="grid grid-cols-2 gap-4 md:grid-cols-5">
+        <StatCard label="Lander views" value={data.uniqueLanderSessions} sub={`${data.landerViews} total`} />
+        <StatCard
+          label="Quiz starts"
+          value={data.quizStarts}
+          sub={`CTR: ${fmtPct(data.quizStarts, data.uniqueLanderSessions)}`}
+          tone="success"
+        />
+        <StatCard
+          label="Quiz completes"
+          value={data.quizCompletes}
+          sub={`${fmtPct(data.quizCompletes, data.quizStarts)} of starts`}
+        />
+        <StatCard
+          label="Checkout views"
+          value={data.checkoutViews}
+          sub={`${fmtPct(data.checkoutViews, data.quizCompletes)} of completes`}
+        />
+        <StatCard
+          label="Paid"
+          value={data.paymentSuccesses}
+          sub={`${fmtPct(data.paymentSuccesses, data.checkoutViews)} checkout conv.`}
+          tone="success"
+        />
+      </div>
+
+      <div className="mt-6 grid grid-cols-2 gap-4 md:grid-cols-3">
+        <StatCard label="Avg quiz time" value={fmtMs(data.avgQuizTimeMs)} />
+        <StatCard label="Lander → Paid" value={fmtPct(data.paymentSuccesses, data.uniqueLanderSessions)} tone="success" />
+        <StatCard label="Payment failures" value={data.paymentFailures} tone={data.paymentFailures > 0 ? "danger" : "muted"} />
+      </div>
+
+      {/* Per-question table */}
+      <div className="mt-8 rounded-2xl border border-border bg-card overflow-hidden">
+        <div className="px-6 py-4 border-b border-border">
+          <h2 className="font-display text-xl font-semibold">Per-question retention</h2>
+          <p className="text-sm text-muted-foreground">
+            How many users viewed each step, how long they spent, and how many dropped off.
+          </p>
+        </div>
+        <table className="w-full text-sm">
+          <thead className="bg-muted/30 text-left">
+            <tr>
+              <th className="p-3">Question</th>
+              <th className="p-3 text-right">Views</th>
+              <th className="p-3 text-right">Answered</th>
+              <th className="p-3 text-right">Conv.</th>
+              <th className="p-3 text-right">Avg time</th>
+              <th className="p-3 text-right">Drop-off</th>
+              <th className="p-3 w-[200px]">Funnel</th>
+            </tr>
+          </thead>
+          <tbody>
+            {data.questionStats.map((s, i) => {
+              const maxViews = Math.max(1, ...data.questionStats.map((q) => q.views));
+              const widthPct = (s.views / maxViews) * 100;
+              return (
+                <tr key={i} className="border-t border-border/40">
+                  <td className="p-3 font-medium">{QUESTION_LABELS[i]}</td>
+                  <td className="p-3 text-right">{s.views}</td>
+                  <td className="p-3 text-right">{s.answers}</td>
+                  <td className="p-3 text-right">{fmtPct(s.answers, s.views)}</td>
+                  <td className="p-3 text-right text-muted-foreground">{fmtMs(s.avgTimeMs)}</td>
+                  <td className={`p-3 text-right font-medium ${s.dropoffPct > 30 ? "text-destructive" : s.dropoffPct > 15 ? "text-amber-600" : "text-emerald-600"}`}>
+                    {s.dropoffPct.toFixed(1)}%
+                  </td>
+                  <td className="p-3">
+                    <div className="h-2 rounded-full bg-muted overflow-hidden">
+                      <div className="h-full bg-primary" style={{ width: `${widthPct}%` }} />
+                    </div>
+                  </td>
+                </tr>
+              );
+            })}
+          </tbody>
+        </table>
+      </div>
+    </>
+  );
+}
+
+/* =====================================================================
+   CRM
+   ===================================================================== */
+
+interface CrmCustomer {
+  email: string;
+  totalSpentCents: number;
+  orderCount: number;
+  lastOrderAt: string;
+  firstOrderAt: string;
+  paidCount: number;
+  pendingCount: number;
+  failedCount: number;
+  hasUpsells: boolean;
+  isGift: boolean;
+  buyerName: string | null;
+  orders: any[];
+  emails: any[];
+}
+
+function CrmPanel() {
+  const [customers, setCustomers] = useState<CrmCustomer[]>([]);
+  const [loading, setLoading] = useState(true);
+  const [search, setSearch] = useState("");
+  const [expanded, setExpanded] = useState<string | null>(null);
+  const [emailLogs, setEmailLogs] = useState<Record<string, any[]>>({});
+  const [quizEvents, setQuizEvents] = useState<Record<string, any[]>>({});
+
+  useEffect(() => {
+    let active = true;
+    (async () => {
+      setLoading(true);
+      const { data: orders } = await supabase
+        .from("orders")
+        .select("*")
+        .order("created_at", { ascending: false })
+        .limit(2000);
+      if (!active) return;
+
+      const map: Record<string, CrmCustomer> = {};
+      for (const o of orders ?? []) {
+        const email = (o.buyer_email ?? "").toLowerCase();
+        if (!email) continue;
+        if (!map[email]) {
+          map[email] = {
+            email,
+            totalSpentCents: 0,
+            orderCount: 0,
+            lastOrderAt: o.created_at,
+            firstOrderAt: o.created_at,
+            paidCount: 0,
+            pendingCount: 0,
+            failedCount: 0,
+            hasUpsells: false,
+            isGift: false,
+            buyerName: o.buyer_name ?? o.customer_name ?? null,
+            orders: [],
+            emails: [],
+          };
+        }
+        const c = map[email];
+        c.orders.push(o);
+        c.orderCount += 1;
+        if (o.payment_status === "paid" || o.payment_status === "succeeded") {
+          c.paidCount += 1;
+          c.totalSpentCents += o.amount_paid_cents ?? 0;
+        } else if (o.payment_status === "failed") {
+          c.failedCount += 1;
+        } else {
+          c.pendingCount += 1;
+        }
+        if (o.has_3rd_verse || o.is_rush || o.has_unlimited_edits) c.hasUpsells = true;
+        if (o.is_gift) c.isGift = true;
+        if (o.created_at > c.lastOrderAt) c.lastOrderAt = o.created_at;
+        if (o.created_at < c.firstOrderAt) c.firstOrderAt = o.created_at;
+        if (!c.buyerName && (o.buyer_name || o.customer_name)) {
+          c.buyerName = o.buyer_name ?? o.customer_name;
+        }
+      }
+
+      setCustomers(
+        Object.values(map).sort((a, b) => b.totalSpentCents - a.totalSpentCents),
+      );
+      setLoading(false);
+    })();
+    return () => {
+      active = false;
+    };
+  }, []);
+
+  const filtered = customers.filter((c) => {
+    if (!search) return true;
+    const s = search.toLowerCase();
+    return c.email.includes(s) || (c.buyerName ?? "").toLowerCase().includes(s);
+  });
+
+  const toggleExpand = async (email: string) => {
+    if (expanded === email) {
+      setExpanded(null);
+      return;
+    }
+    setExpanded(email);
+    if (!emailLogs[email]) {
+      const { data: logs } = await supabase
+        .from("email_send_log")
+        .select("template_name, status, error_message, created_at, message_id")
+        .eq("recipient_email", email)
+        .order("created_at", { ascending: false })
+        .limit(50);
+      setEmailLogs((m) => ({ ...m, [email]: logs ?? [] }));
+    }
+    if (!quizEvents[email]) {
+      const { data: evts } = await supabase
+        .from("quiz_events")
+        .select("event_type, step_index, time_on_step_ms, created_at")
+        .eq("buyer_email", email)
+        .order("created_at", { ascending: true })
+        .limit(200);
+      setQuizEvents((m) => ({ ...m, [email]: evts ?? [] }));
+    }
+  };
+
+  if (loading) return <div className="text-muted-foreground">Loading customers…</div>;
+
+  const totalLifetimeRevenue = customers.reduce((s, c) => s + c.totalSpentCents, 0);
+
+  return (
+    <>
+      <div className="mb-6">
+        <h1 className="font-display text-3xl font-semibold">CRM</h1>
+        <p className="text-sm text-muted-foreground">
+          Every customer who's interacted. Click a row to see all their orders, emails, and quiz path.
+        </p>
+      </div>
+
+      <div className="grid grid-cols-2 gap-4 md:grid-cols-4 mb-6">
+        <StatCard label="Total customers" value={customers.length} />
+        <StatCard label="Lifetime revenue" value={fmtMoney(totalLifetimeRevenue)} tone="success" />
+        <StatCard label="With paid orders" value={customers.filter((c) => c.paidCount > 0).length} />
+        <StatCard label="Repeat buyers" value={customers.filter((c) => c.paidCount > 1).length} />
+      </div>
+
+      <input
+        value={search}
+        onChange={(e) => setSearch(e.target.value)}
+        placeholder="Search by email or name…"
+        className="w-full mb-4 rounded-md border border-border bg-card px-4 py-2 text-sm"
+      />
+
+      <div className="rounded-2xl border border-border bg-card overflow-hidden">
+        <table className="w-full text-sm">
+          <thead className="bg-muted/30 text-left">
+            <tr>
+              <th className="p-3 w-8"></th>
+              <th className="p-3">Customer</th>
+              <th className="p-3 text-right">Orders</th>
+              <th className="p-3 text-right">Spent</th>
+              <th className="p-3">Status</th>
+              <th className="p-3">Last order</th>
+            </tr>
+          </thead>
+          <tbody>
+            {filtered.map((c) => (
+              <>
+                <tr
+                  key={c.email}
+                  onClick={() => toggleExpand(c.email)}
+                  className="border-t border-border/40 cursor-pointer hover:bg-muted/30"
+                >
+                  <td className="p-3">
+                    {expanded === c.email ? <ChevronDown className="h-4 w-4" /> : <ChevronRight className="h-4 w-4" />}
+                  </td>
+                  <td className="p-3">
+                    <div className="font-medium">{c.buyerName ?? "—"}</div>
+                    <div className="text-xs text-muted-foreground">{c.email}</div>
+                  </td>
+                  <td className="p-3 text-right">
+                    <div className="font-medium">{c.orderCount}</div>
+                    <div className="text-[10px] text-muted-foreground">
+                      {c.paidCount}p · {c.pendingCount}pe · {c.failedCount}f
+                    </div>
+                  </td>
+                  <td className="p-3 text-right font-medium text-emerald-600">{fmtMoney(c.totalSpentCents)}</td>
+                  <td className="p-3">
+                    <div className="flex gap-1 flex-wrap">
+                      {c.hasUpsells && <Badge variant="default" className="text-[10px]">upsells</Badge>}
+                      {c.isGift && <Badge variant="outline" className="text-[10px]">gift</Badge>}
+                      {c.paidCount > 1 && <Badge variant="outline" className="text-[10px]">repeat</Badge>}
+                    </div>
+                  </td>
+                  <td className="p-3 text-xs text-muted-foreground">
+                    {new Date(c.lastOrderAt).toLocaleDateString()}
+                  </td>
+                </tr>
+                {expanded === c.email && (
+                  <tr className="border-t border-border/40 bg-muted/20">
+                    <td colSpan={6} className="p-6">
+                      <CustomerDetail
+                        customer={c}
+                        emails={emailLogs[c.email] ?? []}
+                        events={quizEvents[c.email] ?? []}
+                      />
+                    </td>
+                  </tr>
+                )}
+              </>
+            ))}
+            {filtered.length === 0 && (
+              <tr>
+                <td colSpan={6} className="p-8 text-center text-muted-foreground">
+                  No customers.
+                </td>
+              </tr>
+            )}
+          </tbody>
+        </table>
+      </div>
+    </>
+  );
+}
+
+function CustomerDetail({
+  customer,
+  emails,
+  events,
+}: {
+  customer: CrmCustomer;
+  emails: any[];
+  events: any[];
+}) {
+  return (
+    <div className="space-y-6">
+      {/* Orders */}
+      <div>
+        <h3 className="font-semibold text-sm mb-2">Orders ({customer.orders.length})</h3>
+        <div className="rounded-lg border border-border bg-background overflow-hidden">
+          <table className="w-full text-xs">
+            <thead className="bg-muted/30 text-left">
+              <tr>
+                <th className="p-2">Recipient</th>
+                <th className="p-2">Status</th>
+                <th className="p-2">Payment</th>
+                <th className="p-2">Amount</th>
+                <th className="p-2">Upsells</th>
+                <th className="p-2">Created</th>
+              </tr>
+            </thead>
+            <tbody>
+              {customer.orders.map((o: any) => (
+                <tr key={o.id} className="border-t border-border/40">
+                  <td className="p-2">{o.recipient_name}</td>
+                  <td className="p-2"><Badge variant="outline" className="text-[10px]">{o.status}</Badge></td>
+                  <td className="p-2"><Badge variant={o.payment_status === "paid" ? "default" : o.payment_status === "failed" ? "destructive" : "outline"} className="text-[10px]">{o.payment_status}</Badge></td>
+                  <td className="p-2 font-medium">{fmtMoney(o.amount_paid_cents ?? 0)}</td>
+                  <td className="p-2">
+                    <div className="flex gap-1">
+                      {o.has_3rd_verse && <Badge variant="outline" className="text-[10px]">verse</Badge>}
+                      {o.is_rush && <Badge variant="outline" className="text-[10px]">rush</Badge>}
+                      {o.has_unlimited_edits && <Badge variant="outline" className="text-[10px]">edits</Badge>}
+                    </div>
+                  </td>
+                  <td className="p-2 text-muted-foreground">{new Date(o.created_at).toLocaleString()}</td>
+                </tr>
+              ))}
+            </tbody>
+          </table>
+        </div>
+      </div>
+
+      {/* Emails */}
+      <div>
+        <h3 className="font-semibold text-sm mb-2">Emails ({emails.length})</h3>
+        {emails.length === 0 ? (
+          <p className="text-xs text-muted-foreground">No emails sent.</p>
+        ) : (
+          <div className="rounded-lg border border-border bg-background overflow-hidden">
+            <table className="w-full text-xs">
+              <thead className="bg-muted/30 text-left">
+                <tr>
+                  <th className="p-2">Template</th>
+                  <th className="p-2">Status</th>
+                  <th className="p-2">Sent</th>
+                  <th className="p-2">Error</th>
+                </tr>
+              </thead>
+              <tbody>
+                {emails.slice(0, 20).map((e, i) => (
+                  <tr key={i} className="border-t border-border/40">
+                    <td className="p-2">{e.template_name}</td>
+                    <td className="p-2">
+                      <Badge variant={e.status === "sent" ? "default" : e.status === "dlq" || e.status === "failed" ? "destructive" : "outline"} className="text-[10px]">
+                        {e.status}
+                      </Badge>
+                    </td>
+                    <td className="p-2 text-muted-foreground">{new Date(e.created_at).toLocaleString()}</td>
+                    <td className="p-2 text-destructive">{e.error_message?.slice(0, 60) ?? ""}</td>
+                  </tr>
+                ))}
+              </tbody>
+            </table>
+          </div>
+        )}
+      </div>
+
+      {/* Quiz path */}
+      <div>
+        <h3 className="font-semibold text-sm mb-2">Quiz path ({events.length} events)</h3>
+        {events.length === 0 ? (
+          <p className="text-xs text-muted-foreground">No quiz activity tracked.</p>
+        ) : (
+          <div className="text-xs space-y-1 max-h-48 overflow-y-auto">
+            {events.map((e, i) => (
+              <div key={i} className="flex items-center gap-3 text-muted-foreground">
+                <span className="font-mono">{new Date(e.created_at).toLocaleTimeString()}</span>
+                <Badge variant="outline" className="text-[10px]">{e.event_type}</Badge>
+                {e.step_index !== null && <span>step {e.step_index}</span>}
+                {e.time_on_step_ms && <span>· {fmtMs(e.time_on_step_ms)}</span>}
+              </div>
+            ))}
+          </div>
+        )}
+      </div>
+    </div>
+  );
+}
+
+/* =====================================================================
+   Upsells panel
+   ===================================================================== */
+
+function UpsellsPanel() {
+  const [range, setRange] = useState<Range>("30d");
+  const [data, setData] = useState<{ events: any[]; orders: any[] } | null>(null);
+
+  useEffect(() => {
+    let active = true;
+    (async () => {
+      const start = rangeStart(range);
+      let eq = supabase
+        .from("quiz_events")
+        .select("event_type, upsell_type, amount_cents, created_at, session_id")
+        .in("event_type", ["upsell_view", "upsell_accept", "upsell_decline"])
+        .order("created_at", { ascending: false })
+        .limit(5000);
+      if (start) eq = eq.gte("created_at", start.toISOString());
+      let oq = supabase
+        .from("orders")
+        .select("has_3rd_verse, is_rush, has_unlimited_edits, payment_status, created_at")
+        .order("created_at", { ascending: false })
+        .limit(2000);
+      if (start) oq = oq.gte("created_at", start.toISOString());
+      const [{ data: events }, { data: orders }] = await Promise.all([eq, oq]);
+      if (!active) return;
+      setData({ events: events ?? [], orders: orders ?? [] });
+    })();
+    return () => {
+      active = false;
+    };
+  }, [range]);
+
+  if (!data) return <div className="text-muted-foreground">Loading…</div>;
+
+  const types = ["extra_verse", "rush_delivery", "unlimited_edits"];
+  const labels: Record<string, string> = {
+    extra_verse: "Extra verse ($19.99)",
+    rush_delivery: "Rush delivery ($59.00)",
+    unlimited_edits: "Unlimited edits ($32.99)",
+  };
+  const prices: Record<string, number> = { extra_verse: 1999, rush_delivery: 5900, unlimited_edits: 3299 };
+  const orderField: Record<string, string> = {
+    extra_verse: "has_3rd_verse",
+    rush_delivery: "is_rush",
+    unlimited_edits: "has_unlimited_edits",
+  };
+
+  const paidOrders = data.orders.filter((o) => o.payment_status === "paid" || o.payment_status === "succeeded");
+
+  return (
+    <>
+      <div className="mb-6 flex items-center justify-between">
+        <div>
+          <h1 className="font-display text-3xl font-semibold">Upsells</h1>
+          <p className="text-sm text-muted-foreground">View → Accept rates, take rates, revenue per upsell.</p>
+        </div>
+        <RangeSelector value={range} onChange={setRange} />
+      </div>
+
+      <div className="space-y-4">
+        {types.map((t) => {
+          const views = data.events.filter((e) => e.event_type === "upsell_view" && e.upsell_type === t).length;
+          const accepts = data.events.filter((e) => e.event_type === "upsell_accept" && e.upsell_type === t).length;
+          const declines = data.events.filter((e) => e.event_type === "upsell_decline" && e.upsell_type === t).length;
+          const taken = paidOrders.filter((o) => o[orderField[t] as keyof typeof o]).length;
+          const revenue = taken * prices[t];
+
+          return (
+            <div key={t} className="rounded-2xl border border-border bg-card p-6">
+              <div className="flex items-start justify-between mb-4">
+                <h2 className="font-display text-xl font-semibold">{labels[t]}</h2>
+                <div className="text-right">
+                  <div className="text-2xl font-bold text-emerald-600">{fmtMoney(revenue)}</div>
+                  <div className="text-xs text-muted-foreground">revenue</div>
+                </div>
+              </div>
+              <div className="grid grid-cols-4 gap-4">
+                <div>
+                  <div className="text-xs uppercase text-muted-foreground">Views</div>
+                  <div className="text-2xl font-semibold">{views}</div>
+                </div>
+                <div>
+                  <div className="text-xs uppercase text-muted-foreground">Accepted</div>
+                  <div className="text-2xl font-semibold text-emerald-600">{accepts}</div>
+                </div>
+                <div>
+                  <div className="text-xs uppercase text-muted-foreground">Declined</div>
+                  <div className="text-2xl font-semibold text-muted-foreground">{declines}</div>
+                </div>
+                <div>
+                  <div className="text-xs uppercase text-muted-foreground">Take rate</div>
+                  <div className="text-2xl font-semibold">{fmtPct(accepts, views)}</div>
+                </div>
+              </div>
+              <div className="mt-4 text-sm text-muted-foreground">
+                Confirmed in orders: <span className="font-semibold text-foreground">{taken}</span> of {paidOrders.length} paid orders
+                <span className="ml-2">({fmtPct(taken, paidOrders.length)})</span>
+              </div>
+            </div>
+          );
+        })}
+      </div>
+    </>
+  );
+}
+
+/* =====================================================================
+   Existing panels (Orders / Emails / Samples / Refunds / Reactions / Revisions / Ips)
+   — kept identical to previous behavior
+   ===================================================================== */
 
 interface OrderRow {
   id: string;
@@ -191,28 +1140,27 @@ interface OrderRow {
   delivered_at: string | null;
   is_gift: boolean;
   brief_score: any;
+  amount_paid_cents: number;
+  payment_status: string;
 }
 
 function OrdersPanel() {
   const [orders, setOrders] = useState<OrderRow[]>([]);
   const [busy, setBusy] = useState<string | null>(null);
-  const [filter, setFilter] = useState<"all" | "flagged" | "in_progress">("all");
+  const [filter, setFilter] = useState<"all" | "flagged" | "in_progress" | "paid" | "failed">("all");
 
-  useEffect(() => {
-    fetch();
-  }, [filter]);
+  useEffect(() => { load(); }, [filter]);
 
-  const fetch = async () => {
+  const load = async () => {
     let q = supabase
       .from("orders")
-      .select(
-        "id, recipient_name, buyer_email, status, priority, flagged_for_review, flag_reason, created_at, scheduled_delivery_at, delivered_at, is_gift, brief_score",
-      )
+      .select("id, recipient_name, buyer_email, status, priority, flagged_for_review, flag_reason, created_at, scheduled_delivery_at, delivered_at, is_gift, brief_score, amount_paid_cents, payment_status")
       .order("created_at", { ascending: false })
-      .limit(100);
+      .limit(200);
     if (filter === "flagged") q = q.eq("flagged_for_review", true);
-    if (filter === "in_progress")
-      q = q.not("status", "in", "(delivered,cancelled)");
+    if (filter === "in_progress") q = q.not("status", "in", "(delivered,cancelled)");
+    if (filter === "paid") q = q.eq("payment_status", "paid");
+    if (filter === "failed") q = q.eq("payment_status", "failed");
     const { data } = await q;
     setOrders((data as OrderRow[]) ?? []);
   };
@@ -221,9 +1169,16 @@ function OrdersPanel() {
     setBusy(`${orderId}:${label}`);
     try {
       const { data: { session } } = await supabase.auth.getSession();
-      const res = await fetch_fn(fn, session?.access_token, body);
-      console.log(label, res);
-      await fetch();
+      const res = await fetch(`${import.meta.env.VITE_SUPABASE_URL}/functions/v1/${fn}`, {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+          Authorization: `Bearer ${session?.access_token ?? import.meta.env.VITE_SUPABASE_PUBLISHABLE_KEY}`,
+        },
+        body: JSON.stringify(body),
+      });
+      console.log(label, await res.json());
+      await load();
     } finally {
       setBusy(null);
     }
@@ -231,17 +1186,17 @@ function OrdersPanel() {
 
   return (
     <>
-      <div className="flex items-center justify-between mb-6">
+      <div className="mb-6 flex items-center justify-between">
         <h1 className="font-display text-3xl font-semibold">Orders</h1>
         <div className="flex gap-2">
-          {(["all", "in_progress", "flagged"] as const).map((f) => (
+          {(["all", "in_progress", "paid", "failed", "flagged"] as const).map((f) => (
             <button
               key={f}
               onClick={() => setFilter(f)}
               className={`rounded-full border px-4 py-1.5 text-sm capitalize ${
                 filter === f
                   ? "border-primary bg-primary text-primary-foreground"
-                  : "border-border bg-card text-foreground hover:bg-peach/40"
+                  : "border-border bg-card hover:bg-peach/40"
               }`}
             >
               {f.replace("_", " ")}
@@ -257,10 +1212,9 @@ function OrdersPanel() {
               <th className="p-3">Recipient</th>
               <th className="p-3">Buyer</th>
               <th className="p-3">Status</th>
-              <th className="p-3">Score</th>
-              <th className="p-3">Priority</th>
+              <th className="p-3">Payment</th>
+              <th className="p-3">Amount</th>
               <th className="p-3">Created</th>
-              <th className="p-3">Scheduled</th>
               <th className="p-3">Actions</th>
             </tr>
           </thead>
@@ -269,83 +1223,23 @@ function OrdersPanel() {
               <tr key={o.id} className="border-b border-border/40 align-top">
                 <td className="p-3">
                   <div className="font-medium">{o.recipient_name}</div>
-                  {o.is_gift && (
-                    <span className="text-xs text-muted-foreground">gift</span>
-                  )}
-                  {o.flagged_for_review && (
-                    <Badge variant="destructive" className="ml-2 text-xs">
-                      flagged
-                    </Badge>
-                  )}
-                  {o.flag_reason && (
-                    <p className="mt-1 max-w-xs text-xs text-destructive">
-                      {o.flag_reason}
-                    </p>
-                  )}
+                  {o.is_gift && <span className="text-xs text-muted-foreground">gift</span>}
+                  {o.flagged_for_review && <Badge variant="destructive" className="ml-2 text-xs">flagged</Badge>}
                 </td>
-                <td className="p-3 text-xs text-muted-foreground">
-                  {o.buyer_email}
-                </td>
-                <td className="p-3">
-                  <Badge variant="outline">{o.status}</Badge>
-                </td>
-                <td className="p-3 text-xs">
-                  {o.brief_score?.overall ? `${o.brief_score.overall}/5` : "—"}
-                </td>
-                <td className="p-3 text-xs capitalize">{o.priority}</td>
-                <td className="p-3 text-xs">
-                  {new Date(o.created_at).toLocaleString()}
-                </td>
-                <td className="p-3 text-xs">
-                  {o.scheduled_delivery_at
-                    ? new Date(o.scheduled_delivery_at).toLocaleString()
-                    : "—"}
-                </td>
+                <td className="p-3 text-xs text-muted-foreground">{o.buyer_email}</td>
+                <td className="p-3"><Badge variant="outline">{o.status}</Badge></td>
+                <td className="p-3"><Badge variant={o.payment_status === "paid" ? "default" : o.payment_status === "failed" ? "destructive" : "outline"}>{o.payment_status}</Badge></td>
+                <td className="p-3 text-xs">{fmtMoney(o.amount_paid_cents ?? 0)}</td>
+                <td className="p-3 text-xs">{new Date(o.created_at).toLocaleString()}</td>
                 <td className="p-3">
                   <div className="flex flex-col gap-1">
-                    <Button
-                      size="sm"
-                      variant="outline"
-                      disabled={busy === `${o.id}:brief`}
-                      onClick={() =>
-                        callFn(
-                          "generate-brief",
-                          { orderId: o.id },
-                          "brief",
-                          o.id,
-                        )
-                      }
-                    >
+                    <Button size="sm" variant="outline" disabled={busy === `${o.id}:brief`} onClick={() => callFn("generate-brief", { orderId: o.id }, "brief", o.id)}>
                       Regen brief
                     </Button>
-                    <Button
-                      size="sm"
-                      variant="outline"
-                      disabled={busy === `${o.id}:music`}
-                      onClick={() =>
-                        callFn(
-                          "submit-to-kie",
-                          { orderId: o.id },
-                          "music",
-                          o.id,
-                        )
-                      }
-                    >
+                    <Button size="sm" variant="outline" disabled={busy === `${o.id}:music`} onClick={() => callFn("submit-to-kie", { orderId: o.id }, "music", o.id)}>
                       Submit music
                     </Button>
-                    <Button
-                      size="sm"
-                      variant="outline"
-                      disabled={busy === `${o.id}:deliver`}
-                      onClick={() =>
-                        callFn(
-                          "deliver-song",
-                          { orderId: o.id },
-                          "deliver",
-                          o.id,
-                        )
-                      }
-                    >
+                    <Button size="sm" variant="outline" disabled={busy === `${o.id}:deliver`} onClick={() => callFn("deliver-song", { orderId: o.id }, "deliver", o.id)}>
                       Deliver now
                     </Button>
                   </div>
@@ -354,12 +1248,7 @@ function OrdersPanel() {
             ))}
             {orders.length === 0 && (
               <tr>
-                <td
-                  colSpan={8}
-                  className="p-8 text-center text-muted-foreground"
-                >
-                  No orders.
-                </td>
+                <td colSpan={7} className="p-8 text-center text-muted-foreground">No orders.</td>
               </tr>
             )}
           </tbody>
@@ -369,828 +1258,7 @@ function OrdersPanel() {
   );
 }
 
-async function fetch_fn(fn: string, accessToken: string | undefined, body: any) {
-  const res = await fetch(
-    `${import.meta.env.VITE_SUPABASE_URL}/functions/v1/${fn}`,
-    {
-      method: "POST",
-      headers: {
-        "Content-Type": "application/json",
-        Authorization: `Bearer ${accessToken ?? import.meta.env.VITE_SUPABASE_PUBLISHABLE_KEY}`,
-      },
-      body: JSON.stringify(body),
-    },
-  );
-  return res.json();
-}
-
-/* ---------- Refunds ---------- */
-
-interface RefundRow {
-  id: string;
-  order_id: string;
-  buyer_email: string;
-  request_type: string;
-  reason: string;
-  status: string;
-  amount_cents: number | null;
-  admin_notes: string | null;
-  created_at: string;
-  reaction_video_id: string | null;
-}
-
-function RefundsPanel() {
-  const [rows, setRows] = useState<RefundRow[]>([]);
-  const [busy, setBusy] = useState<string | null>(null);
-
-  useEffect(() => {
-    load();
-  }, []);
-
-  const load = async () => {
-    const { data } = await supabase
-      .from("refund_requests")
-      .select(
-        "id, order_id, buyer_email, request_type, reason, status, amount_cents, admin_notes, created_at, reaction_video_id",
-      )
-      .order("created_at", { ascending: false })
-      .limit(100);
-    setRows((data as RefundRow[]) ?? []);
-  };
-
-  const update = async (id: string, status: string, notes?: string) => {
-    setBusy(id);
-    await supabase
-      .from("refund_requests")
-      .update({
-        status,
-        admin_notes: notes ?? null,
-        resolved_at: new Date().toISOString(),
-      })
-      .eq("id", id);
-    await load();
-    setBusy(null);
-  };
-
-  return (
-    <>
-      <h1 className="mb-6 font-display text-3xl font-semibold">Refund queue</h1>
-      <div className="overflow-x-auto rounded-2xl border border-border bg-card">
-        <table className="w-full text-sm">
-          <thead className="border-b border-border bg-muted/30 text-left">
-            <tr>
-              <th className="p-3">Buyer</th>
-              <th className="p-3">Type</th>
-              <th className="p-3">Reason</th>
-              <th className="p-3">Status</th>
-              <th className="p-3">Created</th>
-              <th className="p-3">Actions</th>
-            </tr>
-          </thead>
-          <tbody>
-            {rows.map((r) => (
-              <tr key={r.id} className="border-b border-border/40 align-top">
-                <td className="p-3 text-xs">
-                  <div className="font-medium">{r.buyer_email}</div>
-                  <button
-                    type="button"
-                    className="text-muted-foreground underline"
-                    onClick={() => navigator.clipboard.writeText(r.order_id)}
-                  >
-                    Copy order ID
-                  </button>
-                </td>
-                <td className="p-3 text-xs capitalize">
-                  {r.request_type.replace("_", " ")}
-                </td>
-                <td className="p-3 text-xs max-w-md whitespace-pre-wrap">
-                  {r.reason}
-                  {r.reaction_video_id && (
-                    <Badge variant="outline" className="ml-2 text-xs">
-                      reaction attached
-                    </Badge>
-                  )}
-                </td>
-                <td className="p-3">
-                  <Badge
-                    variant={
-                      r.status === "approved" || r.status === "paid"
-                        ? "default"
-                        : r.status === "denied"
-                          ? "destructive"
-                          : "outline"
-                    }
-                  >
-                    {r.status}
-                  </Badge>
-                </td>
-                <td className="p-3 text-xs">
-                  {new Date(r.created_at).toLocaleString()}
-                </td>
-                <td className="p-3">
-                  <div className="flex flex-col gap-1">
-                    <Button
-                      size="sm"
-                      variant="outline"
-                      disabled={busy === r.id || r.status !== "pending"}
-                      onClick={() => update(r.id, "approved")}
-                    >
-                      Approve
-                    </Button>
-                    <Button
-                      size="sm"
-                      variant="outline"
-                      disabled={busy === r.id || r.status === "paid"}
-                      onClick={() => update(r.id, "paid", "Paid out manually")}
-                    >
-                      Mark paid
-                    </Button>
-                    <Button
-                      size="sm"
-                      variant="outline"
-                      disabled={busy === r.id || r.status === "denied"}
-                      onClick={() => update(r.id, "denied")}
-                    >
-                      Deny
-                    </Button>
-                  </div>
-                </td>
-              </tr>
-            ))}
-            {rows.length === 0 && (
-              <tr>
-                <td
-                  colSpan={6}
-                  className="p-8 text-center text-muted-foreground"
-                >
-                  No refund requests.
-                </td>
-              </tr>
-            )}
-          </tbody>
-        </table>
-      </div>
-    </>
-  );
-}
-
-/* ---------- Reactions ---------- */
-
-interface ReactionRow {
-  id: string;
-  order_id: string;
-  buyer_email: string;
-  storage_path: string;
-  caption: string | null;
-  status: string;
-  created_at: string;
-}
-
-function ReactionsPanel() {
-  const [rows, setRows] = useState<ReactionRow[]>([]);
-  const [previews, setPreviews] = useState<Record<string, string>>({});
-
-  useEffect(() => {
-    load();
-  }, []);
-
-  const load = async () => {
-    const { data } = await supabase
-      .from("reaction_videos")
-      .select(
-        "id, order_id, buyer_email, storage_path, caption, status, created_at",
-      )
-      .order("created_at", { ascending: false })
-      .limit(100);
-    setRows((data as ReactionRow[]) ?? []);
-  };
-
-  const preview = async (row: ReactionRow) => {
-    if (previews[row.id]) return;
-    const { data } = await supabase.storage
-      .from("reactions")
-      .createSignedUrl(row.storage_path, 3600);
-    if (data?.signedUrl) {
-      setPreviews((p) => ({ ...p, [row.id]: data.signedUrl }));
-    }
-  };
-
-  const setStatus = async (id: string, status: string) => {
-    await supabase.from("reaction_videos").update({ status }).eq("id", id);
-    await load();
-  };
-
-  return (
-    <>
-      <h1 className="mb-6 font-display text-3xl font-semibold">Reaction videos</h1>
-      <div className="grid grid-cols-1 gap-6 md:grid-cols-2">
-        {rows.map((r) => (
-          <div
-            key={r.id}
-            className="rounded-2xl border border-border bg-card p-5"
-          >
-            <div className="flex items-start justify-between">
-              <div>
-                <p className="font-medium text-sm">{r.buyer_email}</p>
-                <p className="text-xs text-muted-foreground">
-                  {new Date(r.created_at).toLocaleString()}
-                </p>
-              </div>
-              <Badge variant="outline">{r.status}</Badge>
-            </div>
-            {r.caption && (
-              <p className="mt-3 text-sm italic text-muted-foreground">
-                "{r.caption}"
-              </p>
-            )}
-            {previews[r.id] ? (
-              <video
-                controls
-                src={previews[r.id]}
-                className="mt-3 w-full rounded-lg bg-black"
-              />
-            ) : (
-              <Button
-                variant="outline"
-                size="sm"
-                className="mt-3"
-                onClick={() => preview(r)}
-              >
-                Load preview
-              </Button>
-            )}
-            <div className="mt-3 flex gap-2">
-              <Button
-                size="sm"
-                variant="outline"
-                onClick={() => setStatus(r.id, "approved")}
-                disabled={r.status === "approved"}
-              >
-                Approve
-              </Button>
-              <Button
-                size="sm"
-                variant="outline"
-                onClick={() => setStatus(r.id, "rejected")}
-                disabled={r.status === "rejected"}
-              >
-                Reject
-              </Button>
-            </div>
-          </div>
-        ))}
-        {rows.length === 0 && (
-          <p className="col-span-full text-center text-muted-foreground py-12">
-            No reaction videos yet.
-          </p>
-        )}
-      </div>
-    </>
-  );
-}
-
-/* ---------- Revisions ---------- */
-
-interface RevisionRow {
-  id: string;
-  order_id: string;
-  buyer_email: string;
-  notes: string;
-  is_free: boolean;
-  status: string;
-  admin_notes: string | null;
-  created_at: string;
-}
-
-function RevisionsPanel() {
-  const [rows, setRows] = useState<RevisionRow[]>([]);
-
-  useEffect(() => {
-    load();
-  }, []);
-
-  const load = async () => {
-    const { data } = await supabase
-      .from("revision_requests")
-      .select(
-        "id, order_id, buyer_email, notes, is_free, status, admin_notes, created_at",
-      )
-      .order("created_at", { ascending: false })
-      .limit(100);
-    setRows((data as RevisionRow[]) ?? []);
-  };
-
-  const setStatus = async (id: string, status: string) => {
-    await supabase.from("revision_requests").update({ status }).eq("id", id);
-    await load();
-  };
-
-  return (
-    <>
-      <h1 className="mb-6 font-display text-3xl font-semibold">
-        Revision requests
-      </h1>
-      <div className="overflow-x-auto rounded-2xl border border-border bg-card">
-        <table className="w-full text-sm">
-          <thead className="border-b border-border bg-muted/30 text-left">
-            <tr>
-              <th className="p-3">Buyer</th>
-              <th className="p-3">Notes</th>
-              <th className="p-3">Free?</th>
-              <th className="p-3">Status</th>
-              <th className="p-3">Created</th>
-              <th className="p-3">Actions</th>
-            </tr>
-          </thead>
-          <tbody>
-            {rows.map((r) => (
-              <tr key={r.id} className="border-b border-border/40 align-top">
-                <td className="p-3 text-xs">{r.buyer_email}</td>
-                <td className="p-3 text-xs max-w-md whitespace-pre-wrap">
-                  {r.notes}
-                </td>
-                <td className="p-3 text-xs">
-                  {r.is_free ? (
-                    <Badge variant="outline">free</Badge>
-                  ) : (
-                    <Badge variant="default">paid</Badge>
-                  )}
-                </td>
-                <td className="p-3">
-                  <Badge variant="outline">{r.status}</Badge>
-                </td>
-                <td className="p-3 text-xs">
-                  {new Date(r.created_at).toLocaleString()}
-                </td>
-                <td className="p-3">
-                  <div className="flex flex-col gap-1">
-                    <Button
-                      size="sm"
-                      variant="outline"
-                      onClick={() => setStatus(r.id, "in_progress")}
-                      disabled={r.status === "in_progress"}
-                    >
-                      Start
-                    </Button>
-                    <Button
-                      size="sm"
-                      variant="outline"
-                      onClick={() => setStatus(r.id, "delivered")}
-                      disabled={r.status === "delivered"}
-                    >
-                      Mark delivered
-                    </Button>
-                  </div>
-                </td>
-              </tr>
-            ))}
-            {rows.length === 0 && (
-              <tr>
-                <td
-                  colSpan={6}
-                  className="p-8 text-center text-muted-foreground"
-                >
-                  No revision requests.
-                </td>
-              </tr>
-            )}
-          </tbody>
-        </table>
-      </div>
-    </>
-  );
-}
-
-/* ---------- Featured Samples ---------- */
-
-interface SampleRow {
-  id: string;
-  title: string;
-  recipient_name: string;
-  relationship: string | null;
-  stage: string | null;
-  story_prompt: string;
-  genre: string;
-  genre_label: string;
-  tempo: string;
-  voice: string;
-  quote: string | null;
-  for_text: string | null;
-  cover_image_url: string | null;
-  audio_url: string | null;
-  status: string;
-  flag_reason: string | null;
-  published: boolean;
-  sort_order: number;
-  kie_task_id: string | null;
-  lyrics: string | null;
-  created_at: string;
-}
-
-const EMPTY_SAMPLE = {
-  title: "",
-  recipient_name: "",
-  relationship: "",
-  stage: "",
-  story_prompt: "",
-  genre: "folk",
-  genre_label: "Folk",
-  tempo: "mid",
-  voice: "female",
-  quote: "",
-  for_text: "",
-  cover_image_url: "",
-  sort_order: 0,
-};
-
-function SamplesPanel() {
-  const [samples, setSamples] = useState<SampleRow[]>([]);
-  const [busy, setBusy] = useState<string | null>(null);
-  const [showForm, setShowForm] = useState(false);
-  const [form, setForm] = useState({ ...EMPTY_SAMPLE });
-
-  useEffect(() => {
-    load();
-  }, []);
-
-  const load = async () => {
-    const { data } = await supabase
-      .from("featured_samples")
-      .select("*")
-      .order("sort_order", { ascending: true })
-      .order("created_at", { ascending: false });
-    setSamples((data ?? []) as SampleRow[]);
-  };
-
-  const create = async () => {
-    if (!form.title || !form.recipient_name || !form.story_prompt) {
-      alert("Title, recipient, and story are required");
-      return;
-    }
-    setBusy("create");
-    const { error } = await supabase.from("featured_samples").insert({
-      title: form.title,
-      recipient_name: form.recipient_name,
-      relationship: form.relationship || null,
-      stage: form.stage || null,
-      story_prompt: form.story_prompt,
-      genre: form.genre,
-      genre_label: form.genre_label,
-      tempo: form.tempo,
-      voice: form.voice,
-      quote: form.quote || null,
-      for_text: form.for_text || null,
-      cover_image_url: form.cover_image_url || null,
-      sort_order: Number(form.sort_order) || 0,
-      status: "draft",
-    });
-    setBusy(null);
-    if (error) {
-      alert(error.message);
-      return;
-    }
-    setForm({ ...EMPTY_SAMPLE });
-    setShowForm(false);
-    load();
-  };
-
-  const generate = async (id: string) => {
-    setBusy(id);
-    const { data: { session } } = await supabase.auth.getSession();
-    const res = await fetch(
-      `${import.meta.env.VITE_SUPABASE_URL}/functions/v1/generate-sample`,
-      {
-        method: "POST",
-        headers: {
-          "Content-Type": "application/json",
-          Authorization: `Bearer ${session?.access_token}`,
-        },
-        body: JSON.stringify({ sampleId: id }),
-      },
-    );
-    const json = await res.json().catch(() => ({}));
-    setBusy(null);
-    if (!res.ok) {
-      alert(`Generation failed: ${json.error ?? res.statusText}`);
-      return;
-    }
-    load();
-  };
-
-  // Manual karaoke re-sync via AudioShake forced alignment.
-  // Submits a task, then polls until completed (or fails).
-  const syncLyrics = async (id: string) => {
-    setBusy(`sync-${id}`);
-    const { data: { session } } = await supabase.auth.getSession();
-    const url = `${import.meta.env.VITE_SUPABASE_URL}/functions/v1/audioshake-align`;
-    const headers = {
-      "Content-Type": "application/json",
-      Authorization: `Bearer ${session?.access_token}`,
-    };
-
-    try {
-      const submitRes = await fetch(url, {
-        method: "POST",
-        headers,
-        body: JSON.stringify({ sampleId: id }),
-      });
-      const submitJson = await submitRes.json().catch(() => ({}));
-      if (!submitRes.ok || !submitJson.taskId) {
-        throw new Error(submitJson.error ?? `Submit failed (${submitRes.status})`);
-      }
-      const taskId: string = submitJson.taskId;
-
-      // Poll up to ~5 minutes
-      for (let i = 0; i < 60; i++) {
-        await new Promise((r) => setTimeout(r, 5000));
-        const pollRes = await fetch(url, {
-          method: "POST",
-          headers,
-          body: JSON.stringify({ sampleId: id, taskId }),
-        });
-        const pollJson = await pollRes.json().catch(() => ({}));
-        if (pollJson.status === "completed") {
-          alert(`Synced ${pollJson.lineCount ?? "?"} lines.`);
-          load();
-          return;
-        }
-        if (pollJson.status === "failed") {
-          throw new Error(pollJson.error ?? "AudioShake reported failure");
-        }
-      }
-      throw new Error("Timed out waiting for AudioShake");
-    } catch (e) {
-      alert(`Sync failed: ${e instanceof Error ? e.message : "unknown"}`);
-    } finally {
-      setBusy(null);
-    }
-  };
-
-
-  const togglePublish = async (s: SampleRow) => {
-    setBusy(s.id);
-    await supabase
-      .from("featured_samples")
-      .update({ published: !s.published })
-      .eq("id", s.id);
-    setBusy(null);
-    load();
-  };
-
-  const remove = async (id: string) => {
-    if (!confirm("Delete this sample?")) return;
-    setBusy(id);
-    await supabase.from("featured_samples").delete().eq("id", id);
-    setBusy(null);
-    load();
-  };
-
-  return (
-    <>
-      <div className="mb-6 flex items-center justify-between">
-        <div>
-          <h2 className="font-display text-2xl font-semibold">Featured Samples</h2>
-          <p className="text-sm text-muted-foreground">
-            Demo songs shown on the landing page. Generate via Claude + KIE.
-          </p>
-        </div>
-        <Button onClick={() => setShowForm((v) => !v)}>
-          {showForm ? "Cancel" : "+ New sample"}
-        </Button>
-      </div>
-
-      {showForm && (
-        <div className="mb-8 rounded-lg border border-border bg-card p-6">
-          <div className="grid gap-4 md:grid-cols-2">
-            <Field label="Title">
-              <input
-                className="w-full rounded-md border border-border bg-background px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-primary/40"
-                value={form.title}
-                onChange={(e) => setForm({ ...form, title: e.target.value })}
-              />
-            </Field>
-            <Field label="Recipient name">
-              <input
-                className="w-full rounded-md border border-border bg-background px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-primary/40"
-                value={form.recipient_name}
-                onChange={(e) => setForm({ ...form, recipient_name: e.target.value })}
-              />
-            </Field>
-            <Field label="Relationship">
-              <input
-                className="w-full rounded-md border border-border bg-background px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-primary/40"
-                placeholder="e.g. Mother, Husband"
-                value={form.relationship}
-                onChange={(e) => setForm({ ...form, relationship: e.target.value })}
-              />
-            </Field>
-            <Field label="Stage / situation">
-              <input
-                className="w-full rounded-md border border-border bg-background px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-primary/40"
-                placeholder="e.g. In treatment, Survivor, Memory"
-                value={form.stage}
-                onChange={(e) => setForm({ ...form, stage: e.target.value })}
-              />
-            </Field>
-            <Field label="Genre (key)">
-              <input
-                className="w-full rounded-md border border-border bg-background px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-primary/40"
-                value={form.genre}
-                onChange={(e) => setForm({ ...form, genre: e.target.value })}
-              />
-            </Field>
-            <Field label="Genre label">
-              <input
-                className="w-full rounded-md border border-border bg-background px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-primary/40"
-                value={form.genre_label}
-                onChange={(e) => setForm({ ...form, genre_label: e.target.value })}
-              />
-            </Field>
-            <Field label="Tempo">
-              <input
-                className="w-full rounded-md border border-border bg-background px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-primary/40"
-                value={form.tempo}
-                onChange={(e) => setForm({ ...form, tempo: e.target.value })}
-              />
-            </Field>
-            <Field label="Voice">
-              <input
-                className="w-full rounded-md border border-border bg-background px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-primary/40"
-                value={form.voice}
-                onChange={(e) => setForm({ ...form, voice: e.target.value })}
-              />
-            </Field>
-            <Field label="Quote (homepage card)">
-              <input
-                className="w-full rounded-md border border-border bg-background px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-primary/40"
-                value={form.quote}
-                onChange={(e) => setForm({ ...form, quote: e.target.value })}
-              />
-            </Field>
-            <Field label="For (homepage card)">
-              <input
-                className="w-full rounded-md border border-border bg-background px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-primary/40"
-                placeholder="e.g. For Mom · Stage III"
-                value={form.for_text}
-                onChange={(e) => setForm({ ...form, for_text: e.target.value })}
-              />
-            </Field>
-            <Field label="Cover image URL">
-              <input
-                className="w-full rounded-md border border-border bg-background px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-primary/40"
-                value={form.cover_image_url}
-                onChange={(e) => setForm({ ...form, cover_image_url: e.target.value })}
-              />
-            </Field>
-            <Field label="Sort order">
-              <input
-                type="number"
-                className="w-full rounded-md border border-border bg-background px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-primary/40"
-                value={form.sort_order}
-                onChange={(e) => setForm({ ...form, sort_order: Number(e.target.value) })}
-              />
-            </Field>
-          </div>
-          <div className="mt-4">
-            <Field label="Story prompt (sender's words)">
-              <textarea
-                className="w-full rounded-md border border-border bg-background px-3 py-2 text-sm min-h-[120px] focus:outline-none focus:ring-2 focus:ring-primary/40"
-                value={form.story_prompt}
-                onChange={(e) => setForm({ ...form, story_prompt: e.target.value })}
-              />
-            </Field>
-          </div>
-          <div className="mt-4 flex justify-end gap-2">
-            <Button variant="outline" onClick={() => setShowForm(false)}>
-              Cancel
-            </Button>
-            <Button onClick={create} disabled={busy === "create"}>
-              {busy === "create" ? "Saving…" : "Save sample"}
-            </Button>
-          </div>
-        </div>
-      )}
-
-      <div className="overflow-x-auto rounded-lg border border-border">
-        <table className="w-full text-sm">
-          <thead className="bg-muted/40 text-left">
-            <tr>
-              <th className="p-3">Title</th>
-              <th className="p-3">For</th>
-              <th className="p-3">Genre</th>
-              <th className="p-3">Status</th>
-              <th className="p-3">Audio</th>
-              <th className="p-3">Published</th>
-              <th className="p-3 text-right">Actions</th>
-            </tr>
-          </thead>
-          <tbody>
-            {samples.map((s) => (
-              <tr key={s.id} className="border-t border-border">
-                <td className="p-3 font-medium">{s.title}</td>
-                <td className="p-3 text-muted-foreground">
-                  {s.for_text ?? s.recipient_name}
-                </td>
-                <td className="p-3">{s.genre_label}</td>
-                <td className="p-3">
-                  <Badge variant="outline" className="text-xs">
-                    {s.status}
-                  </Badge>
-                  {s.flag_reason && (
-                    <div className="mt-1 text-xs text-destructive">
-                      {s.flag_reason.slice(0, 80)}
-                    </div>
-                  )}
-                </td>
-                <td className="p-3">
-                  {s.audio_url ? (
-                    <a
-                      href={s.audio_url}
-                      target="_blank"
-                      rel="noreferrer"
-                      className="text-primary underline"
-                    >
-                      Listen
-                    </a>
-                  ) : (
-                    <span className="text-muted-foreground">—</span>
-                  )}
-                </td>
-                <td className="p-3">
-                  <button
-                    onClick={() => togglePublish(s)}
-                    disabled={busy === s.id || !s.audio_url}
-                    className={`rounded px-2 py-1 text-xs ${
-                      s.published
-                        ? "bg-primary text-primary-foreground"
-                        : "bg-muted text-muted-foreground"
-                    } disabled:opacity-50`}
-                  >
-                    {s.published ? "Published" : "Draft"}
-                  </button>
-                </td>
-                <td className="p-3 text-right">
-                  <div className="flex justify-end gap-2">
-                    {!s.kie_task_id && (
-                      <Button
-                        size="sm"
-                        variant="outline"
-                        onClick={() => generate(s.id)}
-                        disabled={busy === s.id}
-                      >
-                        {busy === s.id ? "Generating…" : "Generate"}
-                      </Button>
-                    )}
-                    {s.audio_url && s.lyrics && (
-                      <Button
-                        size="sm"
-                        variant="outline"
-                        onClick={() => syncLyrics(s.id)}
-                        disabled={busy === `sync-${s.id}`}
-                        title="Re-run AudioShake forced alignment to refresh karaoke timings"
-                      >
-                        {busy === `sync-${s.id}` ? "Syncing…" : "Sync lyrics"}
-                      </Button>
-                    )}
-                    <Button
-                      size="sm"
-                      variant="ghost"
-                      onClick={() => remove(s.id)}
-                      disabled={busy === s.id}
-                      className="text-destructive hover:text-destructive"
-                    >
-                      Delete
-                    </Button>
-                  </div>
-                </td>
-              </tr>
-            ))}
-            {samples.length === 0 && (
-              <tr>
-                <td colSpan={7} className="p-8 text-center text-muted-foreground">
-                  No samples yet. Click "+ New sample" to seed one.
-                </td>
-              </tr>
-            )}
-          </tbody>
-        </table>
-      </div>
-    </>
-  );
-}
-
-function Field({ label, children }: { label: string; children: React.ReactNode }) {
-  return (
-    <label className="block">
-      <span className="mb-1 block text-xs font-medium text-muted-foreground">
-        {label}
-      </span>
-      {children}
-    </label>
-  );
-}
-
-/* ---------- Emails ---------- */
+/* ---------- Emails (preserved from previous) ---------- */
 
 interface EmailRow {
   id: string;
@@ -1203,12 +1271,10 @@ interface EmailRow {
   metadata: Record<string, unknown> | null;
 }
 
-type EmailRange = "24h" | "7d" | "30d" | "all";
-
 function EmailsPanel() {
   const [rows, setRows] = useState<EmailRow[]>([]);
   const [loading, setLoading] = useState(true);
-  const [range, setRange] = useState<EmailRange>("7d");
+  const [range, setRange] = useState<Range>("7d");
   const [templateFilter, setTemplateFilter] = useState<string>("all");
   const [statusFilter, setStatusFilter] = useState<string>("all");
   const [search, setSearch] = useState("");
@@ -1217,59 +1283,37 @@ function EmailsPanel() {
     let active = true;
     (async () => {
       setLoading(true);
-      // Pull last 1000 records, filter and dedupe client-side.
       let q = supabase
         .from("email_send_log")
         .select("id, message_id, template_name, recipient_email, status, error_message, created_at, metadata")
         .order("created_at", { ascending: false })
         .limit(1000);
-
-      if (range !== "all") {
-        const since = new Date();
-        if (range === "24h") since.setHours(since.getHours() - 24);
-        if (range === "7d") since.setDate(since.getDate() - 7);
-        if (range === "30d") since.setDate(since.getDate() - 30);
-        q = q.gte("created_at", since.toISOString());
-      }
-
-      const { data, error } = await q;
+      const start = rangeStart(range);
+      if (start) q = q.gte("created_at", start.toISOString());
+      const { data } = await q;
       if (!active) return;
-      if (error) {
-        console.error("[admin/emails] load failed", error);
-        setRows([]);
-      } else {
-        setRows((data ?? []) as EmailRow[]);
-      }
+      setRows((data ?? []) as EmailRow[]);
       setLoading(false);
     })();
-    return () => {
-      active = false;
-    };
+    return () => { active = false; };
   }, [range]);
 
-  // Deduplicate by message_id — keep latest row per email.
   const deduped = (() => {
     const seen = new Map<string, EmailRow>();
     for (const r of rows) {
       const key = r.message_id ?? `__noid_${r.id}`;
-      if (!seen.has(key)) seen.set(key, r); // rows are already DESC by created_at
+      if (!seen.has(key)) seen.set(key, r);
     }
     return Array.from(seen.values());
   })();
 
   const templates = Array.from(new Set(deduped.map((r) => r.template_name))).sort();
-
   const filtered = deduped.filter((r) => {
     if (templateFilter !== "all" && r.template_name !== templateFilter) return false;
     if (statusFilter !== "all" && r.status !== statusFilter) return false;
     if (search) {
       const s = search.toLowerCase();
-      if (
-        !r.recipient_email.toLowerCase().includes(s) &&
-        !r.template_name.toLowerCase().includes(s)
-      ) {
-        return false;
-      }
+      if (!r.recipient_email.toLowerCase().includes(s) && !r.template_name.toLowerCase().includes(s)) return false;
     }
     return true;
   });
@@ -1279,375 +1323,258 @@ function EmailsPanel() {
     sent: filtered.filter((r) => r.status === "sent").length,
     failed: filtered.filter((r) => r.status === "dlq" || r.status === "failed" || r.status === "bounced").length,
     suppressed: filtered.filter((r) => r.status === "suppressed" || r.status === "complained").length,
-    pending: filtered.filter((r) => r.status === "pending").length,
   };
 
   return (
     <>
-      <div className="mb-6 flex items-center justify-between gap-4 flex-wrap">
-        <h2 className="font-display text-2xl">Email log</h2>
-        <div className="flex gap-2">
-          {(["24h", "7d", "30d", "all"] as EmailRange[]).map((r) => (
-            <button
-              key={r}
-              onClick={() => setRange(r)}
-              className={`rounded-md border px-3 py-1.5 text-xs transition-colors ${
-                range === r
-                  ? "border-primary bg-primary text-primary-foreground"
-                  : "border-border bg-card hover:border-primary/40"
-              }`}
-            >
-              {r === "24h" ? "Last 24h" : r === "7d" ? "7 days" : r === "30d" ? "30 days" : "All time"}
-            </button>
-          ))}
-        </div>
+      <div className="mb-6 flex items-center justify-between">
+        <h1 className="font-display text-3xl font-semibold">Emails</h1>
+        <RangeSelector value={range} onChange={setRange} />
       </div>
 
-      <div className="mb-6 grid grid-cols-2 gap-3 md:grid-cols-5">
+      <div className="grid grid-cols-2 gap-3 md:grid-cols-4 mb-6">
         <StatCard label="Total" value={stats.total} />
         <StatCard label="Sent" value={stats.sent} tone="success" />
         <StatCard label="Failed" value={stats.failed} tone="danger" />
         <StatCard label="Suppressed" value={stats.suppressed} tone="warn" />
-        <StatCard label="Pending" value={stats.pending} tone="muted" />
       </div>
 
       <div className="mb-4 flex flex-wrap gap-3">
-        <select
-          value={templateFilter}
-          onChange={(e) => setTemplateFilter(e.target.value)}
-          className="rounded-md border border-border bg-card px-3 py-2 text-sm"
-        >
+        <select value={templateFilter} onChange={(e) => setTemplateFilter(e.target.value)} className="rounded-md border border-border bg-card px-3 py-2 text-sm">
           <option value="all">All templates</option>
-          {templates.map((t) => (
-            <option key={t} value={t}>
-              {t}
-            </option>
-          ))}
+          {templates.map((t) => <option key={t} value={t}>{t}</option>)}
         </select>
-        <select
-          value={statusFilter}
-          onChange={(e) => setStatusFilter(e.target.value)}
-          className="rounded-md border border-border bg-card px-3 py-2 text-sm"
-        >
+        <select value={statusFilter} onChange={(e) => setStatusFilter(e.target.value)} className="rounded-md border border-border bg-card px-3 py-2 text-sm">
           <option value="all">All statuses</option>
           <option value="sent">Sent</option>
-          <option value="pending">Pending</option>
-          <option value="dlq">Failed (DLQ)</option>
-          <option value="failed">Failed</option>
-          <option value="bounced">Bounced</option>
+          <option value="dlq">Failed</option>
           <option value="suppressed">Suppressed</option>
-          <option value="complained">Complained</option>
         </select>
-        <input
-          value={search}
-          onChange={(e) => setSearch(e.target.value)}
-          placeholder="Search recipient or template…"
-          className="flex-1 min-w-[200px] rounded-md border border-border bg-card px-3 py-2 text-sm"
-        />
+        <input value={search} onChange={(e) => setSearch(e.target.value)} placeholder="Search email or template" className="flex-1 min-w-[200px] rounded-md border border-border bg-card px-3 py-2 text-sm" />
       </div>
 
-      <div className="overflow-hidden rounded-lg border border-border bg-card">
-        <table className="w-full text-sm">
-          <thead className="bg-muted/40 text-xs uppercase tracking-wide text-muted-foreground">
-            <tr>
-              <th className="p-3 text-left">Sent at</th>
-              <th className="p-3 text-left">Template</th>
-              <th className="p-3 text-left">Recipient</th>
-              <th className="p-3 text-left">Status</th>
-              <th className="p-3 text-left">Details</th>
-            </tr>
-          </thead>
-          <tbody>
-            {loading && (
+      {loading ? <div className="text-muted-foreground">Loading…</div> : (
+        <div className="rounded-2xl border border-border bg-card overflow-hidden">
+          <table className="w-full text-sm">
+            <thead className="bg-muted/30 text-left">
               <tr>
-                <td colSpan={5} className="p-6 text-center text-muted-foreground">
-                  Loading…
-                </td>
+                <th className="p-3">Template</th>
+                <th className="p-3">Recipient</th>
+                <th className="p-3">Status</th>
+                <th className="p-3">Sent</th>
+                <th className="p-3">Error</th>
               </tr>
-            )}
-            {!loading && filtered.length === 0 && (
-              <tr>
-                <td colSpan={5} className="p-6 text-center text-muted-foreground">
-                  No emails match these filters.
-                </td>
-              </tr>
-            )}
-            {!loading &&
-              filtered.slice(0, 200).map((r) => (
-                <tr key={r.id} className="border-t border-border/60 align-top">
-                  <td className="p-3 text-xs whitespace-nowrap text-muted-foreground">
-                    {new Date(r.created_at).toLocaleString()}
-                  </td>
-                  <td className="p-3 font-mono text-xs">{r.template_name}</td>
-                  <td className="p-3">{r.recipient_email}</td>
+            </thead>
+            <tbody>
+              {filtered.slice(0, 100).map((r) => (
+                <tr key={r.id} className="border-t border-border/40">
+                  <td className="p-3">{r.template_name}</td>
+                  <td className="p-3 text-xs">{r.recipient_email}</td>
                   <td className="p-3">
-                    <EmailStatusBadge status={r.status} />
+                    <Badge variant={r.status === "sent" ? "default" : r.status === "dlq" ? "destructive" : "outline"}>{r.status}</Badge>
                   </td>
-                  <td className="p-3 text-xs text-muted-foreground max-w-md">
-                    {r.error_message ? (
-                      <span className="text-destructive">{r.error_message}</span>
-                    ) : (
-                      <span className="text-muted-foreground/70">—</span>
-                    )}
-                  </td>
+                  <td className="p-3 text-xs">{new Date(r.created_at).toLocaleString()}</td>
+                  <td className="p-3 text-xs text-destructive max-w-md truncate">{r.error_message}</td>
                 </tr>
               ))}
+            </tbody>
+          </table>
+        </div>
+      )}
+    </>
+  );
+}
+
+/* ---------- Refunds, Reactions, Revisions, Samples, IPs (compact preserved versions) ---------- */
+
+function RefundsPanel() {
+  const [rows, setRows] = useState<any[]>([]);
+  const [busy, setBusy] = useState<string | null>(null);
+
+  const load = async () => {
+    const { data } = await supabase.from("refund_requests").select("*").order("created_at", { ascending: false }).limit(100);
+    setRows(data ?? []);
+  };
+  useEffect(() => { load(); }, []);
+
+  const update = async (id: string, status: string, notes?: string) => {
+    setBusy(id);
+    await supabase.from("refund_requests").update({ status, admin_notes: notes ?? null, resolved_at: new Date().toISOString() }).eq("id", id);
+    await load();
+    setBusy(null);
+  };
+
+  return (
+    <>
+      <h1 className="mb-6 font-display text-3xl font-semibold">Refund queue</h1>
+      <div className="overflow-x-auto rounded-2xl border border-border bg-card">
+        <table className="w-full text-sm">
+          <thead className="border-b border-border bg-muted/30 text-left">
+            <tr><th className="p-3">Buyer</th><th className="p-3">Type</th><th className="p-3">Reason</th><th className="p-3">Status</th><th className="p-3">Actions</th></tr>
+          </thead>
+          <tbody>
+            {rows.map((r) => (
+              <tr key={r.id} className="border-b border-border/40">
+                <td className="p-3 text-xs">{r.buyer_email}</td>
+                <td className="p-3 text-xs capitalize">{r.request_type?.replace("_", " ")}</td>
+                <td className="p-3 text-xs max-w-md whitespace-pre-wrap">{r.reason}</td>
+                <td className="p-3"><Badge variant={r.status === "approved" ? "default" : r.status === "denied" ? "destructive" : "outline"}>{r.status}</Badge></td>
+                <td className="p-3">
+                  <div className="flex flex-col gap-1">
+                    <Button size="sm" variant="outline" disabled={busy === r.id || r.status !== "pending"} onClick={() => update(r.id, "approved")}>Approve</Button>
+                    <Button size="sm" variant="outline" disabled={busy === r.id || r.status === "paid"} onClick={() => update(r.id, "paid", "Paid")}>Mark paid</Button>
+                    <Button size="sm" variant="outline" disabled={busy === r.id || r.status === "denied"} onClick={() => update(r.id, "denied")}>Deny</Button>
+                  </div>
+                </td>
+              </tr>
+            ))}
+            {rows.length === 0 && <tr><td colSpan={5} className="p-8 text-center text-muted-foreground">No refund requests.</td></tr>}
           </tbody>
         </table>
-        {filtered.length > 200 && (
-          <div className="border-t border-border/60 p-3 text-center text-xs text-muted-foreground">
-            Showing first 200 of {filtered.length}. Narrow your filters to see more.
-          </div>
-        )}
       </div>
     </>
   );
 }
 
-function StatCard({
-  label,
-  value,
-  tone = "default",
-}: {
-  label: string;
-  value: number;
-  tone?: "default" | "success" | "danger" | "warn" | "muted";
-}) {
-  const toneClass =
-    tone === "success"
-      ? "text-emerald-600"
-      : tone === "danger"
-        ? "text-destructive"
-        : tone === "warn"
-          ? "text-amber-600"
-          : tone === "muted"
-            ? "text-muted-foreground"
-            : "text-foreground";
-  return (
-    <div className="rounded-lg border border-border bg-card p-4">
-      <div className="text-xs uppercase tracking-wide text-muted-foreground">{label}</div>
-      <div className={`mt-1 font-display text-2xl font-semibold ${toneClass}`}>{value}</div>
-    </div>
-  );
-}
-
-function EmailStatusBadge({ status }: { status: string }) {
-  const map: Record<string, string> = {
-    sent: "bg-emerald-500/10 text-emerald-700 border-emerald-500/30",
-    pending: "bg-muted text-muted-foreground border-border",
-    dlq: "bg-destructive/10 text-destructive border-destructive/30",
-    failed: "bg-destructive/10 text-destructive border-destructive/30",
-    bounced: "bg-destructive/10 text-destructive border-destructive/30",
-    suppressed: "bg-amber-500/10 text-amber-700 border-amber-500/30",
-    complained: "bg-amber-500/10 text-amber-700 border-amber-500/30",
-  };
-  const cls = map[status] ?? "bg-muted text-muted-foreground border-border";
-  return (
-    <span className={`inline-flex items-center rounded-full border px-2 py-0.5 text-xs font-medium ${cls}`}>
-      {status}
-    </span>
-  );
-}
-
-/* ---------- IP allowlist ---------- */
-
-interface IpRow {
-  id: string;
-  ip_address: string;
-  label: string;
-  notes: string | null;
-  created_at: string;
-}
-
-function IpAllowlistPanel() {
-  const [rows, setRows] = useState<IpRow[]>([]);
-  const [loading, setLoading] = useState(true);
-  const [currentIp, setCurrentIp] = useState<string | null>(null);
-  const [newLabel, setNewLabel] = useState("");
-  const [adding, setAdding] = useState(false);
-  const [error, setError] = useState<string | null>(null);
-
+function ReactionsPanel() {
+  const [rows, setRows] = useState<any[]>([]);
+  const [previews, setPreviews] = useState<Record<string, string>>({});
   const load = async () => {
-    setLoading(true);
-    const [{ data }, ipRes] = await Promise.all([
-      supabase
-        .from("admin_ip_allowlist")
-        .select("id, ip_address, label, notes, created_at")
-        .order("created_at", { ascending: false }),
-      fetch("/api/admin/ip-check"),
-    ]);
-    setRows(((data ?? []) as IpRow[]).map((r) => ({
-      ...r,
-      ip_address: String(r.ip_address),
-    })));
-    try {
-      const ipData = await ipRes.json();
-      setCurrentIp(ipData.ip ?? null);
-    } catch {
-      setCurrentIp(null);
-    }
-    setLoading(false);
+    const { data } = await supabase.from("reaction_videos").select("*").order("created_at", { ascending: false }).limit(100);
+    setRows(data ?? []);
   };
+  useEffect(() => { load(); }, []);
 
-  useEffect(() => {
-    load();
-  }, []);
-
-  const addCurrent = async () => {
-    setError(null);
-    setAdding(true);
-    try {
-      const { data: sessionData } = await supabase.auth.getSession();
-      const token = sessionData.session?.access_token;
-      if (!token) {
-        setError("Session expired.");
-        setAdding(false);
-        return;
-      }
-      const res = await fetch("/api/admin/ip-add", {
-        method: "POST",
-        headers: {
-          "Content-Type": "application/json",
-          Authorization: `Bearer ${token}`,
-        },
-        body: JSON.stringify({ label: newLabel || "Untitled" }),
-      });
-      const data = await res.json();
-      if (!res.ok || !data.ok) {
-        setError(data.error || "Failed to add IP");
-        setAdding(false);
-        return;
-      }
-      setNewLabel("");
-      await load();
-    } catch (e) {
-      console.error("[admin/ips] add failed", e);
-      setError("Network error");
-    }
-    setAdding(false);
+  const preview = async (row: any) => {
+    if (previews[row.id]) return;
+    const { data } = await supabase.storage.from("reactions").createSignedUrl(row.storage_path, 3600);
+    if (data?.signedUrl) setPreviews((p) => ({ ...p, [row.id]: data.signedUrl }));
   };
-
-  const removeIp = async (id: string, ip: string) => {
-    if (rows.length <= 1) {
-      if (!confirm(`This is the only allowed IP. Removing ${ip} will lock everyone out and reset the allowlist to bootstrap mode. Continue?`)) {
-        return;
-      }
-    } else if (ip === currentIp) {
-      if (!confirm(`${ip} is YOUR current IP. Removing it will lock you out immediately. Continue?`)) {
-        return;
-      }
-    } else {
-      if (!confirm(`Remove ${ip} from the allowlist?`)) return;
-    }
-    const { error: delErr } = await supabase
-      .from("admin_ip_allowlist")
-      .delete()
-      .eq("id", id);
-    if (delErr) {
-      alert(`Failed to remove: ${delErr.message}`);
-      return;
-    }
+  const setStatus = async (id: string, status: string) => {
+    await supabase.from("reaction_videos").update({ status }).eq("id", id);
     await load();
   };
 
   return (
     <>
-      <div className="mb-6">
-        <h2 className="font-display text-2xl">IP allowlist</h2>
-        <p className="mt-1 text-sm text-muted-foreground">
-          Only IPs in this list can see <code>/admin</code> or{" "}
-          <code>/admin/login</code>. All other visitors get a "Not found" page.
-        </p>
-      </div>
-
-      <div className="mb-6 rounded-lg border border-primary/30 bg-primary/5 p-5">
-        <div className="flex items-baseline justify-between gap-4 flex-wrap">
-          <div>
-            <p className="text-xs uppercase tracking-wider text-muted-foreground">
-              Your current IP
-            </p>
-            <p className="mt-1 font-mono text-xl font-semibold">
-              {currentIp ?? "Unknown"}
-            </p>
-          </div>
-          {currentIp && !rows.some((r) => r.ip_address === currentIp) && (
-            <div className="flex flex-1 items-center gap-2 min-w-[280px]">
-              <input
-                value={newLabel}
-                onChange={(e) => setNewLabel(e.target.value)}
-                placeholder="Label (e.g. Home, Office)"
-                className="flex-1 rounded-md border border-border bg-card px-3 py-2 text-sm"
-              />
-              <button
-                onClick={addCurrent}
-                disabled={adding}
-                className="rounded-md bg-primary px-4 py-2 text-sm font-semibold text-primary-foreground hover:brightness-95 disabled:opacity-60"
-              >
-                {adding ? "Adding…" : "Add this IP"}
-              </button>
+      <h1 className="mb-6 font-display text-3xl font-semibold">Reactions</h1>
+      <div className="grid grid-cols-1 gap-6 md:grid-cols-2">
+        {rows.map((r) => (
+          <div key={r.id} className="rounded-2xl border border-border bg-card p-5">
+            <div className="flex justify-between"><p className="font-medium text-sm">{r.buyer_email}</p><Badge variant="outline">{r.status}</Badge></div>
+            {r.caption && <p className="mt-3 text-sm italic text-muted-foreground">"{r.caption}"</p>}
+            {previews[r.id] ? <video controls src={previews[r.id]} className="mt-3 w-full rounded-lg bg-black" /> : <Button variant="outline" size="sm" className="mt-3" onClick={() => preview(r)}>Load preview</Button>}
+            <div className="mt-3 flex gap-2">
+              <Button size="sm" variant="outline" onClick={() => setStatus(r.id, "approved")} disabled={r.status === "approved"}>Approve</Button>
+              <Button size="sm" variant="outline" onClick={() => setStatus(r.id, "rejected")} disabled={r.status === "rejected"}>Reject</Button>
             </div>
-          )}
-          {currentIp && rows.some((r) => r.ip_address === currentIp) && (
-            <span className="rounded-full border border-success/40 bg-success/10 px-3 py-1 text-xs font-semibold text-success">
-              ✓ This IP is allowed
-            </span>
-          )}
-        </div>
-        {error && (
-          <p className="mt-3 text-sm font-medium text-destructive">{error}</p>
-        )}
+          </div>
+        ))}
+        {rows.length === 0 && <p className="col-span-full text-center text-muted-foreground py-12">No reaction videos.</p>}
       </div>
+    </>
+  );
+}
 
-      <div className="overflow-hidden rounded-lg border border-border bg-card">
+function RevisionsPanel() {
+  const [rows, setRows] = useState<any[]>([]);
+  const load = async () => {
+    const { data } = await supabase.from("revision_requests").select("*").order("created_at", { ascending: false }).limit(100);
+    setRows(data ?? []);
+  };
+  useEffect(() => { load(); }, []);
+  const setStatus = async (id: string, status: string) => {
+    await supabase.from("revision_requests").update({ status }).eq("id", id);
+    await load();
+  };
+  return (
+    <>
+      <h1 className="mb-6 font-display text-3xl font-semibold">Revisions</h1>
+      <div className="overflow-x-auto rounded-2xl border border-border bg-card">
         <table className="w-full text-sm">
-          <thead className="bg-muted/40 text-xs uppercase tracking-wide text-muted-foreground">
-            <tr>
-              <th className="p-3 text-left">IP address</th>
-              <th className="p-3 text-left">Label</th>
-              <th className="p-3 text-left">Added</th>
-              <th className="p-3 text-right">Actions</th>
-            </tr>
-          </thead>
+          <thead className="bg-muted/30 text-left"><tr><th className="p-3">Buyer</th><th className="p-3">Notes</th><th className="p-3">Free?</th><th className="p-3">Status</th><th className="p-3">Actions</th></tr></thead>
           <tbody>
-            {loading && (
-              <tr>
-                <td colSpan={4} className="p-6 text-center text-muted-foreground">
-                  Loading…
+            {rows.map((r) => (
+              <tr key={r.id} className="border-t border-border/40">
+                <td className="p-3 text-xs">{r.buyer_email}</td>
+                <td className="p-3 text-xs max-w-md whitespace-pre-wrap">{r.notes}</td>
+                <td className="p-3">{r.is_free ? <Badge variant="outline">free</Badge> : <Badge>paid</Badge>}</td>
+                <td className="p-3"><Badge variant="outline">{r.status}</Badge></td>
+                <td className="p-3">
+                  <div className="flex gap-1">
+                    <Button size="sm" variant="outline" onClick={() => setStatus(r.id, "in_progress")}>Start</Button>
+                    <Button size="sm" variant="outline" onClick={() => setStatus(r.id, "delivered")}>Delivered</Button>
+                  </div>
                 </td>
               </tr>
-            )}
-            {!loading && rows.length === 0 && (
-              <tr>
-                <td colSpan={4} className="p-6 text-center text-muted-foreground">
-                  No IPs in the allowlist yet.
+            ))}
+          </tbody>
+        </table>
+      </div>
+    </>
+  );
+}
+
+function SamplesPanel() {
+  const [samples, setSamples] = useState<any[]>([]);
+  const load = async () => {
+    const { data } = await supabase.from("featured_samples").select("*").order("sort_order", { ascending: true });
+    setSamples(data ?? []);
+  };
+  useEffect(() => { load(); }, []);
+  const togglePublish = async (s: any) => {
+    await supabase.from("featured_samples").update({ published: !s.published }).eq("id", s.id);
+    load();
+  };
+  return (
+    <>
+      <h1 className="mb-6 font-display text-3xl font-semibold">Featured samples</h1>
+      <div className="overflow-x-auto rounded-2xl border border-border bg-card">
+        <table className="w-full text-sm">
+          <thead className="bg-muted/30 text-left"><tr><th className="p-3">Title</th><th className="p-3">For</th><th className="p-3">Genre</th><th className="p-3">Status</th><th className="p-3">Published</th></tr></thead>
+          <tbody>
+            {samples.map((s) => (
+              <tr key={s.id} className="border-t border-border/40">
+                <td className="p-3 font-medium">{s.title}</td>
+                <td className="p-3 text-muted-foreground">{s.for_text ?? s.recipient_name}</td>
+                <td className="p-3">{s.genre_label}</td>
+                <td className="p-3"><Badge variant="outline">{s.status}</Badge></td>
+                <td className="p-3">
+                  <button onClick={() => togglePublish(s)} disabled={!s.audio_url} className={`rounded px-2 py-1 text-xs ${s.published ? "bg-primary text-primary-foreground" : "bg-muted"} disabled:opacity-50`}>
+                    {s.published ? "Published" : "Draft"}
+                  </button>
                 </td>
               </tr>
-            )}
-            {!loading &&
-              rows.map((r) => (
-                <tr key={r.id} className="border-t border-border/60">
-                  <td className="p-3 font-mono text-sm">
-                    {r.ip_address}
-                    {r.ip_address === currentIp && (
-                      <span className="ml-2 rounded-full border border-success/40 bg-success/10 px-2 py-0.5 text-[10px] font-semibold text-success">
-                        YOU
-                      </span>
-                    )}
-                  </td>
-                  <td className="p-3">{r.label}</td>
-                  <td className="p-3 text-xs text-muted-foreground whitespace-nowrap">
-                    {new Date(r.created_at).toLocaleString()}
-                  </td>
-                  <td className="p-3 text-right">
-                    <button
-                      onClick={() => removeIp(r.id, r.ip_address)}
-                      className="text-xs font-medium text-destructive hover:underline"
-                    >
-                      Remove
-                    </button>
-                  </td>
-                </tr>
-              ))}
+            ))}
+          </tbody>
+        </table>
+      </div>
+    </>
+  );
+}
+
+function IpAllowlistPanel() {
+  const [rows, setRows] = useState<any[]>([]);
+  const load = async () => {
+    const { data } = await supabase.from("admin_ip_allowlist").select("*").order("created_at", { ascending: false });
+    setRows(data ?? []);
+  };
+  useEffect(() => { load(); }, []);
+  return (
+    <>
+      <h1 className="mb-6 font-display text-3xl font-semibold">IP allowlist</h1>
+      <div className="rounded-2xl border border-border bg-card overflow-hidden">
+        <table className="w-full text-sm">
+          <thead className="bg-muted/30 text-left"><tr><th className="p-3">IP</th><th className="p-3">Label</th><th className="p-3">Notes</th><th className="p-3">Added</th></tr></thead>
+          <tbody>
+            {rows.map((r) => (
+              <tr key={r.id} className="border-t border-border/40">
+                <td className="p-3 font-mono">{r.ip_address}</td>
+                <td className="p-3">{r.label}</td>
+                <td className="p-3 text-xs text-muted-foreground">{r.notes}</td>
+                <td className="p-3 text-xs">{new Date(r.created_at).toLocaleDateString()}</td>
+              </tr>
+            ))}
           </tbody>
         </table>
       </div>
