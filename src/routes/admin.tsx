@@ -1134,6 +1134,17 @@ function SamplesPanel() {
                         {busy === s.id ? "Generating…" : "Generate"}
                       </Button>
                     )}
+                    {s.audio_url && s.lyrics && (
+                      <Button
+                        size="sm"
+                        variant="outline"
+                        onClick={() => syncLyrics(s.id)}
+                        disabled={busy === `sync-${s.id}`}
+                        title="Re-run AudioShake forced alignment to refresh karaoke timings"
+                      >
+                        {busy === `sync-${s.id}` ? "Syncing…" : "Sync lyrics"}
+                      </Button>
+                    )}
                     <Button
                       size="sm"
                       variant="ghost"
