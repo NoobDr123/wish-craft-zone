@@ -685,11 +685,12 @@ function LandingPage() {
                   &rdquo;
                 </span>
               </h1>
-              <div className="mb-6 text-[13px] text-[#8A8175] md:mb-7 md:text-sm">
+              <div className="mb-6 text-[13px] leading-[1.5] text-[#8A8175] md:mb-7 md:text-sm">
                 <strong className="font-semibold text-[#5A5148]">
-                  Rachel L., Columbus OH
-                </strong>{" "}
-                &nbsp;·&nbsp; Daughter, for her mother in treatment
+                  Rachel L., 34 · Columbus, OH
+                </strong>
+                <br />
+                Daughter of Margaret, 62 · Stage 3 breast cancer, now in remission
               </div>
               <p className="mb-7 max-w-[540px] text-[16px] leading-[1.55] text-[#5A5148] md:mb-8 md:text-[18px]">
                 When cancer takes the words away, give them a personalized song that says what you can't, and reminds them they're loved on the hardest days.{" "}
