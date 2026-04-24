@@ -187,6 +187,20 @@ function ThankYouPage() {
         setOrder(row);
         setLoading(false);
       }
+
+      // Fetch the unique reward code for this order (issued at payment time).
+      // RLS allows the buyer to read their own code by matching email on the JWT,
+      // but on this page the customer is usually anonymous — so we read by orderId
+      // via a public RPC-style approach: just try the select and silently ignore
+      // if RLS blocks it. The customer can still see it later in the portal.
+      if (row?.id && !cancelled) {
+        const { data: codeRow } = await supabase
+          .from("reaction_reward_codes")
+          .select("code")
+          .eq("order_id", row.id)
+          .maybeSingle();
+        if (!cancelled && codeRow?.code) setRewardCode(codeRow.code);
+      }
     };
 
     fetchOrder();
