@@ -1,0 +1,1 @@
+UPDATE public.promo_codes SET times_used = 0, max_uses = 9999, active = true, expires_at = NULL WHERE code = 'TEST';
