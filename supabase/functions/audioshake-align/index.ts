@@ -109,7 +109,35 @@ Deno.serve(async (req) => {
       );
       console.log(`[audioshake-align] task submitted: ${taskId}`);
 
-      return json({ ok: true, status: "submitted", taskId, sampleId });
+      const completed = await waitForCompletedTask(apiKey, taskId);
+      if (!completed.downloadLink) {
+        throw new Error("Alignment task completed without a download link");
+      }
+
+      const alignRes = await fetch(completed.downloadLink);
+      if (!alignRes.ok) {
+        throw new Error(`Failed to download alignment: ${alignRes.status}`);
+      }
+      const alignJson = await alignRes.json();
+      const lines = mapAlignmentToLines(alignJson, cleanLines);
+      if (lines.length === 0) {
+        throw new Error("Alignment produced no lines");
+      }
+
+      const { error: updateErr } = await supabase
+        .from("featured_samples")
+        .update({ synced_lyrics: lines })
+        .eq("id", sampleId);
+      if (updateErr) throw new Error(`Update failed: ${updateErr.message}`);
+
+      return json({
+        ok: true,
+        status: "completed",
+        sampleId,
+        lineCount: lines.length,
+        taskId,
+        provider: "audioshake",
+      });
     }
 
     // --- 2. Check status of existing task ---
@@ -263,6 +291,24 @@ async function checkTaskStatus(
     return { status: "failed" };
   }
   return { status: "pending" };
+}
+
+async function waitForCompletedTask(apiKey: string, taskId: string) {
+  for (let attempt = 0; attempt < MAX_POLL_ATTEMPTS; attempt++) {
+    const result = await checkTaskStatus(apiKey, taskId);
+    console.log(
+      `[audioshake-align] poll ${attempt + 1}/${MAX_POLL_ATTEMPTS} task=${taskId} status=${result.status}`,
+    );
+
+    if (result.status === "completed") return result;
+    if (result.status === "failed") {
+      throw new Error(`Alignment task failed for ${taskId}`);
+    }
+
+    await new Promise((resolve) => setTimeout(resolve, POLL_INTERVAL_MS));
+  }
+
+  throw new Error(`Alignment task timed out after ${MAX_POLL_ATTEMPTS} attempts`);
 }
 
 // =========================================================================

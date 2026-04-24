@@ -134,12 +134,18 @@ function KaraokeOverlay({
   visible: boolean;
 }) {
   const [t, setT] = useState(0);
+  const firstLineStart = lines[0]?.start ?? 0;
 
   useEffect(() => {
-    if (!visible) return;
+    if (!visible) {
+      setT(0);
+      return;
+    }
     const a = audioRef.current;
     if (!a) return;
     const onTime = () => setT(a.currentTime);
+    const syncFromAudio = () => setT(a.currentTime);
+    setT(a.currentTime);
     // Poll as a fallback — some browsers fire timeupdate sparsely (every 250ms+)
     // and we want smooth word-level highlighting.
     const interval = window.setInterval(() => {
@@ -147,26 +153,30 @@ function KaraokeOverlay({
     }, 100);
     a.addEventListener("timeupdate", onTime);
     a.addEventListener("seeked", onTime);
+    a.addEventListener("play", syncFromAudio);
+    a.addEventListener("loadedmetadata", syncFromAudio);
     return () => {
       window.clearInterval(interval);
       a.removeEventListener("timeupdate", onTime);
       a.removeEventListener("seeked", onTime);
+      a.removeEventListener("play", syncFromAudio);
+      a.removeEventListener("loadedmetadata", syncFromAudio);
     };
   }, [audioRef, visible]);
 
   if (!visible || !lines || lines.length === 0) return null;
+  if (t < Math.max(0, firstLineStart - 0.1)) return null;
 
-  // Find active line index (the latest line whose start <= t)
-  let activeIdx = -1;
+  // Find the active line for the current playback window.
+  let activeIdx = lines.length - 1;
   for (let i = 0; i < lines.length; i++) {
-    if (t >= lines[i].start) activeIdx = i;
-    else break;
+    const line = lines[i];
+    const nextStart = lines[i + 1]?.start ?? Number.POSITIVE_INFINITY;
+    if (t >= line.start && t < nextStart) {
+      activeIdx = i;
+      break;
+    }
   }
-  // If we're past the active line's end and before the next line, still
-  // show that line as the most recent (so the screen never goes blank
-  // mid-song); only treat as "before any line" if we haven't reached the
-  // first line's start yet.
-  if (activeIdx === -1) activeIdx = 0;
 
   const active = lines[activeIdx];
   const prev = activeIdx > 0 ? lines[activeIdx - 1] : null;
