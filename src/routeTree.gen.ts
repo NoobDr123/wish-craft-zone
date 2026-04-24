@@ -28,6 +28,7 @@ import { Route as PortalIdRouteImport } from './routes/portal.$id'
 import { Route as ListenIdRouteImport } from './routes/listen.$id'
 import { Route as CheckoutReturnRouteImport } from './routes/checkout.return'
 import { Route as AuthCallbackRouteImport } from './routes/auth.callback'
+import { Route as AdminLoginRouteImport } from './routes/admin.login'
 import { Route as LovableEmailQueueProcessRouteImport } from './routes/lovable/email/queue/process'
 import { Route as LovableEmailAuthWebhookRouteImport } from './routes/lovable/email/auth/webhook'
 import { Route as LovableEmailAuthPreviewRouteImport } from './routes/lovable/email/auth/preview'
@@ -127,6 +128,11 @@ const AuthCallbackRoute = AuthCallbackRouteImport.update({
   path: '/auth/callback',
   getParentRoute: () => rootRouteImport,
 } as any)
+const AdminLoginRoute = AdminLoginRouteImport.update({
+  id: '/login',
+  path: '/login',
+  getParentRoute: () => AdminRoute,
+} as any)
 const LovableEmailQueueProcessRoute =
   LovableEmailQueueProcessRouteImport.update({
     id: '/lovable/email/queue/process',
@@ -147,7 +153,7 @@ const LovableEmailAuthPreviewRoute = LovableEmailAuthPreviewRouteImport.update({
 export interface FileRoutesByFullPath {
   '/': typeof IndexRoute
   '/account': typeof AccountRoute
-  '/admin': typeof AdminRoute
+  '/admin': typeof AdminRouteWithChildren
   '/almost-there': typeof AlmostThereRoute
   '/checkout': typeof CheckoutRouteWithChildren
   '/create': typeof CreateRoute
@@ -160,6 +166,7 @@ export interface FileRoutesByFullPath {
   '/upsell-1': typeof Upsell1Route
   '/upsell-2': typeof Upsell2Route
   '/upsell-3': typeof Upsell3Route
+  '/admin/login': typeof AdminLoginRoute
   '/auth/callback': typeof AuthCallbackRoute
   '/checkout/return': typeof CheckoutReturnRoute
   '/listen/$id': typeof ListenIdRoute
@@ -171,7 +178,7 @@ export interface FileRoutesByFullPath {
 export interface FileRoutesByTo {
   '/': typeof IndexRoute
   '/account': typeof AccountRoute
-  '/admin': typeof AdminRoute
+  '/admin': typeof AdminRouteWithChildren
   '/almost-there': typeof AlmostThereRoute
   '/checkout': typeof CheckoutRouteWithChildren
   '/create': typeof CreateRoute
@@ -184,6 +191,7 @@ export interface FileRoutesByTo {
   '/upsell-1': typeof Upsell1Route
   '/upsell-2': typeof Upsell2Route
   '/upsell-3': typeof Upsell3Route
+  '/admin/login': typeof AdminLoginRoute
   '/auth/callback': typeof AuthCallbackRoute
   '/checkout/return': typeof CheckoutReturnRoute
   '/listen/$id': typeof ListenIdRoute
@@ -196,7 +204,7 @@ export interface FileRoutesById {
   __root__: typeof rootRouteImport
   '/': typeof IndexRoute
   '/account': typeof AccountRoute
-  '/admin': typeof AdminRoute
+  '/admin': typeof AdminRouteWithChildren
   '/almost-there': typeof AlmostThereRoute
   '/checkout': typeof CheckoutRouteWithChildren
   '/create': typeof CreateRoute
@@ -209,6 +217,7 @@ export interface FileRoutesById {
   '/upsell-1': typeof Upsell1Route
   '/upsell-2': typeof Upsell2Route
   '/upsell-3': typeof Upsell3Route
+  '/admin/login': typeof AdminLoginRoute
   '/auth/callback': typeof AuthCallbackRoute
   '/checkout/return': typeof CheckoutReturnRoute
   '/listen/$id': typeof ListenIdRoute
@@ -235,6 +244,7 @@ export interface FileRouteTypes {
     | '/upsell-1'
     | '/upsell-2'
     | '/upsell-3'
+    | '/admin/login'
     | '/auth/callback'
     | '/checkout/return'
     | '/listen/$id'
@@ -259,6 +269,7 @@ export interface FileRouteTypes {
     | '/upsell-1'
     | '/upsell-2'
     | '/upsell-3'
+    | '/admin/login'
     | '/auth/callback'
     | '/checkout/return'
     | '/listen/$id'
@@ -283,6 +294,7 @@ export interface FileRouteTypes {
     | '/upsell-1'
     | '/upsell-2'
     | '/upsell-3'
+    | '/admin/login'
     | '/auth/callback'
     | '/checkout/return'
     | '/listen/$id'
@@ -295,7 +307,7 @@ export interface FileRouteTypes {
 export interface RootRouteChildren {
   IndexRoute: typeof IndexRoute
   AccountRoute: typeof AccountRoute
-  AdminRoute: typeof AdminRoute
+  AdminRoute: typeof AdminRouteWithChildren
   AlmostThereRoute: typeof AlmostThereRoute
   CheckoutRoute: typeof CheckoutRouteWithChildren
   CreateRoute: typeof CreateRoute
@@ -451,6 +463,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof AuthCallbackRouteImport
       parentRoute: typeof rootRouteImport
     }
+    '/admin/login': {
+      id: '/admin/login'
+      path: '/login'
+      fullPath: '/admin/login'
+      preLoaderRoute: typeof AdminLoginRouteImport
+      parentRoute: typeof AdminRoute
+    }
     '/lovable/email/queue/process': {
       id: '/lovable/email/queue/process'
       path: '/lovable/email/queue/process'
@@ -475,6 +494,16 @@ declare module '@tanstack/react-router' {
   }
 }
 
+interface AdminRouteChildren {
+  AdminLoginRoute: typeof AdminLoginRoute
+}
+
+const AdminRouteChildren: AdminRouteChildren = {
+  AdminLoginRoute: AdminLoginRoute,
+}
+
+const AdminRouteWithChildren = AdminRoute._addFileChildren(AdminRouteChildren)
+
 interface CheckoutRouteChildren {
   CheckoutReturnRoute: typeof CheckoutReturnRoute
 }
@@ -490,7 +519,7 @@ const CheckoutRouteWithChildren = CheckoutRoute._addFileChildren(
 const rootRouteChildren: RootRouteChildren = {
   IndexRoute: IndexRoute,
   AccountRoute: AccountRoute,
-  AdminRoute: AdminRoute,
+  AdminRoute: AdminRouteWithChildren,
   AlmostThereRoute: AlmostThereRoute,
   CheckoutRoute: CheckoutRouteWithChildren,
   CreateRoute: CreateRoute,
