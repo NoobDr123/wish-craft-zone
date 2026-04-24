@@ -259,8 +259,10 @@ function CheckoutPage() {
               {promoApplied ? `${promoApplied.discount_pct}% OFF` : "50% OFF"}
             </span>
             <p className="flex items-baseline gap-2">
+              {/* Reference price is always $99 — promo codes discount from
+                  the already-reduced $49.99 (50% OFF), not from $99. */}
               <span className="text-base font-medium text-muted-foreground line-through">
-                $49.99
+                $99
               </span>
               <span className="font-display text-3xl font-bold text-primary">
                 {promoApplied
