@@ -96,6 +96,18 @@ serve(async (req) => {
       updatePayload.payment_status = "paid";
       updatePayload.amount_paid_cents = 0;
       updatePayload.status = "upsells_complete"; // jumps straight to brief generation via trigger
+    } else if (order.stripe_payment_intent_id) {
+      // Partial discount — update the existing PaymentIntent so the user is
+      // charged the discounted amount when they confirm.
+      try {
+        const stripe = createStripeClient(env);
+        await stripe.paymentIntents.update(order.stripe_payment_intent_id, {
+          amount: finalAmount,
+        });
+      } catch (e) {
+        console.error("stripe PI update failed:", e);
+        return json({ ok: false, error: "internal_error" }, 500);
+      }
     }
 
     // Backfill buyer_email on redemption row for reporting
