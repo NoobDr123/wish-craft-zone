@@ -164,7 +164,7 @@ function StaffPage() {
         {tab === "reactions" && <ReactionsPanel />}
         {tab === "revisions" && <RevisionsPanel />}
         {tab === "emails" && <EmailsPanel />}
-        {tab === "ips" && <IpAllowlistPanel />
+        {tab === "ips" && <IpAllowlistPanel />}
       </main>
     </div>
   );
