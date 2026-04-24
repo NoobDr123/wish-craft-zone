@@ -666,12 +666,12 @@ function LandingPage() {
       {/* HERO */}
       <section className="relative overflow-hidden px-0 py-[40px] pb-[40px] sm:py-[70px] sm:pb-[60px]">
         <div className="mx-auto max-w-[1200px] px-5 sm:px-6">
-          <div className="mb-8 flex w-full flex-col items-center gap-3 text-center sm:mb-10 md:mb-12 md:gap-4">
-            <span className="hidden h-px w-12 bg-[#8D6FAF]/40 md:block" />
-            <h2 className="font-display text-[13px] font-semibold uppercase tracking-[0.18em] text-[#8D6FAF] sm:text-[15px] md:text-[15px] md:tracking-[0.32em]">
+          <div className="mb-8 flex w-full flex-col items-center gap-3 text-center sm:mb-10 md:mb-12 md:gap-5">
+            <span className="hidden h-px w-16 bg-[#8D6FAF]/50 md:block" />
+            <h2 className="font-display text-[13px] font-semibold uppercase tracking-[0.18em] text-[#8D6FAF] sm:text-[15px] md:max-w-[22ch] md:text-[28px] md:font-bold md:leading-[1.2] md:tracking-[0.14em] lg:text-[32px]">
               The Most Meaningful Gift For Someone You Love Fighting Cancer
             </h2>
-            <span className="hidden h-px w-12 bg-[#8D6FAF]/40 md:block" />
+            <span className="hidden h-px w-16 bg-[#8D6FAF]/50 md:block" />
           </div>
           <div className="grid items-center gap-8 md:grid-cols-[1.15fr_1fr] md:gap-[60px]">
             <div className="order-2 md:order-1">
