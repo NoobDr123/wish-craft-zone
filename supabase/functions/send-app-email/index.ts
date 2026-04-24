@@ -53,6 +53,36 @@ serve(async (req) => {
       `${template}:${to.toLowerCase()}:${data?.order_id ?? data?.orderId ?? ""}`;
     const messageId = crypto.randomUUID();
 
+    // Get-or-create one unsubscribe token per recipient email.
+    const lowerTo = to.toLowerCase();
+    let unsubscribeToken: string | null = null;
+    const { data: existingTok } = await supabase
+      .from("email_unsubscribe_tokens")
+      .select("token")
+      .eq("email", lowerTo)
+      .maybeSingle();
+    if (existingTok?.token) {
+      unsubscribeToken = existingTok.token;
+    } else {
+      const newToken = crypto.randomUUID().replace(/-/g, "") + crypto.randomUUID().replace(/-/g, "");
+      const { data: inserted, error: tokErr } = await supabase
+        .from("email_unsubscribe_tokens")
+        .insert({ email: lowerTo, token: newToken })
+        .select("token")
+        .maybeSingle();
+      if (tokErr) {
+        // race: another request inserted it — re-read
+        const { data: again } = await supabase
+          .from("email_unsubscribe_tokens")
+          .select("token")
+          .eq("email", lowerTo)
+          .maybeSingle();
+        unsubscribeToken = again?.token ?? newToken;
+      } else {
+        unsubscribeToken = inserted?.token ?? newToken;
+      }
+    }
+
     // Enqueue to the central queue. The dispatcher (process-email-queue server
     // route) reads this exact shape — `purpose: "transactional"` and
     // `idempotency_key` are REQUIRED by the Lovable email API for app emails.
@@ -66,6 +96,7 @@ serve(async (req) => {
       purpose: "transactional",
       label: template,
       idempotency_key: idemKey,
+      unsubscribe_token: unsubscribeToken,
       message_id: messageId,
     };
 
