@@ -4,6 +4,7 @@ import rachelPhoto from "@/assets/rachel-mother-real.jpg";
 
 const RACHEL_SONG_URL =
   "https://tempfile.aiquickdraw.com/r/87ddf1c43b994c3c9e593b383ec8de16.mp3";
+const HERO_SAMPLE_ID = "d14f8ca3-ec11-45c7-b52d-a2671284357c";
 import { SiteHeader } from "@/components/SiteHeader";
 import { SiteFooter } from "@/components/SiteFooter";
 import { supabase } from "@/integrations/supabase/client";
@@ -22,7 +23,15 @@ import whoYourself from "@/assets/who-yourself.png";
 export const Route = createFileRoute("/")({
   component: LandingPage,
   loader: async () => {
-    const [featuredRes, testimonialRes] = await Promise.all([
+    const [heroRes, featuredRes, testimonialRes] = await Promise.all([
+      supabase
+        .from("featured_samples")
+        .select(
+          "id,title,quote,for_text,genre_label,cover_image_url,audio_url,lyrics,synced_lyrics,testimonial_slug",
+        )
+        .eq("published", true)
+        .eq("id", HERO_SAMPLE_ID)
+        .maybeSingle(),
       supabase
         .from("featured_samples")
         .select(
@@ -32,7 +41,7 @@ export const Route = createFileRoute("/")({
         .is("testimonial_slug", null)
         .not("audio_url", "is", null)
         // Exclude the current hero song so it doesn't repeat in the grid
-        .neq("id", "d14f8ca3-ec11-45c7-b52d-a2671284357c")
+        .neq("id", HERO_SAMPLE_ID)
         .order("sort_order", { ascending: true })
         .limit(6),
       supabase
@@ -41,6 +50,9 @@ export const Route = createFileRoute("/")({
         .eq("published", true)
         .not("testimonial_slug", "is", null),
     ]);
+    if (heroRes.error) {
+      console.error("[index loader] hero featured sample error", heroRes.error);
+    }
     if (featuredRes.error) {
       console.error("[index loader] featured_samples error", featuredRes.error);
     }
@@ -58,6 +70,7 @@ export const Route = createFileRoute("/")({
       }
     }
     return {
+      heroSample: (heroRes.data as FeaturedSample | null) ?? null,
       samples: (featuredRes.data ?? []) as FeaturedSample[],
       testimonialSongs,
     };
@@ -698,15 +711,11 @@ function Eyebrow({
 }
 
 function LandingPage() {
-  const { samples, testimonialSongs } = Route.useLoaderData() as {
+  const { heroSample, samples, testimonialSongs } = Route.useLoaderData() as {
+    heroSample: FeaturedSample | null;
     samples: FeaturedSample[];
     testimonialSongs: Record<string, { id: string; audio_url: string | null; title: string }>;
   };
-  // (sample modal removed — playback is now inline on each card)
-  // The hero "Listen to Example" button plays the first published, regenerated
-  // sample (Margaret/Gospel) so it always reflects the latest admin regen.
-  // Falls back to the hardcoded constant if no samples loaded.
-  const heroSample = samples[0];
   const heroSongUrl = heroSample?.audio_url || RACHEL_SONG_URL;
   const heroSyncedLyrics = heroSample?.synced_lyrics ?? [];
   const heroAudioRef = useRef<HTMLAudioElement | null>(null);
