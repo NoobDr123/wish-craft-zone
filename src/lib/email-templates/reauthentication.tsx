@@ -5,6 +5,7 @@ import {
   Head,
   Heading,
   Html,
+  Img,
   Preview,
   Text,
 } from "@react-email/components";
@@ -20,7 +21,7 @@ export const ReauthenticationEmail = ({ token }: ReauthenticationEmailProps) => 
     <Preview>Your {BRAND.name} verification code</Preview>
     <Body style={styles.main}>
       <Container style={styles.container}>
-        <Text style={styles.brand}>{BRAND.name}</Text>
+        <Img src={BRAND.logoUrl} alt={BRAND.name} width={120} style={styles.logo} />
         <Text style={styles.brandSub}>Verification code</Text>
 
         <Heading style={styles.h1}>Confirm it's really you.</Heading>

@@ -6,6 +6,7 @@ import {
   Head,
   Heading,
   Html,
+  Img,
   Preview,
   Text,
 } from "@react-email/components";
@@ -28,7 +29,7 @@ export const EmailChangeEmail = ({
     <Preview>Confirm your new {BRAND.name} email</Preview>
     <Body style={styles.main}>
       <Container style={styles.container}>
-        <Text style={styles.brand}>{BRAND.name}</Text>
+        <Img src={BRAND.logoUrl} alt={BRAND.name} width={120} style={styles.logo} />
         <Text style={styles.brandSub}>Email change</Text>
 
         <Heading style={styles.h1}>Confirm your new email.</Heading>
