@@ -158,9 +158,10 @@ function CheckoutPage() {
         .update({ buyer_email: trimmedEmail, buyer_name: name })
         .eq("id", orderId);
 
+      const { stripeEnvironment } = await import("@/lib/stripe");
       const { data, error: fnError } = await supabase.functions.invoke(
         "apply-promo-code",
-        { body: { orderId, code } },
+        { body: { orderId, code, environment: stripeEnvironment } },
       );
 
       if (fnError || !data?.ok) {

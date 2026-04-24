@@ -5,6 +5,7 @@
 
 import { serve } from "https://deno.land/std@0.168.0/http/server.ts";
 import { createClient } from "npm:@supabase/supabase-js@2";
+import { createStripeClient, type StripeEnv } from "../_shared/stripe.ts";
 
 const corsHeaders = {
   "Access-Control-Allow-Origin": "*",
@@ -30,7 +31,7 @@ serve(async (req) => {
   }
 
   try {
-    const { orderId, code } = await req.json();
+    const { orderId, code, environment } = await req.json();
 
     if (!orderId || typeof orderId !== "string") {
       return json({ ok: false, error: "missing_order_id" }, 400);
@@ -42,10 +43,12 @@ serve(async (req) => {
       return json({ ok: false, error: "invalid_code" }, 400);
     }
 
-    // Load the order to get the base amount + buyer email
+    const env: StripeEnv = environment === "live" ? "live" : "sandbox";
+
+    // Load the order to get the base amount + buyer email + PI id
     const { data: order, error: orderErr } = await supabase
       .from("orders")
-      .select("id, amount_cents, buyer_email, payment_status, status")
+      .select("id, amount_cents, buyer_email, payment_status, status, stripe_payment_intent_id")
       .eq("id", orderId)
       .maybeSingle();
 
@@ -93,6 +96,18 @@ serve(async (req) => {
       updatePayload.payment_status = "paid";
       updatePayload.amount_paid_cents = 0;
       updatePayload.status = "upsells_complete"; // jumps straight to brief generation via trigger
+    } else if (order.stripe_payment_intent_id) {
+      // Partial discount — update the existing PaymentIntent so the user is
+      // charged the discounted amount when they confirm.
+      try {
+        const stripe = createStripeClient(env);
+        await stripe.paymentIntents.update(order.stripe_payment_intent_id, {
+          amount: finalAmount,
+        });
+      } catch (e) {
+        console.error("stripe PI update failed:", e);
+        return json({ ok: false, error: "internal_error" }, 500);
+      }
     }
 
     // Backfill buyer_email on redemption row for reporting
