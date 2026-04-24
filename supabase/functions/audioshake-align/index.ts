@@ -224,49 +224,45 @@ async function submitAlignmentTask(
   return taskId as string;
 }
 
-async function pollUntilComplete(apiKey: string, taskId: string): Promise<string> {
-  for (let i = 0; i < MAX_POLL_ATTEMPTS; i++) {
-    await new Promise((r) => setTimeout(r, POLL_INTERVAL_MS));
-
-    const res = await fetch(`${AUDIOSHAKE_BASE}/tasks/${taskId}`, {
-      headers: { "x-api-key": apiKey, accept: "application/json" },
-    });
-    if (!res.ok) {
-      const t = await res.text();
-      console.warn(`[audioshake-align] poll ${i} got ${res.status}: ${t.slice(0, 200)}`);
-      continue;
-    }
-    const data = await res.json();
-    const targets = data?.targets ?? data?.task?.targets ?? [];
-    const alignmentTarget = targets.find(
-      (t: any) => t?.model === "alignment" || t?.name === "alignment",
-    );
-    const outputs = alignmentTarget?.output ?? alignmentTarget?.outputs ?? [];
-
-    // Look for a JSON output with status completed
-    for (const out of outputs) {
-      const status = out?.status ?? out?.state;
-      const link = out?.link ?? out?.url ?? out?.downloadUrl;
-      const isJson =
-        out?.format === "json" ||
-        (typeof link === "string" && link.toLowerCase().includes(".json"));
-      if (status === "completed" && isJson && link) {
-        return link as string;
-      }
-      if (status === "failed" || status === "error") {
-        throw new Error(`AudioShake job failed: ${JSON.stringify(out).slice(0, 300)}`);
-      }
-    }
-
-    // Top-level status check
-    const topStatus = data?.status ?? data?.task?.status;
-    if (topStatus === "failed" || topStatus === "error") {
-      throw new Error(`AudioShake task failed: ${JSON.stringify(data).slice(0, 300)}`);
-    }
-
-    console.log(`[audioshake-align] poll ${i + 1} status=${topStatus ?? "pending"}`);
+async function checkTaskStatus(
+  apiKey: string,
+  taskId: string,
+): Promise<{ status: "pending" | "completed" | "failed"; downloadLink?: string }> {
+  const res = await fetch(`${AUDIOSHAKE_BASE}/tasks/${taskId}`, {
+    headers: { "x-api-key": apiKey, accept: "application/json" },
+  });
+  if (!res.ok) {
+    const t = await res.text();
+    console.warn(`[audioshake-align] status ${res.status}: ${t.slice(0, 200)}`);
+    return { status: "pending" };
   }
-  throw new Error("AudioShake alignment timed out");
+  const data = await res.json();
+  const targets = data?.targets ?? data?.task?.targets ?? [];
+  const alignmentTarget = targets.find(
+    (t: any) => t?.model === "alignment" || t?.name === "alignment",
+  );
+  const outputs = alignmentTarget?.output ?? alignmentTarget?.outputs ?? [];
+
+  for (const out of outputs) {
+    const status = out?.status ?? out?.state;
+    const link = out?.link ?? out?.url ?? out?.downloadUrl;
+    const isJson =
+      out?.format === "json" ||
+      (typeof link === "string" && link.toLowerCase().includes(".json"));
+    if (status === "completed" && isJson && link) {
+      return { status: "completed", downloadLink: link };
+    }
+    if (status === "failed" || status === "error") {
+      console.error(`[audioshake-align] target failed: ${JSON.stringify(out).slice(0, 300)}`);
+      return { status: "failed" };
+    }
+  }
+
+  const topStatus = data?.status ?? data?.task?.status;
+  if (topStatus === "failed" || topStatus === "error") {
+    return { status: "failed" };
+  }
+  return { status: "pending" };
 }
 
 // =========================================================================
