@@ -56,6 +56,28 @@ serve(async (req) => {
         .update(update)
         .eq("id", sampleIdFromQuery);
 
+      // If audio just landed, kick AudioShake forced-alignment so the karaoke
+      // overlay gets word-level timings. Fire-and-forget — don't block the
+      // KIE callback response on it.
+      if (audioUrl) {
+        const internalSecret = Deno.env.get("INTERNAL_TRIGGER_SECRET");
+        if (internalSecret) {
+          fetch(
+            `${Deno.env.get("SUPABASE_URL")}/functions/v1/audioshake-align`,
+            {
+              method: "POST",
+              headers: {
+                "Content-Type": "application/json",
+                "x-internal-secret": internalSecret,
+              },
+              body: JSON.stringify({ sampleId: sampleIdFromQuery }),
+            },
+          ).catch((e) => console.warn("audioshake-align kickoff failed:", e));
+        } else {
+          console.warn("INTERNAL_TRIGGER_SECRET not set; skipping AudioShake");
+        }
+      }
+
       return json({ ok: true, sampleId: sampleIdFromQuery });
     }
 
