@@ -14,6 +14,33 @@ export type Database = {
   }
   public: {
     Tables: {
+      admin_ip_allowlist: {
+        Row: {
+          added_by: string | null
+          created_at: string
+          id: string
+          ip_address: unknown
+          label: string
+          notes: string | null
+        }
+        Insert: {
+          added_by?: string | null
+          created_at?: string
+          id?: string
+          ip_address: unknown
+          label: string
+          notes?: string | null
+        }
+        Update: {
+          added_by?: string | null
+          created_at?: string
+          id?: string
+          ip_address?: unknown
+          label?: string
+          notes?: string | null
+        }
+        Relationships: []
+      }
       email_send_log: {
         Row: {
           created_at: string
