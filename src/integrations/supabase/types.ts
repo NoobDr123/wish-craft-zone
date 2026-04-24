@@ -546,6 +546,57 @@ export type Database = {
           },
         ]
       }
+      page_sessions: {
+        Row: {
+          buyer_email: string | null
+          created_at: string
+          first_seen_at: string
+          id: string
+          landing_path: string | null
+          last_seen_at: string
+          order_id: string | null
+          referrer: string | null
+          session_id: string
+          user_agent: string | null
+          user_id: string | null
+          utm_campaign: string | null
+          utm_medium: string | null
+          utm_source: string | null
+        }
+        Insert: {
+          buyer_email?: string | null
+          created_at?: string
+          first_seen_at?: string
+          id?: string
+          landing_path?: string | null
+          last_seen_at?: string
+          order_id?: string | null
+          referrer?: string | null
+          session_id: string
+          user_agent?: string | null
+          user_id?: string | null
+          utm_campaign?: string | null
+          utm_medium?: string | null
+          utm_source?: string | null
+        }
+        Update: {
+          buyer_email?: string | null
+          created_at?: string
+          first_seen_at?: string
+          id?: string
+          landing_path?: string | null
+          last_seen_at?: string
+          order_id?: string | null
+          referrer?: string | null
+          session_id?: string
+          user_agent?: string | null
+          user_id?: string | null
+          utm_campaign?: string | null
+          utm_medium?: string | null
+          utm_source?: string | null
+        }
+        Relationships: []
+      }
       promo_code_redemptions: {
         Row: {
           buyer_email: string | null
@@ -617,6 +668,51 @@ export type Database = {
           notes?: string | null
           times_used?: number
           updated_at?: string
+        }
+        Relationships: []
+      }
+      quiz_events: {
+        Row: {
+          amount_cents: number | null
+          buyer_email: string | null
+          created_at: string
+          event_type: string
+          id: number
+          order_id: string | null
+          payload: Json | null
+          session_id: string
+          step_index: number | null
+          step_key: string | null
+          time_on_step_ms: number | null
+          upsell_type: string | null
+        }
+        Insert: {
+          amount_cents?: number | null
+          buyer_email?: string | null
+          created_at?: string
+          event_type: string
+          id?: number
+          order_id?: string | null
+          payload?: Json | null
+          session_id: string
+          step_index?: number | null
+          step_key?: string | null
+          time_on_step_ms?: number | null
+          upsell_type?: string | null
+        }
+        Update: {
+          amount_cents?: number | null
+          buyer_email?: string | null
+          created_at?: string
+          event_type?: string
+          id?: number
+          order_id?: string | null
+          payload?: Json | null
+          session_id?: string
+          step_index?: number | null
+          step_key?: string | null
+          time_on_step_ms?: number | null
+          upsell_type?: string | null
         }
         Relationships: []
       }
