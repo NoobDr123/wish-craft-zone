@@ -777,6 +777,7 @@ interface SampleRow {
   published: boolean;
   sort_order: number;
   kie_task_id: string | null;
+  lyrics: string | null;
   created_at: string;
 }
 
