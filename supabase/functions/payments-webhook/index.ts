@@ -98,6 +98,14 @@ async function handlePaymentSucceeded(pi: any) {
       console.error("sendOrderConfirmation failed:", e),
     );
 
+    // Issue the unique reaction-reward promo code (locked until they upload
+    // a reaction video). Idempotent — safe to call on retries.
+    supabase
+      .rpc("issue_reward_code_for_order", { _order_id: orderId })
+      .then(({ error }) => {
+        if (error) console.error("issue_reward_code_for_order failed:", error);
+      });
+
     return;
   }
 
