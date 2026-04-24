@@ -121,16 +121,23 @@ function KaraokeOverlay({
   const [t, setT] = useState(0);
 
   useEffect(() => {
+    if (!visible) return;
     const a = audioRef.current;
     if (!a) return;
     const onTime = () => setT(a.currentTime);
+    // Poll as a fallback — some browsers fire timeupdate sparsely (every 250ms+)
+    // and we want smooth word-level highlighting.
+    const interval = window.setInterval(() => {
+      if (!a.paused) setT(a.currentTime);
+    }, 100);
     a.addEventListener("timeupdate", onTime);
     a.addEventListener("seeked", onTime);
     return () => {
+      window.clearInterval(interval);
       a.removeEventListener("timeupdate", onTime);
       a.removeEventListener("seeked", onTime);
     };
-  }, [audioRef]);
+  }, [audioRef, visible]);
 
   if (!visible || !lines || lines.length === 0) return null;
 
@@ -160,14 +167,14 @@ function KaraokeOverlay({
   const wordsHit = Math.floor(progress * words.length);
 
   return (
-    <div className="pointer-events-none absolute inset-x-0 top-0 z-10 px-4 pt-4 sm:px-6 sm:pt-6">
-      <div className="mx-auto max-w-[420px] rounded-2xl bg-black/55 px-4 py-3 text-center backdrop-blur-md sm:px-5 sm:py-3.5">
+    <div className="pointer-events-none absolute inset-x-0 top-0 z-30 px-3 pt-3 sm:px-4 sm:pt-4">
+      <div className="mx-auto max-w-[480px] rounded-2xl bg-black/70 px-4 py-3 text-center shadow-lg backdrop-blur-md sm:px-5 sm:py-4">
         {prev && (
-          <div className="mb-1 truncate text-[11px] font-medium leading-tight text-white/45 sm:text-xs">
+          <div className="mb-1.5 truncate text-[12px] font-medium leading-tight text-white/50 sm:text-[13px]">
             {prev.text}
           </div>
         )}
-        <div className="text-[15px] font-semibold leading-snug text-white sm:text-[17px]">
+        <div className="text-[17px] font-semibold leading-snug text-white drop-shadow-sm sm:text-[19px]">
           {words.map((w, i) => (
             <span
               key={i}
@@ -185,7 +192,7 @@ function KaraokeOverlay({
           ))}
         </div>
         {next && (
-          <div className="mt-1 truncate text-[11px] font-medium leading-tight text-white/45 sm:text-xs">
+          <div className="mt-1.5 truncate text-[12px] font-medium leading-tight text-white/50 sm:text-[13px]">
             {next.text}
           </div>
         )}
