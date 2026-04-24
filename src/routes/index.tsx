@@ -594,6 +594,10 @@ function LandingPage() {
     testimonialSongs: Record<string, { id: string; audio_url: string | null; title: string }>;
   };
   // (sample modal removed — playback is now inline on each card)
+  // The hero "Listen to Example" button plays the first published, regenerated
+  // sample (Margaret/Gospel) so it always reflects the latest admin regen.
+  // Falls back to the hardcoded constant if no samples loaded.
+  const heroSongUrl = samples[0]?.audio_url || RACHEL_SONG_URL;
   const heroAudioRef = useRef<HTMLAudioElement | null>(null);
   const [heroPlaying, setHeroPlaying] = useState(false);
   const [heroEverPlayed, setHeroEverPlayed] = useState(false);
