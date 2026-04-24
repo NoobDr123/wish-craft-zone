@@ -346,6 +346,7 @@ export type Database = {
           customer_name: string | null
           delivered_at: string | null
           delivery_date: string | null
+          discount_cents: number
           flag_reason: string | null
           flagged_for_review: boolean
           genre: string | null
@@ -364,6 +365,7 @@ export type Database = {
           personal_note: string | null
           priority: string
           product_config: Json
+          promo_code_id: string | null
           quiz_payload: Json | null
           recipient_email: string | null
           recipient_name: string
@@ -401,6 +403,7 @@ export type Database = {
           customer_name?: string | null
           delivered_at?: string | null
           delivery_date?: string | null
+          discount_cents?: number
           flag_reason?: string | null
           flagged_for_review?: boolean
           genre?: string | null
@@ -419,6 +422,7 @@ export type Database = {
           personal_note?: string | null
           priority?: string
           product_config?: Json
+          promo_code_id?: string | null
           quiz_payload?: Json | null
           recipient_email?: string | null
           recipient_name: string
@@ -456,6 +460,7 @@ export type Database = {
           customer_name?: string | null
           delivered_at?: string | null
           delivery_date?: string | null
+          discount_cents?: number
           flag_reason?: string | null
           flagged_for_review?: boolean
           genre?: string | null
@@ -474,6 +479,7 @@ export type Database = {
           personal_note?: string | null
           priority?: string
           product_config?: Json
+          promo_code_id?: string | null
           quiz_payload?: Json | null
           recipient_email?: string | null
           recipient_name?: string
@@ -510,7 +516,88 @@ export type Database = {
             referencedRelation: "public_shared_songs"
             referencedColumns: ["id"]
           },
+          {
+            foreignKeyName: "orders_promo_code_id_fkey"
+            columns: ["promo_code_id"]
+            isOneToOne: false
+            referencedRelation: "promo_codes"
+            referencedColumns: ["id"]
+          },
         ]
+      }
+      promo_code_redemptions: {
+        Row: {
+          buyer_email: string | null
+          created_at: string
+          discount_cents: number
+          id: string
+          order_id: string
+          promo_code_id: string
+        }
+        Insert: {
+          buyer_email?: string | null
+          created_at?: string
+          discount_cents: number
+          id?: string
+          order_id: string
+          promo_code_id: string
+        }
+        Update: {
+          buyer_email?: string | null
+          created_at?: string
+          discount_cents?: number
+          id?: string
+          order_id?: string
+          promo_code_id?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "promo_code_redemptions_promo_code_id_fkey"
+            columns: ["promo_code_id"]
+            isOneToOne: false
+            referencedRelation: "promo_codes"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      promo_codes: {
+        Row: {
+          active: boolean
+          code: string
+          created_at: string
+          discount_pct: number
+          expires_at: string | null
+          id: string
+          max_uses: number
+          notes: string | null
+          times_used: number
+          updated_at: string
+        }
+        Insert: {
+          active?: boolean
+          code: string
+          created_at?: string
+          discount_pct: number
+          expires_at?: string | null
+          id?: string
+          max_uses?: number
+          notes?: string | null
+          times_used?: number
+          updated_at?: string
+        }
+        Update: {
+          active?: boolean
+          code?: string
+          created_at?: string
+          discount_pct?: number
+          expires_at?: string | null
+          id?: string
+          max_uses?: number
+          notes?: string | null
+          times_used?: number
+          updated_at?: string
+        }
+        Relationships: []
       }
       reaction_reward_codes: {
         Row: {
@@ -1032,6 +1119,10 @@ export type Database = {
           msg_id: number
           read_ct: number
         }[]
+      }
+      redeem_promo_code: {
+        Args: { _base_amount_cents: number; _code: string; _order_id: string }
+        Returns: Json
       }
     }
     Enums: {
