@@ -34,7 +34,11 @@ serve(async (req) => {
     const env = (environment || "sandbox") as StripeEnv;
     const stripe = createStripeClient(env);
 
-    const pi = await stripe.paymentIntents.retrieve(paymentIntentId);
+    // Expand `latest_charge` so we can read billing email/name as a fallback
+    // when the buyer never typed those into the form (Apple Pay quick path).
+    const pi = await stripe.paymentIntents.retrieve(paymentIntentId, {
+      expand: ["latest_charge"],
+    });
     const orderId = pi.metadata?.orderId;
     const kind = pi.metadata?.kind;
     const upsellType = pi.metadata?.upsellType;
