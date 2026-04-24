@@ -23,15 +23,19 @@ export function CheckoutProgress({ current }: CheckoutProgressProps) {
 
   return (
     <div className="w-full border-b border-border/60 bg-background-card/80 backdrop-blur-md">
-      <div className="mx-auto flex max-w-2xl items-center justify-between gap-1.5 px-3 py-3 sm:gap-2 sm:px-6 sm:py-4">
+      <div className="mx-auto flex max-w-2xl items-stretch px-3 py-3 sm:px-6 sm:py-4">
         {steps.map((step, i) => {
           const state =
             step.id < current ? "done" : step.id === current ? "current" : "todo";
           const isLast = i === steps.length - 1;
 
           return (
-            <div key={step.id} className="flex flex-1 items-center">
-              <div className="flex min-w-0 flex-col items-center gap-1 sm:gap-1.5">
+            <div
+              key={step.id}
+              className="flex flex-1 items-start"
+            >
+              {/* Step column — fixed share of the row so all 3 are equal */}
+              <div className="flex w-14 shrink-0 flex-col items-center gap-1 sm:w-24 sm:gap-1.5">
                 <div
                   className={[
                     "flex h-8 w-8 items-center justify-center rounded-full border-2 transition-all sm:h-9 sm:w-9",
@@ -60,7 +64,7 @@ export function CheckoutProgress({ current }: CheckoutProgressProps) {
                 </span>
                 <span
                   className={[
-                    "hidden text-[10px] font-semibold uppercase tracking-[0.16em] sm:block md:text-xs",
+                    "hidden text-center text-[10px] font-semibold uppercase tracking-[0.16em] sm:block md:text-xs",
                     state === "todo"
                       ? "text-muted-foreground"
                       : "text-foreground",
@@ -70,10 +74,11 @@ export function CheckoutProgress({ current }: CheckoutProgressProps) {
                 </span>
               </div>
 
+              {/* Connector — sits between this step and the next, vertically centered on the icon */}
               {!isLast && (
                 <div
                   className={[
-                    "mx-1.5 h-0.5 flex-1 rounded-full transition-all sm:mx-3",
+                    "mx-1.5 mt-4 h-0.5 flex-1 rounded-full transition-all sm:mx-3 sm:mt-[18px]",
                     step.id < current
                       ? "bg-primary"
                       : step.id === current
