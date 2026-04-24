@@ -303,6 +303,9 @@ function mapAlignmentToLines(alignment: any, cleanLines: string[]): SyncedLine[]
     null;
 
   if (Array.isArray(candidateLines) && candidateLines.length > 0) {
+    const textMapped = mapSegmentsToCleanLines(candidateLines, cleanLines);
+    if (textMapped.length > 0) return enforceMonotonic(textMapped);
+
     const out: SyncedLine[] = [];
     for (let i = 0; i < candidateLines.length && i < cleanLines.length; i++) {
       const seg = candidateLines[i];
@@ -359,6 +362,97 @@ function mapAlignmentToLines(alignment: any, cleanLines: string[]): SyncedLine[]
 function numOrNull(v: unknown): number | null {
   const n = typeof v === "string" ? parseFloat(v) : (v as number);
   return Number.isFinite(n) ? n : null;
+}
+
+function mapSegmentsToCleanLines(candidateLines: any[], cleanLines: string[]): SyncedLine[] {
+  const usable = candidateLines
+    .map((seg) => ({
+      text: typeof seg?.text === "string" ? seg.text.trim() : "",
+      start: numOrNull(seg?.start ?? seg?.start_time),
+      end: numOrNull(seg?.end ?? seg?.end_time),
+    }))
+    .filter((seg) => seg.text && seg.start !== null);
+
+  if (usable.length === 0) return [];
+
+  const out: SyncedLine[] = [];
+  let cursor = 0;
+
+  for (const cleanLine of cleanLines) {
+    const target = normalizeLyric(cleanLine);
+    if (!target) continue;
+
+    let best:
+      | { startIdx: number; endIdx: number; score: number }
+      | null = null;
+
+    for (let startIdx = cursor; startIdx < Math.min(usable.length, cursor + 4); startIdx++) {
+      let combined = "";
+
+      for (let endIdx = startIdx; endIdx < Math.min(usable.length, startIdx + 4); endIdx++) {
+        combined = `${combined} ${usable[endIdx].text}`.trim();
+        const score = lyricMatchScore(target, normalizeLyric(combined));
+
+        if (!best || score > best.score) {
+          best = { startIdx, endIdx, score };
+        }
+
+        if (score >= 0.98) break;
+      }
+
+      if (best?.score && best.score >= 0.98) break;
+    }
+
+    if (!best || best.score < 0.58) {
+      continue;
+    }
+
+    const first = usable[best.startIdx];
+    const last = usable[best.endIdx];
+    const start = first.start!;
+    const end = last.end ?? start + 2;
+
+    out.push({
+      start: round2(start),
+      end: round2(Math.max(end, start + 0.3)),
+      text: cleanLine,
+    });
+
+    cursor = best.endIdx + 1;
+  }
+
+  return out;
+}
+
+function normalizeLyric(input: string): string {
+  return input
+    .toLowerCase()
+    .replace(/[’']/g, "")
+    .replace(/[^a-z0-9\s]/g, " ")
+    .replace(/\s+/g, " ")
+    .trim();
+}
+
+function lyricMatchScore(target: string, candidate: string): number {
+  if (!target || !candidate) return 0;
+  if (target === candidate) return 1;
+  if (target.includes(candidate) || candidate.includes(target)) {
+    return Math.min(target.length, candidate.length) / Math.max(target.length, candidate.length);
+  }
+
+  const targetTokens = new Set(target.split(" ").filter(Boolean));
+  const candidateTokens = new Set(candidate.split(" ").filter(Boolean));
+  if (targetTokens.size === 0 || candidateTokens.size === 0) return 0;
+
+  let overlap = 0;
+  for (const token of targetTokens) {
+    if (candidateTokens.has(token)) overlap += 1;
+  }
+
+  const precision = overlap / candidateTokens.size;
+  const recall = overlap / targetTokens.size;
+  if (precision + recall === 0) return 0;
+  return (2 * precision * recall) / (precision + recall);
 }
 
 function enforceMonotonic(lines: SyncedLine[]): SyncedLine[] {

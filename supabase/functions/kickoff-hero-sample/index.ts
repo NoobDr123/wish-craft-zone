@@ -12,7 +12,7 @@ serve(async (req) => {
   if (req.method === "OPTIONS") return new Response(null, { headers: corsHeaders });
 
   try {
-    const { sampleId, mode = "generate" } = await req.json();
+    const { sampleId, taskId, mode = "generate" } = await req.json();
     if (!sampleId) {
       return new Response(JSON.stringify({ error: "Missing sampleId" }), {
         status: 400,
@@ -39,7 +39,7 @@ serve(async (req) => {
         "Content-Type": "application/json",
         "x-internal-secret": secret,
       },
-      body: JSON.stringify({ sampleId }),
+      body: JSON.stringify({ sampleId, taskId }),
     });
 
     const body = await res.text();
