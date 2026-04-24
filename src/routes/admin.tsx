@@ -870,29 +870,6 @@ function SamplesPanel() {
     load();
   };
 
-  const syncLyrics = async (id: string) => {
-    setBusy(id);
-    const { data: { session } } = await supabase.auth.getSession();
-    const res = await fetch(
-      `${import.meta.env.VITE_SUPABASE_URL}/functions/v1/transcribe-sample`,
-      {
-        method: "POST",
-        headers: {
-          "Content-Type": "application/json",
-          Authorization: `Bearer ${session?.access_token}`,
-        },
-        body: JSON.stringify({ sampleId: id }),
-      },
-    );
-    const json = await res.json().catch(() => ({}));
-    setBusy(null);
-    if (!res.ok) {
-      alert(`Sync failed: ${json.error ?? res.statusText}`);
-      return;
-    }
-    alert(`Synced ${json.lineCount} lyric lines.`);
-    load();
-  };
 
   const togglePublish = async (s: SampleRow) => {
     setBusy(s.id);
