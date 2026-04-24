@@ -12,9 +12,11 @@ import { useAdminGuard } from "@/hooks/useAdminGuard";
 import { AdminMfaEnroll } from "@/components/admin/AdminMfaEnroll";
 import { AdminMfaChallenge } from "@/components/admin/AdminMfaChallenge";
 import { supabase } from "@/integrations/supabase/client";
+import { AdminIpGate } from "@/components/admin/AdminIpGate";
+import { AdminIpBootstrap } from "@/components/admin/AdminIpBootstrap";
 
 export const Route = createFileRoute("/admin")({
-  component: StaffPage,
+  component: AdminRoute,
   head: () => ({
     meta: [
       { title: "Staff · RibbonSong" },
@@ -24,7 +26,19 @@ export const Route = createFileRoute("/admin")({
   }),
 });
 
-type Tab = "orders" | "refunds" | "reactions" | "revisions" | "samples" | "emails";
+function AdminRoute() {
+  return (
+    <AdminIpGate
+      bootstrap={({ ip, onAdded }) => (
+        <AdminIpBootstrap ip={ip} onAdded={onAdded} />
+      )}
+    >
+      <StaffPage />
+    </AdminIpGate>
+  );
+}
+
+type Tab = "orders" | "refunds" | "reactions" | "revisions" | "samples" | "emails" | "ips";
 
 function StaffPage() {
   const { state, user, refresh } = useAdminGuard();
@@ -122,6 +136,7 @@ function StaffPage() {
               ["reactions", "Reactions"],
               ["revisions", "Revisions"],
               ["emails", "Emails"],
+              ["ips", "IP allowlist"],
             ] as Array<[Tab, string]>
           ).map(([key, label]) => (
             <button
@@ -149,6 +164,7 @@ function StaffPage() {
         {tab === "reactions" && <ReactionsPanel />}
         {tab === "revisions" && <RevisionsPanel />}
         {tab === "emails" && <EmailsPanel />}
+        {tab === "ips" && <IpAllowlistPanel />}
       </main>
     </div>
   );
@@ -1362,5 +1378,211 @@ function EmailStatusBadge({ status }: { status: string }) {
     <span className={`inline-flex items-center rounded-full border px-2 py-0.5 text-xs font-medium ${cls}`}>
       {status}
     </span>
+  );
+}
+
+/* ---------- IP allowlist ---------- */
+
+interface IpRow {
+  id: string;
+  ip_address: string;
+  label: string;
+  notes: string | null;
+  created_at: string;
+}
+
+function IpAllowlistPanel() {
+  const [rows, setRows] = useState<IpRow[]>([]);
+  const [loading, setLoading] = useState(true);
+  const [currentIp, setCurrentIp] = useState<string | null>(null);
+  const [newLabel, setNewLabel] = useState("");
+  const [adding, setAdding] = useState(false);
+  const [error, setError] = useState<string | null>(null);
+
+  const load = async () => {
+    setLoading(true);
+    const [{ data }, ipRes] = await Promise.all([
+      supabase
+        .from("admin_ip_allowlist")
+        .select("id, ip_address, label, notes, created_at")
+        .order("created_at", { ascending: false }),
+      fetch("/api/admin/ip-check"),
+    ]);
+    setRows(((data ?? []) as IpRow[]).map((r) => ({
+      ...r,
+      ip_address: String(r.ip_address),
+    })));
+    try {
+      const ipData = await ipRes.json();
+      setCurrentIp(ipData.ip ?? null);
+    } catch {
+      setCurrentIp(null);
+    }
+    setLoading(false);
+  };
+
+  useEffect(() => {
+    load();
+  }, []);
+
+  const addCurrent = async () => {
+    setError(null);
+    setAdding(true);
+    try {
+      const { data: sessionData } = await supabase.auth.getSession();
+      const token = sessionData.session?.access_token;
+      if (!token) {
+        setError("Session expired.");
+        setAdding(false);
+        return;
+      }
+      const res = await fetch("/api/admin/ip-add", {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+          Authorization: `Bearer ${token}`,
+        },
+        body: JSON.stringify({ label: newLabel || "Untitled" }),
+      });
+      const data = await res.json();
+      if (!res.ok || !data.ok) {
+        setError(data.error || "Failed to add IP");
+        setAdding(false);
+        return;
+      }
+      setNewLabel("");
+      await load();
+    } catch (e) {
+      console.error("[admin/ips] add failed", e);
+      setError("Network error");
+    }
+    setAdding(false);
+  };
+
+  const removeIp = async (id: string, ip: string) => {
+    if (rows.length <= 1) {
+      if (!confirm(`This is the only allowed IP. Removing ${ip} will lock everyone out and reset the allowlist to bootstrap mode. Continue?`)) {
+        return;
+      }
+    } else if (ip === currentIp) {
+      if (!confirm(`${ip} is YOUR current IP. Removing it will lock you out immediately. Continue?`)) {
+        return;
+      }
+    } else {
+      if (!confirm(`Remove ${ip} from the allowlist?`)) return;
+    }
+    const { error: delErr } = await supabase
+      .from("admin_ip_allowlist")
+      .delete()
+      .eq("id", id);
+    if (delErr) {
+      alert(`Failed to remove: ${delErr.message}`);
+      return;
+    }
+    await load();
+  };
+
+  return (
+    <>
+      <div className="mb-6">
+        <h2 className="font-display text-2xl">IP allowlist</h2>
+        <p className="mt-1 text-sm text-muted-foreground">
+          Only IPs in this list can see <code>/admin</code> or{" "}
+          <code>/admin/login</code>. All other visitors get a "Not found" page.
+        </p>
+      </div>
+
+      <div className="mb-6 rounded-lg border border-primary/30 bg-primary/5 p-5">
+        <div className="flex items-baseline justify-between gap-4 flex-wrap">
+          <div>
+            <p className="text-xs uppercase tracking-wider text-muted-foreground">
+              Your current IP
+            </p>
+            <p className="mt-1 font-mono text-xl font-semibold">
+              {currentIp ?? "Unknown"}
+            </p>
+          </div>
+          {currentIp && !rows.some((r) => r.ip_address === currentIp) && (
+            <div className="flex flex-1 items-center gap-2 min-w-[280px]">
+              <input
+                value={newLabel}
+                onChange={(e) => setNewLabel(e.target.value)}
+                placeholder="Label (e.g. Home, Office)"
+                className="flex-1 rounded-md border border-border bg-card px-3 py-2 text-sm"
+              />
+              <button
+                onClick={addCurrent}
+                disabled={adding}
+                className="rounded-md bg-primary px-4 py-2 text-sm font-semibold text-primary-foreground hover:brightness-95 disabled:opacity-60"
+              >
+                {adding ? "Adding…" : "Add this IP"}
+              </button>
+            </div>
+          )}
+          {currentIp && rows.some((r) => r.ip_address === currentIp) && (
+            <span className="rounded-full border border-success/40 bg-success/10 px-3 py-1 text-xs font-semibold text-success">
+              ✓ This IP is allowed
+            </span>
+          )}
+        </div>
+        {error && (
+          <p className="mt-3 text-sm font-medium text-destructive">{error}</p>
+        )}
+      </div>
+
+      <div className="overflow-hidden rounded-lg border border-border bg-card">
+        <table className="w-full text-sm">
+          <thead className="bg-muted/40 text-xs uppercase tracking-wide text-muted-foreground">
+            <tr>
+              <th className="p-3 text-left">IP address</th>
+              <th className="p-3 text-left">Label</th>
+              <th className="p-3 text-left">Added</th>
+              <th className="p-3 text-right">Actions</th>
+            </tr>
+          </thead>
+          <tbody>
+            {loading && (
+              <tr>
+                <td colSpan={4} className="p-6 text-center text-muted-foreground">
+                  Loading…
+                </td>
+              </tr>
+            )}
+            {!loading && rows.length === 0 && (
+              <tr>
+                <td colSpan={4} className="p-6 text-center text-muted-foreground">
+                  No IPs in the allowlist yet.
+                </td>
+              </tr>
+            )}
+            {!loading &&
+              rows.map((r) => (
+                <tr key={r.id} className="border-t border-border/60">
+                  <td className="p-3 font-mono text-sm">
+                    {r.ip_address}
+                    {r.ip_address === currentIp && (
+                      <span className="ml-2 rounded-full border border-success/40 bg-success/10 px-2 py-0.5 text-[10px] font-semibold text-success">
+                        YOU
+                      </span>
+                    )}
+                  </td>
+                  <td className="p-3">{r.label}</td>
+                  <td className="p-3 text-xs text-muted-foreground whitespace-nowrap">
+                    {new Date(r.created_at).toLocaleString()}
+                  </td>
+                  <td className="p-3 text-right">
+                    <button
+                      onClick={() => removeIp(r.id, r.ip_address)}
+                      className="text-xs font-medium text-destructive hover:underline"
+                    >
+                      Remove
+                    </button>
+                  </td>
+                </tr>
+              ))}
+          </tbody>
+        </table>
+      </div>
+    </>
   );
 }
