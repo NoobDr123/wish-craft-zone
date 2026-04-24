@@ -411,25 +411,6 @@ function ThankYouPage() {
               <strong>2 more free RibbonSongs</strong> — on us.
             </p>
 
-            {/* The promo code — clearly visible so they know it's real and theirs */}
-            <div className="mt-4 rounded-2xl border border-amber-400/50 bg-white/50 p-3 sm:p-4">
-              <p className="text-[10px] font-bold uppercase tracking-wider text-amber-800/80 sm:text-[11px]">
-                Your unique reward code
-              </p>
-              <div className="mt-1.5 flex items-center justify-between gap-3">
-                <code className="font-mono text-base font-bold tracking-wider text-amber-950 sm:text-lg">
-                  {rewardCode ?? (loading ? "Loading…" : "Issued shortly")}
-                </code>
-                <span className="rounded-full bg-amber-500/20 px-2.5 py-1 text-[10px] font-bold uppercase tracking-wider text-amber-800 sm:text-[11px]">
-                  🔒 Locked
-                </span>
-              </div>
-              <p className="mt-2 text-[11px] leading-relaxed text-amber-900/70 sm:text-[12px]">
-                Single-use, tied to your order. Unlocks automatically after we
-                receive & approve your reaction video.
-              </p>
-            </div>
-
             {/* How it works — 3 quick steps */}
             <ol className="mt-4 space-y-2.5 text-[13px] sm:text-sm">
               {[
