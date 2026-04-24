@@ -1,4 +1,4 @@
-import { useMemo, useState } from "react";
+import { useEffect, useMemo, useRef, useState } from "react";
 import { createFileRoute, Link, useNavigate } from "@tanstack/react-router";
 import { QuizShell } from "@/components/QuizShell";
 import {
@@ -10,6 +10,7 @@ import {
   TipChips,
 } from "@/components/QuizInputs";
 import { useQuizStore } from "@/stores/quizStore";
+import { track, ensureSession } from "@/lib/tracking";
 import {
   getProfile,
   journeyOptions,
@@ -83,6 +84,25 @@ function CreatePage() {
   const navigate = useNavigate();
   const q = useQuizStore();
   const [index, setIndex] = useState(0);
+  const stepEnteredAt = useRef<number>(Date.now());
+  const quizStartedAt = useRef<number | null>(null);
+
+  // Track quiz_start once per mount
+  useEffect(() => {
+    void ensureSession();
+    quizStartedAt.current = Date.now();
+    void track({ type: "quiz_start", stepIndex: 0 });
+  }, []);
+
+  // Track question_view whenever step index changes
+  useEffect(() => {
+    stepEnteredAt.current = Date.now();
+    void track({
+      type: "question_view",
+      stepIndex: index,
+      buyerEmail: q.buyer_email || undefined,
+    });
+  }, [index, q.buyer_email]);
 
   const profile = useMemo(
     () => getProfile(q.relationship, q.relationship_other, q.recipient_name, q.stage),
@@ -453,8 +473,26 @@ function CreatePage() {
   const valid = step.isValid(q);
 
   const next = () => {
+    const elapsed = Date.now() - stepEnteredAt.current;
+    void track({
+      type: "question_answer",
+      stepIndex: safeIndex,
+      timeOnStepMs: elapsed,
+      buyerEmail: q.buyer_email || undefined,
+    });
     if (safeIndex < total - 1) setIndex(safeIndex + 1);
-    else navigate({ to: "/almost-there" });
+    else {
+      const totalTime = quizStartedAt.current
+        ? Date.now() - quizStartedAt.current
+        : null;
+      void track({
+        type: "quiz_complete",
+        stepIndex: total,
+        timeOnStepMs: totalTime ?? undefined,
+        buyerEmail: q.buyer_email || undefined,
+      });
+      navigate({ to: "/almost-there" });
+    }
   };
   const back = () => setIndex(Math.max(0, safeIndex - 1));
 

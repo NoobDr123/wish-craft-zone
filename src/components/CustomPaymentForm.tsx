@@ -101,6 +101,9 @@ function InnerForm({ returnUrl, email, amountLabel, amountCents, promoVersion, o
       setErrorMsg(msg);
       onError?.(msg);
       setSubmitting(false);
+      void import("@/lib/tracking").then(({ track }) =>
+        track({ type: "payment_failed", buyerEmail: email, payload: { message: msg } })
+      );
       return;
     }
 
@@ -108,6 +111,9 @@ function InnerForm({ returnUrl, email, amountLabel, amountCents, promoVersion, o
     // return page, which polls for the order to be marked paid and then
     // forwards to the upsell flow.
     if (paymentIntent && (paymentIntent.status === "succeeded" || paymentIntent.status === "processing" || paymentIntent.status === "requires_capture")) {
+      void import("@/lib/tracking").then(({ track }) =>
+        track({ type: "payment_success", buyerEmail: email, payload: { status: paymentIntent.status } })
+      );
       window.location.assign(returnUrl);
       return;
     }

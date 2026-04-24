@@ -83,6 +83,21 @@ function CheckoutPage() {
     if (!q.recipient_name) navigate({ to: "/create" });
   }, [hydrated, q.recipient_name, navigate]);
 
+  // Track checkout page view once hydrated
+  useEffect(() => {
+    if (!hydrated) return;
+    void import("@/lib/tracking").then(({ track, attachSessionIdentity }) => {
+      void track({
+        type: "checkout_view",
+        buyerEmail: q.buyer_email || undefined,
+      });
+      if (q.buyer_email) {
+        void attachSessionIdentity({ buyerEmail: q.buyer_email });
+      }
+    });
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [hydrated]);
+
   const emailValid = emailRe.test(email);
   const nameValid = name.trim().length > 1;
   const ready = emailValid && nameValid;

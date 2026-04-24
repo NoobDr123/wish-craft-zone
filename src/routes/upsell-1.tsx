@@ -4,6 +4,7 @@ import { UpsellShell } from "@/components/UpsellShell";
 import { useQuizStore } from "@/stores/quizStore";
 import { supabase } from "@/integrations/supabase/client";
 import { stripeEnvironment } from "@/lib/stripe";
+import { track } from "@/lib/tracking";
 
 export const Route = createFileRoute("/upsell-1")({
   component: Upsell1,
@@ -27,7 +28,23 @@ function Upsell1() {
   const [processing, setProcessing] = useState(false);
   const countdown = useCountdown(5 * 60);
 
+  useEffect(() => {
+    void track({
+      type: "upsell_view",
+      upsellType: "extra_verse",
+      orderId: q.orderId,
+      buyerEmail: q.buyer_email || undefined,
+    });
+  }, [q.orderId, q.buyer_email]);
+
   const accept = async () => {
+    void track({
+      type: "upsell_accept",
+      upsellType: "extra_verse",
+      orderId: q.orderId,
+      buyerEmail: q.buyer_email || undefined,
+      amountCents: 1999,
+    });
     if (!q.orderId) {
       navigate({ to: "/upsell-2" });
       return;
@@ -46,7 +63,15 @@ function Upsell1() {
     navigate({ to: "/upsell-2" });
   };
 
-  const decline = () => navigate({ to: "/upsell-2" });
+  const decline = () => {
+    void track({
+      type: "upsell_decline",
+      upsellType: "extra_verse",
+      orderId: q.orderId,
+      buyerEmail: q.buyer_email || undefined,
+    });
+    navigate({ to: "/upsell-2" });
+  };
 
   return (
     <UpsellShell
