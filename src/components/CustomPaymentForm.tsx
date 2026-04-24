@@ -15,6 +15,10 @@ interface CustomPaymentFormProps {
   returnUrl: string;
   email: string;
   amountLabel: string;
+  /** Current amount in cents — used to keep Apple/Google Pay sheet in sync after promo edits. */
+  amountCents: number;
+  /** Bumped every time the server-side PI amount changes (e.g. after a promo applies). */
+  promoVersion?: number;
   onError?: (msg: string) => void;
   disabled?: boolean;
   disabledReason?: string;
@@ -52,12 +56,22 @@ export function CustomPaymentForm(props: CustomPaymentFormProps) {
   );
 }
 
-function InnerForm({ returnUrl, email, amountLabel, onError, disabled, disabledReason }: CustomPaymentFormProps) {
+function InnerForm({ returnUrl, email, amountLabel, amountCents, promoVersion, onError, disabled, disabledReason }: CustomPaymentFormProps) {
   const stripe = useStripe();
   const elements = useElements();
   const [submitting, setSubmitting] = useState(false);
   const [errorMsg, setErrorMsg] = useState<string | null>(null);
   const [walletReady, setWalletReady] = useState(false);
+
+  // When the server-side PaymentIntent amount changes (promo applied),
+  // pull the updated amount into Elements so the Apple/Google Pay sheet
+  // and PaymentElement reflect the new total.
+  useEffect(() => {
+    if (!elements || promoVersion === undefined || promoVersion === 0) return;
+    elements.fetchUpdates().catch((e) => {
+      console.error("[CustomPaymentForm] fetchUpdates failed:", e);
+    });
+  }, [elements, promoVersion]);
 
   const handleConfirm = async () => {
     if (!stripe || !elements) return;
