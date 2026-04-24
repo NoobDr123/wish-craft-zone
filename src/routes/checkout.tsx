@@ -189,7 +189,7 @@ function CheckoutPage() {
 
       if (data.free) {
         // Skip Stripe entirely — order is already marked paid + queued
-        navigate({ to: "/processing", search: { orderId } as any });
+        navigate({ to: "/processing" });
       }
     } catch (e) {
       console.error("apply promo failed:", e);
