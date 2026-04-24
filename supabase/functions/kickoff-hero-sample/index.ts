@@ -1,4 +1,4 @@
-// One-shot helper: kicks off generate-sample for the current hero song
+// One-shot helper: triggers either hero song generation or karaoke sync
 // using the INTERNAL_TRIGGER_SECRET available in env. Safe to delete after use.
 
 import { serve } from "https://deno.land/std@0.168.0/http/server.ts";
@@ -12,7 +12,7 @@ serve(async (req) => {
   if (req.method === "OPTIONS") return new Response(null, { headers: corsHeaders });
 
   try {
-    const { sampleId } = await req.json();
+    const { sampleId, mode = "generate" } = await req.json();
     if (!sampleId) {
       return new Response(JSON.stringify({ error: "Missing sampleId" }), {
         status: 400,
@@ -29,7 +29,11 @@ serve(async (req) => {
       });
     }
 
-    const res = await fetch(`${supabaseUrl}/functions/v1/generate-sample`, {
+    const targetPath = mode === "karaoke"
+      ? "audioshake-align"
+      : "generate-sample";
+
+    const res = await fetch(`${supabaseUrl}/functions/v1/${targetPath}`, {
       method: "POST",
       headers: {
         "Content-Type": "application/json",
