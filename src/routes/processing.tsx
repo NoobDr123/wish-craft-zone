@@ -116,6 +116,7 @@ function ThankYouPage() {
   const q = useQuizStore();
   const [order, setOrder] = useState<OrderRow | null>(null);
   const [loading, setLoading] = useState(true);
+  const [rewardCode, setRewardCode] = useState<string | null>(null);
 
   // Magic-link sender state — auto-emails the buyer a passwordless sign-in
   // link straight to /dashboard so they can land in their account in one tap.
