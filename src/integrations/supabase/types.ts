@@ -512,6 +512,57 @@ export type Database = {
           },
         ]
       }
+      reaction_reward_codes: {
+        Row: {
+          buyer_email: string
+          code: string
+          created_at: string
+          first_redeemed_at: string | null
+          free_songs_remaining: number
+          fully_redeemed_at: string | null
+          id: string
+          order_id: string
+          reaction_video_id: string | null
+          refund_request_id: string | null
+          status: string
+          unlocked_at: string | null
+          updated_at: string
+          user_id: string | null
+        }
+        Insert: {
+          buyer_email: string
+          code: string
+          created_at?: string
+          first_redeemed_at?: string | null
+          free_songs_remaining?: number
+          fully_redeemed_at?: string | null
+          id?: string
+          order_id: string
+          reaction_video_id?: string | null
+          refund_request_id?: string | null
+          status?: string
+          unlocked_at?: string | null
+          updated_at?: string
+          user_id?: string | null
+        }
+        Update: {
+          buyer_email?: string
+          code?: string
+          created_at?: string
+          first_redeemed_at?: string | null
+          free_songs_remaining?: number
+          fully_redeemed_at?: string | null
+          id?: string
+          order_id?: string
+          reaction_video_id?: string | null
+          refund_request_id?: string | null
+          status?: string
+          unlocked_at?: string | null
+          updated_at?: string
+          user_id?: string | null
+        }
+        Relationships: []
+      }
       reaction_videos: {
         Row: {
           buyer_email: string
@@ -931,6 +982,7 @@ export type Database = {
         Args: { payload: Json; queue_name: string }
         Returns: number
       }
+      generate_reward_code: { Args: never; Returns: string }
       has_role: {
         Args: {
           _role: Database["public"]["Enums"]["app_role"]
@@ -939,6 +991,31 @@ export type Database = {
         Returns: boolean
       }
       has_valid_mfa: { Args: { _user_id: string }; Returns: boolean }
+      issue_reward_code_for_order: {
+        Args: { _order_id: string }
+        Returns: {
+          buyer_email: string
+          code: string
+          created_at: string
+          first_redeemed_at: string | null
+          free_songs_remaining: number
+          fully_redeemed_at: string | null
+          id: string
+          order_id: string
+          reaction_video_id: string | null
+          refund_request_id: string | null
+          status: string
+          unlocked_at: string | null
+          updated_at: string
+          user_id: string | null
+        }
+        SetofOptions: {
+          from: "*"
+          to: "reaction_reward_codes"
+          isOneToOne: true
+          isSetofReturn: false
+        }
+      }
       move_to_dlq: {
         Args: {
           dlq_name: string
