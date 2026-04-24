@@ -249,9 +249,6 @@ function ThankYouPage() {
 
   return (
     <div className="min-h-screen bg-gradient-warm pb-16 sm:pb-24">
-      {/* Themed progress: Payment ✓, Bonus ✓, Final confirmation (current) */}
-      <CheckoutProgress current={3} />
-
       {/* Success bar — mirrors the warning bar on upsell pages */}
       <div className="w-full border-b border-success/40 bg-success/15">
         <div className="mx-auto flex max-w-2xl items-center justify-center gap-2 px-4 py-2.5 text-center">
@@ -262,6 +259,9 @@ function ThankYouPage() {
           </p>
         </div>
       </div>
+
+      {/* Themed progress: Payment ✓, Bonus ✓, Final confirmation (current) */}
+      <CheckoutProgress current={3} />
 
       <header className="border-b border-peach/60 bg-background/60 backdrop-blur">
         <div className="mx-auto flex max-w-3xl items-center justify-between gap-2 px-4 py-3 sm:px-5 sm:py-4">
