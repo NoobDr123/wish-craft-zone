@@ -386,85 +386,87 @@ function ThankYouPage() {
           )}
         </section>
 
-        {/* Gold guarantee box — single adaptive safety net based on upsells.
-            Customers who bought "Unlimited edits" get the re-recordings angle.
-            Everyone else (and especially higher-spend orders) sees the refund
-            angle, since that's the strongest reassurance for a bigger purchase. */}
-        {(() => {
-          const hasUnlimitedEdits = !!order?.has_unlimited_edits;
+        {/* Gold reward-program box — single, bold offer.
+            Customers who film & upload a reaction video get a FULL refund
+            PLUS 2 free songs (redeemed via the unique promo code below).
+            The code is single-use & tied to this order so the program is
+            safe from abuse. */}
+        <section className="relative mt-5 overflow-hidden rounded-2xl border-2 border-amber-400/70 bg-gradient-to-br from-amber-50 via-yellow-50 to-amber-100/80 p-5 shadow-[0_8px_30px_-10px_rgba(217,164,6,0.45)] sm:mt-6 sm:rounded-3xl sm:p-7">
+          <div className="pointer-events-none absolute -right-10 -top-10 h-40 w-40 rounded-full bg-amber-300/30 blur-3xl" />
+          <div className="pointer-events-none absolute -bottom-12 -left-8 h-36 w-36 rounded-full bg-yellow-300/30 blur-3xl" />
 
-          // Headline / icon / body adapt to what the customer actually bought.
-          const safetyNet = hasUnlimitedEdits
-            ? {
-                badge: "Unlimited edits is active",
-                title: "Unlimited re-writes — until it's perfect",
-                Icon: Music2,
-                lead: (
-                  <>
-                    You upgraded to unlimited edits, so we'll keep refining{" "}
-                    <span className="font-semibold text-amber-950">
-                      {recipient}
-                    </span>
-                    's song — voice, lyrics, vibe, tempo — as many times as you
-                    need, at no extra cost.
-                  </>
-                ),
-                bullet: "Every revision is free. No limits, no surprise fees.",
-                footer:
-                  "We don't stop until you'd happily hit play in front of them.",
-              }
-            : {
-                badge: "Our promise to you",
-                title: "Love it — or your money back",
-                Icon: ShieldCheck,
-                lead: (
-                  <>
-                    If{" "}
-                    <span className="font-semibold text-amber-950">
-                      {recipient}
-                    </span>
-                    's song isn't the gift you imagined, you're covered by our
-                    30-day money-back guarantee.
-                  </>
-                ),
-                bullet:
-                  "Request a full refund within 30 days from your dashboard — no questions, no hassle.",
-                footer:
-                  "That's how confident we are. Your gift will land — or your money comes back.",
-              };
+          <div className="relative">
+            <div className="inline-flex items-center gap-1.5 rounded-full border border-amber-500/40 bg-amber-500/10 px-3 py-1 text-[10px] font-bold uppercase tracking-wider text-amber-800 sm:text-[11px]">
+              <Sparkles className="h-3 w-3" /> Reaction Reward · Get every cent back
+            </div>
+            <h3 className="mt-3 font-display text-2xl font-bold leading-[1.1] text-amber-950 sm:text-[28px]">
+              Get a full refund + 2 free songs
+            </h3>
+            <p className="mt-2 text-[13px] leading-relaxed text-amber-900/80 sm:text-sm">
+              Film{" "}
+              <span className="font-semibold text-amber-950">{recipient}</span>{" "}
+              hearing their song for the first time, upload the clip from your
+              dashboard, and we'll refund <strong>100% of your order</strong>{" "}
+              <em>and</em> send you a code for{" "}
+              <strong>2 more free RibbonSongs</strong> — on us.
+            </p>
 
-          const Icon = safetyNet.Icon;
-
-          return (
-            <section className="relative mt-5 overflow-hidden rounded-2xl border-2 border-amber-400/70 bg-gradient-to-br from-amber-50 via-yellow-50 to-amber-100/80 p-5 shadow-[0_8px_30px_-10px_rgba(217,164,6,0.45)] sm:mt-6 sm:rounded-3xl sm:p-7">
-              <div className="pointer-events-none absolute -right-10 -top-10 h-40 w-40 rounded-full bg-amber-300/30 blur-3xl" />
-              <div className="pointer-events-none absolute -bottom-12 -left-8 h-36 w-36 rounded-full bg-yellow-300/30 blur-3xl" />
-
-              <div className="relative">
-                <div className="inline-flex items-center gap-1.5 rounded-full border border-amber-500/40 bg-amber-500/10 px-3 py-1 text-[10px] font-bold uppercase tracking-wider text-amber-800 sm:text-[11px]">
-                  <Sparkles className="h-3 w-3" /> {safetyNet.badge}
-                </div>
-                <h3 className="mt-3 font-display text-xl font-bold text-amber-950 sm:text-2xl">
-                  {safetyNet.title}
-                </h3>
-                <p className="mt-1.5 text-[13px] leading-relaxed text-amber-900/80 sm:text-sm">
-                  {safetyNet.lead}
-                </p>
-
-                <div className="mt-4 flex gap-3 rounded-2xl border border-amber-400/40 bg-white/40 p-3 text-[13px] sm:p-4 sm:text-sm">
-                  <div className="mt-0.5 flex h-8 w-8 shrink-0 items-center justify-center rounded-full bg-amber-500/20 ring-2 ring-amber-400/40">
-                    <Icon className="h-4 w-4 text-amber-800" />
-                  </div>
-                  <p className="text-amber-900/90">{safetyNet.bullet}</p>
-                </div>
-
-                <p className="mt-4 border-t border-amber-400/40 pt-3 text-[12px] italic text-amber-900/70 sm:text-[13px]">
-                  {safetyNet.footer}
-                </p>
+            {/* The promo code — clearly visible so they know it's real and theirs */}
+            <div className="mt-4 rounded-2xl border border-amber-400/50 bg-white/50 p-3 sm:p-4">
+              <p className="text-[10px] font-bold uppercase tracking-wider text-amber-800/80 sm:text-[11px]">
+                Your unique reward code
+              </p>
+              <div className="mt-1.5 flex items-center justify-between gap-3">
+                <code className="font-mono text-base font-bold tracking-wider text-amber-950 sm:text-lg">
+                  {rewardCode ?? (loading ? "Loading…" : "Issued shortly")}
+                </code>
+                <span className="rounded-full bg-amber-500/20 px-2.5 py-1 text-[10px] font-bold uppercase tracking-wider text-amber-800 sm:text-[11px]">
+                  🔒 Locked
+                </span>
               </div>
-            </section>
-          );
-        })()}
+              <p className="mt-2 text-[11px] leading-relaxed text-amber-900/70 sm:text-[12px]">
+                Single-use, tied to your order. Unlocks automatically after we
+                receive & approve your reaction video.
+              </p>
+            </div>
+
+            {/* How it works — 3 quick steps */}
+            <ol className="mt-4 space-y-2.5 text-[13px] sm:text-sm">
+              {[
+                {
+                  n: "1",
+                  t: "Capture the moment",
+                  d: "Record their genuine reaction the first time they hear the song — phone camera is perfect.",
+                },
+                {
+                  n: "2",
+                  t: "Upload from your dashboard",
+                  d: "Head to your order page and submit the video — takes under a minute.",
+                },
+                {
+                  n: "3",
+                  t: "Get refunded + receive your code",
+                  d: "Once approved, your money lands back on your card and your code unlocks for 2 free songs.",
+                },
+              ].map((step) => (
+                <li key={step.n} className="flex gap-3">
+                  <div className="mt-0.5 flex h-7 w-7 shrink-0 items-center justify-center rounded-full bg-amber-500/25 font-display text-sm font-bold text-amber-900 ring-2 ring-amber-400/40">
+                    {step.n}
+                  </div>
+                  <div>
+                    <p className="font-bold text-amber-950">{step.t}</p>
+                    <p className="mt-0.5 text-amber-900/80">{step.d}</p>
+                  </div>
+                </li>
+              ))}
+            </ol>
+
+            <p className="mt-4 border-t border-amber-400/40 pt-3 text-[12px] italic text-amber-900/70 sm:text-[13px]">
+              No catch. We just love seeing the reactions — and a real moment is
+              the best gift you can give us back.
+            </p>
+          </div>
+        </section>
 
         <section className="mt-5 rounded-2xl border border-peach/70 bg-card p-4 shadow-soft sm:mt-6 sm:rounded-3xl sm:p-6 md:p-8">
           <h2 className="flex items-center gap-2 font-display text-xl font-bold text-foreground sm:text-2xl">
