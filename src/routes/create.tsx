@@ -1,4 +1,4 @@
-import { useMemo, useState } from "react";
+import { useEffect, useMemo, useRef, useState } from "react";
 import { createFileRoute, Link, useNavigate } from "@tanstack/react-router";
 import { QuizShell } from "@/components/QuizShell";
 import {
@@ -10,6 +10,7 @@ import {
   TipChips,
 } from "@/components/QuizInputs";
 import { useQuizStore } from "@/stores/quizStore";
+import { track, ensureSession } from "@/lib/tracking";
 import {
   getProfile,
   journeyOptions,
