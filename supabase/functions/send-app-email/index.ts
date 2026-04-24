@@ -11,6 +11,7 @@ const supabase = createClient(
 );
 
 const FROM = "RibbonSong <noreply@notify.ribbonsong.com>";
+const SENDER_DOMAIN = "notify.ribbonsong.com";
 
 const corsHeaders = {
   "Access-Control-Allow-Origin": "*",
@@ -21,7 +22,7 @@ serve(async (req) => {
   if (req.method === "OPTIONS") return new Response(null, { headers: corsHeaders });
 
   try {
-    const { template, to, data } = await req.json();
+    const { template, to, data, idempotencyKey } = await req.json();
     if (!template || !to) return json({ error: "template and to required" }, 400);
 
     const rendered = render(template, data ?? {});
@@ -44,15 +45,28 @@ serve(async (req) => {
       return json({ ok: true, skipped: "suppressed" });
     }
 
-    // Enqueue to the central queue for sending
+    // Stable idempotency key — caller can pass one (preferred), otherwise we
+    // derive a deterministic one from template + recipient + any order id so
+    // retries by us don't double-send.
+    const idemKey =
+      (typeof idempotencyKey === "string" && idempotencyKey) ||
+      `${template}:${to.toLowerCase()}:${data?.order_id ?? data?.orderId ?? ""}`;
+    const messageId = crypto.randomUUID();
+
+    // Enqueue to the central queue. The dispatcher (process-email-queue server
+    // route) reads this exact shape — `purpose: "transactional"` and
+    // `idempotency_key` are REQUIRED by the Lovable email API for app emails.
     const enqueuePayload = {
-      from: FROM,
       to,
+      from: FROM,
+      sender_domain: SENDER_DOMAIN,
       subject: rendered.subject,
       html: rendered.html,
       text: rendered.text,
-      template_name: template,
-      metadata: data ?? {},
+      purpose: "transactional",
+      label: template,
+      idempotency_key: idemKey,
+      message_id: messageId,
     };
 
     const { error: enqueueErr } = await supabase.rpc("enqueue_email", {
@@ -72,13 +86,14 @@ serve(async (req) => {
     }
 
     await supabase.from("email_send_log").insert({
+      message_id: messageId,
       recipient_email: to,
       template_name: template,
       status: "pending",
-      metadata: { queued: true },
+      metadata: { queued: true, idempotency_key: idemKey },
     });
 
-    return json({ ok: true });
+    return json({ ok: true, messageId });
   } catch (e: any) {
     console.error("send-app-email error", e);
     return json({ error: e.message }, 500);
