@@ -1,10 +1,11 @@
 import { createFileRoute, useNavigate } from "@tanstack/react-router";
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import { UpsellShell } from "@/components/UpsellShell";
 import { Delivery48Downsell } from "@/components/Delivery48Downsell";
 import { useQuizStore } from "@/stores/quizStore";
 import { supabase } from "@/integrations/supabase/client";
 import { stripeEnvironment } from "@/lib/stripe";
+import { track } from "@/lib/tracking";
 
 export const Route = createFileRoute("/upsell-2")({
   component: Upsell2,
@@ -17,7 +18,23 @@ function Upsell2() {
   const [showDownsell, setShowDownsell] = useState(false);
   const [downsellProcessing, setDownsellProcessing] = useState(false);
 
+  useEffect(() => {
+    void track({
+      type: "upsell_view",
+      upsellType: "rush_delivery",
+      orderId: q.orderId,
+      buyerEmail: q.buyer_email || undefined,
+    });
+  }, [q.orderId, q.buyer_email]);
+
   const accept = async () => {
+    void track({
+      type: "upsell_accept",
+      upsellType: "rush_delivery",
+      orderId: q.orderId,
+      buyerEmail: q.buyer_email || undefined,
+      amountCents: 2999,
+    });
     if (!q.orderId) {
       navigate({ to: "/upsell-3" });
       return;
@@ -36,9 +53,30 @@ function Upsell2() {
   };
 
   // Decline 24h rush → open the slim 48-hour downsell.
-  const decline = () => setShowDownsell(true);
+  const decline = () => {
+    void track({
+      type: "upsell_decline",
+      upsellType: "rush_delivery",
+      orderId: q.orderId,
+      buyerEmail: q.buyer_email || undefined,
+    });
+    void track({
+      type: "upsell_view",
+      upsellType: "delivery_48h",
+      orderId: q.orderId,
+      buyerEmail: q.buyer_email || undefined,
+    });
+    setShowDownsell(true);
+  };
 
   const accept48 = async () => {
+    void track({
+      type: "upsell_accept",
+      upsellType: "delivery_48h",
+      orderId: q.orderId,
+      buyerEmail: q.buyer_email || undefined,
+      amountCents: 1499,
+    });
     if (!q.orderId) {
       setShowDownsell(false);
       navigate({ to: "/upsell-3" });
@@ -60,6 +98,12 @@ function Upsell2() {
   };
 
   const decline48 = () => {
+    void track({
+      type: "upsell_decline",
+      upsellType: "delivery_48h",
+      orderId: q.orderId,
+      buyerEmail: q.buyer_email || undefined,
+    });
     setShowDownsell(false);
     navigate({ to: "/upsell-3" });
   };

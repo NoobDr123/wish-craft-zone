@@ -1,9 +1,10 @@
 import { createFileRoute, useNavigate } from "@tanstack/react-router";
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import { UpsellShell } from "@/components/UpsellShell";
 import { useQuizStore } from "@/stores/quizStore";
 import { supabase } from "@/integrations/supabase/client";
 import { stripeEnvironment } from "@/lib/stripe";
+import { track } from "@/lib/tracking";
 
 export const Route = createFileRoute("/upsell-3")({
   component: Upsell3,
@@ -13,6 +14,15 @@ function Upsell3() {
   const navigate = useNavigate();
   const q = useQuizStore();
   const [processing, setProcessing] = useState(false);
+
+  useEffect(() => {
+    void track({
+      type: "upsell_view",
+      upsellType: "unlimited_edits",
+      orderId: q.orderId,
+      buyerEmail: q.buyer_email || undefined,
+    });
+  }, [q.orderId, q.buyer_email]);
 
   const finishAndAdvance = async () => {
     // Tell the backend upsell decisions are done — this flips status to
@@ -32,6 +42,13 @@ function Upsell3() {
   };
 
   const accept = async () => {
+    void track({
+      type: "upsell_accept",
+      upsellType: "unlimited_edits",
+      orderId: q.orderId,
+      buyerEmail: q.buyer_email || undefined,
+      amountCents: 3299,
+    });
     if (!q.orderId) {
       await finishAndAdvance();
       return;
@@ -50,6 +67,12 @@ function Upsell3() {
   };
 
   const decline = async () => {
+    void track({
+      type: "upsell_decline",
+      upsellType: "unlimited_edits",
+      orderId: q.orderId,
+      buyerEmail: q.buyer_email || undefined,
+    });
     await finishAndAdvance();
   };
 
