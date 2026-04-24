@@ -60,6 +60,17 @@ function CheckoutPage() {
   const [error, setError] = useState<string | null>(null);
   const [reviewOpen, setReviewOpen] = useState(false);
 
+  // Promo code state
+  const [promoCode, setPromoCode] = useState("");
+  const [promoApplying, setPromoApplying] = useState(false);
+  const [promoError, setPromoError] = useState<string | null>(null);
+  const [promoApplied, setPromoApplied] = useState<{
+    discount_pct: number;
+    discount_cents: number;
+    final_amount_cents: number;
+    free: boolean;
+  } | null>(null);
+
   useEffect(() => {
     if (!q.recipient_name) navigate({ to: "/create" });
   }, [q.recipient_name, navigate]);

@@ -699,7 +699,7 @@ function LandingPage() {
                 </strong>
               </p>
               <div className="mb-7 flex w-full flex-col items-stretch gap-3">
-                <PrimaryBtn large fullWidth>Start My Custom Song 🎗️ →</PrimaryBtn>
+                <PrimaryBtn large fullWidth>Start My Custom Song 🎗️</PrimaryBtn>
               </div>
               <div className="w-full text-center text-[13px] leading-[1.4] text-[#5A5148] md:text-[13.5px]">
                 Trusted by{" "}
@@ -904,7 +904,7 @@ function LandingPage() {
           </div>
 
           <div className="mt-12 text-center md:mt-14">
-            <PrimaryBtn large>Start My Custom Song 🎗️ →</PrimaryBtn>
+            <PrimaryBtn large>Start My Custom Song 🎗️</PrimaryBtn>
           </div>
         </div>
       </section>
@@ -1044,7 +1044,7 @@ function LandingPage() {
           </div>
 
           <div className="mt-12 text-center">
-            <PrimaryBtn large>Start My Custom Song 🎗️ →</PrimaryBtn>
+            <PrimaryBtn large>Start My Custom Song 🎗️</PrimaryBtn>
           </div>
         </div>
       </section>
@@ -1098,7 +1098,7 @@ function LandingPage() {
           </div>
 
           <div className="mt-10 text-center md:mt-12">
-            <PrimaryBtn large>Start My Custom Song 🎗️ →</PrimaryBtn>
+            <PrimaryBtn large>Start My Custom Song 🎗️</PrimaryBtn>
           </div>
         </div>
       </section>
@@ -1289,7 +1289,7 @@ function LandingPage() {
             give someone a song that says everything you couldn't. There's just
             now.
           </p>
-          <PrimaryBtn large>Start My Custom Song 🎗️ →</PrimaryBtn>
+          <PrimaryBtn large>Start My Custom Song 🎗️</PrimaryBtn>
           <div className="mt-6 text-[13px] text-[rgba(246,240,230,0.55)]">
             Delivered in 5 days · Free revisions · Money back guarantee
           </div>
