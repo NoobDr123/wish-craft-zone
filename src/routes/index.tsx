@@ -668,7 +668,7 @@ function LandingPage() {
         <div className="mx-auto max-w-[1200px] px-5 sm:px-6">
           <div className="mb-8 flex w-full flex-col items-center gap-3 text-center sm:mb-10 md:mb-12 md:gap-4">
             <span className="hidden h-px w-12 bg-[#8D6FAF]/40 md:block" />
-            <h2 className="max-w-[22ch] font-display text-[18px] font-bold uppercase leading-[1.25] tracking-[0.14em] text-[#8D6FAF] sm:max-w-none sm:text-[22px] sm:tracking-[0.18em] md:text-[15px] md:font-semibold md:tracking-[0.32em]">
+            <h2 className="font-display text-[13px] font-semibold uppercase tracking-[0.18em] text-[#8D6FAF] sm:text-[15px] md:text-[15px] md:tracking-[0.32em]">
               The Most Meaningful Gift For Someone You Love Fighting Cancer
             </h2>
             <span className="hidden h-px w-12 bg-[#8D6FAF]/40 md:block" />
