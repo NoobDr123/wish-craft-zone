@@ -84,21 +84,39 @@ function InnerForm({ returnUrl, email, amountLabel, amountCents, promoVersion, o
     setSubmitting(true);
     setErrorMsg(null);
 
-    const { error } = await stripe.confirmPayment({
+    // We use `allow_redirects: "never"` on the PaymentIntent so confirmPayment
+    // resolves in-place rather than redirecting. That means we MUST handle
+    // navigation ourselves on success — Stripe will not navigate to return_url.
+    const { error, paymentIntent } = await stripe.confirmPayment({
       elements,
       confirmParams: {
         return_url: returnUrl,
         receipt_email: email,
       },
+      redirect: "if_required",
     });
 
-    // If we reach here, there was an immediate error (otherwise Stripe redirects)
     if (error) {
       const msg = error.message || "Payment failed. Please try another card.";
       setErrorMsg(msg);
       onError?.(msg);
       setSubmitting(false);
+      return;
     }
+
+    // Payment succeeded (or requires async processing) — navigate to the
+    // return page, which polls for the order to be marked paid and then
+    // forwards to the upsell flow.
+    if (paymentIntent && (paymentIntent.status === "succeeded" || paymentIntent.status === "processing" || paymentIntent.status === "requires_capture")) {
+      window.location.assign(returnUrl);
+      return;
+    }
+
+    // Unexpected state — surface a generic error so the user isn't stuck.
+    const msg = "Payment is taking longer than expected. Please refresh.";
+    setErrorMsg(msg);
+    onError?.(msg);
+    setSubmitting(false);
   };
 
   const handleExpressConfirm = async (event: { resolve: () => void; reject: () => void } | any) => {
@@ -110,17 +128,22 @@ function InnerForm({ returnUrl, email, amountLabel, amountCents, promoVersion, o
       event?.reject?.();
       return;
     }
-    const { error } = await stripe.confirmPayment({
+    const { error, paymentIntent } = await stripe.confirmPayment({
       elements,
       confirmParams: {
         return_url: returnUrl,
         receipt_email: email,
       },
+      redirect: "if_required",
     });
     if (error) {
       const msg = error.message || "Payment failed.";
       setErrorMsg(msg);
       onError?.(msg);
+      return;
+    }
+    if (paymentIntent && (paymentIntent.status === "succeeded" || paymentIntent.status === "processing" || paymentIntent.status === "requires_capture")) {
+      window.location.assign(returnUrl);
     }
   };
 
