@@ -268,3 +268,14 @@
   80% { transform: translate(1px, 2px) rotate(0.3deg); }
   90% { transform: translate(-2px, -1.5px) rotate(-0.5deg); }
 }
+
+@keyframes nudge-right {
+  0%, 100% { transform: translateX(0); opacity: 0.65; }
+  50% { transform: translateX(4px); opacity: 1; }
+}
+@keyframes nudge-left {
+  0%, 100% { transform: translateX(0); opacity: 0.65; }
+  50% { transform: translateX(-4px); opacity: 1; }
+}
+.animate-nudge-right { animation: nudge-right 1.2s ease-in-out infinite; }
+.animate-nudge-left { animation: nudge-left 1.2s ease-in-out infinite; }
