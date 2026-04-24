@@ -3,7 +3,7 @@
 //   2. Admin role (user_roles table)
 //   3. TOTP 2FA, re-prompted every 12 hours
 
-import { createFileRoute, Link, useNavigate } from "@tanstack/react-router";
+import { createFileRoute, Link, Outlet, useLocation, useNavigate } from "@tanstack/react-router";
 import { useEffect, useState } from "react";
 import { Logo } from "@/components/Logo";
 import { Button } from "@/components/ui/button";
@@ -27,6 +27,12 @@ export const Route = createFileRoute("/admin")({
 });
 
 function AdminRoute() {
+  const location = useLocation();
+
+  if (location.pathname === "/admin/login") {
+    return <Outlet />;
+  }
+
   return (
     <AdminIpGate
       bootstrap={({ ip, onAdded }) => (

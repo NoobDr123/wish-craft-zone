@@ -5,8 +5,6 @@ import { useEffect, useState } from "react";
 import { supabase } from "@/integrations/supabase/client";
 import { useAuth } from "./useAuth";
 
-const ADMIN_EMAILS = ["sylwester@flowscommerce.com"];
-
 export type AdminGuardState =
   | "loading"
   | "anonymous"
@@ -30,15 +28,19 @@ export function useAdminGuard() {
       return;
     }
 
-    const email = (user.email ?? "").toLowerCase();
-    if (!ADMIN_EMAILS.includes(email)) {
-      setState("not_admin");
-      return;
-    }
-
     let cancelled = false;
     (async () => {
-      const [{ data: mfaRow }, { data: verif }] = await Promise.all([
+      const [
+        { data: roleRow, error: roleError },
+        { data: mfaRow, error: mfaError },
+        { data: verif, error: verifError },
+      ] = await Promise.all([
+        supabase
+          .from("user_roles")
+          .select("role")
+          .eq("user_id", user.id)
+          .eq("role", "admin")
+          .maybeSingle(),
         supabase
           .from("user_mfa")
           .select("enrolled")
@@ -56,6 +58,19 @@ export function useAdminGuard() {
 
       if (cancelled) return;
 
+      if (roleError || mfaError || verifError) {
+        console.error("admin guard lookup failed", {
+          roleError,
+          mfaError,
+          verifError,
+        });
+      }
+
+      if (!roleRow) {
+        setState("not_admin");
+        return;
+      }
+
       if (!mfaRow?.enrolled) {
         setState("needs_enrollment");
         return;
@@ -65,7 +80,10 @@ export function useAdminGuard() {
         return;
       }
       setState("ready");
-    })();
+    })().catch((error) => {
+      console.error("admin guard failed", error);
+      if (!cancelled) setState("not_admin");
+    });
 
     return () => {
       cancelled = true;

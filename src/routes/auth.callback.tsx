@@ -16,7 +16,7 @@ export const Route = createFileRoute("/auth/callback")({
 // Whitelist of safe in-app redirect targets. We don't want an attacker to
 // craft a magic-link URL with `?redirect=//evil.com` and bounce users
 // off-site, so only known route paths are honored.
-const SAFE_REDIRECTS = new Set(["/dashboard", "/account", "/create", "/"]);
+const SAFE_REDIRECTS = new Set(["/dashboard", "/account", "/create", "/admin", "/"]);
 
 function AuthCallback() {
   const navigate = useNavigate();
@@ -25,7 +25,7 @@ function AuthCallback() {
   useEffect(() => {
     const target =
       redirect && SAFE_REDIRECTS.has(redirect)
-        ? (redirect as "/dashboard" | "/account" | "/create" | "/")
+        ? (redirect as "/dashboard" | "/account" | "/create" | "/admin" | "/")
         : "/account";
 
     // Supabase auto-handles the magic link hash on the client.
