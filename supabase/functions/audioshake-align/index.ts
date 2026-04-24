@@ -70,7 +70,7 @@ Deno.serve(async (req) => {
     const apiKey = Deno.env.get("AUDIOSHAKE_API_KEY");
     if (!apiKey) return json({ error: "AUDIOSHAKE_API_KEY not configured" }, 500);
 
-    const { sampleId } = await req.json();
+    const { sampleId, taskId: existingTaskId } = await req.json();
     if (!sampleId) return json({ error: "sampleId required" }, 400);
 
     const supabase = createClient(
@@ -91,41 +91,55 @@ Deno.serve(async (req) => {
     const cleanLines = extractSingableLines(sample.lyrics);
     if (cleanLines.length === 0) throw new Error("No singable lines in lyrics");
 
-    console.log(
-      `[audioshake-align] sample=${sampleId} lines=${cleanLines.length} audio=${sample.audio_url}`,
-    );
+    let taskId = existingTaskId as string | undefined;
 
-    // --- 1. Upload lyrics as a text asset ---
-    const lyricsText = cleanLines.join("\n");
-    const transcriptAssetId = await uploadLyricsAsset(apiKey, lyricsText);
-    console.log(`[audioshake-align] transcript asset uploaded: ${transcriptAssetId}`);
+    if (!taskId) {
+      // --- 1. Submit job ---
+      console.log(
+        `[audioshake-align] submitting sample=${sampleId} lines=${cleanLines.length}`,
+      );
+      const lyricsText = cleanLines.join("\n");
+      const transcriptAssetId = await uploadLyricsAsset(apiKey, lyricsText);
+      console.log(`[audioshake-align] transcript asset uploaded: ${transcriptAssetId}`);
 
-    // --- 2. Submit alignment task ---
-    const taskId = await submitAlignmentTask(
-      apiKey,
-      sample.audio_url,
-      transcriptAssetId,
-    );
-    console.log(`[audioshake-align] task submitted: ${taskId}`);
+      taskId = await submitAlignmentTask(
+        apiKey,
+        sample.audio_url,
+        transcriptAssetId,
+      );
+      console.log(`[audioshake-align] task submitted: ${taskId}`);
 
-    // --- 3. Poll until complete ---
-    const downloadLink = await pollUntilComplete(apiKey, taskId);
-    console.log(`[audioshake-align] task complete: ${downloadLink}`);
+      return json({ ok: true, status: "submitted", taskId, sampleId });
+    }
 
-    // --- 4. Download alignment JSON ---
+    // --- 2. Check status of existing task ---
+    const { status, downloadLink } = await checkTaskStatus(apiKey, taskId);
+    console.log(`[audioshake-align] task=${taskId} status=${status}`);
+
+    if (status === "pending") {
+      return json({ ok: true, status: "pending", taskId, sampleId });
+    }
+    if (status === "failed") {
+      return json({ ok: false, status: "failed", taskId, sampleId }, 500);
+    }
+    if (!downloadLink) {
+      throw new Error("Completed but no download link");
+    }
+
+    // --- 3. Download alignment JSON ---
     const alignRes = await fetch(downloadLink);
     if (!alignRes.ok) {
       throw new Error(`Failed to download alignment: ${alignRes.status}`);
     }
     const alignJson = await alignRes.json();
 
-    // --- 5. Convert word-level timings into our line-based structure ---
+    // --- 4. Convert word-level timings into our line-based structure ---
     const lines = mapAlignmentToLines(alignJson, cleanLines);
     if (lines.length === 0) {
       throw new Error("Alignment produced no lines");
     }
 
-    // --- 6. Save back to DB ---
+    // --- 5. Save back to DB ---
     const { error: updateErr } = await supabase
       .from("featured_samples")
       .update({ synced_lyrics: lines })
@@ -134,6 +148,7 @@ Deno.serve(async (req) => {
 
     return json({
       ok: true,
+      status: "completed",
       sampleId,
       lineCount: lines.length,
       taskId,
