@@ -121,16 +121,23 @@ function KaraokeOverlay({
   const [t, setT] = useState(0);
 
   useEffect(() => {
+    if (!visible) return;
     const a = audioRef.current;
     if (!a) return;
     const onTime = () => setT(a.currentTime);
+    // Poll as a fallback — some browsers fire timeupdate sparsely (every 250ms+)
+    // and we want smooth word-level highlighting.
+    const interval = window.setInterval(() => {
+      if (!a.paused) setT(a.currentTime);
+    }, 100);
     a.addEventListener("timeupdate", onTime);
     a.addEventListener("seeked", onTime);
     return () => {
+      window.clearInterval(interval);
       a.removeEventListener("timeupdate", onTime);
       a.removeEventListener("seeked", onTime);
     };
-  }, [audioRef]);
+  }, [audioRef, visible]);
 
   if (!visible || !lines || lines.length === 0) return null;
 
