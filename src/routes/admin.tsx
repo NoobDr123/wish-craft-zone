@@ -1108,17 +1108,6 @@ function SamplesPanel() {
                         {busy === s.id ? "Generating…" : "Generate"}
                       </Button>
                     )}
-                    {s.audio_url && (
-                      <Button
-                        size="sm"
-                        variant="outline"
-                        onClick={() => syncLyrics(s.id)}
-                        disabled={busy === s.id}
-                        title="Auto-align lyrics to audio for karaoke display"
-                      >
-                        {busy === s.id ? "Syncing…" : "Sync Lyrics"}
-                      </Button>
-                    )}
                     <Button
                       size="sm"
                       variant="ghost"
