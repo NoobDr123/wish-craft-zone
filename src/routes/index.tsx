@@ -882,8 +882,14 @@ function LandingPage() {
                       />
                     )}
                   </span>
-                  <span className="text-[14px] font-semibold tracking-[0.005em] text-[#1F1B16] sm:text-[15px]">
+                  <span className="flex items-center gap-1.5 text-[14px] font-semibold tracking-[0.005em] text-[#1F1B16] sm:text-[15px]">
+                    {!heroPlaying && (
+                      <span aria-hidden="true" className="animate-nudge-right text-[#8D6FAF]">›››</span>
+                    )}
                     {heroPlaying ? "Pause" : "Listen to Example"}
+                    {!heroPlaying && (
+                      <span aria-hidden="true" className="animate-nudge-left text-[#8D6FAF]">‹‹‹</span>
+                    )}
                   </span>
                 </button>
 
