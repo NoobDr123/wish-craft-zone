@@ -863,6 +863,9 @@ function LandingPage() {
                   onClick={handleHeroPlay}
                   className="absolute inset-x-3 bottom-3 z-20 flex items-center justify-center gap-2.5 rounded-full bg-[rgba(246,240,230,0.97)] py-3 shadow-[0_8px_24px_rgba(0,0,0,0.28)] ring-1 ring-black/5 transition-all hover:-translate-y-px hover:shadow-[0_10px_28px_rgba(0,0,0,0.32)] sm:inset-x-4 sm:bottom-4 sm:py-3.5"
                 >
+                  {!heroPlaying && (
+                    <span aria-hidden="true" className="animate-nudge-right text-[#8D6FAF] text-[14px] font-semibold sm:text-[15px]">›››</span>
+                  )}
                   <span className="flex h-8 w-8 items-center justify-center rounded-full bg-[#8D6FAF] sm:h-9 sm:w-9">
                     {heroPlaying ? (
                       <span className="flex gap-[3px]">
@@ -882,14 +885,8 @@ function LandingPage() {
                       />
                     )}
                   </span>
-                  <span className="flex items-center gap-1.5 text-[14px] font-semibold tracking-[0.005em] text-[#1F1B16] sm:text-[15px]">
-                    {!heroPlaying && (
-                      <span aria-hidden="true" className="animate-nudge-right text-[#8D6FAF]">›››</span>
-                    )}
+                  <span className="text-[14px] font-semibold tracking-[0.005em] text-[#1F1B16] sm:text-[15px]">
                     {heroPlaying ? "Pause" : "Listen to Example"}
-                    {!heroPlaying && (
-                      <span aria-hidden="true" className="animate-nudge-left text-[#8D6FAF]">‹‹‹</span>
-                    )}
                   </span>
                 </button>
 
