@@ -121,6 +121,7 @@ function StaffPage() {
               ["refunds", "Refund queue"],
               ["reactions", "Reactions"],
               ["revisions", "Revisions"],
+              ["emails", "Emails"],
             ] as Array<[Tab, string]>
           ).map(([key, label]) => (
             <button
@@ -147,6 +148,7 @@ function StaffPage() {
         {tab === "refunds" && <RefundsPanel />}
         {tab === "reactions" && <ReactionsPanel />}
         {tab === "revisions" && <RevisionsPanel />}
+        {tab === "emails" && <EmailsPanel />}
       </main>
     </div>
   );
