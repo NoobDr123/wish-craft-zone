@@ -27,7 +27,7 @@ export const Route = createFileRoute("/")({
       supabase
         .from("featured_samples")
         .select(
-          "id,title,quote,for_text,genre_label,cover_image_url,audio_url,lyrics,synced_lyrics,testimonial_slug",
+          "id,title,quote,for_text,genre_label,cover_image_url,audio_url,lyrics,synced_lyrics,testimonial_slug,recipient_name,relationship",
         )
         .eq("published", true)
         .eq("id", HERO_SAMPLE_ID)
@@ -35,7 +35,7 @@ export const Route = createFileRoute("/")({
       supabase
         .from("featured_samples")
         .select(
-          "id,title,quote,for_text,genre_label,cover_image_url,audio_url,lyrics,synced_lyrics,testimonial_slug",
+          "id,title,quote,for_text,genre_label,cover_image_url,audio_url,lyrics,synced_lyrics,testimonial_slug,recipient_name,relationship",
         )
         .eq("published", true)
         .is("testimonial_slug", null)
