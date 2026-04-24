@@ -114,6 +114,8 @@ interface FeaturedSample {
   audio_url: string | null;
   lyrics: string | null;
   synced_lyrics?: SyncedLine[] | null;
+  recipient_name?: string | null;
+  relationship?: string | null;
 }
 
 /**
