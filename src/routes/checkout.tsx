@@ -371,7 +371,13 @@ function CheckoutPage() {
                 key={paymentIntentId}
                 clientSecret={clientSecret}
                 email={email.trim().toLowerCase()}
-                amountLabel="$49.99"
+                amountLabel={
+                  promoApplied
+                    ? `$${(promoApplied.final_amount_cents / 100).toFixed(2)}`
+                    : "$49.99"
+                }
+                amountCents={promoApplied?.final_amount_cents ?? 4999}
+                promoVersion={promoApplied ? 1 : 0}
                 returnUrl={`${window.location.origin}/checkout/return?payment_intent_id=${paymentIntentId}`}
                 onError={(msg) => setError(msg)}
                 disabled={!ready}
