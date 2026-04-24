@@ -89,6 +89,7 @@ serve(async (req) => {
       .from("orders")
       .update({
         stripe_payment_intent_id: paymentIntent.id,
+        stripe_customer_id: customerId,
         payment_status: "checkout_started",
       })
       .eq("id", orderId)
