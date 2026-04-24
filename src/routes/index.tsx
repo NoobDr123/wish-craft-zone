@@ -738,7 +738,7 @@ function LandingPage() {
 
                 <audio
                   ref={heroAudioRef}
-                  src={RACHEL_SONG_URL}
+                  src={heroSongUrl}
                   preload="metadata"
                   onEnded={() => { setHeroPlaying(false); }}
                 />
