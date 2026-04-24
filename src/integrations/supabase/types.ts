@@ -308,10 +308,12 @@ export type Database = {
           amount_paid_cents: number
           audio_variants: Json | null
           auto_qc_results: Json | null
+          auto_user_provisioned_at: string | null
           brief: Json | null
           brief_score: Json | null
           buyer_email: string
           buyer_name: string | null
+          confirmation_email_sent_at: string | null
           created_at: string
           currency: string
           customer_name: string | null
@@ -361,10 +363,12 @@ export type Database = {
           amount_paid_cents?: number
           audio_variants?: Json | null
           auto_qc_results?: Json | null
+          auto_user_provisioned_at?: string | null
           brief?: Json | null
           brief_score?: Json | null
           buyer_email: string
           buyer_name?: string | null
+          confirmation_email_sent_at?: string | null
           created_at?: string
           currency?: string
           customer_name?: string | null
@@ -414,10 +418,12 @@ export type Database = {
           amount_paid_cents?: number
           audio_variants?: Json | null
           auto_qc_results?: Json | null
+          auto_user_provisioned_at?: string | null
           brief?: Json | null
           brief_score?: Json | null
           buyer_email?: string
           buyer_name?: string | null
+          confirmation_email_sent_at?: string | null
           created_at?: string
           currency?: string
           customer_name?: string | null
