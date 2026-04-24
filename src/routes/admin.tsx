@@ -24,7 +24,7 @@ export const Route = createFileRoute("/admin")({
   }),
 });
 
-type Tab = "orders" | "refunds" | "reactions" | "revisions" | "samples";
+type Tab = "orders" | "refunds" | "reactions" | "revisions" | "samples" | "emails";
 
 function StaffPage() {
   const { state, user, refresh } = useAdminGuard();
