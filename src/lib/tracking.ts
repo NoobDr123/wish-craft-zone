@@ -122,7 +122,12 @@ export async function attachSessionIdentity(input: {
   if (typeof window === "undefined") return;
   const sessionId = getSessionId();
   try {
-    const patch: Record<string, unknown> = {
+    const patch: {
+      last_seen_at: string;
+      buyer_email?: string;
+      order_id?: string;
+      user_id?: string;
+    } = {
       last_seen_at: new Date().toISOString(),
     };
     if (input.buyerEmail) patch.buyer_email = input.buyerEmail.toLowerCase();
