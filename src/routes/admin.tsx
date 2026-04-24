@@ -12,9 +12,11 @@ import { useAdminGuard } from "@/hooks/useAdminGuard";
 import { AdminMfaEnroll } from "@/components/admin/AdminMfaEnroll";
 import { AdminMfaChallenge } from "@/components/admin/AdminMfaChallenge";
 import { supabase } from "@/integrations/supabase/client";
+import { AdminIpGate } from "@/components/admin/AdminIpGate";
+import { AdminIpBootstrap } from "@/components/admin/AdminIpBootstrap";
 
 export const Route = createFileRoute("/admin")({
-  component: StaffPage,
+  component: AdminRoute,
   head: () => ({
     meta: [
       { title: "Staff · RibbonSong" },
@@ -23,6 +25,18 @@ export const Route = createFileRoute("/admin")({
     ],
   }),
 });
+
+function AdminRoute() {
+  return (
+    <AdminIpGate
+      bootstrap={({ ip, onAdded }) => (
+        <AdminIpBootstrap ip={ip} onAdded={onAdded} />
+      )}
+    >
+      <StaffPage />
+    </AdminIpGate>
+  );
+}
 
 type Tab = "orders" | "refunds" | "reactions" | "revisions" | "samples" | "emails";
 
