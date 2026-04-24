@@ -137,6 +137,11 @@ function InnerForm({ returnUrl, email, amountLabel, amountCents, promoVersion, o
             buttonHeight: 48,
             buttonTheme: { applePay: "black", googlePay: "black" },
             paymentMethods: { applePay: "always", googlePay: "always", link: "auto" },
+            layout: {
+              maxColumns: 1,
+              maxRows: 0,
+              overflow: "never",
+            },
           }}
         />
         <div className="my-4 flex items-center gap-3">
