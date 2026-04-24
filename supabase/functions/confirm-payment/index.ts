@@ -58,7 +58,7 @@ serve(async (req) => {
       // Read current state first so we don't clobber a webhook that already ran.
       const { data: existing } = await supabase
         .from("orders")
-        .select("id, payment_status, status, confirmation_email_sent_at")
+        .select("id, payment_status, status, buyer_email, buyer_name, confirmation_email_sent_at")
         .eq("id", orderId)
         .maybeSingle();
 
@@ -66,18 +66,41 @@ serve(async (req) => {
         return json({ error: "Order not found", orderId }, 404);
       }
 
+      // If the buyer never typed their email into the form (e.g. tapped Apple
+      // Pay too fast and the debounced save didn't fire), pull the real email
+      // from Stripe's PI / latest charge billing details so the confirmation
+      // email + dashboard lookup work.
+      const placeholder = typeof existing.buyer_email === "string"
+        && /^pending\+.*@ribbonsong\.com$/i.test(existing.buyer_email);
+      let realEmail: string | null = null;
+      let realName: string | null = null;
+      if (placeholder) {
+        const charge = (pi as any).latest_charge && typeof (pi as any).latest_charge === "object"
+          ? (pi as any).latest_charge
+          : null;
+        const billingDetails = charge?.billing_details ?? null;
+        realEmail = (pi.receipt_email as string | null)
+          || (billingDetails?.email as string | null)
+          || null;
+        realName = (billingDetails?.name as string | null) || null;
+      }
+
       // Always update payment ids / status if not already paid.
       if (existing.payment_status !== "paid") {
+        const updates: Record<string, unknown> = {
+          stripe_customer_id: pi.customer as string | null,
+          stripe_payment_intent_id: pi.id,
+          stripe_payment_method_id: pi.payment_method as string | null,
+          payment_status: "paid",
+          amount_paid_cents: pi.amount_received ?? pi.amount ?? 0,
+          status: "awaiting_upsells",
+        };
+        if (placeholder && realEmail) updates.buyer_email = realEmail.toLowerCase();
+        if (placeholder && realName) updates.buyer_name = realName;
+
         const { error: updErr } = await supabase
           .from("orders")
-          .update({
-            stripe_customer_id: pi.customer as string | null,
-            stripe_payment_intent_id: pi.id,
-            stripe_payment_method_id: pi.payment_method as string | null,
-            payment_status: "paid",
-            amount_paid_cents: pi.amount_received ?? pi.amount ?? 0,
-            status: "awaiting_upsells",
-          })
+          .update(updates)
           .eq("id", orderId);
 
         if (updErr) {
