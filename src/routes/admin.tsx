@@ -870,6 +870,55 @@ function SamplesPanel() {
     load();
   };
 
+  // Manual karaoke re-sync via AudioShake forced alignment.
+  // Submits a task, then polls until completed (or fails).
+  const syncLyrics = async (id: string) => {
+    setBusy(`sync-${id}`);
+    const { data: { session } } = await supabase.auth.getSession();
+    const url = `${import.meta.env.VITE_SUPABASE_URL}/functions/v1/audioshake-align`;
+    const headers = {
+      "Content-Type": "application/json",
+      Authorization: `Bearer ${session?.access_token}`,
+    };
+
+    try {
+      const submitRes = await fetch(url, {
+        method: "POST",
+        headers,
+        body: JSON.stringify({ sampleId: id }),
+      });
+      const submitJson = await submitRes.json().catch(() => ({}));
+      if (!submitRes.ok || !submitJson.taskId) {
+        throw new Error(submitJson.error ?? `Submit failed (${submitRes.status})`);
+      }
+      const taskId: string = submitJson.taskId;
+
+      // Poll up to ~5 minutes
+      for (let i = 0; i < 60; i++) {
+        await new Promise((r) => setTimeout(r, 5000));
+        const pollRes = await fetch(url, {
+          method: "POST",
+          headers,
+          body: JSON.stringify({ sampleId: id, taskId }),
+        });
+        const pollJson = await pollRes.json().catch(() => ({}));
+        if (pollJson.status === "completed") {
+          alert(`Synced ${pollJson.lineCount ?? "?"} lines.`);
+          load();
+          return;
+        }
+        if (pollJson.status === "failed") {
+          throw new Error(pollJson.error ?? "AudioShake reported failure");
+        }
+      }
+      throw new Error("Timed out waiting for AudioShake");
+    } catch (e) {
+      alert(`Sync failed: ${e instanceof Error ? e.message : "unknown"}`);
+    } finally {
+      setBusy(null);
+    }
+  };
+
 
   const togglePublish = async (s: SampleRow) => {
     setBusy(s.id);
