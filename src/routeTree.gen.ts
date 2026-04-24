@@ -29,6 +29,7 @@ import { Route as ListenIdRouteImport } from './routes/listen.$id'
 import { Route as CheckoutReturnRouteImport } from './routes/checkout.return'
 import { Route as AuthCallbackRouteImport } from './routes/auth.callback'
 import { Route as AdminLoginRouteImport } from './routes/admin.login'
+import { Route as ApiAdminIpCheckRouteImport } from './routes/api.admin.ip-check'
 import { Route as LovableEmailQueueProcessRouteImport } from './routes/lovable/email/queue/process'
 import { Route as LovableEmailAuthWebhookRouteImport } from './routes/lovable/email/auth/webhook'
 import { Route as LovableEmailAuthPreviewRouteImport } from './routes/lovable/email/auth/preview'
@@ -133,6 +134,11 @@ const AdminLoginRoute = AdminLoginRouteImport.update({
   path: '/login',
   getParentRoute: () => AdminRoute,
 } as any)
+const ApiAdminIpCheckRoute = ApiAdminIpCheckRouteImport.update({
+  id: '/api/admin/ip-check',
+  path: '/api/admin/ip-check',
+  getParentRoute: () => rootRouteImport,
+} as any)
 const LovableEmailQueueProcessRoute =
   LovableEmailQueueProcessRouteImport.update({
     id: '/lovable/email/queue/process',
@@ -171,6 +177,7 @@ export interface FileRoutesByFullPath {
   '/checkout/return': typeof CheckoutReturnRoute
   '/listen/$id': typeof ListenIdRoute
   '/portal/$id': typeof PortalIdRoute
+  '/api/admin/ip-check': typeof ApiAdminIpCheckRoute
   '/lovable/email/auth/preview': typeof LovableEmailAuthPreviewRoute
   '/lovable/email/auth/webhook': typeof LovableEmailAuthWebhookRoute
   '/lovable/email/queue/process': typeof LovableEmailQueueProcessRoute
@@ -196,6 +203,7 @@ export interface FileRoutesByTo {
   '/checkout/return': typeof CheckoutReturnRoute
   '/listen/$id': typeof ListenIdRoute
   '/portal/$id': typeof PortalIdRoute
+  '/api/admin/ip-check': typeof ApiAdminIpCheckRoute
   '/lovable/email/auth/preview': typeof LovableEmailAuthPreviewRoute
   '/lovable/email/auth/webhook': typeof LovableEmailAuthWebhookRoute
   '/lovable/email/queue/process': typeof LovableEmailQueueProcessRoute
@@ -222,6 +230,7 @@ export interface FileRoutesById {
   '/checkout/return': typeof CheckoutReturnRoute
   '/listen/$id': typeof ListenIdRoute
   '/portal/$id': typeof PortalIdRoute
+  '/api/admin/ip-check': typeof ApiAdminIpCheckRoute
   '/lovable/email/auth/preview': typeof LovableEmailAuthPreviewRoute
   '/lovable/email/auth/webhook': typeof LovableEmailAuthWebhookRoute
   '/lovable/email/queue/process': typeof LovableEmailQueueProcessRoute
@@ -249,6 +258,7 @@ export interface FileRouteTypes {
     | '/checkout/return'
     | '/listen/$id'
     | '/portal/$id'
+    | '/api/admin/ip-check'
     | '/lovable/email/auth/preview'
     | '/lovable/email/auth/webhook'
     | '/lovable/email/queue/process'
@@ -274,6 +284,7 @@ export interface FileRouteTypes {
     | '/checkout/return'
     | '/listen/$id'
     | '/portal/$id'
+    | '/api/admin/ip-check'
     | '/lovable/email/auth/preview'
     | '/lovable/email/auth/webhook'
     | '/lovable/email/queue/process'
@@ -299,6 +310,7 @@ export interface FileRouteTypes {
     | '/checkout/return'
     | '/listen/$id'
     | '/portal/$id'
+    | '/api/admin/ip-check'
     | '/lovable/email/auth/preview'
     | '/lovable/email/auth/webhook'
     | '/lovable/email/queue/process'
@@ -323,6 +335,7 @@ export interface RootRouteChildren {
   AuthCallbackRoute: typeof AuthCallbackRoute
   ListenIdRoute: typeof ListenIdRoute
   PortalIdRoute: typeof PortalIdRoute
+  ApiAdminIpCheckRoute: typeof ApiAdminIpCheckRoute
   LovableEmailAuthPreviewRoute: typeof LovableEmailAuthPreviewRoute
   LovableEmailAuthWebhookRoute: typeof LovableEmailAuthWebhookRoute
   LovableEmailQueueProcessRoute: typeof LovableEmailQueueProcessRoute
@@ -470,6 +483,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof AdminLoginRouteImport
       parentRoute: typeof AdminRoute
     }
+    '/api/admin/ip-check': {
+      id: '/api/admin/ip-check'
+      path: '/api/admin/ip-check'
+      fullPath: '/api/admin/ip-check'
+      preLoaderRoute: typeof ApiAdminIpCheckRouteImport
+      parentRoute: typeof rootRouteImport
+    }
     '/lovable/email/queue/process': {
       id: '/lovable/email/queue/process'
       path: '/lovable/email/queue/process'
@@ -535,6 +555,7 @@ const rootRouteChildren: RootRouteChildren = {
   AuthCallbackRoute: AuthCallbackRoute,
   ListenIdRoute: ListenIdRoute,
   PortalIdRoute: PortalIdRoute,
+  ApiAdminIpCheckRoute: ApiAdminIpCheckRoute,
   LovableEmailAuthPreviewRoute: LovableEmailAuthPreviewRoute,
   LovableEmailAuthWebhookRoute: LovableEmailAuthWebhookRoute,
   LovableEmailQueueProcessRoute: LovableEmailQueueProcessRoute,
