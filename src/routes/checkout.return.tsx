@@ -4,6 +4,7 @@ import { CheckCircle2 } from "lucide-react";
 import { Logo } from "@/components/Logo";
 import { supabase } from "@/integrations/supabase/client";
 import { useQuizStore } from "@/stores/quizStore";
+import { stripeEnvironment } from "@/lib/stripe";
 
 export const Route = createFileRoute("/checkout/return")({
   component: CheckoutReturnPage,
@@ -72,6 +73,16 @@ function CheckoutReturnPage() {
           }
         } catch {
           // Pixel failures must never block the funnel.
+        }
+
+        // Auto-provision the buyer's account in the background so that by
+        // the time they finish the upsell flow and land on /processing,
+        // they're already signed in. Fire-and-forget — failure here MUST
+        // NOT block the funnel; they can always sign in later via email.
+        if (paymentIntentId) {
+          autoLogin(paymentIntentId).catch((e) =>
+            console.error("autoLogin failed (non-fatal):", e),
+          );
         }
 
         setStatus("ready");
