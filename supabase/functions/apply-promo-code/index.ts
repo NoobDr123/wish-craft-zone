@@ -92,10 +92,15 @@ serve(async (req) => {
     };
 
     if (finalAmount === 0) {
-      // Free order — short-circuit the whole payment flow
+      // Free order — short-circuit the whole payment flow.
+      // Also mark it as rush + priority so process-kie-callback schedules
+      // delivery immediately (instead of the default +24h) — useful for
+      // 100% test/promo codes where we want instant end-to-end.
       updatePayload.payment_status = "paid";
       updatePayload.amount_paid_cents = 0;
       updatePayload.status = "upsells_complete"; // jumps straight to brief generation via trigger
+      updatePayload.is_rush = true;
+      updatePayload.priority = "priority";
     } else if (order.stripe_payment_intent_id) {
       // Partial discount — update the existing PaymentIntent so the user is
       // charged the discounted amount when they confirm.
