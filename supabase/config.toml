@@ -50,3 +50,6 @@ verify_jwt = false
 
 [functions.audioshake-align]
 verify_jwt = false
+
+[functions.audioshake-poll-once]
+verify_jwt = false
