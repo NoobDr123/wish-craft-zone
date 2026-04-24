@@ -1,3 +1,4 @@
+import { Fragment } from "react";
 import { Check, Gift, ClipboardCheck } from "lucide-react";
 
 interface CheckoutProgressProps {
@@ -8,6 +9,10 @@ interface CheckoutProgressProps {
 /**
  * Slim progress indicator shown at the top of the checkout flow.
  * Steps: Payment, Bonus, Final confirmation. Uses the brand palette.
+ *
+ * Layout: each step is auto-width and centered on its icon. Connectors
+ * are flex-1 lines BETWEEN steps, which guarantees the steps are evenly
+ * spaced across the row (and the icons line up under their labels).
  */
 export function CheckoutProgress({ current }: CheckoutProgressProps) {
   const steps = [
@@ -23,15 +28,26 @@ export function CheckoutProgress({ current }: CheckoutProgressProps) {
 
   return (
     <div className="w-full border-b border-border/60 bg-background-card/80 backdrop-blur-md">
-      <div className="mx-auto flex max-w-2xl items-center justify-between gap-1.5 px-3 py-3 sm:gap-2 sm:px-6 sm:py-4">
+      <div className="mx-auto flex max-w-2xl items-start px-4 py-3 sm:px-6 sm:py-4">
         {steps.map((step, i) => {
           const state =
-            step.id < current ? "done" : step.id === current ? "current" : "todo";
+            step.id < current
+              ? "done"
+              : step.id === current
+                ? "current"
+                : "todo";
           const isLast = i === steps.length - 1;
+          const connectorState =
+            step.id < current
+              ? "done"
+              : step.id === current
+                ? "current"
+                : "todo";
 
           return (
-            <div key={step.id} className="flex flex-1 items-center">
-              <div className="flex min-w-0 flex-col items-center gap-1 sm:gap-1.5">
+            <Fragment key={step.id}>
+              {/* Step column — auto width, icon centered, label below */}
+              <div className="flex shrink-0 flex-col items-center gap-1 sm:gap-1.5">
                 <div
                   className={[
                     "flex h-8 w-8 items-center justify-center rounded-full border-2 transition-all sm:h-9 sm:w-9",
@@ -47,10 +63,9 @@ export function CheckoutProgress({ current }: CheckoutProgressProps) {
                 >
                   <step.Icon className="h-3.5 w-3.5 sm:h-4 sm:w-4" />
                 </div>
-                {/* Short label on mobile, full label on >=sm */}
                 <span
                   className={[
-                    "max-w-full truncate text-center text-[9px] font-semibold uppercase tracking-[0.12em] sm:hidden",
+                    "text-center text-[9px] font-semibold uppercase tracking-[0.12em] sm:hidden",
                     state === "todo"
                       ? "text-muted-foreground"
                       : "text-foreground",
@@ -60,7 +75,7 @@ export function CheckoutProgress({ current }: CheckoutProgressProps) {
                 </span>
                 <span
                   className={[
-                    "hidden text-[10px] font-semibold uppercase tracking-[0.16em] sm:block md:text-xs",
+                    "hidden text-center text-[10px] font-semibold uppercase tracking-[0.16em] sm:block md:text-xs",
                     state === "todo"
                       ? "text-muted-foreground"
                       : "text-foreground",
@@ -70,19 +85,20 @@ export function CheckoutProgress({ current }: CheckoutProgressProps) {
                 </span>
               </div>
 
+              {/* Connector — only between steps, vertically aligned with the icon */}
               {!isLast && (
                 <div
                   className={[
-                    "mx-1.5 h-0.5 flex-1 rounded-full transition-all sm:mx-3",
-                    step.id < current
+                    "mx-2 mt-4 h-0.5 flex-1 rounded-full transition-all sm:mx-3 sm:mt-[18px]",
+                    connectorState === "done"
                       ? "bg-primary"
-                      : step.id === current
+                      : connectorState === "current"
                         ? "bg-gradient-to-r from-primary to-border"
                         : "bg-border",
                   ].join(" ")}
                 />
               )}
-            </div>
+            </Fragment>
           );
         })}
       </div>

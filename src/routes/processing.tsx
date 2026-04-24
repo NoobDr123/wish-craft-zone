@@ -329,41 +329,41 @@ function ThankYouPage() {
 
               <div className="my-4 border-t border-dashed border-peach sm:my-5" />
 
-              <div className="space-y-2.5 text-[14px] sm:space-y-3 sm:text-[15px]">
-                <div className="flex items-start justify-between gap-3">
+              <div className="space-y-3 text-[14px] sm:space-y-3 sm:text-[15px]">
+                <div className="flex flex-col gap-0.5 sm:flex-row sm:items-start sm:justify-between sm:gap-3">
                   <span className="inline-flex items-center gap-2 text-muted-foreground">
                     <Mail className="h-4 w-4 shrink-0" /> Confirmation sent to
                   </span>
-                  <span className="break-all text-right font-semibold text-foreground">
+                  <span className="break-all font-semibold text-foreground sm:text-right">
                     {buyerEmail}
                   </span>
                 </div>
 
                 {order?.is_gift && order.recipient_email && (
-                  <div className="flex items-start justify-between gap-3">
+                  <div className="flex flex-col gap-0.5 sm:flex-row sm:items-start sm:justify-between sm:gap-3">
                     <span className="inline-flex items-center gap-2 text-muted-foreground">
                       <Send className="h-4 w-4 shrink-0" /> Gift delivery to
                     </span>
-                    <span className="break-all text-right font-semibold text-foreground">
+                    <span className="break-all font-semibold text-foreground sm:text-right">
                       {order.recipient_email}
                     </span>
                   </div>
                 )}
 
-                <div className="flex items-start justify-between gap-3">
+                <div className="flex flex-col gap-0.5 sm:flex-row sm:items-start sm:justify-between sm:gap-3">
                   <span className="inline-flex items-center gap-2 text-muted-foreground">
                     <Calendar className="h-4 w-4 shrink-0" /> Expected delivery
                   </span>
-                  <span className="text-right font-semibold text-primary">
+                  <span className="font-semibold text-primary sm:text-right">
                     {deliveryDate}
                   </span>
                 </div>
 
-                <div className="flex items-start justify-between gap-3">
+                <div className="flex flex-col gap-0.5 sm:flex-row sm:items-start sm:justify-between sm:gap-3">
                   <span className="inline-flex items-center gap-2 text-muted-foreground">
                     <Sparkles className="h-4 w-4 shrink-0" /> Delivery speed
                   </span>
-                  <span className="text-right font-semibold text-foreground">
+                  <span className="font-semibold text-foreground sm:text-right">
                     {deliveryWindow}
                   </span>
                 </div>
