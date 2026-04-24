@@ -39,17 +39,48 @@ function CheckoutReturnPage() {
 
     let cancelled = false;
     let attempts = 0;
+    let confirmCalled = false;
+
+    const lookupOrder = async () => {
+      const query = supabase
+        .from("orders")
+        .select("id, payment_status, status, amount_paid_cents, amount_cents, currency, stripe_payment_intent_id");
+      return paymentIntentId
+        ? await query.eq("stripe_payment_intent_id", paymentIntentId).maybeSingle()
+        : await query.eq("stripe_checkout_session_id", sessionId!).maybeSingle();
+    };
+
+    // Server-side fallback: ask Stripe directly whether the PI succeeded and
+    // mark the order paid. The webhook is supposed to do this, but Apple/Google
+    // Pay flows can race the redirect and webhooks aren't always reliable.
+    const callConfirm = async () => {
+      if (!paymentIntentId || confirmCalled) return;
+      confirmCalled = true;
+      try {
+        const { data, error } = await supabase.functions.invoke("confirm-payment", {
+          body: { paymentIntentId, environment: stripeEnvironment },
+        });
+        if (error) {
+          console.warn("confirm-payment error (will keep polling):", error.message);
+        } else {
+          console.log("confirm-payment result:", data);
+        }
+      } catch (e) {
+        console.warn("confirm-payment threw (will keep polling):", e);
+      }
+    };
 
     const poll = async () => {
       attempts += 1;
 
-      const query = supabase
-        .from("orders")
-        .select("id, payment_status, status, amount_paid_cents, amount_cents, currency, stripe_payment_intent_id");
+      // On the first attempt, kick the server-side confirmation in parallel
+      // with the DB read. By the second poll the order should be marked paid
+      // even if the webhook never fired.
+      if (attempts === 1) {
+        callConfirm();
+      }
 
-      const { data: order } = paymentIntentId
-        ? await query.eq("stripe_payment_intent_id", paymentIntentId).maybeSingle()
-        : await query.eq("stripe_checkout_session_id", sessionId!).maybeSingle();
+      const { data: order } = await lookupOrder();
 
       if (cancelled) return;
 
@@ -90,7 +121,14 @@ function CheckoutReturnPage() {
         return;
       }
 
-      if (attempts > 15) {
+      // Retry confirm-payment a few times in case the first call lost the race
+      // (e.g. PI hadn't transitioned to succeeded yet on Stripe's side).
+      if (attempts === 4 || attempts === 8) {
+        confirmCalled = false;
+        callConfirm();
+      }
+
+      if (attempts > 20) {
         if (order?.id) {
           q.set("orderId", order.id);
           if (paymentIntentId) q.set("checkoutSessionId", paymentIntentId);

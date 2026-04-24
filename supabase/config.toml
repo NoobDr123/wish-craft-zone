@@ -53,3 +53,6 @@ verify_jwt = false
 
 [functions.kickoff-hero-sample]
 verify_jwt = false
+
+[functions.confirm-payment]
+verify_jwt = false
