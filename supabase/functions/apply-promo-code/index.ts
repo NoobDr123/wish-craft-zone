@@ -31,7 +31,7 @@ serve(async (req) => {
   }
 
   try {
-    const { orderId, code } = await req.json();
+    const { orderId, code, environment } = await req.json();
 
     if (!orderId || typeof orderId !== "string") {
       return json({ ok: false, error: "missing_order_id" }, 400);
@@ -43,10 +43,12 @@ serve(async (req) => {
       return json({ ok: false, error: "invalid_code" }, 400);
     }
 
-    // Load the order to get the base amount + buyer email
+    const env: StripeEnv = environment === "live" ? "live" : "sandbox";
+
+    // Load the order to get the base amount + buyer email + PI id
     const { data: order, error: orderErr } = await supabase
       .from("orders")
-      .select("id, amount_cents, buyer_email, payment_status, status")
+      .select("id, amount_cents, buyer_email, payment_status, status, stripe_payment_intent_id")
       .eq("id", orderId)
       .maybeSingle();
 
