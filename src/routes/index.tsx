@@ -4,7 +4,7 @@ import rachelPhoto from "@/assets/rachel-mother-real.jpg";
 
 const RACHEL_SONG_URL =
   "https://tempfile.aiquickdraw.com/r/87ddf1c43b994c3c9e593b383ec8de16.mp3";
-const HERO_SAMPLE_ID = "d14f8ca3-ec11-45c7-b52d-a2671284357c";
+const HERO_SAMPLE_ID = "7c2985a2-8ab5-4920-a0bb-347dcf619019";
 import { SiteHeader } from "@/components/SiteHeader";
 import { SiteFooter } from "@/components/SiteFooter";
 import { supabase } from "@/integrations/supabase/client";
@@ -803,18 +803,18 @@ function LandingPage() {
                 <span className="font-display text-[1.05em] font-semibold not-italic text-[#8D6FAF]">
                   &ldquo;
                 </span>
-                I played it on the drive home from her last chemo. We both
-                cried the whole way.
+                She was diagnosed 3 weeks ago. I didn&rsquo;t know what to say.
+                So I made her a song. She plays it before every infusion.
                 <span className="font-display text-[1.05em] font-semibold not-italic text-[#8D6FAF]">
                   &rdquo;
                 </span>
               </h1>
               <div className="mb-6 text-[13px] leading-[1.5] text-[#8A8175] md:mb-7 md:text-sm">
                 <strong className="font-semibold text-[#5A5148]">
-                  Rachel L., 34 · Columbus, OH
+                  Rachel L., 34, Columbus, OH
                 </strong>
                 <br />
-                Daughter of Margaret, 62 · Stage 3 breast cancer, now in remission
+                Daughter of Margaret, 62, Stage 3 breast cancer, currently in treatment
               </div>
               <p className="mb-7 max-w-[540px] text-[16px] leading-[1.55] text-[#5A5148] md:mb-8 md:text-[18px]">
                 When cancer takes the words away, give them a personalized song that says what you can't, and reminds them they're loved on the hardest days.{" "}
