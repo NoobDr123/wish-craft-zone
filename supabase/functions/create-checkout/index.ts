@@ -40,13 +40,35 @@ serve(async (req) => {
     // 1. Resolve price (cached after first call) — fast path.
     const price = await getBasePrice(env);
 
-    // 2. Create the PaymentIntent WITHOUT a Customer object.
-    //    Stripe will auto-create one from billing details on confirm.
-    //    `setup_future_usage` still saves the card for upsells via webhook.
-    //    This drops the previous Customer round-trip (~300 ms).
+    // 1b. Look up any email already on the order so we can attach the new
+    //     Customer to it. Apple/Google Pay buyers may not have typed an
+    //     email; we'll patch the Customer later in confirm-payment.
+    const { data: existingOrder } = await supabase
+      .from("orders")
+      .select("buyer_email, stripe_customer_id")
+      .eq("id", orderId)
+      .maybeSingle();
+
+    // 2. ALWAYS create + attach a Stripe Customer so `setup_future_usage`
+    //    saves the PaymentMethod against a real customer. Without this, all
+    //    upsells (charge-upsell with off_session: true) fail because the
+    //    saved PaymentMethod isn't bound to any customer.
+    let customerId = existingOrder?.stripe_customer_id ?? null;
+    if (!customerId) {
+      const customer = await stripe.customers.create({
+        email:
+          existingOrder?.buyer_email && !existingOrder.buyer_email.startsWith("pending+")
+            ? existingOrder.buyer_email
+            : undefined,
+        metadata: { orderId },
+      });
+      customerId = customer.id;
+    }
+
     const paymentIntent = await stripe.paymentIntents.create({
       amount: price.amount,
       currency: price.currency,
+      customer: customerId,
       setup_future_usage: "off_session",
       automatic_payment_methods: {
         enabled: true,
