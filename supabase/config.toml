@@ -41,3 +41,6 @@ verify_jwt = false
 
 [functions.redeem-login-token]
 verify_jwt = false
+
+[functions.apply-promo-code]
+verify_jwt = false
