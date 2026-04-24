@@ -26,7 +26,7 @@ export const Route = createFileRoute("/")({
       supabase
         .from("featured_samples")
         .select(
-          "id,title,quote,for_text,genre_label,cover_image_url,audio_url,lyrics,testimonial_slug",
+          "id,title,quote,for_text,genre_label,cover_image_url,audio_url,lyrics,synced_lyrics,testimonial_slug",
         )
         .eq("published", true)
         .is("testimonial_slug", null)
@@ -83,6 +83,12 @@ export const Route = createFileRoute("/")({
   }),
 });
 
+interface SyncedLine {
+  start: number;
+  end: number;
+  text: string;
+}
+
 interface FeaturedSample {
   id: string;
   title: string;
@@ -92,6 +98,100 @@ interface FeaturedSample {
   cover_image_url: string | null;
   audio_url: string | null;
   lyrics: string | null;
+  synced_lyrics?: SyncedLine[] | null;
+}
+
+/**
+ * Karaoke-style synced lyrics overlay.
+ *
+ * Listens to the provided <audio> element's timeupdate and renders the
+ * active line bright + a previous and next line dimmed. Active words
+ * inside the line are progressively highlighted based on time elapsed
+ * within that line.
+ */
+function KaraokeOverlay({
+  audioRef,
+  lines,
+  visible,
+}: {
+  audioRef: React.RefObject<HTMLAudioElement | null>;
+  lines: SyncedLine[];
+  visible: boolean;
+}) {
+  const [t, setT] = useState(0);
+
+  useEffect(() => {
+    const a = audioRef.current;
+    if (!a) return;
+    const onTime = () => setT(a.currentTime);
+    a.addEventListener("timeupdate", onTime);
+    a.addEventListener("seeked", onTime);
+    return () => {
+      a.removeEventListener("timeupdate", onTime);
+      a.removeEventListener("seeked", onTime);
+    };
+  }, [audioRef]);
+
+  if (!visible || !lines || lines.length === 0) return null;
+
+  // Find active line index (the latest line whose start <= t)
+  let activeIdx = -1;
+  for (let i = 0; i < lines.length; i++) {
+    if (t >= lines[i].start) activeIdx = i;
+    else break;
+  }
+  // If we're past the active line's end and before the next line, still
+  // show that line as the most recent (so the screen never goes blank
+  // mid-song); only treat as "before any line" if we haven't reached the
+  // first line's start yet.
+  if (activeIdx === -1) activeIdx = 0;
+
+  const active = lines[activeIdx];
+  const prev = activeIdx > 0 ? lines[activeIdx - 1] : null;
+  const next = activeIdx < lines.length - 1 ? lines[activeIdx + 1] : null;
+
+  // Word-level progress inside the active line
+  const words = active.text.split(/\s+/).filter(Boolean);
+  const lineDuration = Math.max(0.4, active.end - active.start);
+  const progress = Math.min(
+    1,
+    Math.max(0, (t - active.start) / lineDuration),
+  );
+  const wordsHit = Math.floor(progress * words.length);
+
+  return (
+    <div className="pointer-events-none absolute inset-x-0 top-0 z-10 px-4 pt-4 sm:px-6 sm:pt-6">
+      <div className="mx-auto max-w-[420px] rounded-2xl bg-black/55 px-4 py-3 text-center backdrop-blur-md sm:px-5 sm:py-3.5">
+        {prev && (
+          <div className="mb-1 truncate text-[11px] font-medium leading-tight text-white/45 sm:text-xs">
+            {prev.text}
+          </div>
+        )}
+        <div className="text-[15px] font-semibold leading-snug text-white sm:text-[17px]">
+          {words.map((w, i) => (
+            <span
+              key={i}
+              className={
+                i < wordsHit
+                  ? "text-[#E8C547]"
+                  : i === wordsHit
+                    ? "text-white"
+                    : "text-white/70"
+              }
+            >
+              {w}
+              {i < words.length - 1 ? " " : ""}
+            </span>
+          ))}
+        </div>
+        {next && (
+          <div className="mt-1 truncate text-[11px] font-medium leading-tight text-white/45 sm:text-xs">
+            {next.text}
+          </div>
+        )}
+      </div>
+    </div>
+  );
 }
 
 // Fallback display data when no samples are published yet
@@ -597,7 +697,9 @@ function LandingPage() {
   // The hero "Listen to Example" button plays the first published, regenerated
   // sample (Margaret/Gospel) so it always reflects the latest admin regen.
   // Falls back to the hardcoded constant if no samples loaded.
-  const heroSongUrl = samples[0]?.audio_url || RACHEL_SONG_URL;
+  const heroSample = samples[0];
+  const heroSongUrl = heroSample?.audio_url || RACHEL_SONG_URL;
+  const heroSyncedLyrics = heroSample?.synced_lyrics ?? [];
   const heroAudioRef = useRef<HTMLAudioElement | null>(null);
   const [heroPlaying, setHeroPlaying] = useState(false);
   const [heroEverPlayed, setHeroEverPlayed] = useState(false);
@@ -735,6 +837,12 @@ function LandingPage() {
                   />
                 )}
                 <div className="pointer-events-none absolute inset-x-0 bottom-0 h-1/3 bg-gradient-to-t from-black/55 via-black/15 to-transparent" />
+
+                <KaraokeOverlay
+                  audioRef={heroAudioRef}
+                  lines={heroSyncedLyrics}
+                  visible={heroPlaying}
+                />
 
                 <audio
                   ref={heroAudioRef}

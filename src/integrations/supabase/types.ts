@@ -153,6 +153,7 @@ export type Database = {
           stage: string | null
           status: string
           story_prompt: string
+          synced_lyrics: Json | null
           tempo: string
           testimonial_slug: string | null
           title: string
@@ -183,6 +184,7 @@ export type Database = {
           stage?: string | null
           status?: string
           story_prompt: string
+          synced_lyrics?: Json | null
           tempo?: string
           testimonial_slug?: string | null
           title: string
@@ -213,6 +215,7 @@ export type Database = {
           stage?: string | null
           status?: string
           story_prompt?: string
+          synced_lyrics?: Json | null
           tempo?: string
           testimonial_slug?: string | null
           title?: string
