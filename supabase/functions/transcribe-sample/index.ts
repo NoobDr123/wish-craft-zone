@@ -1,13 +1,13 @@
-// Aligns the Claude-written lyrics for a featured_samples row to its audio.
-// Words come from the `lyrics` column (Claude's source of truth — no transcription).
-// Timing is estimated by:
-//   1. Reading audio duration via a partial fetch + WebAudio-free MP3 header parse,
-//      falling back to a Lovable AI duration probe if needed.
-//   2. Asking Claude (Opus) to split lyrics into singable lines and weight each
-//      line by syllable count + line type (verse/chorus/bridge), distributing the
-//      total audio duration across lines so karaoke pacing feels musical.
+// Aligns the source lyrics for a featured_samples row to its actual audio.
+// Words come from the `lyrics` column (source of truth — never re-transcribed).
+//
+// Primary strategy: send the audio + lyrics to Gemini 2.5 Pro via the Lovable AI
+//   Gateway and ask it to return real per-line timestamps by listening.
+// Fallback strategy: estimate timing by syllable weight + duration probe (used
+//   only if the audio-based pass fails).
+//
 // Triggered by the DB trigger `trigger_transcribe_sample` whenever audio_url changes.
-// Auth: INTERNAL_TRIGGER_SECRET.
+// Auth: INTERNAL_TRIGGER_SECRET header OR service-role JWT.
 
 import { createClient } from "https://esm.sh/@supabase/supabase-js@2.45.0";
 
@@ -23,14 +23,8 @@ interface SyncedLine {
   text: string;
 }
 
-interface ClaudeLine {
-  text: string;
-  weight: number; // relative duration weight (syllable + type adjusted)
-  section?: string; // "verse" | "chorus" | "bridge" | "outro" | "intro"
-}
-
-const ANTHROPIC_URL = "https://api.anthropic.com/v1/messages";
-const CLAUDE_MODEL = "claude-opus-4-5";
+const LOVABLE_AI_URL = "https://ai.gateway.lovable.dev/v1/chat/completions";
+const ALIGN_MODEL = "google/gemini-2.5-pro";
 
 Deno.serve(async (req) => {
   if (req.method === "OPTIONS")
@@ -82,30 +76,28 @@ Deno.serve(async (req) => {
     if (!sample.audio_url) throw new Error("Sample has no audio_url");
     if (!sample.lyrics) throw new Error("Sample has no lyrics");
 
-    // 1) Get audio duration
+    const cleanLines = extractSingableLines(sample.lyrics);
+    if (cleanLines.length === 0) throw new Error("No singable lines in lyrics");
+
+    // Get audio duration up-front (used by both strategies)
     const duration = await getAudioDuration(sample.audio_url);
-    console.log(`[transcribe-sample] sample=${sampleId} duration=${duration}s`);
+    console.log(`[transcribe-sample] sample=${sampleId} duration=${duration}s lines=${cleanLines.length}`);
 
-    // 2) Have Claude split + weight lyric lines
-    const claudeLines = await splitLyricsWithClaude(sample.lyrics);
-    if (claudeLines.length === 0) throw new Error("Claude returned no lines");
+    let lines: SyncedLine[] | null = null;
+    let source = "audio-align";
 
-    // 3) Distribute the audio duration across lines using weights.
-    //    Reserve a small intro (~5% or up to 6s) and outro (~3% or up to 4s)
-    //    for instrumental space so first line doesn't start at 0.
-    const introPad = Math.min(6, Math.max(2, duration * 0.05));
-    const outroPad = Math.min(4, Math.max(1, duration * 0.03));
-    const singDuration = Math.max(duration - introPad - outroPad, duration * 0.7);
+    // Primary: align by listening to the audio
+    try {
+      lines = await alignWithAudio(sample.audio_url, cleanLines, duration);
+      console.log(`[transcribe-sample] audio-align produced ${lines?.length ?? 0} lines`);
+    } catch (e) {
+      console.warn("[transcribe-sample] audio-align failed, falling back:", e);
+    }
 
-    const totalWeight = claudeLines.reduce((s, l) => s + l.weight, 0) || 1;
-    const lines: SyncedLine[] = [];
-    let cursor = introPad;
-    for (const cl of claudeLines) {
-      const dur = (cl.weight / totalWeight) * singDuration;
-      const start = round2(cursor);
-      const end = round2(cursor + dur);
-      lines.push({ start, end, text: cl.text });
-      cursor += dur;
+    // Fallback: syllable-weighted distribution
+    if (!lines || lines.length === 0) {
+      lines = syllableFallback(cleanLines, duration);
+      source = "syllable-fallback";
     }
 
     const { error: updateErr } = await supabase
@@ -119,7 +111,7 @@ Deno.serve(async (req) => {
       sampleId,
       duration,
       lineCount: lines.length,
-      source: "claude",
+      source,
     });
   } catch (e) {
     console.error("transcribe-sample error:", e);
@@ -141,9 +133,20 @@ function json(body: unknown, status = 200) {
   });
 }
 
+// --------- Lyric prep ---------
+function extractSingableLines(raw: string): string[] {
+  return raw
+    .split(/\r?\n/)
+    .map((l) => l.trim())
+    .filter(
+      (l) =>
+        l.length > 0 &&
+        !/^\[.*\]$/.test(l) && // [Verse 1], [Chorus]
+        !/^\(.*\)$/.test(l), // (instrumental)
+    );
+}
+
 // --------- Audio duration ---------
-// Try Content-Duration header (some CDNs send it), then estimate via byte-rate
-// for MP3 (CBR assumption), then fall back to a fixed estimate.
 async function getAudioDuration(url: string): Promise<number> {
   try {
     const head = await fetch(url, { method: "HEAD" });
@@ -155,89 +158,169 @@ async function getAudioDuration(url: string): Promise<number> {
     const len = parseInt(head.headers.get("content-length") || "0", 10);
     const ct = (head.headers.get("content-type") || "").toLowerCase();
     if (len > 0 && (ct.includes("mpeg") || ct.includes("mp3"))) {
-      // Suno songs are 192kbps CBR by default
+      // Suno songs are ~192kbps CBR
       const bitsPerSecond = 192_000;
       const seconds = (len * 8) / bitsPerSecond;
       if (seconds > 30 && seconds < 600) return Math.round(seconds);
     }
   } catch (e) {
-    console.warn("[transcribe-sample] HEAD failed, falling back", e);
+    console.warn("[transcribe-sample] HEAD failed", e);
   }
-  // Fallback estimate — typical Suno V5 ribbon song length
   return 180;
 }
 
-// --------- Claude lyric splitter ---------
-async function splitLyricsWithClaude(lyrics: string): Promise<ClaudeLine[]> {
-  const apiKey = Deno.env.get("ANTHROPIC_API_KEY");
-  if (!apiKey) throw new Error("ANTHROPIC_API_KEY not configured");
+// --------- Primary: audio-aligned via Gemini ---------
+async function alignWithAudio(
+  audioUrl: string,
+  lines: string[],
+  duration: number,
+): Promise<SyncedLine[]> {
+  const apiKey = Deno.env.get("LOVABLE_API_KEY");
+  if (!apiKey) throw new Error("LOVABLE_API_KEY not configured");
 
-  const system = `You are a karaoke timing engineer. You split song lyrics into singable lines and assign each line a relative duration "weight" (a positive number). Heavier weights mean the line takes longer to sing. Use these rules:
-- One singable line per entry. Never combine multiple lines.
-- Skip pure section headers like [Verse 1], [Chorus], [Bridge], [Outro] — these are not sung.
-- Skip blank lines.
-- Weight ≈ syllable count, with multipliers:
-  * Chorus / refrain repeat lines: ×1.15 (often held)
-  * Bridge climactic lines: ×1.1
-  * Short interjections (e.g. "Oh", "Yeah"): ×0.6 minimum 1
-  * Final outro line: ×1.4 (typically held / faded)
-- Tag each line with its section: "intro", "verse", "chorus", "bridge", "outro".
-- Output STRICT JSON only. No prose, no markdown.`;
+  // Fetch audio + base64 encode for inline part
+  const audioRes = await fetch(audioUrl);
+  if (!audioRes.ok) throw new Error(`audio fetch ${audioRes.status}`);
+  const audioBuf = new Uint8Array(await audioRes.arrayBuffer());
+  const audioB64 = uint8ToBase64(audioBuf);
+  const ct = audioRes.headers.get("content-type") || "audio/mpeg";
 
-  const user = `Split this song into singable lines with weights. Return JSON only.
+  const numbered = lines.map((t, i) => `${i + 1}. ${t}`).join("\n");
 
-LYRICS:
-${lyrics}
+  const system =
+    "You are a karaoke alignment engineer. You receive a song's audio and the exact lyrics, line by line. " +
+    "Listen to the audio and return the START time (in seconds, decimals OK) at which each line begins being sung. " +
+    "Do NOT change the lyrics text. Do NOT skip lines. Return one entry per input line, in order. " +
+    "Use tool calling to return the result.";
 
-Return JSON:
-{
-  "lines": [
-    { "text": "first singable line", "weight": 12, "section": "verse" },
-    ...
-  ]
-}`;
+  const user =
+    `Audio duration: ${duration.toFixed(1)}s. Total lines to align: ${lines.length}.\n\n` +
+    `Lyrics (one per line, numbered):\n${numbered}\n\n` +
+    `Listen to the audio and return start_seconds for each line. End time will be inferred from the next line's start.`;
 
-  const res = await fetch(ANTHROPIC_URL, {
+  const body = {
+    model: ALIGN_MODEL,
+    messages: [
+      { role: "system", content: system },
+      {
+        role: "user",
+        content: [
+          { type: "text", text: user },
+          {
+            type: "input_audio",
+            input_audio: { data: audioB64, format: ct.includes("wav") ? "wav" : "mp3" },
+          },
+        ],
+      },
+    ],
+    tools: [
+      {
+        type: "function",
+        function: {
+          name: "submit_alignment",
+          description: "Submit the per-line start times in seconds.",
+          parameters: {
+            type: "object",
+            properties: {
+              alignments: {
+                type: "array",
+                items: {
+                  type: "object",
+                  properties: {
+                    line_number: { type: "integer" },
+                    start_seconds: { type: "number" },
+                  },
+                  required: ["line_number", "start_seconds"],
+                  additionalProperties: false,
+                },
+              },
+            },
+            required: ["alignments"],
+            additionalProperties: false,
+          },
+        },
+      },
+    ],
+    tool_choice: { type: "function", function: { name: "submit_alignment" } },
+  };
+
+  const res = await fetch(LOVABLE_AI_URL, {
     method: "POST",
     headers: {
+      Authorization: `Bearer ${apiKey}`,
       "Content-Type": "application/json",
-      "x-api-key": apiKey,
-      "anthropic-version": "2023-06-01",
     },
-    body: JSON.stringify({
-      model: CLAUDE_MODEL,
-      max_tokens: 4000,
-      temperature: 0.1,
-      system,
-      messages: [{ role: "user", content: user }],
-    }),
+    body: JSON.stringify(body),
   });
   if (!res.ok) {
     const t = await res.text();
-    throw new Error(`Claude ${res.status}: ${t.slice(0, 300)}`);
+    throw new Error(`Lovable AI ${res.status}: ${t.slice(0, 300)}`);
   }
   const data = await res.json();
-  const text: string = data?.content?.[0]?.text ?? "";
-  const cleaned = text.replace(/^```(?:json)?\s*/i, "").replace(/\s*```\s*$/i, "").trim();
-  let parsed: any;
-  try {
-    parsed = JSON.parse(cleaned);
-  } catch {
-    const m = cleaned.match(/\{[\s\S]*\}/);
-    if (!m) throw new Error("Claude returned non-JSON: " + text.slice(0, 200));
-    parsed = JSON.parse(m[0]);
+  const toolCall = data?.choices?.[0]?.message?.tool_calls?.[0];
+  if (!toolCall?.function?.arguments) throw new Error("No tool call returned");
+  const args = JSON.parse(toolCall.function.arguments);
+  const alignments: { line_number: number; start_seconds: number }[] =
+    Array.isArray(args?.alignments) ? args.alignments : [];
+  if (alignments.length === 0) throw new Error("Empty alignments");
+
+  // Build a lookup keyed by 1-based line number
+  const byNum = new Map<number, number>();
+  for (const a of alignments) {
+    if (Number.isFinite(a.start_seconds) && a.line_number >= 1) {
+      byNum.set(a.line_number, Math.max(0, a.start_seconds));
+    }
   }
-  const arr = Array.isArray(parsed?.lines) ? parsed.lines : [];
-  return arr
-    .map((l: any) => ({
-      text: String(l.text ?? "").trim(),
-      weight: Math.max(1, Number(l.weight) || syllableEstimate(String(l.text ?? ""))),
-      section: l.section,
-    }))
-    .filter((l: ClaudeLine) => l.text.length > 0);
+
+  // Construct synced lines, filling gaps and clamping monotonically
+  const result: SyncedLine[] = [];
+  let lastStart = 0;
+  for (let i = 0; i < lines.length; i++) {
+    let start = byNum.get(i + 1);
+    if (start === undefined) {
+      // estimate based on neighbors
+      start = lastStart + 3;
+    }
+    if (start < lastStart) start = lastStart + 0.2; // enforce monotonic
+    result.push({ start: round2(start), end: 0, text: lines[i] });
+    lastStart = start;
+  }
+  // Compute end as next line's start (or duration for the last)
+  for (let i = 0; i < result.length; i++) {
+    const next = result[i + 1];
+    const end = next ? next.start : Math.min(duration, result[i].start + 5);
+    result[i].end = round2(Math.max(end, result[i].start + 0.3));
+  }
+
+  // Sanity check: at least 60% of lines should have non-default starts
+  const filled = Array.from(byNum.values()).length;
+  if (filled < Math.max(3, Math.floor(lines.length * 0.6))) {
+    throw new Error(`Only ${filled}/${lines.length} aligned, rejecting`);
+  }
+  return result;
 }
 
-// Fallback syllable estimator if Claude omits a weight
+// --------- Fallback: syllable-weighted distribution ---------
+function syllableFallback(lines: string[], duration: number): SyncedLine[] {
+  const introPad = Math.min(6, Math.max(2, duration * 0.05));
+  const outroPad = Math.min(4, Math.max(1, duration * 0.03));
+  const singDuration = Math.max(duration - introPad - outroPad, duration * 0.7);
+
+  const weights = lines.map((l) => syllableEstimate(l));
+  const totalWeight = weights.reduce((s, w) => s + w, 0) || 1;
+
+  const out: SyncedLine[] = [];
+  let cursor = introPad;
+  for (let i = 0; i < lines.length; i++) {
+    const dur = (weights[i] / totalWeight) * singDuration;
+    const start = round2(cursor);
+    const end = round2(cursor + dur);
+    out.push({ start, end, text: lines[i] });
+    cursor += dur;
+  }
+  return out;
+}
+
 function syllableEstimate(text: string): number {
   const cleaned = text.toLowerCase().replace(/[^a-z\s']/g, " ");
   const words = cleaned.split(/\s+/).filter(Boolean);
@@ -247,4 +330,15 @@ function syllableEstimate(text: string): number {
     count += Math.max(1, groups ? groups.length : 1);
   }
   return Math.max(1, count);
+}
+
+// --------- helpers ---------
+function uint8ToBase64(bytes: Uint8Array): string {
+  // chunk to avoid call-stack issues for large audio
+  let binary = "";
+  const chunk = 0x8000;
+  for (let i = 0; i < bytes.length; i += chunk) {
+    binary += String.fromCharCode(...bytes.subarray(i, i + chunk));
+  }
+  return btoa(binary);
 }
