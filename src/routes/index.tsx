@@ -734,6 +734,14 @@ function LandingPage() {
   const [heroPlaying, setHeroPlaying] = useState(false);
   const [heroEverPlayed, setHeroEverPlayed] = useState(false);
 
+  // Funnel tracking — record one lander_view per session per page load
+  useEffect(() => {
+    void import("@/lib/tracking").then(({ track, ensureSession }) => {
+      void ensureSession();
+      void track({ type: "lander_view", stepKey: "index" });
+    });
+  }, []);
+
   // Inline sample playback — one audio at a time, no modal
   const sampleAudioRef = useRef<HTMLAudioElement | null>(null);
   const [playingSampleId, setPlayingSampleId] = useState<string | null>(null);
