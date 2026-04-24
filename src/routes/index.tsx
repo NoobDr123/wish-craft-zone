@@ -667,10 +667,9 @@ function LandingPage() {
       <section className="relative overflow-hidden px-0 py-[40px] pb-[40px] sm:py-[70px] sm:pb-[60px]">
         <div className="mx-auto max-w-[1200px] px-5 sm:px-6">
           <div className="mb-8 flex w-full justify-center text-center sm:mb-10 md:mb-12">
-            <div className="inline-flex items-center gap-2.5 text-[13px] font-semibold uppercase tracking-[0.18em] text-[#8D6FAF] sm:text-[15px] md:text-[17px]">
-              <span className="h-2 w-2 rounded-full bg-[#8D6FAF]" />
+            <h2 className="max-w-[28ch] font-display text-[18px] font-bold uppercase leading-[1.2] tracking-[0.14em] text-[#8D6FAF] sm:text-[22px] sm:tracking-[0.16em] md:text-[26px] md:font-extrabold md:tracking-[0.18em]">
               The Most Meaningful Gift For Someone You Love Fighting Cancer
-            </div>
+            </h2>
           </div>
           <div className="grid items-center gap-8 md:grid-cols-[1.15fr_1fr] md:gap-[60px]">
             <div className="order-2 md:order-1">
