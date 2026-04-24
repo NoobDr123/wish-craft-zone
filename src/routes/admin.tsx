@@ -34,7 +34,10 @@ function StaffPage() {
 
   useEffect(() => {
     if (state === "anonymous") {
-      navigate({ to: "/login", search: { redirect: adminPath } as any });
+      // Staff get their own dedicated login surface — keeps the customer
+      // login (/login) free of staff-only copy and prevents customers from
+      // landing on /admin by mistake when they only need to track an order.
+      navigate({ to: "/admin/login" });
     }
   }, [state, navigate, adminPath]);
 
