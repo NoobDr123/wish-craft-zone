@@ -27,7 +27,7 @@ export const Route = createFileRoute("/")({
       supabase
         .from("featured_samples")
         .select(
-          "id,title,quote,for_text,genre_label,cover_image_url,audio_url,lyrics,synced_lyrics,testimonial_slug",
+          "id,title,quote,for_text,genre_label,cover_image_url,audio_url,lyrics,synced_lyrics,testimonial_slug,recipient_name,relationship",
         )
         .eq("published", true)
         .eq("id", HERO_SAMPLE_ID)
@@ -35,7 +35,7 @@ export const Route = createFileRoute("/")({
       supabase
         .from("featured_samples")
         .select(
-          "id,title,quote,for_text,genre_label,cover_image_url,audio_url,lyrics,synced_lyrics,testimonial_slug",
+          "id,title,quote,for_text,genre_label,cover_image_url,audio_url,lyrics,synced_lyrics,testimonial_slug,recipient_name,relationship",
         )
         .eq("published", true)
         .is("testimonial_slug", null)
@@ -114,6 +114,8 @@ interface FeaturedSample {
   audio_url: string | null;
   lyrics: string | null;
   synced_lyrics?: SyncedLine[] | null;
+  recipient_name?: string | null;
+  relationship?: string | null;
 }
 
 /**
@@ -787,10 +789,22 @@ function LandingPage() {
       setPlayingSampleId(null);
     }
     setHeroEverPlayed(true);
+    // Ensure src is set (defensive against SSR / rerender edge cases)
+    if (!a.src || a.src === window.location.href) {
+      a.src = heroSongUrl;
+    }
     a.currentTime = 0;
-    a.play()
-      .then(() => setHeroPlaying(true))
-      .catch(() => {});
+    const playPromise = a.play();
+    if (playPromise && typeof playPromise.then === "function") {
+      playPromise
+        .then(() => setHeroPlaying(true))
+        .catch((err) => {
+          console.error("[hero] audio play failed", err, { src: a.src });
+          setHeroPlaying(false);
+        });
+    } else {
+      setHeroPlaying(true);
+    }
   };
 
   // Choose displayed list — real samples if available, otherwise the fallback set
@@ -806,6 +820,8 @@ function LandingPage() {
           cover_image_url: s.cover_image_url,
           audio_url: null,
           lyrics: null,
+          recipient_name: null,
+          relationship: null,
         })) satisfies FeaturedSample[]);
 
   return (
@@ -933,7 +949,7 @@ function LandingPage() {
                   <div className="absolute left-3 top-3 flex items-center gap-2 rounded-full bg-black/45 px-3 py-1.5 backdrop-blur-sm sm:left-4 sm:top-4">
                     <span className="flex h-2 w-2 animate-pulse rounded-full bg-[#E8C547]" />
                     <span className="text-[11px] font-medium uppercase tracking-[0.12em] text-white/95">
-                      We Made It — Now playing
+                      {heroSample?.title ? `${heroSample.title} — Now playing` : "Now playing"}
                     </span>
                   </div>
                 )}
@@ -1184,16 +1200,22 @@ function LandingPage() {
                     <h3 className="mb-2 font-display text-[19px] font-medium leading-[1.25] tracking-[-0.01em] text-[#1F1B16] md:text-[20px]">
                       {s.title}
                     </h3>
-                    {s.quote && (
+                    {s.quote ? (
                       <p className="mb-3 text-[14px] italic leading-[1.55] text-[#5A5148]">
                         {s.quote}
                       </p>
-                    )}
-                    {s.for_text && (
-                      <div className="mt-auto pt-2 text-[12px] leading-[1.5] text-[#8A8175]">
-                        {s.for_text}
-                      </div>
-                    )}
+                    ) : s.recipient_name && s.relationship ? (
+                      <p className="mb-3 text-[14px] italic leading-[1.55] text-[#5A5148]">
+                        A song made for {s.recipient_name}, from a {s.relationship.toLowerCase()} who couldn't find the words.
+                      </p>
+                    ) : null}
+                    <div className="mt-auto pt-2 text-[12px] leading-[1.5] text-[#8A8175]">
+                      {s.for_text
+                        ? s.for_text
+                        : s.recipient_name && s.relationship
+                          ? `Written for ${s.recipient_name} · From a ${s.relationship.toLowerCase()}`
+                          : null}
+                    </div>
                     <div className="mt-2 text-[11px] font-semibold uppercase tracking-[0.12em] text-[#8D6FAF]">
                       {s.genre_label}
                     </div>
