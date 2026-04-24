@@ -1333,7 +1333,7 @@ function LandingPage() {
                       <div className="text-[13.5px] font-semibold text-[#1F1B16]">
                         {t.name}
                       </div>
-                      <div className="truncate text-[12px] text-[#8A8175]">
+                      <div className="text-[12px] leading-snug text-[#8A8175] break-words">
                         {t.meta}
                       </div>
                     </div>
