@@ -90,6 +90,14 @@ async function handlePaymentSucceeded(pi: any) {
         amount: pi.amount_received ?? pi.amount,
       },
     });
+
+    // Fire-and-forget: send the order confirmation email with all details.
+    // Done here (vs. on the client) so it sends even if the buyer closes the
+    // tab right after payment.
+    sendOrderConfirmation(orderId).catch((e) =>
+      console.error("sendOrderConfirmation failed:", e),
+    );
+
     return;
   }
 
