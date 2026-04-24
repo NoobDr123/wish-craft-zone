@@ -448,39 +448,86 @@ function ThankYouPage() {
               </p>
             </div>
           ) : (
-            <button
-              type="button"
-              onClick={() => sendMagicLink(buyerEmail)}
-              disabled={magicLinkStatus === "sending" || !buyerEmail}
-              className="mt-5 flex w-full items-center justify-center gap-2 rounded-xl bg-primary px-5 py-3.5 text-[15px] font-bold text-primary-foreground shadow-glow transition-all hover:brightness-95 active:scale-[0.99] disabled:cursor-not-allowed disabled:opacity-60 disabled:shadow-none sm:mt-6 sm:rounded-2xl sm:px-6 sm:py-4 sm:text-base"
-            >
-              {magicLinkStatus === "sending" ? (
-                <>
-                  <Loader2 className="h-4 w-4 animate-spin" /> Sending sign-in
-                  link…
-                </>
-              ) : (
-                <>
-                  Go to my dashboard <ArrowRight className="h-4 w-4" />
-                </>
-              )}
-            </button>
+            <DashboardCta
+              buyerEmail={buyerEmail}
+              fallbackSendMagicLink={() => sendMagicLink(buyerEmail)}
+              magicLinkStatus={magicLinkStatus}
+            />
           )}
           {magicLinkStatus === "error" && magicLinkError && (
             <p className="mt-2 text-center text-xs font-medium text-destructive">
               {magicLinkError}
             </p>
           )}
-          {magicLinkStatus !== "sent" && buyerEmail && (
-            <p className="mt-2 text-center text-[11px] text-muted-foreground sm:text-xs">
-              We'll email a one-tap sign-in link to{" "}
-              <span className="font-semibold text-foreground">{buyerEmail}</span>
-              . No password needed.
-            </p>
-          )}
         </section>
       </main>
     </div>
+  );
+}
+
+/**
+ * If the buyer was auto-signed-in at /checkout/return, this button is a
+ * direct link to /dashboard. If auto-login failed (e.g. cookies blocked),
+ * we fall back to sending a magic-link email — same UX as before.
+ */
+function DashboardCta({
+  buyerEmail,
+  fallbackSendMagicLink,
+  magicLinkStatus,
+}: {
+  buyerEmail: string;
+  fallbackSendMagicLink: () => void;
+  magicLinkStatus: "idle" | "sending" | "sent" | "error";
+}) {
+  const [hasSession, setHasSession] = useState<boolean | null>(null);
+
+  useEffect(() => {
+    let cancelled = false;
+    supabase.auth.getSession().then(({ data }) => {
+      if (!cancelled) setHasSession(!!data.session);
+    });
+    return () => {
+      cancelled = true;
+    };
+  }, []);
+
+  if (hasSession) {
+    return (
+      <a
+        href="/dashboard"
+        className="mt-5 flex w-full items-center justify-center gap-2 rounded-xl bg-primary px-5 py-3.5 text-[15px] font-bold text-primary-foreground shadow-glow transition-all hover:brightness-95 active:scale-[0.99] sm:mt-6 sm:rounded-2xl sm:px-6 sm:py-4 sm:text-base"
+      >
+        Go to my dashboard <ArrowRight className="h-4 w-4" />
+      </a>
+    );
+  }
+
+  return (
+    <>
+      <button
+        type="button"
+        onClick={fallbackSendMagicLink}
+        disabled={magicLinkStatus === "sending" || !buyerEmail}
+        className="mt-5 flex w-full items-center justify-center gap-2 rounded-xl bg-primary px-5 py-3.5 text-[15px] font-bold text-primary-foreground shadow-glow transition-all hover:brightness-95 active:scale-[0.99] disabled:cursor-not-allowed disabled:opacity-60 disabled:shadow-none sm:mt-6 sm:rounded-2xl sm:px-6 sm:py-4 sm:text-base"
+      >
+        {magicLinkStatus === "sending" ? (
+          <>
+            <Loader2 className="h-4 w-4 animate-spin" /> Sending sign in link…
+          </>
+        ) : (
+          <>
+            Email me a sign in link <ArrowRight className="h-4 w-4" />
+          </>
+        )}
+      </button>
+      {buyerEmail && (
+        <p className="mt-2 text-center text-[11px] text-muted-foreground sm:text-xs">
+          We'll email a one tap sign in link to{" "}
+          <span className="font-semibold text-foreground">{buyerEmail}</span>.
+          No password needed.
+        </p>
+      )}
+    </>
   );
 }
 
