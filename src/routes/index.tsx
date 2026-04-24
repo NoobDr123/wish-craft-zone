@@ -820,6 +820,8 @@ function LandingPage() {
           cover_image_url: s.cover_image_url,
           audio_url: null,
           lyrics: null,
+          recipient_name: null,
+          relationship: null,
         })) satisfies FeaturedSample[]);
 
   return (
