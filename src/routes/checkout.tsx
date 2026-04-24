@@ -255,19 +255,71 @@ function CheckoutPage() {
 
           <div className="flex flex-wrap items-center justify-between gap-3">
             <span className="rounded-full border-2 border-primary/40 bg-primary/5 px-3 py-1 text-xs font-bold tracking-wider text-primary">
-              50% OFF
+              {promoApplied ? `${promoApplied.discount_pct}% OFF` : "50% OFF"}
             </span>
             <p className="flex items-baseline gap-2">
               <span className="text-base font-medium text-muted-foreground line-through">
-                $99.99
+                $49.99
               </span>
               <span className="font-display text-3xl font-bold text-primary">
-                $49.99
+                {promoApplied
+                  ? `$${(promoApplied.final_amount_cents / 100).toFixed(2)}`
+                  : "$49.99"}
               </span>
               <span className="text-sm font-semibold text-muted-foreground">
                 USD
               </span>
             </p>
+          </div>
+
+          {/* Promo code input */}
+          <div className="mt-5 rounded-2xl border border-dashed border-primary/30 bg-primary/5 p-4">
+            {promoApplied ? (
+              <div className="flex items-center justify-between gap-3 text-sm">
+                <div>
+                  <p className="font-semibold text-primary">
+                    Promo applied: {promoCode.toUpperCase()}
+                  </p>
+                  <p className="text-muted-foreground">
+                    {promoApplied.free
+                      ? "Your order is free — redirecting…"
+                      : `You saved $${(promoApplied.discount_cents / 100).toFixed(2)}.`}
+                  </p>
+                </div>
+                <CheckCircle2 className="h-5 w-5 text-success" />
+              </div>
+            ) : (
+              <>
+                <label className="mb-2 block text-xs font-semibold uppercase tracking-wider text-muted-foreground">
+                  Have a promo code?
+                </label>
+                <div className="flex gap-2">
+                  <input
+                    type="text"
+                    value={promoCode}
+                    onChange={(e) => {
+                      setPromoCode(e.target.value);
+                      setPromoError(null);
+                    }}
+                    placeholder="Enter code"
+                    className="flex-1 rounded-xl border-2 border-peach bg-background px-3 py-2.5 text-sm uppercase tracking-wider text-foreground placeholder:normal-case placeholder:tracking-normal placeholder:text-muted-foreground/60 focus:border-primary focus:outline-none focus:ring-2 focus:ring-primary/30"
+                    maxLength={32}
+                    disabled={promoApplying}
+                  />
+                  <button
+                    type="button"
+                    onClick={handleApplyPromo}
+                    disabled={promoApplying || !promoCode.trim()}
+                    className="shrink-0 rounded-xl bg-primary px-4 py-2.5 text-sm font-semibold text-primary-foreground transition-colors hover:bg-primary/90 disabled:cursor-not-allowed disabled:opacity-50"
+                  >
+                    {promoApplying ? "Applying…" : "Apply"}
+                  </button>
+                </div>
+                {promoError && (
+                  <p className="mt-2 text-xs text-destructive">{promoError}</p>
+                )}
+              </>
+            )}
           </div>
 
           <button
