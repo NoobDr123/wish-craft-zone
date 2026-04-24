@@ -360,7 +360,62 @@ function ThankYouPage() {
           )}
         </section>
 
-        {/* What happens next */}
+        {/* Gold guarantee box — refund + free re-writes promise */}
+        <section className="relative mt-5 overflow-hidden rounded-2xl border-2 border-amber-400/70 bg-gradient-to-br from-amber-50 via-yellow-50 to-amber-100/80 p-5 shadow-[0_8px_30px_-10px_rgba(217,164,6,0.45)] sm:mt-6 sm:rounded-3xl sm:p-7">
+          <div className="pointer-events-none absolute -right-10 -top-10 h-40 w-40 rounded-full bg-amber-300/30 blur-3xl" />
+          <div className="pointer-events-none absolute -bottom-12 -left-8 h-36 w-36 rounded-full bg-yellow-300/30 blur-3xl" />
+
+          <div className="relative">
+            <div className="inline-flex items-center gap-1.5 rounded-full border border-amber-500/40 bg-amber-500/10 px-3 py-1 text-[10px] font-bold uppercase tracking-wider text-amber-800 sm:text-[11px]">
+              <Sparkles className="h-3 w-3" /> Our promise to you
+            </div>
+            <h3 className="mt-3 font-display text-xl font-bold text-amber-950 sm:text-2xl">
+              You'll love it — or it's on us
+            </h3>
+            <p className="mt-1.5 text-[13px] leading-relaxed text-amber-900/80 sm:text-sm">
+              We stand behind every song. If the first version isn't perfect for{" "}
+              <span className="font-semibold text-amber-950">{recipient}</span>,
+              you have two safety nets:
+            </p>
+
+            <ul className="mt-4 space-y-3 text-[13px] sm:text-sm">
+              <li className="flex gap-3">
+                <div className="mt-0.5 flex h-7 w-7 shrink-0 items-center justify-center rounded-full bg-amber-500/20 ring-2 ring-amber-400/40">
+                  <Music2 className="h-3.5 w-3.5 text-amber-800" />
+                </div>
+                <div>
+                  <p className="font-bold text-amber-950">
+                    2 free re-recordings included
+                  </p>
+                  <p className="mt-0.5 text-amber-900/80">
+                    Don't love the voice, vibe, or lyrics? Tell us what to
+                    change and we'll re-record it — twice, completely free.
+                  </p>
+                </div>
+              </li>
+              <li className="flex gap-3">
+                <div className="mt-0.5 flex h-7 w-7 shrink-0 items-center justify-center rounded-full bg-amber-500/20 ring-2 ring-amber-400/40">
+                  <ShieldCheck className="h-3.5 w-3.5 text-amber-800" />
+                </div>
+                <div>
+                  <p className="font-bold text-amber-950">
+                    30-day money-back guarantee
+                  </p>
+                  <p className="mt-0.5 text-amber-900/80">
+                    Still not the perfect gift? Request a full refund within 30
+                    days from your dashboard — no questions, no hassle.
+                  </p>
+                </div>
+              </li>
+            </ul>
+
+            <p className="mt-4 border-t border-amber-400/40 pt-3 text-[12px] italic text-amber-900/70 sm:text-[13px]">
+              That's how confident we are. Your gift will land — or your money
+              comes back.
+            </p>
+          </div>
+        </section>
+
         <section className="mt-5 rounded-2xl border border-peach/70 bg-card p-4 shadow-soft sm:mt-6 sm:rounded-3xl sm:p-6 md:p-8">
           <h2 className="flex items-center gap-2 font-display text-xl font-bold text-foreground sm:text-2xl">
             <Sparkles className="h-5 w-5 text-primary" /> What happens next
