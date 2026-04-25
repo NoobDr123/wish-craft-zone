@@ -371,56 +371,65 @@ function VariantSwitcher({
     <div className="mt-6 rounded-2xl border border-[rgba(246,240,230,0.12)] bg-[rgba(246,240,230,0.04)] p-4">
       <div className="flex items-center justify-between gap-3">
         <p className="text-xs uppercase tracking-wider text-[rgba(246,240,230,0.55)]">
-          Two takes were generated
+          Two versions of your song
         </p>
-        {!unlocked && otherVariant && !otherVariant.audio_url ? null : (
-          <span className="text-xs text-[rgba(246,240,230,0.55)]">
-            {canSwitch ? "Tap to switch" : ""}
-          </span>
+        {unlocked && (
+          <span className="text-xs text-[rgba(246,240,230,0.55)]">Tap to switch</span>
         )}
       </div>
       <div className="mt-3 grid grid-cols-2 gap-2">
-        {variants.map((v, i) => {
-          const active = v.id === selectedVariant?.id;
-          const isOther = v.id !== selectedVariant?.id;
-          const locked = isOther && !unlocked && variants.length === 1; // only one came back; unlock will fetch second
+        {[0, 1].map((i) => {
+          const v = variants[i];
+          const isFirst = i === 0;
+          const isLockedSecond = !isFirst && !unlocked;
+          const active = v && v.id === selectedVariant?.id;
+          const playable = !!v?.audio_url && (isFirst || unlocked);
           return (
             <button
-              key={v.id || i}
-              onClick={() => v.audio_url && select(v.id)}
-              disabled={!v.audio_url}
+              key={v?.id || `slot-${i}`}
+              onClick={() => playable && v && select(v.id)}
+              disabled={!playable}
               className={`flex items-center justify-between rounded-xl border px-4 py-3 text-sm transition ${
                 active
                   ? "border-[#E5D9EF] bg-[rgba(229,217,239,0.12)] text-[#F6F0E6]"
-                  : "border-[rgba(246,240,230,0.15)] bg-transparent text-[rgba(246,240,230,0.7)] hover:border-[rgba(246,240,230,0.3)]"
-              } ${!v.audio_url ? "opacity-50 cursor-not-allowed" : ""}`}
+                  : isLockedSecond
+                    ? "border-[rgba(246,240,230,0.12)] bg-[rgba(246,240,230,0.02)] text-[rgba(246,240,230,0.45)]"
+                    : "border-[rgba(246,240,230,0.15)] bg-transparent text-[rgba(246,240,230,0.7)] hover:border-[rgba(246,240,230,0.3)]"
+              } ${!playable && !isLockedSecond ? "opacity-50 cursor-not-allowed" : ""} ${isLockedSecond ? "cursor-not-allowed" : ""}`}
             >
               <span className="flex items-center gap-2">
                 <Music className="h-3.5 w-3.5" />
-                Take {i + 1}
+                Version {i + 1}
               </span>
               {active && <Check className="h-4 w-4" />}
-              {locked && <Lock className="h-3.5 w-3.5" />}
+              {isLockedSecond && <Lock className="h-3.5 w-3.5" />}
             </button>
           );
         })}
       </div>
 
       {!unlocked && (
-        <div className="mt-4 flex flex-col gap-3 rounded-xl border border-[rgba(229,217,239,0.25)] bg-[rgba(229,217,239,0.06)] p-4 sm:flex-row sm:items-center sm:justify-between">
-          <div>
-            <p className="text-sm font-medium text-[#E5D9EF]">Unlock the second take</p>
-            <p className="mt-0.5 text-xs text-[rgba(246,240,230,0.65)]">
-              Same lyrics, a different feel. One-time $5 charge to your saved card.
-            </p>
+        <div className="mt-4 rounded-xl border border-[rgba(229,217,239,0.25)] bg-[rgba(229,217,239,0.06)] p-4">
+          <div className="flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between">
+            <div>
+              <p className="text-sm font-medium text-[#E5D9EF]">
+                Hear it sung a different way
+              </p>
+              <p className="mt-0.5 text-xs text-[rgba(246,240,230,0.7)]">
+                Same heartfelt lyrics — a fresh voice and feel. Many people end up loving the second one more.
+              </p>
+            </div>
+            <Button
+              onClick={unlock}
+              disabled={unlocking || !hasSavedCard}
+              className="bg-[#E5D9EF] text-[#1F1B16] hover:bg-[#d8c8e6] whitespace-nowrap"
+            >
+              {unlocking ? "Unlocking…" : hasSavedCard ? "Unlock for $5" : "No saved card"}
+            </Button>
           </div>
-          <Button
-            onClick={unlock}
-            disabled={unlocking || !hasSavedCard}
-            className="bg-[#E5D9EF] text-[#1F1B16] hover:bg-[#d8c8e6]"
-          >
-            {unlocking ? "Charging…" : hasSavedCard ? "Unlock for $5" : "No saved card"}
-          </Button>
+          <p className="mt-2 text-[10px] leading-relaxed text-[rgba(246,240,230,0.45)]">
+            We'll make a one-time $5 charge to the card you used at checkout. No subscription.
+          </p>
         </div>
       )}
     </div>
