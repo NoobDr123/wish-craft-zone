@@ -162,7 +162,7 @@ export const useQuizStore = create<QuizState>()(
     (set) => ({
       ...initial,
       set: (key, value) => set({ [key]: value } as Partial<QuizState>),
-      reset: () => set({ ...initial, orderId: undefined }),
+      reset: () => set({ ...initial, orderId: undefined, reward_code: undefined }),
     }),
     { name: "ribbonsong-quiz-v3" },
   ),
