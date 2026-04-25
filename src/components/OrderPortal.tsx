@@ -779,9 +779,11 @@ function RefundTab({ orderId, buyerEmail, refunds, reload }: any) {
 function RewardsTab({
   reward,
   returningPromos,
+  onOpenReaction,
 }: {
   reward: Reward | null;
   returningPromos: PromoCode[];
+  onOpenReaction: () => void;
 }) {
   const copy = async (code: string) => {
     try {
@@ -793,69 +795,113 @@ function RewardsTab({
   };
 
   const reactionApproved = reward?.status === "approved";
+  const reactionPending = reward?.status === "submitted" || reward?.status === "pending_review";
   const reactionStatus = reward?.status ?? null;
+
+  // Golden Ticket #1 — clickable in three states:
+  //   1. Not submitted yet  → "Upload reaction → unlock 2 free songs" (opens Reaction tab)
+  //   2. Pending review     → status note, no CTA
+  //   3. Approved           → "Use it now → start a free song" (links to /create with reward)
+  const ticket1Cta = !reward
+    ? { label: "Upload reaction → unlock 2 free songs", onClick: onOpenReaction }
+    : reactionApproved
+      ? {
+          label: `Collect your free song → ${reward!.free_songs_remaining} left`,
+          to: "/create" as const,
+          search: { reward: reward!.code },
+        }
+      : null;
 
   return (
     <div className="space-y-5">
       <div className="text-center">
         <h2 className="font-display text-2xl">Two free gifts, just for you</h2>
         <p className="mx-auto mt-1 max-w-md text-sm text-[rgba(31,27,22,0.65)]">
-          Our way of saying thank you. Two golden tickets you can use whenever you'd like.
+          Tap a ticket to use it. They're yours to keep — no expiry pressure.
         </p>
       </div>
 
       <GoldTicket
         icon={<Heart className="h-5 w-5" />}
-        eyebrow="Golden ticket #1"
-        title="Send us their reaction → full refund + 2 free songs"
+        eyebrow="Golden ticket #1 · Reaction reward"
+        title={
+          reactionApproved
+            ? "Approved! You earned a full refund + 2 free songs"
+            : "Send us their reaction → full refund + 2 free songs"
+        }
         body={
           !reward
-            ? "Capture the moment they hear it for the first time, upload it on the Reaction video tab, and once approved we'll refund this order in full and give you 2 free songs to gift to anyone."
+            ? "Film the moment they hear it for the first time. Once we approve it, we refund this order in full AND send you 2 free songs to gift to anyone."
             : reactionApproved
-              ? `Approved! ${reward!.free_songs_remaining} free song${reward!.free_songs_remaining === 1 ? "" : "s"} remaining.`
-              : `Status: ${reactionStatus}. We'll email you as soon as it's reviewed.`
+              ? `Your refund is on the way. Use the code below (or tap the button) to start a free song — ${reward!.free_songs_remaining} remaining.`
+              : reactionPending
+                ? "We're reviewing your reaction video. You'll get an email the moment it's approved (usually within 24h) — then this ticket unlocks instantly."
+                : `Status: ${reactionStatus}. We'll email you as soon as it's reviewed.`
         }
         code={reactionApproved ? reward!.code : null}
         onCopy={reactionApproved ? () => copy(reward!.code) : undefined}
-        ctaLink={
-          reactionApproved
-            ? { to: "/create", search: { reward: reward!.code }, label: "Use it now → start a free song" }
-            : null
-        }
+        cta={ticket1Cta}
       />
 
       {returningPromos.length > 0 ? (
-        returningPromos.map((p, idx) => (
-          <GoldTicket
-            key={p.id}
-            icon={<Ticket className="h-5 w-5" />}
-            eyebrow={returningPromos.length > 1 ? `Golden ticket #${idx + 2}` : "Golden ticket #2"}
-            title={`${p.discount_pct}% off your next song`}
-            body="Saved for the next time someone in your life deserves a song. Works at checkout."
-            code={p.active && p.times_used < p.max_uses ? p.code : null}
-            badge={
-              p.times_used >= p.max_uses
-                ? "Used"
-                : !p.active
-                  ? "Inactive"
-                  : `${p.discount_pct}% off`
-            }
-            onCopy={
-              p.active && p.times_used < p.max_uses ? () => copy(p.code) : undefined
-            }
-          />
-        ))
+        returningPromos.map((p, idx) => {
+          const usable = p.active && p.times_used < p.max_uses;
+          return (
+            <GoldTicket
+              key={p.id}
+              icon={<Ticket className="h-5 w-5" />}
+              eyebrow={
+                returningPromos.length > 1
+                  ? `Golden ticket #${idx + 2} · Loyalty discount`
+                  : "Golden ticket #2 · Loyalty discount"
+              }
+              title={
+                usable
+                  ? `Collect your next song — ${p.discount_pct}% off`
+                  : `${p.discount_pct}% off (used)`
+              }
+              body={
+                usable
+                  ? `Tap below to start a new song with ${p.discount_pct}% off automatically applied at checkout. No code to remember.`
+                  : "You've already redeemed this discount. Order another song any time."
+              }
+              code={usable ? p.code : null}
+              badge={
+                p.times_used >= p.max_uses
+                  ? "Used"
+                  : !p.active
+                    ? "Inactive"
+                    : `${p.discount_pct}% off`
+              }
+              onCopy={usable ? () => copy(p.code) : undefined}
+              cta={
+                usable
+                  ? {
+                      label: `Collect your new song · -${p.discount_pct}%`,
+                      to: "/create" as const,
+                      search: { promo: p.code },
+                    }
+                  : null
+              }
+            />
+          );
+        })
       ) : (
         <GoldTicket
           icon={<Ticket className="h-5 w-5" />}
-          eyebrow="Golden ticket #2"
-          title="A special offer on your next song"
-          body="Once your song is delivered, a personal discount code will appear here for the next time you'd like to send a song."
+          eyebrow="Golden ticket #2 · Loyalty discount"
+          title="A discount on your next song — unlocks at delivery"
+          body="The moment your song lands, a personal discount code appears here. One tap and your next song is cheaper at checkout — automatically."
         />
       )}
     </div>
   );
 }
+
+type GoldTicketCta =
+  | { label: string; onClick: () => void; to?: undefined; search?: undefined }
+  | { label: string; to: "/create"; search?: { reward?: string; promo?: string }; onClick?: undefined }
+  | null;
 
 function GoldTicket({
   icon,
@@ -865,7 +911,7 @@ function GoldTicket({
   code,
   badge,
   onCopy,
-  ctaLink,
+  cta,
 }: {
   icon: ReactNode;
   eyebrow: string;
@@ -874,7 +920,7 @@ function GoldTicket({
   code?: string | null;
   badge?: string;
   onCopy?: () => void;
-  ctaLink?: { to: string; search?: any; label: string } | null;
+  cta?: GoldTicketCta;
 }) {
   return (
     <div className="relative overflow-hidden rounded-2xl border border-[rgba(141,111,175,0.3)] bg-gradient-to-br from-[rgba(141,111,175,0.16)] via-[#FBF6EC] to-[rgba(141,111,175,0.10)] p-6 shadow-[0_0_40px_-20px_rgba(141,111,175,0.4)]">
@@ -914,15 +960,23 @@ function GoldTicket({
             </div>
           )}
 
-          {ctaLink && (
+          {cta && (cta.to ? (
             <Link
-              to={ctaLink.to}
-              search={ctaLink.search}
-              className="mt-3 inline-block text-sm text-[#8D6FAF] underline"
+              to={cta.to}
+              search={cta.search}
+              className="mt-4 inline-flex items-center justify-center rounded-full bg-[#8D6FAF] px-5 py-2.5 text-sm font-semibold text-[#FFF7EE] shadow-sm transition hover:bg-[#6B4F8A]"
             >
-              {ctaLink.label}
+              {cta.label}
             </Link>
-          )}
+          ) : (
+            <button
+              type="button"
+              onClick={cta.onClick}
+              className="mt-4 inline-flex items-center justify-center rounded-full bg-[#8D6FAF] px-5 py-2.5 text-sm font-semibold text-[#FFF7EE] shadow-sm transition hover:bg-[#6B4F8A]"
+            >
+              {cta.label}
+            </button>
+          ))}
         </div>
       </div>
     </div>
