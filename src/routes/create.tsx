@@ -30,6 +30,9 @@ import {
 
 export const Route = createFileRoute("/create")({
   component: CreatePage,
+  validateSearch: (search: Record<string, unknown>) => ({
+    reward: typeof search.reward === "string" ? search.reward : undefined,
+  }),
   head: () => ({
     meta: [
       { title: "Create Their Song · RibbonSong" },
