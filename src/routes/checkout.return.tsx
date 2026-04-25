@@ -211,7 +211,7 @@ async function autoLogin(paymentIntentId: string): Promise<void> {
     body: {
       paymentIntentId,
       environment: stripeEnvironment,
-      redirectTo: "/dashboard",
+      redirectTo: "/account",
     },
   });
 
