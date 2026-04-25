@@ -1,5 +1,47 @@
 import { create } from "zustand";
-import { persist } from "zustand/middleware";
+import { persist, createJSONStorage } from "zustand/middleware";
+
+// Quiz answers are persisted in localStorage for 24 hours, then auto-cleared.
+const QUIZ_TTL_MS = 24 * 60 * 60 * 1000;
+const QUIZ_TIMESTAMP_KEY = "ribbonsong-quiz-v3-savedAt";
+
+const ttlStorage = {
+  getItem: (name: string): string | null => {
+    if (typeof window === "undefined") return null;
+    try {
+      const savedAtRaw = window.localStorage.getItem(QUIZ_TIMESTAMP_KEY);
+      if (savedAtRaw) {
+        const savedAt = Number(savedAtRaw);
+        if (Number.isFinite(savedAt) && Date.now() - savedAt > QUIZ_TTL_MS) {
+          window.localStorage.removeItem(name);
+          window.localStorage.removeItem(QUIZ_TIMESTAMP_KEY);
+          return null;
+        }
+      }
+      return window.localStorage.getItem(name);
+    } catch {
+      return null;
+    }
+  },
+  setItem: (name: string, value: string): void => {
+    if (typeof window === "undefined") return;
+    try {
+      window.localStorage.setItem(name, value);
+      window.localStorage.setItem(QUIZ_TIMESTAMP_KEY, String(Date.now()));
+    } catch {
+      // ignore quota / privacy errors
+    }
+  },
+  removeItem: (name: string): void => {
+    if (typeof window === "undefined") return;
+    try {
+      window.localStorage.removeItem(name);
+      window.localStorage.removeItem(QUIZ_TIMESTAMP_KEY);
+    } catch {
+      // ignore
+    }
+  },
+};
 
 export type RelationshipKey =
   | "Husband"
