@@ -58,7 +58,7 @@ export const Route = createFileRoute("/")({
     }
     const testimonialSongs: Record<string, { id: string; audio_url: string | null; title: string }> = {};
     for (const row of testimonialRes.data ?? []) {
-      if (row.testimonial_slug) {
+      if (row.testimonial_slug && row.id && row.title) {
         testimonialSongs[row.testimonial_slug] = {
           id: row.id,
           audio_url: row.audio_url,
