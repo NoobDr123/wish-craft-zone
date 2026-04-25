@@ -138,10 +138,13 @@ function PortalSong() {
   const delivered = order.status === "delivered" && !!selectedVariant?.audio_url;
   const sharePath = order.share_page_slug ? `/listen/${order.share_page_slug}` : null;
 
+  const revisionCap = order.has_unlimited_edits ? 5 : 1;
+  const revisionsUsed = revisions.length;
+
   const tabs: Array<[typeof tab, string]> = [
     ["player", "Lyrics"],
     ["reaction", "Reaction video"],
-    ["revision", "Free revision"],
+    ["revision", order.has_unlimited_edits ? "Revisions" : "Free revision"],
     ["refund", "Refund / gift card"],
     ["rewards", "Rewards"],
   ];
