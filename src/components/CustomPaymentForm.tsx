@@ -66,6 +66,7 @@ function InnerForm({ returnUrl, paymentIntentId, email, amountLabel, amountCents
   const [submitting, setSubmitting] = useState(false);
   const [errorMsg, setErrorMsg] = useState<string | null>(null);
   const [walletReady, setWalletReady] = useState(false);
+  const [linkReady, setLinkReady] = useState(false);
 
   // Fire Meta Pixel InitiateCheckout exactly once when the payment form
   // mounts. This is the standard funnel signal Meta uses to optimize ad
