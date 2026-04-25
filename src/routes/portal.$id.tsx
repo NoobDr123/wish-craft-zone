@@ -261,9 +261,20 @@ function PortalSong() {
 
             <div className="mt-8">
               {tab === "player" && (
-                <pre className="whitespace-pre-wrap rounded-2xl border border-[rgba(246,240,230,0.12)] bg-[rgba(246,240,230,0.04)] p-6 font-sans text-[15px] leading-relaxed text-[#F6F0E6]">
-                  {lyrics}
-                </pre>
+                <div className="space-y-6">
+                  <pre className="whitespace-pre-wrap rounded-2xl border border-[rgba(246,240,230,0.12)] bg-[rgba(246,240,230,0.04)] p-6 font-sans text-[15px] leading-relaxed text-[#F6F0E6]">
+                    {lyrics}
+                  </pre>
+                  <RevisionTab
+                    orderId={order.id}
+                    buyerEmail={order.buyer_email}
+                    revisions={revisions}
+                    cap={revisionCap}
+                    used={revisionsUsed}
+                    hasUnlimited={!!order.has_unlimited_edits}
+                    reload={load}
+                  />
+                </div>
               )}
               {tab === "reaction" && (
                 <ReactionTab
@@ -272,17 +283,6 @@ function PortalSong() {
                   userId={user!.id}
                   reactions={reactions}
                   reward={reward}
-                  reload={load}
-                />
-              )}
-              {tab === "revision" && (
-                <RevisionTab
-                  orderId={order.id}
-                  buyerEmail={order.buyer_email}
-                  revisions={revisions}
-                  cap={revisionCap}
-                  used={revisionsUsed}
-                  hasUnlimited={!!order.has_unlimited_edits}
                   reload={load}
                 />
               )}
