@@ -32,7 +32,7 @@ serve(async (req) => {
   try {
     switch (event.type) {
       case "payment_intent.succeeded":
-        await handlePaymentSucceeded(event.data.object);
+        await handlePaymentSucceeded(event.data.object, env);
         break;
       case "payment_intent.payment_failed":
         console.log(
@@ -58,7 +58,7 @@ serve(async (req) => {
   return ok();
 });
 
-async function handlePaymentSucceeded(pi: any) {
+async function handlePaymentSucceeded(pi: any, env: StripeEnv) {
   const orderId = pi.metadata?.orderId;
   const kind = pi.metadata?.kind; // "base_order" | undefined (upsells use upsellType)
   const upsellType = pi.metadata?.upsellType;
@@ -76,6 +76,7 @@ async function handlePaymentSucceeded(pi: any) {
         stripe_customer_id: pi.customer,
         stripe_payment_intent_id: pi.id,
         stripe_payment_method_id: pi.payment_method,
+        stripe_env: env,
         payment_status: "paid",
         amount_paid_cents: pi.amount_received ?? pi.amount ?? 0,
         status: "awaiting_upsells",

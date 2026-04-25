@@ -1,8 +1,12 @@
 // Delivery: marks order as delivered, sends transactional email to recipient
 // (or buyer if not a gift) with link to /listen/:slug. Idempotent.
+//
+// Also pushes fulfillment metadata to Stripe (PaymentIntent.metadata +
+// description) so chargebacks can be defended automatically.
 
 import { serve } from "https://deno.land/std@0.168.0/http/server.ts";
 import { createClient } from "npm:@supabase/supabase-js@2";
+import { createStripeClient, type StripeEnv } from "../_shared/stripe.ts";
 
 const supabase = createClient(
   Deno.env.get("SUPABASE_URL")!,
@@ -77,11 +81,13 @@ serve(async (req) => {
       }
     }
 
+    const deliveredAt = new Date().toISOString();
+
     await supabase
       .from("orders")
       .update({
         status: "delivered",
-        delivered_at: new Date().toISOString(),
+        delivered_at: deliveredAt,
       })
       .eq("id", orderId);
 
@@ -91,12 +97,71 @@ serve(async (req) => {
       payload: { listen_url: listenUrl, sent_to: targets.map((t) => t.email) },
     });
 
+    // ---- Stripe chargeback defense: push fulfillment metadata ----
+    // Best-effort. Don't fail delivery if Stripe is unreachable.
+    syncFulfillmentToStripe(orderId, order, listenUrl, deliveredAt).catch((e) =>
+      console.error("syncFulfillmentToStripe failed:", e),
+    );
+
     return json({ ok: true, listenUrl });
   } catch (e: any) {
     console.error("deliver-song error", e);
     return json({ error: e.message }, 500);
   }
 });
+
+async function syncFulfillmentToStripe(
+  orderId: string,
+  order: any,
+  listenUrl: string,
+  deliveredAt: string,
+) {
+  if (!order.stripe_payment_intent_id) {
+    console.log(`Order ${orderId} has no PI — skipping Stripe fulfillment sync`);
+    return;
+  }
+  if (!order.stripe_env || (order.stripe_env !== "live" && order.stripe_env !== "sandbox")) {
+    console.log(`Order ${orderId} has no stripe_env — skipping Stripe fulfillment sync`);
+    return;
+  }
+  if (order.stripe_fulfillment_synced_at) {
+    console.log(`Order ${orderId} fulfillment already synced — skipping`);
+    return;
+  }
+
+  const env: StripeEnv = order.stripe_env;
+  const stripe = createStripeClient(env);
+
+  // Truncate description to Stripe's 350-char limit. Customer-facing string
+  // shows on the receipt and bank statement context — helps reduce
+  // "I don't recognize this charge" disputes.
+  const recipientName = String(order.recipient_name ?? "your recipient").slice(0, 80);
+  const description = `Custom song delivered for ${recipientName} on ${deliveredAt.slice(0, 10)}`.slice(0, 350);
+
+  await stripe.paymentIntents.update(order.stripe_payment_intent_id, {
+    description,
+    metadata: {
+      // Stripe metadata values must be strings, max 500 chars, max 50 keys
+      fulfilled: "true",
+      delivered_at: deliveredAt,
+      delivery_method: "email",
+      listen_url: listenUrl.slice(0, 500),
+      recipient_name: recipientName,
+      order_id: orderId,
+    },
+  });
+
+  await supabase
+    .from("orders")
+    .update({ stripe_fulfillment_synced_at: new Date().toISOString() })
+    .eq("id", orderId);
+
+  await supabase.from("job_events").insert({
+    order_id: orderId,
+    event_type: "stripe_fulfillment_synced",
+    payload: { stripe_env: env, payment_intent_id: order.stripe_payment_intent_id },
+  });
+}
 
 function json(body: unknown, status = 200) {
   return new Response(JSON.stringify(body), {

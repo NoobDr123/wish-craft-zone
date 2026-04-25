@@ -56,3 +56,6 @@ verify_jwt = false
 
 [functions.confirm-payment]
 verify_jwt = false
+
+[functions.record-play]
+verify_jwt = false
