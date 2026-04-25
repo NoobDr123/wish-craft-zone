@@ -16,9 +16,12 @@ export const PIPELINE_CONFIG = {
   briefGenerationTimeoutMs: 90 * 1000, // 90s for Claude
   autoQcTimeoutMs: 120 * 1000, // 2 min
 
-  // Delivery delays (artificial — feels handcrafted)
-  standardDeliveryDelayHours: 48, // 2 days
-  rushDeliveryDelayHours: 10, // 10 hours
+  // Delivery delays (artificial — feels handcrafted, under-promise / over-deliver)
+  // Promised on landing: 5 days standard / 48h express / 24h rush.
+  // Actual delivery is a fraction of that so customers are pleasantly surprised.
+  standardDeliveryDelayHours: 24, // promised 5 days, actually 24h
+  express48hDeliveryDelayHours: 12, // promised 48h, actually 12h
+  rush24hDeliveryDelayHours: 7, // promised 24h, actually 7h
   hospiceDeliveryDelayMinutes: 20, // 20 min
 
   // Stale state alerts
