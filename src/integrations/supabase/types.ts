@@ -1381,6 +1381,10 @@ export type Database = {
         Args: { payload: Json; queue_name: string }
         Returns: number
       }
+      enqueue_job: {
+        Args: { payload: Json; queue_name: string }
+        Returns: number
+      }
       generate_reward_code: { Args: never; Returns: string }
       has_role: {
         Args: {
