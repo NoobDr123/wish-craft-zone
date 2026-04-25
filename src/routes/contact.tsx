@@ -137,7 +137,7 @@ function ContactPage() {
   }
 
   return (
-    <div className="min-h-screen bg-[#1F1B16] text-[#1F1B16]">
+    <div className="min-h-screen bg-[#F6F0E6] text-[#1F1B16]">
       <SiteHeader />
 
       <main className="mx-auto max-w-[1100px] px-5 pb-20 pt-12 sm:px-6 md:pt-16">
