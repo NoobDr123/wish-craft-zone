@@ -590,6 +590,7 @@ function RevisionTab({
 }) {
   const [notes, setNotes] = useState("");
   const [busy, setBusy] = useState(false);
+  const [submitError, setSubmitError] = useState<string | null>(null);
 
   const remaining = Math.max(0, cap - used);
   const canSubmit = remaining > 0;
@@ -597,6 +598,7 @@ function RevisionTab({
   const submit = async () => {
     if (notes.trim().length < 10 || !canSubmit) return;
     setBusy(true);
+    setSubmitError(null);
     const { error } = await supabase.from("revision_requests").insert({
       order_id: orderId,
       buyer_email: buyerEmail,
@@ -605,7 +607,11 @@ function RevisionTab({
     });
     setBusy(false);
     if (error) {
-      toast.error(error.message);
+      // Backend may reject (e.g. unlimited cap of 10 reached, RLS, etc.).
+      // Surface the error inline — never the scary "you ran out" copy.
+      setSubmitError(
+        "Couldn't send that one through — please try again or message support below.",
+      );
       return;
     }
     setNotes("");
@@ -613,20 +619,39 @@ function RevisionTab({
     await reload();
   };
 
+  // Status copy — keep it positive and concrete.
+  // Free tier: "1 free edit left" / "0 free edits left"
+  // Unlimited: "Unlimited edits included · X used"
+  const remainingLabel = hasUnlimited
+    ? `Unlimited edits · ${used} used`
+    : `${remaining} of ${cap} free edit${cap === 1 ? "" : "s"} left`;
+
   const helper = hasUnlimited
-    ? `Unlimited revisions on this song. ${used} submitted so far.`
-    : "Tell us what to tweak — wording, tempo, voice, anything. We'll re-record it for you, on us.";
+    ? "Tweak as many times as you need — wording, tempo, voice, anything. Our team re-records every revision."
+    : "Tell us what to tweak — wording, tempo, voice, anything. We'll re-record it for you, on us. You get 1 free revision per song.";
 
   return (
     <div className="space-y-6">
+      {/* Always-visible status pill so customers instantly see what they have */}
+      <div className="flex items-center justify-between rounded-2xl border border-[rgba(141,111,175,0.25)] bg-[rgba(141,111,175,0.06)] px-4 py-3">
+        <span className="text-sm font-medium text-[#1F1B16]">Edits on this song</span>
+        <Badge
+          variant="outline"
+          className={
+            hasUnlimited
+              ? "border-[#8D6FAF] bg-[rgba(141,111,175,0.12)] text-[#6B4F8A]"
+              : remaining > 0
+                ? "border-emerald-400 text-emerald-700"
+                : "border-[rgba(31,27,22,0.3)] text-[rgba(31,27,22,0.6)]"
+          }
+        >
+          {remainingLabel}
+        </Badge>
+      </div>
+
       {revisions.length > 0 && (
         <div className="rounded-2xl border border-[rgba(31,27,22,0.12)] bg-[#FBF6EC] p-6">
-          <div className="flex items-center justify-between">
-            <h2 className="font-display text-xl">Your revisions</h2>
-            <Badge variant="outline" className="border-[rgba(31,27,22,0.3)] text-[rgba(31,27,22,0.75)]">
-              {hasUnlimited ? `${used} submitted` : `${used} of ${cap} used`}
-            </Badge>
-          </div>
+          <h2 className="font-display text-xl">Your revisions</h2>
           <div className="mt-4 space-y-4">
             {revisions.map((r) => (
               <div
@@ -666,6 +691,9 @@ function RevisionTab({
             className="mt-3 w-full rounded-xl border border-[rgba(31,27,22,0.2)] bg-white p-3 text-sm text-[#1F1B16] placeholder:text-[rgba(31,27,22,0.4)]"
             rows={6}
           />
+          {submitError && (
+            <p className="mt-2 text-sm text-red-600">{submitError}</p>
+          )}
           <Button
             className="mt-4 bg-[#8D6FAF] text-[#FFF7EE] hover:bg-[#6B4F8A]"
             disabled={notes.trim().length < 10 || busy}
@@ -673,19 +701,15 @@ function RevisionTab({
           >
             {busy ? "Submitting…" : hasUnlimited ? "Submit revision" : "Send to our team — it's free"}
           </Button>
-          {hasUnlimited && (
-            <p className="mt-3 text-xs text-[rgba(31,27,22,0.55)]">
-              Unlimited revisions included with this song.
-            </p>
-          )}
         </div>
       ) : (
         <div className="rounded-2xl border border-[rgba(31,27,22,0.12)] bg-[#FBF6EC] p-6">
-          <h2 className="font-display text-xl">No revisions remaining</h2>
+          <h2 className="font-display text-xl">You've used your free edit</h2>
           <p className="mt-2 text-sm text-[rgba(31,27,22,0.7)]">
-            You've used all {cap} {cap === 1 ? "revision" : "revisions"} for this song. Need more changes?{" "}
+            Need another tweak? Message our team in the Help tab — we're flexible
+            on real fixes. Or{" "}
             <Link to="/create" className="text-[#8D6FAF] underline">
-              Order another song
+              start a new song
             </Link>
             .
           </p>
