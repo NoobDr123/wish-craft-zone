@@ -1,5 +1,5 @@
 import { useEffect, useMemo, useRef, useState } from "react";
-import { createFileRoute, Link, useNavigate } from "@tanstack/react-router";
+import { createFileRoute, Link, useNavigate, useSearch } from "@tanstack/react-router";
 import { QuizShell } from "@/components/QuizShell";
 import {
   ListSelect,
@@ -11,6 +11,9 @@ import {
 } from "@/components/QuizInputs";
 import { useQuizStore } from "@/stores/quizStore";
 import { track, ensureSession } from "@/lib/tracking";
+import { supabase } from "@/integrations/supabase/client";
+import { useAuth } from "@/hooks/useAuth";
+import { Gift, AlertCircle } from "lucide-react";
 import {
   getProfile,
   journeyOptions,
