@@ -316,9 +316,7 @@ function CreatePage() {
             placeholder={c5.placeholder}
             value={q.qualities}
             onChange={(e) => q.set("qualities", e.target.value)}
-            maxLength={200}
             rows={5}
-            showCount
           />
           <TipChips chips={q5Tips(profile)} />
         </Question>
