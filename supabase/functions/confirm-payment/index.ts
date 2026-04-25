@@ -62,12 +62,24 @@ serve(async (req) => {
       // Read current state first so we don't clobber a webhook that already ran.
       const { data: existing } = await supabase
         .from("orders")
-        .select("id, payment_status, status, buyer_email, buyer_name, confirmation_email_sent_at")
+        .select("id, payment_status, status, buyer_email, buyer_name, confirmation_email_sent_at, promo_code_id")
         .eq("id", orderId)
         .maybeSingle();
 
       if (!existing) {
         return json({ error: "Order not found", orderId }, 404);
+      }
+
+      // Detect T3ST end-to-end test orders so we can fast-track straight to
+      // upsells_complete (upsells are pre-added by apply-promo-code).
+      let isT3st = false;
+      if (existing.promo_code_id) {
+        const { data: promo } = await supabase
+          .from("promo_codes")
+          .select("code")
+          .eq("id", existing.promo_code_id)
+          .maybeSingle();
+        isT3st = (promo?.code || "").toUpperCase() === "T3ST";
       }
 
       // If the buyer never typed their email into the form (e.g. tapped Apple
@@ -98,7 +110,8 @@ serve(async (req) => {
           stripe_env: env,
           payment_status: "paid",
           amount_paid_cents: pi.amount_received ?? pi.amount ?? 0,
-          status: "awaiting_upsells",
+          // T3ST: skip upsell pages — go straight to brief generation.
+          status: isT3st ? "upsells_complete" : "awaiting_upsells",
         };
         if (placeholder && realEmail) updates.buyer_email = realEmail.toLowerCase();
         if (placeholder && realName) updates.buyer_name = realName;
