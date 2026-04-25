@@ -21,7 +21,8 @@ import {
   Video,
   Pencil,
   Inbox,
-  
+  Activity,
+
   LogOut,
   ChevronDown,
   ChevronRight,
@@ -33,6 +34,7 @@ import { Textarea } from "@/components/ui/textarea";
 import { useAdminGuard } from "@/hooks/useAdminGuard";
 import { AdminMfaEnroll } from "@/components/admin/AdminMfaEnroll";
 import { AdminMfaChallenge } from "@/components/admin/AdminMfaChallenge";
+import { WebhookDebugPanel } from "@/components/admin/WebhookDebugPanel";
 import { supabase } from "@/integrations/supabase/client";
 
 export const Route = createFileRoute("/admin")({
@@ -63,7 +65,8 @@ type Tab =
   | "refunds"
   | "reactions"
   | "revisions"
-  | "support";
+  | "support"
+  | "webhooks";
 
 const NAV: Array<{ key: Tab; label: string; icon: any; group: string }> = [
   { key: "dashboard", label: "Dashboard", icon: LayoutDashboard, group: "Overview" },
@@ -77,6 +80,7 @@ const NAV: Array<{ key: Tab; label: string; icon: any; group: string }> = [
   { key: "refunds", label: "Refunds", icon: RotateCcw, group: "Support" },
   { key: "reactions", label: "Reactions", icon: Video, group: "Support" },
   { key: "revisions", label: "Revisions", icon: Pencil, group: "Support" },
+  { key: "webhooks", label: "Webhook debug", icon: Activity, group: "Debug" },
 ];
 
 function StaffPage() {
@@ -193,6 +197,7 @@ function StaffPage() {
           {tab === "reactions" && <ReactionsPanel />}
           {tab === "revisions" && <RevisionsPanel />}
           {tab === "support" && <SupportPanel />}
+          {tab === "webhooks" && <WebhookDebugPanel />}
           
         </div>
       </main>
