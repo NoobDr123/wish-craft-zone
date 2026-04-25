@@ -20,7 +20,7 @@ import {
   RotateCcw,
   Video,
   Pencil,
-  Shield,
+  
   LogOut,
   ChevronDown,
   ChevronRight,
