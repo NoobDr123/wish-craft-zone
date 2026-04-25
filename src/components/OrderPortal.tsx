@@ -867,6 +867,7 @@ function RewardsTab({
       <GoldTicket
         icon={<Heart className="h-5 w-5" />}
         eyebrow="Golden ticket #1 · Reaction reward"
+        gold
         title={
           reactionApproved
             ? "Approved! You earned a full refund + 2 free songs"
@@ -955,6 +956,7 @@ function GoldTicket({
   badge,
   onCopy,
   cta,
+  gold,
 }: {
   icon: ReactNode;
   eyebrow: string;
@@ -964,16 +966,35 @@ function GoldTicket({
   badge?: string;
   onCopy?: () => void;
   cta?: GoldTicketCta;
+  gold?: boolean;
 }) {
   return (
-    <div className="relative overflow-hidden rounded-2xl border border-[rgba(141,111,175,0.3)] bg-gradient-to-br from-[rgba(141,111,175,0.16)] via-[#FBF6EC] to-[rgba(141,111,175,0.10)] p-6 shadow-[0_0_40px_-20px_rgba(141,111,175,0.4)]">
+    <div
+      className={
+        gold
+          ? "relative overflow-hidden rounded-2xl border border-[rgba(193,154,69,0.45)] bg-gradient-to-br from-[#FCEFC6] via-[#FFF7DD] to-[#F7E5A4] p-6 shadow-[0_0_40px_-18px_rgba(193,154,69,0.55)]"
+          : "relative overflow-hidden rounded-2xl border border-[rgba(141,111,175,0.3)] bg-gradient-to-br from-[rgba(141,111,175,0.16)] via-[#FBF6EC] to-[rgba(141,111,175,0.10)] p-6 shadow-[0_0_40px_-20px_rgba(141,111,175,0.4)]"
+      }
+    >
       <div className="absolute inset-y-0 left-16 hidden w-px bg-[rgba(31,27,22,0.12)] sm:block" />
       <div className="flex items-start gap-4">
-        <div className="flex h-10 w-10 shrink-0 items-center justify-center rounded-full bg-[rgba(141,111,175,0.18)] text-[#8D6FAF]">
+        <div
+          className={
+            gold
+              ? "flex h-10 w-10 shrink-0 items-center justify-center rounded-full bg-[#F2D27A] text-[#7A5A18]"
+              : "flex h-10 w-10 shrink-0 items-center justify-center rounded-full bg-[rgba(141,111,175,0.18)] text-[#8D6FAF]"
+          }
+        >
           {icon}
         </div>
         <div className="flex-1">
-          <p className="text-[10px] font-semibold uppercase tracking-[0.2em] text-[#8D6FAF]">
+          <p
+            className={
+              gold
+                ? "text-[10px] font-semibold uppercase tracking-[0.2em] text-[#A07A1A]"
+                : "text-[10px] font-semibold uppercase tracking-[0.2em] text-[#8D6FAF]"
+            }
+          >
             {eyebrow}
           </p>
           <h3 className="mt-1 font-display text-lg leading-snug text-[#1F1B16]">{title}</h3>
