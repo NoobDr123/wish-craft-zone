@@ -138,7 +138,8 @@ function PortalSong() {
   const delivered = order.status === "delivered" && !!selectedVariant?.audio_url;
   const sharePath = order.share_page_slug ? `/listen/${order.share_page_slug}` : null;
 
-  const revisionCap = order.has_unlimited_edits ? 5 : 1;
+  // Backend hard cap of 15 to prevent abuse, but UI presents as "Unlimited" for upsell purchasers.
+  const revisionCap = order.has_unlimited_edits ? 15 : 1;
   const revisionsUsed = revisions.length;
 
   const tabs: Array<[typeof tab, string]> = [
