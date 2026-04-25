@@ -476,21 +476,80 @@ function CreatePage() {
   const back = () => setIndex(Math.max(0, safeIndex - 1));
 
   return (
-    <QuizShell
-      current={safeIndex + 1}
-      total={total}
-      chapter={step.chapter}
-      title={step.title}
-      subtitle={step.subtitle}
-      onNext={next}
-      onBack={safeIndex > 0 ? back : undefined}
-      isValid={valid}
-      nextLabel={
-        step.nextLabel ?? (safeIndex === total - 1 ? "Finish" : "Continue")
-      }
-      optional={step.optional}
-    >
-      {step.render()}
-    </QuizShell>
+    <>
+      {(rewardStatus === "valid" ||
+        rewardStatus === "validating" ||
+        rewardStatus === "needs_login" ||
+        rewardStatus === "invalid") && (
+        <div className="mx-auto max-w-2xl px-5 pt-4">
+          {rewardStatus === "valid" && (
+            <div className="flex items-start gap-3 rounded-2xl border border-success/40 bg-success/10 p-4 text-sm text-foreground">
+              <Gift className="mt-0.5 h-5 w-5 shrink-0 text-success" />
+              <div>
+                <p className="font-semibold">Free song unlocked 🎁</p>
+                <p className="mt-1 text-muted-foreground">
+                  Reward code <span className="font-mono">{search.reward}</span>{" "}
+                  applied. You won't be charged for this song.
+                  {rewardRemaining !== null
+                    ? ` ${rewardRemaining} free song${
+                        rewardRemaining === 1 ? "" : "s"
+                      } remaining on this code after redemption.`
+                    : ""}
+                </p>
+              </div>
+            </div>
+          )}
+          {rewardStatus === "validating" && (
+            <div className="rounded-2xl border border-border bg-muted/40 p-4 text-sm text-muted-foreground">
+              Validating reward code…
+            </div>
+          )}
+          {rewardStatus === "needs_login" && (
+            <div className="flex items-start gap-3 rounded-2xl border border-primary/40 bg-primary/5 p-4 text-sm text-foreground">
+              <AlertCircle className="mt-0.5 h-5 w-5 shrink-0 text-primary" />
+              <div>
+                <p className="font-semibold">Sign in to redeem your free song</p>
+                <p className="mt-1 text-muted-foreground">
+                  Reward codes are tied to your account. Please{" "}
+                  <Link
+                    to="/login"
+                    search={{ redirect: `/create?reward=${search.reward}` }}
+                    className="font-medium underline"
+                  >
+                    log in
+                  </Link>{" "}
+                  to continue.
+                </p>
+              </div>
+            </div>
+          )}
+          {rewardStatus === "invalid" && (
+            <div className="flex items-start gap-3 rounded-2xl border border-destructive/40 bg-destructive/5 p-4 text-sm text-foreground">
+              <AlertCircle className="mt-0.5 h-5 w-5 shrink-0 text-destructive" />
+              <div>
+                <p className="font-semibold">Reward code couldn't be applied</p>
+                <p className="mt-1 text-muted-foreground">{rewardError}</p>
+              </div>
+            </div>
+          )}
+        </div>
+      )}
+      <QuizShell
+        current={safeIndex + 1}
+        total={total}
+        chapter={step.chapter}
+        title={step.title}
+        subtitle={step.subtitle}
+        onNext={next}
+        onBack={safeIndex > 0 ? back : undefined}
+        isValid={valid}
+        nextLabel={
+          step.nextLabel ?? (safeIndex === total - 1 ? "Finish" : "Continue")
+        }
+        optional={step.optional}
+      >
+        {step.render()}
+      </QuizShell>
+    </>
   );
 }
