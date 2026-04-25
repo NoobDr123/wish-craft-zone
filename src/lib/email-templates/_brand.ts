@@ -28,7 +28,7 @@ export const styles = {
   main: {
     backgroundColor: "#ffffff",
     fontFamily:
-      '"Inter", -apple-system, BlinkMacSystemFont, "Segoe UI", Helvetica, Arial, sans-serif',
+      '"Instrument Sans", -apple-system, BlinkMacSystemFont, "Segoe UI", Helvetica, Arial, sans-serif',
     margin: 0,
     padding: 0,
   },
