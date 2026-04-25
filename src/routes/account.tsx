@@ -114,7 +114,7 @@ function AccountPage() {
             </Link>
             <Link
               to="/create"
-              className="inline-flex items-center gap-1.5 rounded-full bg-[#8D6FAF] px-4 py-2 font-medium text-[#1F1B16] hover:bg-[#6B4F8A]"
+              className="inline-flex items-center gap-1.5 rounded-full bg-[#8D6FAF] px-4 py-2 font-medium text-[#FFF7EE] hover:bg-[#6B4F8A]"
             >
               <Plus className="h-3.5 w-3.5" /> New song
             </Link>
