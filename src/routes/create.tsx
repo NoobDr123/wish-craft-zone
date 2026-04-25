@@ -29,13 +29,15 @@ import {
   q8Tips,
 } from "@/lib/quizCopy";
 
-type CreateSearch = { reward?: string };
+type CreateSearch = { reward?: string; promo?: string };
 
 export const Route = createFileRoute("/create")({
   component: CreatePage,
   validateSearch: (search: Record<string, unknown>): CreateSearch => {
-    const reward = typeof search.reward === "string" ? search.reward : undefined;
-    return reward ? { reward } : {};
+    const out: CreateSearch = {};
+    if (typeof search.reward === "string") out.reward = search.reward;
+    if (typeof search.promo === "string") out.promo = search.promo;
+    return out;
   },
   head: () => ({
     meta: [
