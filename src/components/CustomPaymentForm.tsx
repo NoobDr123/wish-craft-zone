@@ -276,7 +276,12 @@ function InnerForm({ returnUrl, paymentIntentId, email, amountLabel, amountCents
 
   return (
     <div className="space-y-5 p-4 md:p-6">
-      {/* Apple Pay / Google Pay / Link — one-tap row */}
+      {/* Apple Pay / Google Pay — one-tap row.
+          Link is intentionally excluded here because the Express Checkout
+          version of Link redirects buyers to link.com. Inline Link autofill
+          is enabled inside the PaymentElement below, which keeps everything
+          on-site (Stripe shows a small "Pay faster with Link" prompt and
+          auto-fills saved cards without leaving the page). */}
       <div className={walletReady ? "" : "hidden"}>
         <ExpressCheckoutElement
           onReady={({ availablePaymentMethods }) => {
@@ -286,8 +291,6 @@ function InnerForm({ returnUrl, paymentIntentId, email, amountLabel, amountCents
           options={{
             buttonHeight: 48,
             buttonTheme: { applePay: "black", googlePay: "black" },
-            // Link is disabled so buyers stay fully on-site (link.com would
-            // pull them off our checkout). Apple Pay / Google Pay only.
             paymentMethods: { applePay: "always", googlePay: "always", link: "never" },
             layout: {
               maxColumns: 1,
@@ -305,12 +308,15 @@ function InnerForm({ returnUrl, paymentIntentId, email, amountLabel, amountCents
         </div>
       </div>
 
-      {/* Card form — Link signup panel hidden, Link still available via Express row above */}
+      {/* Card form — wallets disabled (handled by Express row above), but
+          Link is enabled INLINE so buyers who have a Link account get
+          one-click autofill of their saved card directly on this page,
+          with no redirect to link.com. */}
       <PaymentElement
         options={{
           layout: { type: "tabs", defaultCollapsed: false },
           defaultValues: { billingDetails: { email } },
-          wallets: { applePay: "never", googlePay: "never", link: "never" } as any,
+          wallets: { applePay: "never", googlePay: "never" },
         }}
       />
 
