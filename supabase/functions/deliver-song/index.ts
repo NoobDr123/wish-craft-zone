@@ -7,6 +7,7 @@
 import { serve } from "https://deno.land/std@0.168.0/http/server.ts";
 import { createClient } from "npm:@supabase/supabase-js@2";
 import { createStripeClient, type StripeEnv } from "../_shared/stripe.ts";
+import { guardInternal } from "../_shared/auth.ts";
 
 const supabase = createClient(
   Deno.env.get("SUPABASE_URL")!,
@@ -22,6 +23,9 @@ const corsHeaders = {
 
 serve(async (req) => {
   if (req.method === "OPTIONS") return new Response(null, { headers: corsHeaders });
+
+  const unauthorized = await guardInternal(req, corsHeaders);
+  if (unauthorized) return unauthorized;
 
   try {
     const { orderId } = await req.json();
