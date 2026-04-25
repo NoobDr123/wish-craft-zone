@@ -130,13 +130,24 @@ export function TextArea({ showCount, ...props }: TextAreaProps) {
         }`}
       />
       {showCount && max !== undefined && (
-        <span
-          className={`pointer-events-none absolute bottom-3 right-4 rounded bg-card/90 px-1.5 py-0.5 text-xs tabular-nums ${
-            value.length > max * 0.85 ? "text-primary" : "text-muted-foreground/70"
-          }`}
-        >
-          {value.length} / {max}
-        </span>
+        <>
+          {/* Desktop: floating in textarea bottom-right */}
+          <span
+            className={`pointer-events-none absolute bottom-3 right-4 hidden rounded bg-card/90 px-1.5 py-0.5 text-xs tabular-nums sm:inline-block ${
+              value.length > max * 0.85 ? "text-primary" : "text-muted-foreground/70"
+            }`}
+          >
+            {value.length} / {max}
+          </span>
+          {/* Mobile: always-visible counter below the textarea, no scroll needed */}
+          <div
+            className={`mt-1.5 text-right text-xs tabular-nums sm:hidden ${
+              value.length > max * 0.85 ? "text-primary" : "text-muted-foreground/70"
+            }`}
+          >
+            {value.length} / {max}
+          </div>
+        </>
       )}
     </div>
   );
