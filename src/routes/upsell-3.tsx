@@ -32,7 +32,7 @@ function Upsell3() {
     if (q.orderId) {
       try {
         await supabase.functions.invoke("mark-upsells-complete", {
-          body: { orderId: q.orderId },
+          body: { orderId: q.orderId, sessionId: q.checkoutSessionId },
         });
       } catch (err) {
         console.warn("mark-upsells-complete failed (non-fatal):", err);
