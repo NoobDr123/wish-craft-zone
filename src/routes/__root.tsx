@@ -92,15 +92,9 @@ function RootShell({ children }: { children: React.ReactNode }) {
         <HeadContent />
       </head>
       <body>
-        {/* Meta Pixel <noscript> fallback — only emitted on the production hostname.
-            Rendered server-side so non-prod (preview, lovable.dev) never ships the tracking img. */}
-        {process.env.NODE_ENV === "production" ? (
-          <noscript
-            dangerouslySetInnerHTML={{
-              __html: `<script>(function(){var h=window.location.hostname;if(h==='ribbonsong.com'||h==='www.ribbonsong.com'){document.write('<img height="1" width="1" style="display:none" src="https://www.facebook.com/tr?id=1397546595537286&ev=PageView&noscript=1" alt=""/>')}})();</script>`,
-            }}
-          />
-        ) : null}
+        {/* Meta Pixel <noscript> fallback removed: it's static HTML and would fire
+            on every hostname (preview, lovable.dev) without a JS hostname guard.
+            The main Pixel script above handles all real users (JS required for Pixel events). */}
         {children}
         <Scripts />
       </body>
