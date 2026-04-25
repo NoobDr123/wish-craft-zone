@@ -216,7 +216,7 @@ function InnerForm({ returnUrl, paymentIntentId, email, amountLabel, amountCents
       return;
     }
 
-    if (finalize(paymentIntent, "card")) return;
+    if (await finalize(paymentIntent, "card")) return;
 
     // Truly unexpected — surface a generic error so the user isn't stuck.
     const msg = "Payment is taking longer than expected. Please refresh.";
@@ -264,7 +264,7 @@ function InnerForm({ returnUrl, paymentIntentId, email, amountLabel, amountCents
       return;
     }
 
-    if (finalize(paymentIntent, "express")) return;
+    if (await finalize(paymentIntent, "express")) return;
 
     // Last-resort: PI is in some unhandled state. Navigate to the return
     // page anyway — it polls + calls confirm-payment server-side and will
