@@ -213,24 +213,19 @@ export function OrderPortal({ orderId, userId }: { orderId: string; userId: stri
             sharePath={sharePath}
           />
 
-          <nav className="mt-10 flex justify-center gap-1 border-b border-[rgba(31,27,22,0.15)] overflow-x-auto">
-            {tabs.map(([k, l]) => (
-              <button
-                key={k}
-                onClick={() => setTab(k)}
-                className={`relative whitespace-nowrap px-4 py-3 text-sm transition ${
-                  tab === k
-                    ? "font-semibold text-[#1F1B16]"
-                    : "text-[rgba(31,27,22,0.55)] hover:text-[#1F1B16]"
-                }`}
-              >
-                {l}
-                {tab === k && (
-                  <span className="absolute inset-x-2 -bottom-px h-0.5 bg-[#8D6FAF]" />
-                )}
-              </button>
-            ))}
-          </nav>
+          {/* ---- BIG OBVIOUS QUICK ACTIONS — impossible to miss ---- */}
+          <QuickActions
+            recipientName={order.recipient_name}
+            onEdit={() => setTab("player")}
+            onReaction={() => setTab("reaction")}
+            onGifts={() => setTab("rewards")}
+            onHelp={() => setTab("refund")}
+            hasReward={!!reward}
+            hasPromos={returningPromos.length > 0}
+          />
+
+          {/* ---- BIG TAB BAR — icons + labels + descriptions ---- */}
+          <BigTabBar tab={tab} setTab={setTab} />
 
           <div className="mt-8">
             {tab === "player" && (
