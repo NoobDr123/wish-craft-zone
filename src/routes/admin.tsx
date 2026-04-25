@@ -724,6 +724,7 @@ function CrmPanel() {
       const { data: orders } = await supabase
         .from("orders")
         .select("*")
+        .not("buyer_email", "like", "pending+%@ribbonsong.com")
         .order("created_at", { ascending: false })
         .limit(2000);
       if (!active) return;
