@@ -318,59 +318,61 @@ function DashboardPanel() {
   const [data, setData] = useState<DashboardData | null>(null);
   const [loading, setLoading] = useState(true);
 
+  const load = async (signal?: { active: boolean }) => {
+    setLoading(true);
+    const start = rangeStart(range);
+    let q = supabase
+      .from("orders")
+      .select("id, amount_paid_cents, amount_cents, payment_status, status, has_3rd_verse, is_rush, has_unlimited_edits, created_at")
+      .not("buyer_email", "like", "pending+%@ribbonsong.com")
+      .order("created_at", { ascending: false })
+      .limit(2000);
+    if (start) q = q.gte("created_at", start.toISOString());
+    const { data: rows } = await q;
+    if (signal && !signal.active) return;
+    const orders = rows ?? [];
+    const paid = orders.filter((o) => o.payment_status === "paid" || o.payment_status === "succeeded");
+    const failed = orders.filter((o) => o.payment_status === "failed");
+    const pending = orders.filter((o) => o.payment_status === "pending");
+    const revenueCents = paid.reduce((s, o) => s + (o.amount_paid_cents ?? 0), 0);
+    const aovCents = paid.length > 0 ? Math.round(revenueCents / paid.length) : 0;
+
+    const byDay: Record<string, { cents: number; orders: number }> = {};
+    for (const o of paid) {
+      const d = new Date(o.created_at).toISOString().slice(0, 10);
+      if (!byDay[d]) byDay[d] = { cents: 0, orders: 0 };
+      byDay[d].cents += o.amount_paid_cents ?? 0;
+      byDay[d].orders += 1;
+    }
+    const dailySales = Object.entries(byDay)
+      .map(([date, v]) => ({ date, cents: v.cents, orders: v.orders }))
+      .sort((a, b) => a.date.localeCompare(b.date));
+
+    setData({
+      revenueCents,
+      orderCount: orders.length,
+      paidCount: paid.length,
+      pendingCount: pending.length,
+      failedCount: failed.length,
+      aovCents,
+      upsellCounts: {
+        extra_verse: paid.filter((o) => o.has_3rd_verse).length,
+        rush_delivery: paid.filter((o) => o.is_rush).length,
+        unlimited_edits: paid.filter((o) => o.has_unlimited_edits).length,
+      },
+      dailySales,
+    });
+    setLoading(false);
+  };
+
   useEffect(() => {
-    let active = true;
-    (async () => {
-      setLoading(true);
-      const start = rangeStart(range);
-      let q = supabase
-        .from("orders")
-        .select("id, amount_paid_cents, amount_cents, payment_status, status, has_3rd_verse, is_rush, has_unlimited_edits, created_at")
-        .not("buyer_email", "like", "pending+%@ribbonsong.com")
-        .order("created_at", { ascending: false })
-        .limit(2000);
-      if (start) q = q.gte("created_at", start.toISOString());
-      const { data: rows } = await q;
-      if (!active) return;
-      const orders = rows ?? [];
-      const paid = orders.filter((o) => o.payment_status === "paid" || o.payment_status === "succeeded");
-      const failed = orders.filter((o) => o.payment_status === "failed");
-      const pending = orders.filter((o) => o.payment_status === "pending");
-      const revenueCents = paid.reduce((s, o) => s + (o.amount_paid_cents ?? 0), 0);
-      const aovCents = paid.length > 0 ? Math.round(revenueCents / paid.length) : 0;
-
-      // Daily sales
-      const byDay: Record<string, { cents: number; orders: number }> = {};
-      for (const o of paid) {
-        const d = new Date(o.created_at).toISOString().slice(0, 10);
-        if (!byDay[d]) byDay[d] = { cents: 0, orders: 0 };
-        byDay[d].cents += o.amount_paid_cents ?? 0;
-        byDay[d].orders += 1;
-      }
-      const dailySales = Object.entries(byDay)
-        .map(([date, v]) => ({ date, cents: v.cents, orders: v.orders }))
-        .sort((a, b) => a.date.localeCompare(b.date));
-
-      setData({
-        revenueCents,
-        orderCount: orders.length,
-        paidCount: paid.length,
-        pendingCount: pending.length,
-        failedCount: failed.length,
-        aovCents,
-        upsellCounts: {
-          extra_verse: paid.filter((o) => o.has_3rd_verse).length,
-          rush_delivery: paid.filter((o) => o.is_rush).length,
-          unlimited_edits: paid.filter((o) => o.has_unlimited_edits).length,
-        },
-        dailySales,
-      });
-      setLoading(false);
-    })();
-    return () => {
-      active = false;
-    };
+    const signal = { active: true };
+    load(signal);
+    return () => { signal.active = false; };
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [range]);
+
+  useRealtimeRefresh("orders", () => load());
 
   if (loading || !data) {
     return (
