@@ -491,12 +491,7 @@ function songDelivered(d: Record<string, any>) {
        </div>`
     : "";
 
-  const portalBlock = portal && !isRecipient
-    ? `<p style="font-size:14px;color:#5A5148;line-height:1.55;margin:0 0 16px;">
-         Your <a style="color:#8D6FAF;" href="${portal}">song portal</a> has share links, the lyrics,
-         the Re-found program (refund + free songs for a reaction video), and free revisions.
-       </p>`
-    : "";
+  const portalBlock = "";
 
   const html = `<!doctype html>
 <html><body style="margin:0;padding:0;background:#ffffff;font-family:'Instrument Sans',Inter,Arial,sans-serif;">
