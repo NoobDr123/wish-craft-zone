@@ -113,6 +113,95 @@ export function TextInput(props: TextInputProps) {
   );
 }
 
+// Common email domains for autocomplete suggestions.
+const EMAIL_DOMAINS = [
+  "gmail.com",
+  "yahoo.com",
+  "outlook.com",
+  "hotmail.com",
+  "icloud.com",
+  "me.com",
+  "live.com",
+  "aol.com",
+  "proton.me",
+  "protonmail.com",
+];
+
+interface EmailInputProps
+  extends Omit<React.InputHTMLAttributes<HTMLInputElement>, "type" | "onChange" | "list"> {
+  value: string;
+  onChange: (e: React.ChangeEvent<HTMLInputElement>) => void;
+}
+
+/**
+ * Smart email field:
+ * - `type="email"` + `autoComplete="email"` + `inputMode="email"` triggers the
+ *   device keyboard's email suggestions (iOS / Android pull from saved Apple ID
+ *   / Google account emails — that's the only "device email" we can offer).
+ * - A <datalist> suggests common domain completions as the user types past `@`.
+ */
+export function EmailInput({ value, onChange, ...rest }: EmailInputProps) {
+  const listId = "email-domain-suggestions";
+  const atIdx = value.indexOf("@");
+  const local = atIdx >= 0 ? value.slice(0, atIdx) : value;
+  const showSuggestions = atIdx >= 0 && local.length > 0;
+
+  const handleSuggestionClick = (domain: string) => {
+    const synthetic = {
+      target: { value: `${local}@${domain}` },
+      currentTarget: { value: `${local}@${domain}` },
+    } as unknown as React.ChangeEvent<HTMLInputElement>;
+    onChange(synthetic);
+  };
+
+  return (
+    <div className="space-y-2">
+      <input
+        {...rest}
+        type="email"
+        inputMode="email"
+        autoComplete="email"
+        autoCapitalize="off"
+        autoCorrect="off"
+        spellCheck={false}
+        list={listId}
+        value={value}
+        onChange={onChange}
+        className={`w-full rounded-2xl border border-dashed border-peach bg-card px-5 py-4 text-base text-foreground outline-none transition-all placeholder:text-muted-foreground/70 focus:border-solid focus:border-primary focus:shadow-soft ${
+          rest.className ?? ""
+        }`}
+      />
+      <datalist id={listId}>
+        {EMAIL_DOMAINS.map((d) => (
+          <option key={d} value={`${local}@${d}`} />
+        ))}
+      </datalist>
+      {showSuggestions && (
+        <div className="flex flex-wrap gap-1.5">
+          {EMAIL_DOMAINS.slice(0, 5).map((d) => {
+            const full = `${local}@${d}`;
+            const active = value.toLowerCase() === full.toLowerCase();
+            return (
+              <button
+                key={d}
+                type="button"
+                onClick={() => handleSuggestionClick(d)}
+                className={`rounded-full border px-3 py-1 text-xs font-medium transition-all ${
+                  active
+                    ? "border-primary bg-primary text-primary-foreground"
+                    : "border-border bg-card text-muted-foreground hover:border-primary/50 hover:text-foreground"
+                }`}
+              >
+                @{d}
+              </button>
+            );
+          })}
+        </div>
+      )}
+    </div>
+  );
+}
+
 interface TextAreaProps extends React.TextareaHTMLAttributes<HTMLTextAreaElement> {
   showCount?: boolean;
 }
@@ -130,13 +219,24 @@ export function TextArea({ showCount, ...props }: TextAreaProps) {
         }`}
       />
       {showCount && max !== undefined && (
-        <span
-          className={`pointer-events-none absolute bottom-3 right-4 rounded bg-card/90 px-1.5 py-0.5 text-xs tabular-nums ${
-            value.length > max * 0.85 ? "text-primary" : "text-muted-foreground/70"
-          }`}
-        >
-          {value.length} / {max}
-        </span>
+        <>
+          {/* Desktop: floating in textarea bottom-right */}
+          <span
+            className={`pointer-events-none absolute bottom-3 right-4 hidden rounded bg-card/90 px-1.5 py-0.5 text-xs tabular-nums sm:inline-block ${
+              value.length > max * 0.85 ? "text-primary" : "text-muted-foreground/70"
+            }`}
+          >
+            {value.length} / {max}
+          </span>
+          {/* Mobile: always-visible counter below the textarea, no scroll needed */}
+          <div
+            className={`mt-1.5 text-right text-xs tabular-nums sm:hidden ${
+              value.length > max * 0.85 ? "text-primary" : "text-muted-foreground/70"
+            }`}
+          >
+            {value.length} / {max}
+          </div>
+        </>
       )}
     </div>
   );
