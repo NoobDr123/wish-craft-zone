@@ -392,13 +392,18 @@ export type Database = {
           recipient_email: string | null
           recipient_name: string
           recipient_relationship: string | null
+          regeneration_used_at: string | null
           relationship: string | null
           revision_count: number
           revision_notes: string | null
           scheduled_delivery_at: string | null
+          second_variant_unlocked_at: string | null
           selected_variant_id: string | null
           share_page_slug: string | null
           song_title_idea: string | null
+          source_kind: string
+          source_promo_code_id: string | null
+          source_reward_code_id: string | null
           status: string
           stripe_checkout_session_id: string | null
           stripe_customer_id: string | null
@@ -452,13 +457,18 @@ export type Database = {
           recipient_email?: string | null
           recipient_name: string
           recipient_relationship?: string | null
+          regeneration_used_at?: string | null
           relationship?: string | null
           revision_count?: number
           revision_notes?: string | null
           scheduled_delivery_at?: string | null
+          second_variant_unlocked_at?: string | null
           selected_variant_id?: string | null
           share_page_slug?: string | null
           song_title_idea?: string | null
+          source_kind?: string
+          source_promo_code_id?: string | null
+          source_reward_code_id?: string | null
           status?: string
           stripe_checkout_session_id?: string | null
           stripe_customer_id?: string | null
@@ -512,13 +522,18 @@ export type Database = {
           recipient_email?: string | null
           recipient_name?: string
           recipient_relationship?: string | null
+          regeneration_used_at?: string | null
           relationship?: string | null
           revision_count?: number
           revision_notes?: string | null
           scheduled_delivery_at?: string | null
+          second_variant_unlocked_at?: string | null
           selected_variant_id?: string | null
           share_page_slug?: string | null
           song_title_idea?: string | null
+          source_kind?: string
+          source_promo_code_id?: string | null
+          source_reward_code_id?: string | null
           status?: string
           stripe_checkout_session_id?: string | null
           stripe_customer_id?: string | null
@@ -551,6 +566,20 @@ export type Database = {
             columns: ["promo_code_id"]
             isOneToOne: false
             referencedRelation: "promo_codes"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "orders_source_promo_code_id_fkey"
+            columns: ["source_promo_code_id"]
+            isOneToOne: false
+            referencedRelation: "promo_codes"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "orders_source_reward_code_id_fkey"
+            columns: ["source_reward_code_id"]
+            isOneToOne: false
+            referencedRelation: "reaction_reward_codes"
             referencedColumns: ["id"]
           },
         ]
@@ -697,8 +726,13 @@ export type Database = {
           discount_pct: number
           expires_at: string | null
           id: string
+          issued_for_order_id: string | null
+          issued_for_reward_code_id: string | null
+          kind: string
           max_uses: number
           notes: string | null
+          owner_email: string | null
+          owner_user_id: string | null
           times_used: number
           updated_at: string
         }
@@ -709,8 +743,13 @@ export type Database = {
           discount_pct: number
           expires_at?: string | null
           id?: string
+          issued_for_order_id?: string | null
+          issued_for_reward_code_id?: string | null
+          kind?: string
           max_uses?: number
           notes?: string | null
+          owner_email?: string | null
+          owner_user_id?: string | null
           times_used?: number
           updated_at?: string
         }
@@ -721,12 +760,39 @@ export type Database = {
           discount_pct?: number
           expires_at?: string | null
           id?: string
+          issued_for_order_id?: string | null
+          issued_for_reward_code_id?: string | null
+          kind?: string
           max_uses?: number
           notes?: string | null
+          owner_email?: string | null
+          owner_user_id?: string | null
           times_used?: number
           updated_at?: string
         }
-        Relationships: []
+        Relationships: [
+          {
+            foreignKeyName: "promo_codes_issued_for_order_id_fkey"
+            columns: ["issued_for_order_id"]
+            isOneToOne: false
+            referencedRelation: "orders"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "promo_codes_issued_for_order_id_fkey"
+            columns: ["issued_for_order_id"]
+            isOneToOne: false
+            referencedRelation: "public_shared_songs"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "promo_codes_issued_for_reward_code_id_fkey"
+            columns: ["issued_for_reward_code_id"]
+            isOneToOne: false
+            referencedRelation: "reaction_reward_codes"
+            referencedColumns: ["id"]
+          },
+        ]
       }
       quiz_events: {
         Row: {
@@ -775,6 +841,8 @@ export type Database = {
       }
       reaction_reward_codes: {
         Row: {
+          approved_at: string | null
+          approved_by: string | null
           buyer_email: string
           code: string
           created_at: string
@@ -784,13 +852,20 @@ export type Database = {
           id: string
           order_id: string
           reaction_video_id: string | null
+          refund_amount_cents: number | null
           refund_request_id: string | null
+          refund_stripe_id: string | null
+          refund_synced_at: string | null
+          rejected_at: string | null
+          rejection_reason: string | null
           status: string
           unlocked_at: string | null
           updated_at: string
           user_id: string | null
         }
         Insert: {
+          approved_at?: string | null
+          approved_by?: string | null
           buyer_email: string
           code: string
           created_at?: string
@@ -800,13 +875,20 @@ export type Database = {
           id?: string
           order_id: string
           reaction_video_id?: string | null
+          refund_amount_cents?: number | null
           refund_request_id?: string | null
+          refund_stripe_id?: string | null
+          refund_synced_at?: string | null
+          rejected_at?: string | null
+          rejection_reason?: string | null
           status?: string
           unlocked_at?: string | null
           updated_at?: string
           user_id?: string | null
         }
         Update: {
+          approved_at?: string | null
+          approved_by?: string | null
           buyer_email?: string
           code?: string
           created_at?: string
@@ -816,7 +898,12 @@ export type Database = {
           id?: string
           order_id?: string
           reaction_video_id?: string | null
+          refund_amount_cents?: number | null
           refund_request_id?: string | null
+          refund_stripe_id?: string | null
+          refund_synced_at?: string | null
+          rejected_at?: string | null
+          rejection_reason?: string | null
           status?: string
           unlocked_at?: string | null
           updated_at?: string
@@ -1252,9 +1339,45 @@ export type Database = {
         Returns: boolean
       }
       has_valid_mfa: { Args: { _user_id: string }; Returns: boolean }
+      issue_personal_promo_code: {
+        Args: {
+          _discount_pct: number
+          _expires_in_days?: number
+          _issued_for_order_id?: string
+          _issued_for_reward_code_id?: string
+          _kind: string
+          _owner_email: string
+          _owner_user_id: string
+        }
+        Returns: {
+          active: boolean
+          code: string
+          created_at: string
+          discount_pct: number
+          expires_at: string | null
+          id: string
+          issued_for_order_id: string | null
+          issued_for_reward_code_id: string | null
+          kind: string
+          max_uses: number
+          notes: string | null
+          owner_email: string | null
+          owner_user_id: string | null
+          times_used: number
+          updated_at: string
+        }
+        SetofOptions: {
+          from: "*"
+          to: "promo_codes"
+          isOneToOne: true
+          isSetofReturn: false
+        }
+      }
       issue_reward_code_for_order: {
         Args: { _order_id: string }
         Returns: {
+          approved_at: string | null
+          approved_by: string | null
           buyer_email: string
           code: string
           created_at: string
@@ -1264,7 +1387,12 @@ export type Database = {
           id: string
           order_id: string
           reaction_video_id: string | null
+          refund_amount_cents: number | null
           refund_request_id: string | null
+          refund_stripe_id: string | null
+          refund_synced_at: string | null
+          rejected_at: string | null
+          rejection_reason: string | null
           status: string
           unlocked_at: string | null
           updated_at: string
