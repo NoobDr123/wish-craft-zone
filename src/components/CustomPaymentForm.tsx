@@ -60,7 +60,7 @@ export function CustomPaymentForm(props: CustomPaymentFormProps) {
   );
 }
 
-function InnerForm({ returnUrl, email, amountLabel, amountCents, promoVersion, onError, disabled, disabledReason }: CustomPaymentFormProps) {
+function InnerForm({ returnUrl, paymentIntentId, email, amountLabel, amountCents, promoVersion, onError, disabled, disabledReason }: CustomPaymentFormProps) {
   const stripe = useStripe();
   const elements = useElements();
   const [submitting, setSubmitting] = useState(false);
