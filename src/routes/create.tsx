@@ -296,9 +296,7 @@ function CreatePage() {
             placeholder={c4.placeholder}
             value={q.fighting_for}
             onChange={(e) => q.set("fighting_for", e.target.value)}
-            maxLength={200}
             rows={5}
-            showCount
             autoFocus
           />
           <TipChips chips={q4Tips(profile)} />
@@ -318,9 +316,7 @@ function CreatePage() {
             placeholder={c5.placeholder}
             value={q.qualities}
             onChange={(e) => q.set("qualities", e.target.value)}
-            maxLength={200}
             rows={5}
-            showCount
           />
           <TipChips chips={q5Tips(profile)} />
         </Question>
@@ -339,9 +335,7 @@ function CreatePage() {
             placeholder={c6.placeholder}
             value={q.shared_memory}
             onChange={(e) => q.set("shared_memory", e.target.value)}
-            maxLength={300}
             rows={5}
-            showCount
           />
           <TipChips chips={q6Tips(profile)} />
         </Question>
@@ -380,9 +374,7 @@ function CreatePage() {
             placeholder={c8.placeholder}
             value={q.personal_words}
             onChange={(e) => q.set("personal_words", e.target.value)}
-            maxLength={800}
             rows={8}
-            showCount
             autoFocus
           />
           <TipChips
