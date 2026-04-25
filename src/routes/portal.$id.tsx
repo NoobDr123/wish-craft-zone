@@ -859,102 +859,142 @@ function RewardsTab({
     }
   };
 
+  const reactionApproved = reward?.status === "approved";
+  const reactionStatus = reward?.status ?? null;
+
   return (
-    <div className="space-y-4">
-      {/* Reaction reward */}
-      <div className="rounded-2xl border border-[rgba(246,240,230,0.12)] bg-[rgba(246,240,230,0.04)] p-6">
-        <div className="flex items-start gap-3">
-          <Gift className="mt-1 h-5 w-5 text-[#E5D9EF]" />
-          <div className="flex-1">
-            <h2 className="font-display text-xl">Reaction reward (2 free songs)</h2>
-            {!reward && (
-              <p className="mt-2 text-sm text-[rgba(246,240,230,0.65)]">
-                Submit a reaction video on the previous tab. Once approved, your code unlocks here
-                and you can send 2 free songs to anyone.
-              </p>
-            )}
-            {reward && reward.status !== "approved" && (
-              <p className="mt-2 text-sm text-[rgba(246,240,230,0.65)]">
-                Status:{" "}
-                <Badge variant="outline" className="ml-1 border-[rgba(246,240,230,0.3)] text-[rgba(246,240,230,0.75)]">
-                  {reward.status}
-                </Badge>
-              </p>
-            )}
-            {reward && reward.status === "approved" && (
-              <>
-                <p className="mt-2 text-sm text-[rgba(246,240,230,0.7)]">
-                  <span className="font-medium text-[#F6F0E6]">{reward.free_songs_remaining}</span>{" "}
-                  free song{reward.free_songs_remaining === 1 ? "" : "s"} remaining
-                </p>
-                <div className="mt-3 flex items-center gap-2 rounded-xl border border-[rgba(229,217,239,0.3)] bg-[rgba(229,217,239,0.08)] px-4 py-3">
-                  <code className="flex-1 font-mono text-sm font-semibold text-[#E5D9EF]">
-                    {reward.code}
-                  </code>
-                  <Button
-                    variant="outline"
-                    size="sm"
-                    onClick={() => copy(reward.code)}
-                    className="border-[rgba(229,217,239,0.4)] bg-transparent text-[#E5D9EF] hover:bg-[rgba(229,217,239,0.1)]"
-                  >
-                    <Copy className="mr-1.5 h-3.5 w-3.5" />
-                    Copy
-                  </Button>
-                </div>
-                <Link
-                  to="/create"
-                  search={{ reward: reward.code } as any}
-                  className="mt-3 inline-block text-sm text-[#E5D9EF] underline"
-                >
-                  Use it now → start a free song
-                </Link>
-              </>
-            )}
-          </div>
-        </div>
+    <div className="space-y-5">
+      <div className="text-center">
+        <h2 className="font-display text-2xl">Two free gifts, just for you</h2>
+        <p className="mx-auto mt-1 max-w-md text-sm text-[rgba(246,240,230,0.65)]">
+          Our way of saying thank you. Two golden tickets you can use whenever you'd like.
+        </p>
       </div>
 
-      {/* Returning customer 10% codes */}
-      {returningPromos.length > 0 && (
-        <div className="rounded-2xl border border-[rgba(246,240,230,0.12)] bg-[rgba(246,240,230,0.04)] p-6">
-          <h2 className="font-display text-xl">Your 10% off code</h2>
-          <p className="mt-1 text-sm text-[rgba(246,240,230,0.65)]">
-            Saved for next time you order — works at checkout.
+      {/* Ticket 1 — Reaction reward (refund + 2 free songs) */}
+      <GoldTicket
+        icon={<Heart className="h-5 w-5" />}
+        eyebrow="Golden ticket #1"
+        title="Send us their reaction → full refund + 2 free songs"
+        body={
+          !reward
+            ? "Capture the moment they hear it for the first time, upload it on the Reaction video tab, and once approved we'll refund this order in full and give you 2 free songs to gift to anyone."
+            : reactionApproved
+              ? `Approved! ${reward!.free_songs_remaining} free song${reward!.free_songs_remaining === 1 ? "" : "s"} remaining.`
+              : `Status: ${reactionStatus}. We'll email you as soon as it's reviewed.`
+        }
+        code={reactionApproved ? reward!.code : null}
+        onCopy={reactionApproved ? () => copy(reward!.code) : undefined}
+        ctaLink={
+          reactionApproved
+            ? { to: "/create", search: { reward: reward!.code }, label: "Use it now → start a free song" }
+            : null
+        }
+      />
+
+      {/* Ticket 2 — Returning customer discount */}
+      {returningPromos.length > 0 ? (
+        returningPromos.map((p, idx) => (
+          <GoldTicket
+            key={p.id}
+            icon={<Ticket className="h-5 w-5" />}
+            eyebrow={returningPromos.length > 1 ? `Golden ticket #${idx + 2}` : "Golden ticket #2"}
+            title={`${p.discount_pct}% off your next song`}
+            body="Saved for the next time someone in your life deserves a song. Works at checkout."
+            code={p.active && p.times_used < p.max_uses ? p.code : null}
+            badge={
+              p.times_used >= p.max_uses
+                ? "Used"
+                : !p.active
+                  ? "Inactive"
+                  : `${p.discount_pct}% off`
+            }
+            onCopy={
+              p.active && p.times_used < p.max_uses ? () => copy(p.code) : undefined
+            }
+          />
+        ))
+      ) : (
+        <GoldTicket
+          icon={<Ticket className="h-5 w-5" />}
+          eyebrow="Golden ticket #2"
+          title="A special offer on your next song"
+          body="Once your song is delivered, a personal discount code will appear here for the next time you'd like to send a song."
+        />
+      )}
+    </div>
+  );
+}
+
+function GoldTicket({
+  icon,
+  eyebrow,
+  title,
+  body,
+  code,
+  badge,
+  onCopy,
+  ctaLink,
+}: {
+  icon: React.ReactNode;
+  eyebrow: string;
+  title: string;
+  body: string;
+  code?: string | null;
+  badge?: string;
+  onCopy?: () => void;
+  ctaLink?: { to: string; search?: any; label: string } | null;
+}) {
+  return (
+    <div className="relative overflow-hidden rounded-2xl border border-[rgba(229,217,239,0.3)] bg-gradient-to-br from-[rgba(229,217,239,0.10)] via-[rgba(246,240,230,0.04)] to-[rgba(229,217,239,0.06)] p-6 shadow-[0_0_40px_-20px_rgba(229,217,239,0.4)]">
+      {/* perforated edge accent */}
+      <div className="absolute inset-y-0 left-16 hidden w-px bg-[rgba(246,240,230,0.12)] sm:block" />
+      <div className="flex items-start gap-4">
+        <div className="flex h-10 w-10 shrink-0 items-center justify-center rounded-full bg-[rgba(229,217,239,0.18)] text-[#E5D9EF]">
+          {icon}
+        </div>
+        <div className="flex-1">
+          <p className="text-[10px] font-semibold uppercase tracking-[0.2em] text-[#E5D9EF]">
+            {eyebrow}
           </p>
-          <div className="mt-3 space-y-2">
-            {returningPromos.map((p) => (
-              <div
-                key={p.id}
-                className="flex items-center gap-2 rounded-xl border border-[rgba(246,240,230,0.15)] bg-[rgba(246,240,230,0.04)] px-4 py-3"
-              >
-                <code className="flex-1 font-mono text-sm font-semibold text-[#F6F0E6]">
-                  {p.code}
-                </code>
-                <Badge
-                  variant="outline"
-                  className={
-                    p.times_used >= p.max_uses || !p.active
-                      ? "border-[rgba(246,240,230,0.2)] text-[rgba(246,240,230,0.4)]"
-                      : "border-emerald-500/40 text-emerald-300"
-                  }
-                >
-                  {p.times_used >= p.max_uses ? "Used" : !p.active ? "Inactive" : `${p.discount_pct}% off`}
+          <h3 className="mt-1 font-display text-lg leading-snug text-[#F6F0E6]">{title}</h3>
+          <p className="mt-2 text-sm text-[rgba(246,240,230,0.7)]">{body}</p>
+
+          {code && (
+            <div className="mt-4 flex items-center gap-2 rounded-xl border border-[rgba(229,217,239,0.3)] bg-[rgba(229,217,239,0.08)] px-4 py-3">
+              <code className="flex-1 font-mono text-sm font-semibold text-[#E5D9EF]">
+                {code}
+              </code>
+              {badge && (
+                <Badge variant="outline" className="border-emerald-500/40 text-emerald-300">
+                  {badge}
                 </Badge>
+              )}
+              {onCopy && (
                 <Button
                   variant="outline"
                   size="sm"
-                  onClick={() => copy(p.code)}
-                  className="border-[rgba(246,240,230,0.2)] bg-transparent text-[#F6F0E6] hover:bg-[rgba(246,240,230,0.08)]"
-                  disabled={p.times_used >= p.max_uses || !p.active}
+                  onClick={onCopy}
+                  className="border-[rgba(229,217,239,0.4)] bg-transparent text-[#E5D9EF] hover:bg-[rgba(229,217,239,0.1)]"
                 >
                   <Copy className="mr-1.5 h-3.5 w-3.5" />
                   Copy
                 </Button>
-              </div>
-            ))}
-          </div>
+              )}
+            </div>
+          )}
+
+          {ctaLink && (
+            <Link
+              to={ctaLink.to}
+              search={ctaLink.search}
+              className="mt-3 inline-block text-sm text-[#E5D9EF] underline"
+            >
+              {ctaLink.label}
+            </Link>
+          )}
         </div>
-      )}
+      </div>
     </div>
   );
 }
