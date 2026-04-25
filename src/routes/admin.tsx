@@ -47,15 +47,7 @@ export const Route = createFileRoute("/admin")({
 function AdminRoute() {
   const location = useLocation();
   if (location.pathname === "/admin/login") return <Outlet />;
-  return (
-    <AdminIpGate
-      bootstrap={({ ip, onAdded }) => (
-        <AdminIpBootstrap ip={ip} onAdded={onAdded} />
-      )}
-    >
-      <StaffPage />
-    </AdminIpGate>
-  );
+  return <StaffPage />;
 }
 
 type Tab =
