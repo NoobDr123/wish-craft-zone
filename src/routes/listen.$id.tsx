@@ -63,6 +63,7 @@ export const Route = createFileRoute("/listen/$id")({
 function ListenPage() {
   const { order, title } = Route.useLoaderData();
   const [variant, setVariant] = useState<any>(null);
+  const playRecorded = useRef(false);
 
   useEffect(() => {
     const variants = (order.audio_variants as any[]) ?? [];
@@ -72,6 +73,24 @@ function ListenPage() {
   }, [order]);
 
   const lyrics = (order.brief as any)?.lyrics ?? "";
+
+  // Fire once per page load when the user actually starts playing.
+  // This becomes Stripe chargeback evidence ("they listened to their song").
+  const handleFirstPlay = () => {
+    if (playRecorded.current) return;
+    playRecorded.current = true;
+    void supabase.functions
+      .invoke("record-play", {
+        body: {
+          orderId: order.id,
+          variantId: variant?.id ?? null,
+          source: "listen_page",
+        },
+      })
+      .catch(() => {
+        // Silent — chargeback evidence is best-effort; never block playback.
+      });
+  };
 
   return (
     <div className="min-h-screen bg-gradient-warm">
@@ -94,6 +113,7 @@ function ListenPage() {
               artist={`${order.genre ?? "Acoustic"} · ${order.tempo ?? "Mid-tempo"}`}
               src={variant.audio_url}
               lyrics={lyrics}
+              onFirstPlay={handleFirstPlay}
             />
           ) : (
             <p className="text-center text-muted-foreground">
