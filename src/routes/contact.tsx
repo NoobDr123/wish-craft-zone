@@ -137,19 +137,19 @@ function ContactPage() {
   }
 
   return (
-    <div className="min-h-screen bg-[#1F1B16] text-[#F6F0E6]">
+    <div className="min-h-screen bg-[#F6F0E6] text-[#1F1B16]">
       <SiteHeader />
 
       <main className="mx-auto max-w-[1100px] px-5 pb-20 pt-12 sm:px-6 md:pt-16">
         {/* Header */}
         <section className="mx-auto max-w-[720px] text-center">
-          <p className="text-[12px] uppercase tracking-[0.18em] text-[rgba(246,240,230,0.55)]">
+          <p className="text-[12px] uppercase tracking-[0.18em] text-[rgba(31,27,22,0.55)]">
             We're here to help
           </p>
           <h1 className="mt-3 font-display text-[40px] font-semibold leading-[1.05] tracking-[-0.02em] md:text-[56px]">
             Talk to a real human
           </h1>
-          <p className="mx-auto mt-5 max-w-[560px] text-[16px] leading-[1.55] text-[rgba(246,240,230,0.7)] md:text-[17px]">
+          <p className="mx-auto mt-5 max-w-[560px] text-[16px] leading-[1.55] text-[rgba(31,27,22,0.7)] md:text-[17px]">
             Most questions are answered below. If yours isn't, send us a note — we usually reply
             within a few hours.
           </p>
@@ -158,16 +158,16 @@ function ContactPage() {
         {/* Contact + quick info */}
         <section className="mt-12 grid gap-8 md:mt-16 md:grid-cols-[1.2fr_1fr]">
           {/* Form */}
-          <div className="rounded-[20px] border border-[rgba(246,240,230,0.12)] bg-[rgba(246,240,230,0.04)] p-6 md:p-8">
+          <div className="rounded-[20px] border border-[rgba(31,27,22,0.12)] bg-[#FBF6EC] p-6 md:p-8">
             <h2 className="font-display text-[24px] font-semibold tracking-[-0.01em]">
               Send us a message
             </h2>
-            <p className="mt-2 text-[14px] text-[rgba(246,240,230,0.6)]">
+            <p className="mt-2 text-[14px] text-[rgba(31,27,22,0.6)]">
               Have an order already? Drop the order ID so we can find it faster.
             </p>
 
             {submitted ? (
-              <div className="mt-6 rounded-[14px] border border-[rgba(229,217,239,0.25)] bg-[rgba(229,217,239,0.06)] p-5 text-[14px] text-[#E5D9EF]">
+              <div className="mt-6 rounded-[14px] border border-[rgba(141,111,175,0.25)] bg-[rgba(141,111,175,0.06)] p-5 text-[14px] text-[#8D6FAF]">
                 Got it — your message is in our inbox. We'll reply to{" "}
                 <span className="font-semibold">{email}</span> within a few hours. If anything
                 urgent, you can also email us directly at{" "}
@@ -179,7 +179,7 @@ function ContactPage() {
             ) : (
               <form onSubmit={handleSubmit} className="mt-6 space-y-4">
                 <div className="space-y-2">
-                  <Label htmlFor="name" className="text-[#F6F0E6]">
+                  <Label htmlFor="name" className="text-[#1F1B16]">
                     Your name
                   </Label>
                   <Input
@@ -188,13 +188,13 @@ function ContactPage() {
                     onChange={(e) => setName(e.target.value)}
                     maxLength={100}
                     required
-                    className="border-[rgba(246,240,230,0.2)] bg-[rgba(246,240,230,0.06)] text-[#F6F0E6] placeholder:text-[rgba(246,240,230,0.4)]"
+                    className="border-[rgba(31,27,22,0.2)] bg-white text-[#1F1B16] placeholder:text-[rgba(31,27,22,0.4)]"
                     placeholder="Jane Doe"
                   />
                 </div>
 
                 <div className="space-y-2">
-                  <Label htmlFor="email" className="text-[#F6F0E6]">
+                  <Label htmlFor="email" className="text-[#1F1B16]">
                     Email
                   </Label>
                   <Input
@@ -204,27 +204,27 @@ function ContactPage() {
                     onChange={(e) => setEmail(e.target.value)}
                     maxLength={255}
                     required
-                    className="border-[rgba(246,240,230,0.2)] bg-[rgba(246,240,230,0.06)] text-[#F6F0E6] placeholder:text-[rgba(246,240,230,0.4)]"
+                    className="border-[rgba(31,27,22,0.2)] bg-white text-[#1F1B16] placeholder:text-[rgba(31,27,22,0.4)]"
                     placeholder="you@example.com"
                   />
                 </div>
 
                 <div className="space-y-2">
-                  <Label htmlFor="orderId" className="text-[#F6F0E6]">
-                    Order ID <span className="text-[rgba(246,240,230,0.5)]">(optional)</span>
+                  <Label htmlFor="orderId" className="text-[#1F1B16]">
+                    Order ID <span className="text-[rgba(31,27,22,0.5)]">(optional)</span>
                   </Label>
                   <Input
                     id="orderId"
                     value={orderId}
                     onChange={(e) => setOrderId(e.target.value)}
                     maxLength={100}
-                    className="border-[rgba(246,240,230,0.2)] bg-[rgba(246,240,230,0.06)] text-[#F6F0E6] placeholder:text-[rgba(246,240,230,0.4)]"
+                    className="border-[rgba(31,27,22,0.2)] bg-white text-[#1F1B16] placeholder:text-[rgba(31,27,22,0.4)]"
                     placeholder="e.g. 8f3a2c…"
                   />
                 </div>
 
                 <div className="space-y-2">
-                  <Label htmlFor="message" className="text-[#F6F0E6]">
+                  <Label htmlFor="message" className="text-[#1F1B16]">
                     Message
                   </Label>
                   <Textarea
@@ -234,10 +234,10 @@ function ContactPage() {
                     maxLength={2000}
                     required
                     rows={6}
-                    className="border-[rgba(246,240,230,0.2)] bg-[rgba(246,240,230,0.06)] text-[#F6F0E6] placeholder:text-[rgba(246,240,230,0.4)]"
+                    className="border-[rgba(31,27,22,0.2)] bg-white text-[#1F1B16] placeholder:text-[rgba(31,27,22,0.4)]"
                     placeholder="Tell us what's going on…"
                   />
-                  <p className="text-right text-[12px] text-[rgba(246,240,230,0.45)]">
+                  <p className="text-right text-[12px] text-[rgba(31,27,22,0.45)]">
                     {message.length}/2000
                   </p>
                 </div>
@@ -245,7 +245,7 @@ function ContactPage() {
                 <Button
                   type="submit"
                   disabled={submitting}
-                  className="h-12 w-full rounded-full bg-[#E5D9EF] text-[15px] font-semibold text-[#1F1B16] hover:bg-[#d8c8e6]"
+                  className="h-12 w-full rounded-full bg-[#8D6FAF] text-[15px] font-semibold text-[#FFF7EE] hover:bg-[#6B4F8A]"
                 >
                   {submitting ? "Sending…" : "Send message"}
                 </Button>
@@ -255,30 +255,30 @@ function ContactPage() {
 
           {/* Quick info card */}
           <div className="space-y-4">
-            <div className="rounded-[20px] border border-[rgba(246,240,230,0.12)] bg-[rgba(246,240,230,0.04)] p-6">
+            <div className="rounded-[20px] border border-[rgba(31,27,22,0.12)] bg-[#FBF6EC] p-6">
               <h3 className="font-display text-[18px] font-semibold">Email</h3>
-              <p className="mt-1 text-[14px] text-[rgba(246,240,230,0.65)]">
+              <p className="mt-1 text-[14px] text-[rgba(31,27,22,0.65)]">
                 Fastest way to reach us.
               </p>
               <a
                 href="mailto:hello@ribbonsong.com"
-                className="mt-3 inline-block text-[15px] font-medium text-[#E5D9EF] hover:underline"
+                className="mt-3 inline-block text-[15px] font-medium text-[#8D6FAF] hover:underline"
               >
                 hello@ribbonsong.com
               </a>
             </div>
 
-            <div className="rounded-[20px] border border-[rgba(246,240,230,0.12)] bg-[rgba(246,240,230,0.04)] p-6">
+            <div className="rounded-[20px] border border-[rgba(31,27,22,0.12)] bg-[#FBF6EC] p-6">
               <h3 className="font-display text-[18px] font-semibold">Reply time</h3>
-              <p className="mt-1 text-[14px] text-[rgba(246,240,230,0.65)]">
+              <p className="mt-1 text-[14px] text-[rgba(31,27,22,0.65)]">
                 We usually answer within a few hours, 7 days a week. Order issues are always top
                 priority.
               </p>
             </div>
 
-            <div className="rounded-[20px] border border-[rgba(246,240,230,0.12)] bg-[rgba(246,240,230,0.04)] p-6">
+            <div className="rounded-[20px] border border-[rgba(31,27,22,0.12)] bg-[#FBF6EC] p-6">
               <h3 className="font-display text-[18px] font-semibold">Already ordered?</h3>
-              <p className="mt-1 text-[14px] text-[rgba(246,240,230,0.65)]">
+              <p className="mt-1 text-[14px] text-[rgba(31,27,22,0.65)]">
                 You can track your order, request revisions, and download your song from your
                 listening page.
               </p>
@@ -289,7 +289,7 @@ function ContactPage() {
         {/* FAQ */}
         <section id="faq" className="mt-20 md:mt-24">
           <div className="mx-auto max-w-[720px] text-center">
-            <p className="text-[12px] uppercase tracking-[0.18em] text-[rgba(246,240,230,0.55)]">
+            <p className="text-[12px] uppercase tracking-[0.18em] text-[rgba(31,27,22,0.55)]">
               FAQ
             </p>
             <h2 className="mt-3 font-display text-[32px] font-semibold leading-[1.1] tracking-[-0.02em] md:text-[42px]">
@@ -303,12 +303,12 @@ function ContactPage() {
                 <AccordionItem
                   key={i}
                   value={`faq-${i}`}
-                  className="overflow-hidden rounded-[14px] border border-[rgba(246,240,230,0.12)] bg-[rgba(246,240,230,0.04)] px-5"
+                  className="overflow-hidden rounded-[14px] border border-[rgba(31,27,22,0.12)] bg-[#FBF6EC] px-5"
                 >
-                  <AccordionTrigger className="py-5 text-left text-[16px] font-medium text-[#F6F0E6] hover:no-underline md:text-[17px]">
+                  <AccordionTrigger className="py-5 text-left text-[16px] font-medium text-[#1F1B16] hover:no-underline md:text-[17px]">
                     {faq.q}
                   </AccordionTrigger>
-                  <AccordionContent className="pb-5 text-[15px] leading-[1.6] text-[rgba(246,240,230,0.7)]">
+                  <AccordionContent className="pb-5 text-[15px] leading-[1.6] text-[rgba(31,27,22,0.7)]">
                     {faq.a}
                   </AccordionContent>
                 </AccordionItem>
