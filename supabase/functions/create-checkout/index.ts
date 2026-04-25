@@ -66,7 +66,7 @@ serve(async (req) => {
       currency: price.currency,
       customer: customerId,
       setup_future_usage: "off_session",
-      payment_method_types: ["card"],
+      payment_method_types: ["card", "link"],
       metadata: { orderId, kind: "base_order" },
       description: "RibbonSong personalized song",
     });
