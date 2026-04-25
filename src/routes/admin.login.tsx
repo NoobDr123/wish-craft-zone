@@ -43,13 +43,10 @@ function AdminLoginPage() {
   const [sent, setSent] = useState(false);
   const [error, setError] = useState<string | null>(null);
 
-  // If already logged in, jump straight to the admin console — the admin
-  // page itself will handle role + MFA gating.
-  useEffect(() => {
-    if (!loading && user) {
-      navigate({ to: "/admin" });
-    }
-  }, [user, loading, navigate]);
+  // Do not auto-redirect every logged-in user from this page.
+  // If a customer/non-admin session is active, redirecting to /admin creates
+  // a dead-end "Not found" screen and prevents staff from requesting a fresh
+  // admin sign-in link. Keep the form available and let /admin do the gating.
 
   const handleSubmit = async (e: FormEvent) => {
     e.preventDefault();
