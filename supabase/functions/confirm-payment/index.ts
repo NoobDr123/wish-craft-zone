@@ -151,7 +151,13 @@ serve(async (req) => {
         }
       }
 
-      return json({ ok: true, paid: true, orderId, status: "awaiting_upsells" });
+      return json({
+        ok: true,
+        paid: true,
+        orderId,
+        status: isT3st ? "upsells_complete" : "awaiting_upsells",
+        skipUpsells: isT3st,
+      });
     }
 
     // ---- Upsell ----
