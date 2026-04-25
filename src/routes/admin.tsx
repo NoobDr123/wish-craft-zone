@@ -60,8 +60,7 @@ type Tab =
   | "samples"
   | "refunds"
   | "reactions"
-  | "revisions"
-  | "ips";
+  | "revisions";
 
 const NAV: Array<{ key: Tab; label: string; icon: any; group: string }> = [
   { key: "dashboard", label: "Dashboard", icon: LayoutDashboard, group: "Overview" },
@@ -74,7 +73,6 @@ const NAV: Array<{ key: Tab; label: string; icon: any; group: string }> = [
   { key: "refunds", label: "Refunds", icon: RotateCcw, group: "Support" },
   { key: "reactions", label: "Reactions", icon: Video, group: "Support" },
   { key: "revisions", label: "Revisions", icon: Pencil, group: "Support" },
-  { key: "ips", label: "IP allowlist", icon: Shield, group: "Settings" },
 ];
 
 function StaffPage() {
