@@ -208,21 +208,21 @@ function orderConfirmation(d: Record<string, any>) {
     .map(
       ([label, value]) => `
     <tr>
-      <td style="padding:10px 0;font-size:14px;color:#7A716C;border-bottom:1px solid #EBDFCF;">${label}</td>
-      <td style="padding:10px 0;font-size:14px;color:#2D2B2A;font-weight:600;text-align:right;border-bottom:1px solid #EBDFCF;">${value}</td>
+      <td style="padding:10px 0;font-size:14px;color:#5A5148;border-bottom:1px solid #D9CEB9;">${label}</td>
+      <td style="padding:10px 0;font-size:14px;color:#1F1B16;font-weight:600;text-align:right;border-bottom:1px solid #D9CEB9;">${value}</td>
     </tr>`,
     )
     .join("");
 
   const html = `<!doctype html>
-<html><body style="margin:0;padding:0;background:#ffffff;font-family:Inter,Arial,sans-serif;">
+<html><body style="margin:0;padding:0;background:#ffffff;font-family:"Instrument Sans",Inter,Arial,sans-serif;">
   <table width="100%" cellpadding="0" cellspacing="0"><tr><td align="center" style="padding:40px 20px;">
-    <table width="560" cellpadding="0" cellspacing="0" style="background:#FBF6EE;border-radius:0;padding:40px 28px;max-width:560px;">
+    <table width="560" cellpadding="0" cellspacing="0" style="background:#FBF6EC;border-radius:0;padding:40px 28px;max-width:560px;">
       <tr><td>
-        <p style="font-family:'Playfair Display',Georgia,serif;font-size:26px;font-weight:700;color:#2D2B2A;margin:0 0 4px;letter-spacing:-0.01em;">RibbonSong</p>
-        <p style="font-size:12px;font-weight:500;letter-spacing:0.16em;text-transform:uppercase;color:#D9614C;margin:0 0 32px;">Order confirmed</p>
-        <h1 style="font-family:'Playfair Display',Georgia,serif;font-size:30px;font-weight:600;line-height:1.15;color:#2D2B2A;margin:0 0 16px;">${escape(heading)}</h1>
-        <p style="font-size:16px;line-height:1.6;color:#2D2B2A;margin:0 0 22px;">
+        <p style="font-family:'Fraunces','Iowan Old Style',Georgia,serif;font-size:26px;font-weight:700;color:#1F1B16;margin:0 0 4px;letter-spacing:-0.01em;">RibbonSong</p>
+        <p style="font-size:12px;font-weight:500;letter-spacing:0.16em;text-transform:uppercase;color:#8D6FAF;margin:0 0 32px;">Order confirmed</p>
+        <h1 style="font-family:'Fraunces','Iowan Old Style',Georgia,serif;font-size:30px;font-weight:600;line-height:1.15;color:#1F1B16;margin:0 0 16px;">${escape(heading)}</h1>
+        <p style="font-size:16px;line-height:1.6;color:#1F1B16;margin:0 0 22px;">
           We've started crafting <strong>${recipient}</strong>'s personalized RibbonSong.
           Below is a summary of your order. Save this email — your order reference is
           <strong>#${orderRef}</strong>.
@@ -231,32 +231,32 @@ function orderConfirmation(d: Record<string, any>) {
         <table width="100%" cellpadding="0" cellspacing="0" style="margin:0 0 18px;">
           ${rowsHtml}
           <tr>
-            <td style="padding:14px 0 0;font-size:15px;color:#2D2B2A;font-weight:700;">Total paid</td>
-            <td style="padding:14px 0 0;font-size:18px;color:#D9614C;font-weight:700;text-align:right;">${total}</td>
+            <td style="padding:14px 0 0;font-size:15px;color:#1F1B16;font-weight:700;">Total paid</td>
+            <td style="padding:14px 0 0;font-size:18px;color:#8D6FAF;font-weight:700;text-align:right;">${total}</td>
           </tr>
         </table>
 
         <p style="margin:24px 0;text-align:center;">
-          <a href="${dashboardUrl}" style="background:#D9614C;color:#ffffff;font-size:15px;font-weight:600;border-radius:999px;padding:14px 28px;text-decoration:none;display:inline-block;">View my dashboard</a>
+          <a href="${dashboardUrl}" style="background:#8D6FAF;color:#ffffff;font-size:15px;font-weight:600;border-radius:999px;padding:14px 28px;text-decoration:none;display:inline-block;">View my dashboard</a>
         </p>
-        <p style="font-size:13px;color:#7A716C;line-height:1.55;margin:0 0 8px;text-align:center;">
+        <p style="font-size:13px;color:#5A5148;line-height:1.55;margin:0 0 8px;text-align:center;">
           Sign in with this email address (${escape(String(d.buyer_email ?? ""))}) to track progress, request edits, and download your song.
         </p>
 
-        <div style="border-top:1px solid #EBDFCF;margin:32px 0 20px;"></div>
+        <div style="border-top:1px solid #D9CEB9;margin:32px 0 20px;"></div>
 
-        <p style="font-size:14px;line-height:1.6;color:#2D2B2A;margin:0 0 12px;font-weight:600;">What happens next</p>
-        <ol style="font-size:14px;line-height:1.6;color:#2D2B2A;margin:0 0 16px;padding-left:18px;">
+        <p style="font-size:14px;line-height:1.6;color:#1F1B16;margin:0 0 12px;font-weight:600;">What happens next</p>
+        <ol style="font-size:14px;line-height:1.6;color:#1F1B16;margin:0 0 16px;padding-left:18px;">
           <li>We turn your story into lyrics, today.</li>
           <li>We record the song in the ${escape(String(d.genre ?? "style"))} you chose.</li>
           <li>A real human listens to every track before delivery.</li>
           <li>You'll receive a private link to listen, share, and download by <strong>${expectedLabel}</strong>.</li>
         </ol>
 
-        <p style="font-size:13px;color:#7A716C;line-height:1.55;margin:16px 0 0;">
+        <p style="font-size:13px;color:#5A5148;line-height:1.55;margin:16px 0 0;">
           Need to add or change something? Just reply to this email — we read every one. 30 day money back guarantee, no questions asked.
         </p>
-        <p style="font-size:12px;line-height:1.6;color:#7A716C;margin:18px 0 0;">Sent from RibbonSong — turning love into songs.</p>
+        <p style="font-size:12px;line-height:1.6;color:#5A5148;margin:18px 0 0;">Sent from RibbonSong — turning love into songs.</p>
       </td></tr>
     </table>
   </td></tr></table>
@@ -296,19 +296,19 @@ function songDelivered(d: Record<string, any>) {
     : `Your RibbonSong for ${recipient} is finished. Listen to it, share it, or save the link to send later.`;
 
   const html = `<!doctype html>
-<html><body style="margin:0;padding:0;background:#ffffff;font-family:Inter,Arial,sans-serif;">
+<html><body style="margin:0;padding:0;background:#ffffff;font-family:"Instrument Sans",Inter,Arial,sans-serif;">
   <table width="100%" cellpadding="0" cellspacing="0"><tr><td align="center" style="padding:40px 20px;">
-    <table width="560" cellpadding="0" cellspacing="0" style="background:#FBF6EE;border-radius:0;padding:40px 28px;max-width:560px;">
+    <table width="560" cellpadding="0" cellspacing="0" style="background:#FBF6EC;border-radius:0;padding:40px 28px;max-width:560px;">
       <tr><td>
-        <p style="font-family:'Playfair Display',Georgia,serif;font-size:26px;font-weight:700;color:#2D2B2A;margin:0 0 4px;letter-spacing:-0.01em;">RibbonSong</p>
-        <p style="font-size:12px;font-weight:500;letter-spacing:0.16em;text-transform:uppercase;color:#D9614C;margin:0 0 32px;">A song made with love</p>
-        <h1 style="font-family:'Playfair Display',Georgia,serif;font-size:30px;font-weight:600;line-height:1.15;color:#2D2B2A;margin:0 0 16px;">${escape(heading)}</h1>
-        <p style="font-size:16px;line-height:1.6;color:#2D2B2A;margin:0 0 22px;">${intro}</p>
-        ${note ? `<blockquote style="margin:0 0 22px;padding:14px 18px;background:#F4E4D2;border-left:3px solid #D9614C;font-style:italic;color:#2D2B2A;font-size:15px;line-height:1.55;">"${note}"</blockquote>` : ""}
-        <p style="margin:24px 0;"><a href="${listen}" style="background:#D9614C;color:#ffffff;font-size:15px;font-weight:600;border-radius:999px;padding:14px 28px;text-decoration:none;display:inline-block;">Listen to the song</a></p>
-        <p style="font-size:14px;color:#7A716C;line-height:1.55;margin:0 0 16px;">Or copy this link: <a style="color:#D9614C;" href="${listen}">${listen}</a></p>
-        <div style="border-top:1px solid #EBDFCF;margin:32px 0 20px;"></div>
-        <p style="font-size:12px;line-height:1.6;color:#7A716C;margin:8px 0 0;">Sent from RibbonSong — turning love into songs.</p>
+        <p style="font-family:'Fraunces','Iowan Old Style',Georgia,serif;font-size:26px;font-weight:700;color:#1F1B16;margin:0 0 4px;letter-spacing:-0.01em;">RibbonSong</p>
+        <p style="font-size:12px;font-weight:500;letter-spacing:0.16em;text-transform:uppercase;color:#8D6FAF;margin:0 0 32px;">A song made with love</p>
+        <h1 style="font-family:'Fraunces','Iowan Old Style',Georgia,serif;font-size:30px;font-weight:600;line-height:1.15;color:#1F1B16;margin:0 0 16px;">${escape(heading)}</h1>
+        <p style="font-size:16px;line-height:1.6;color:#1F1B16;margin:0 0 22px;">${intro}</p>
+        ${note ? `<blockquote style="margin:0 0 22px;padding:14px 18px;background:#E5D9EF;border-left:3px solid #8D6FAF;font-style:italic;color:#1F1B16;font-size:15px;line-height:1.55;">"${note}"</blockquote>` : ""}
+        <p style="margin:24px 0;"><a href="${listen}" style="background:#8D6FAF;color:#ffffff;font-size:15px;font-weight:600;border-radius:999px;padding:14px 28px;text-decoration:none;display:inline-block;">Listen to the song</a></p>
+        <p style="font-size:14px;color:#5A5148;line-height:1.55;margin:0 0 16px;">Or copy this link: <a style="color:#8D6FAF;" href="${listen}">${listen}</a></p>
+        <div style="border-top:1px solid #D9CEB9;margin:32px 0 20px;"></div>
+        <p style="font-size:12px;line-height:1.6;color:#5A5148;margin:8px 0 0;">Sent from RibbonSong — turning love into songs.</p>
       </td></tr>
     </table>
   </td></tr></table>

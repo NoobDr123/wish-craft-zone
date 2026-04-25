@@ -7,15 +7,20 @@ export const BRAND = {
   rootUrl: "https://ribbonsong.com",
   logoUrl:
     "https://tytxdnftsnspejnyfbmg.supabase.co/storage/v1/object/public/email-assets/ribbonsong-logo.png",
-  // Warm cream + terracotta palette to match the app
+  // Synced with src/styles.css landing-page tokens (light theme)
   colors: {
-    cream: "#FBF6EE",
-    foreground: "#2D2B2A",
-    muted: "#7A716C",
-    primary: "#D9614C", // warm terracotta
-    primaryForeground: "#FFFFFF",
-    border: "#EBDFCF",
-    peach: "#F4E4D2",
+    cream: "#F6F0E6",        // --background
+    backgroundCard: "#FBF6EC", // --background-card
+    backgroundWarm: "#ECE2D0", // --background-warm / --muted / --peach
+    foreground: "#1F1B16",    // --foreground
+    foregroundSoft: "#5A5148",// --foreground-soft / --muted-foreground
+    muted: "#8A8175",         // --foreground-faint
+    primary: "#8D6FAF",       // --primary (warm purple)
+    primaryHover: "#6B4F8A",  // --primary-hover
+    primaryForeground: "#FFF7EE", // --primary-foreground
+    accent: "#E5D9EF",        // --accent
+    border: "#D9CEB9",        // --border
+    peach: "#ECE2D0",         // --peach
   },
 } as const;
 
@@ -23,7 +28,7 @@ export const styles = {
   main: {
     backgroundColor: "#ffffff",
     fontFamily:
-      '"Inter", -apple-system, BlinkMacSystemFont, "Segoe UI", Helvetica, Arial, sans-serif',
+      '"Instrument Sans", -apple-system, BlinkMacSystemFont, "Segoe UI", Helvetica, Arial, sans-serif',
     margin: 0,
     padding: 0,
   },
@@ -50,7 +55,7 @@ export const styles = {
     textAlign: "center" as const,
   },
   h1: {
-    fontFamily: '"Playfair Display", Georgia, serif',
+    fontFamily: '"Fraunces", "Iowan Old Style", Georgia, serif',
     fontSize: "30px",
     fontWeight: 600 as const,
     lineHeight: "1.15",
