@@ -19,6 +19,7 @@ import { Route as PrivacyRouteImport } from './routes/privacy'
 import { Route as LoginRouteImport } from './routes/login'
 import { Route as DashboardRouteImport } from './routes/dashboard'
 import { Route as CreateRouteImport } from './routes/create'
+import { Route as ContactRouteImport } from './routes/contact'
 import { Route as CheckoutRouteImport } from './routes/checkout'
 import { Route as AlmostThereRouteImport } from './routes/almost-there'
 import { Route as AdminRouteImport } from './routes/admin'
@@ -86,6 +87,11 @@ const DashboardRoute = DashboardRouteImport.update({
 const CreateRoute = CreateRouteImport.update({
   id: '/create',
   path: '/create',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const ContactRoute = ContactRouteImport.update({
+  id: '/contact',
+  path: '/contact',
   getParentRoute: () => rootRouteImport,
 } as any)
 const CheckoutRoute = CheckoutRouteImport.update({
@@ -188,6 +194,7 @@ export interface FileRoutesByFullPath {
   '/admin': typeof AdminRouteWithChildren
   '/almost-there': typeof AlmostThereRoute
   '/checkout': typeof CheckoutRouteWithChildren
+  '/contact': typeof ContactRoute
   '/create': typeof CreateRoute
   '/dashboard': typeof DashboardRoute
   '/login': typeof LoginRoute
@@ -218,6 +225,7 @@ export interface FileRoutesByTo {
   '/admin': typeof AdminRouteWithChildren
   '/almost-there': typeof AlmostThereRoute
   '/checkout': typeof CheckoutRouteWithChildren
+  '/contact': typeof ContactRoute
   '/create': typeof CreateRoute
   '/dashboard': typeof DashboardRoute
   '/login': typeof LoginRoute
@@ -249,6 +257,7 @@ export interface FileRoutesById {
   '/admin': typeof AdminRouteWithChildren
   '/almost-there': typeof AlmostThereRoute
   '/checkout': typeof CheckoutRouteWithChildren
+  '/contact': typeof ContactRoute
   '/create': typeof CreateRoute
   '/dashboard': typeof DashboardRoute
   '/login': typeof LoginRoute
@@ -281,6 +290,7 @@ export interface FileRouteTypes {
     | '/admin'
     | '/almost-there'
     | '/checkout'
+    | '/contact'
     | '/create'
     | '/dashboard'
     | '/login'
@@ -311,6 +321,7 @@ export interface FileRouteTypes {
     | '/admin'
     | '/almost-there'
     | '/checkout'
+    | '/contact'
     | '/create'
     | '/dashboard'
     | '/login'
@@ -341,6 +352,7 @@ export interface FileRouteTypes {
     | '/admin'
     | '/almost-there'
     | '/checkout'
+    | '/contact'
     | '/create'
     | '/dashboard'
     | '/login'
@@ -372,6 +384,7 @@ export interface RootRouteChildren {
   AdminRoute: typeof AdminRouteWithChildren
   AlmostThereRoute: typeof AlmostThereRoute
   CheckoutRoute: typeof CheckoutRouteWithChildren
+  ContactRoute: typeof ContactRoute
   CreateRoute: typeof CreateRoute
   DashboardRoute: typeof DashboardRoute
   LoginRoute: typeof LoginRoute
@@ -465,6 +478,13 @@ declare module '@tanstack/react-router' {
       path: '/create'
       fullPath: '/create'
       preLoaderRoute: typeof CreateRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/contact': {
+      id: '/contact'
+      path: '/contact'
+      fullPath: '/contact'
+      preLoaderRoute: typeof ContactRouteImport
       parentRoute: typeof rootRouteImport
     }
     '/checkout': {
@@ -624,6 +644,7 @@ const rootRouteChildren: RootRouteChildren = {
   AdminRoute: AdminRouteWithChildren,
   AlmostThereRoute: AlmostThereRoute,
   CheckoutRoute: CheckoutRouteWithChildren,
+  ContactRoute: ContactRoute,
   CreateRoute: CreateRoute,
   DashboardRoute: DashboardRoute,
   LoginRoute: LoginRoute,
