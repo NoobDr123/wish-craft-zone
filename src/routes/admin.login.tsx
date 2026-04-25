@@ -2,12 +2,12 @@
 // never share the same login surface — different copy, no "Create your
 // first song" CTA, and the post-auth redirect always points back to /admin.
 
-import { createFileRoute, useNavigate } from "@tanstack/react-router";
-import { useEffect, useState, type FormEvent } from "react";
+import { createFileRoute } from "@tanstack/react-router";
+import { useState, type FormEvent } from "react";
 import { ArrowLeft, Lock, CheckCircle2, Loader2, ShieldCheck } from "lucide-react";
 import { Logo } from "@/components/Logo";
 import { supabase } from "@/integrations/supabase/client";
-import { useAuth } from "@/hooks/useAuth";
+
 
 export const Route = createFileRoute("/admin/login")({
   component: AdminLoginRoute,
@@ -36,20 +36,15 @@ function AdminLoginRoute() {
 }
 
 function AdminLoginPage() {
-  const navigate = useNavigate();
-  const { user, loading } = useAuth();
   const [email, setEmail] = useState("");
   const [submitting, setSubmitting] = useState(false);
   const [sent, setSent] = useState(false);
   const [error, setError] = useState<string | null>(null);
 
-  // If already logged in, jump straight to the admin console — the admin
-  // page itself will handle role + MFA gating.
-  useEffect(() => {
-    if (!loading && user) {
-      navigate({ to: "/admin" });
-    }
-  }, [user, loading, navigate]);
+  // Do not auto-redirect every logged-in user from this page.
+  // If a customer/non-admin session is active, redirecting to /admin creates
+  // a dead-end "Not found" screen and prevents staff from requesting a fresh
+  // admin sign-in link. Keep the form available and let /admin do the gating.
 
   const handleSubmit = async (e: FormEvent) => {
     e.preventDefault();
