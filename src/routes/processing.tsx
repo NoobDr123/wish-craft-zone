@@ -582,11 +582,10 @@ function DashboardCta({
   if (hasSession) {
     return (
       <a
-        href="/dashboard"
+        href="/account"
         className="mt-5 flex w-full items-center justify-center gap-2 rounded-xl bg-primary px-5 py-3.5 text-[15px] font-bold text-primary-foreground shadow-glow transition-all hover:brightness-95 active:scale-[0.99] sm:mt-6 sm:rounded-2xl sm:px-6 sm:py-4 sm:text-base"
       >
-        Go to my dashboard <ArrowRight className="h-4 w-4" />
-      </a>
+        Go to my songs <ArrowRight className="h-4 w-4" /></a>
     );
   }
 
