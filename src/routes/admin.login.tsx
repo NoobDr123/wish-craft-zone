@@ -36,8 +36,6 @@ function AdminLoginRoute() {
 }
 
 function AdminLoginPage() {
-  const navigate = useNavigate();
-  const { user, loading } = useAuth();
   const [email, setEmail] = useState("");
   const [submitting, setSubmitting] = useState(false);
   const [sent, setSent] = useState(false);
