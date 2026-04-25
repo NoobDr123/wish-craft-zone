@@ -29,27 +29,29 @@ serve(async (req) => {
   const auth = req.headers.get("Authorization") ?? "";
   const token = auth.replace(/^Bearer\s+/i, "").trim();
   const providedSecret = req.headers.get("x-internal-secret") ?? "";
-  const anonKey = Deno.env.get("SUPABASE_ANON_KEY")
-    ?? Deno.env.get("SUPABASE_PUBLISHABLE_KEY")
-    ?? "";
+
+  // The edge runtime exposes both SUPABASE_ANON_KEY and SUPABASE_PUBLISHABLE_KEY,
+  // but in this project SUPABASE_ANON_KEY is set to a truncated/legacy value
+  // (length ~46) while SUPABASE_PUBLISHABLE_KEY contains the real JWT (length ~208)
+  // that pg_cron actually sends. Accept either — match against both.
+  const anonKey1 = Deno.env.get("SUPABASE_ANON_KEY") ?? "";
+  const anonKey2 = Deno.env.get("SUPABASE_PUBLISHABLE_KEY") ?? "";
 
   const isAuthorized =
     (providedSecret && providedSecret === INTERNAL_SECRET) ||
     (token && token === SERVICE_KEY) ||
-    (token && anonKey && token === anonKey);
+    (token && anonKey1 && token === anonKey1) ||
+    (token && anonKey2 && token === anonKey2);
 
   if (!isAuthorized) {
     console.log("drain-queue auth failed", {
       hasProvidedSecret: !!providedSecret,
-      providedSecretMatchesInternal: providedSecret === INTERNAL_SECRET,
-      hasToken: !!token,
       tokenLen: token.length,
       tokenMatchesService: token === SERVICE_KEY,
-      hasAnonKey: !!anonKey,
-      anonKeyLen: anonKey.length,
-      tokenMatchesAnon: token === anonKey,
-      hasInternalSecret: !!INTERNAL_SECRET,
-      hasServiceKey: !!SERVICE_KEY,
+      anonKey1Len: anonKey1.length,
+      anonKey2Len: anonKey2.length,
+      tokenMatchesAnon1: token === anonKey1,
+      tokenMatchesAnon2: token === anonKey2,
     });
     const unauthorized = await guardInternal(req, corsHeaders);
     if (unauthorized) return unauthorized;
