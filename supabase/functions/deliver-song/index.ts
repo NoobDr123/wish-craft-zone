@@ -46,6 +46,37 @@ serve(async (req) => {
 
     const slug = order.share_page_slug ?? order.id;
     const listenUrl = `${SITE_URL}/listen/${slug}`;
+    const portalUrl = `${SITE_URL}/portal/${order.id}`;
+
+    // Auto-issue a 10%-off returning-customer promo (idempotent: skip if a
+    // returning code already exists for this order).
+    let returningPromoCode: string | null = null;
+    try {
+      const { data: existing } = await supabase
+        .from("promo_codes")
+        .select("code")
+        .eq("issued_for_order_id", order.id)
+        .eq("kind", "returning_10pct")
+        .maybeSingle();
+      if (existing?.code) {
+        returningPromoCode = existing.code;
+      } else if (order.source_kind === "paid") {
+        // Only issue for paid orders, not free reward orders.
+        const { data: newPromo } = await supabase.rpc("issue_personal_promo_code", {
+          _kind: "returning_10pct",
+          _discount_pct: 10,
+          _owner_user_id: order.user_id,
+          _owner_email: order.buyer_email,
+          _issued_for_order_id: order.id,
+          _issued_for_reward_code_id: null,
+          _expires_in_days: 180,
+        });
+        const promoRow = Array.isArray(newPromo) ? newPromo[0] : newPromo;
+        returningPromoCode = promoRow?.code ?? null;
+      }
+    } catch (e) {
+      console.error("Failed to issue returning promo:", e);
+    }
 
     // Determine recipient. For gifts, send to recipient_email if provided,
     // otherwise notify buyer. Always notify buyer too on first delivery.
@@ -70,9 +101,12 @@ serve(async (req) => {
               recipient_name: order.recipient_name,
               buyer_name: order.buyer_name ?? "Someone who loves you",
               listen_url: listenUrl,
+              portal_url: portalUrl,
               personal_note: order.personal_note ?? null,
               role: t.role,
               delivery_tier: order.delivery_tier ?? "standard",
+              // Only buyer gets the returning promo code, not recipient
+              returning_promo_code: t.role === "buyer" ? returningPromoCode : null,
             },
           }),
         });
