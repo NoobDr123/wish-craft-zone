@@ -136,6 +136,18 @@ function CreatePage() {
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [search.reward, user, authLoading]);
 
+  // Stash incoming ?promo=CODE (from Golden Ticket #2) so checkout auto-fills it.
+  useEffect(() => {
+    const promo = search.promo?.trim();
+    if (promo) {
+      try {
+        sessionStorage.setItem("rs_pending_promo", promo);
+      } catch {
+        /* ignore storage failures */
+      }
+    }
+  }, [search.promo]);
+
   // Track quiz_start once per mount
   useEffect(() => {
     void ensureSession();
