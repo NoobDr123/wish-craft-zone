@@ -114,3 +114,62 @@ export const styles = {
     textAlign: "center" as const,
   },
 };
+
+// ---------------------------------------------------------------------------
+// Shared footer with unsubscribe link.
+// Use this in ALL transactional/marketing templates (NOT auth emails — those
+// are legally required and must not be unsubscribable).
+// ---------------------------------------------------------------------------
+
+interface EmailFooterProps {
+  /** Optional unsubscribe URL. When omitted, the link is hidden. */
+  unsubscribeUrl?: string;
+}
+
+const footerWrap = {
+  borderTop: `1px solid ${BRAND.colors.border}`,
+  marginTop: "32px",
+  paddingTop: "20px",
+  textAlign: "center" as const,
+};
+
+const footerLine = {
+  fontSize: "12px",
+  lineHeight: "1.6",
+  color: BRAND.colors.muted,
+  margin: "4px 0",
+};
+
+const footerLink = {
+  color: BRAND.colors.muted,
+  textDecoration: "underline",
+};
+
+export const EmailFooter = ({ unsubscribeUrl }: EmailFooterProps) =>
+  React.createElement(
+    "div",
+    { style: footerWrap },
+    React.createElement(
+      "p",
+      { style: footerLine },
+      `Sent with care from ${BRAND.name} — turning love into songs.`
+    ),
+    unsubscribeUrl
+      ? React.createElement(
+          "p",
+          { style: footerLine },
+          "Don't want these emails? ",
+          React.createElement(
+            "a",
+            { href: unsubscribeUrl, style: footerLink },
+            "Unsubscribe"
+          ),
+          "."
+        )
+      : null,
+    React.createElement(
+      "p",
+      { style: { ...footerLine, marginTop: "8px" } },
+      `© ${new Date().getFullYear()} ${BRAND.name}`
+    )
+  );
