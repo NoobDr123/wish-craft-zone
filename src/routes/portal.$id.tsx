@@ -54,7 +54,7 @@ function PortalSong() {
   const [reactions, setReactions] = useState<any[]>([]);
   const [reward, setReward] = useState<Reward | null>(null);
   const [returningPromos, setReturningPromos] = useState<PromoCode[]>([]);
-  const [tab, setTab] = useState<"player" | "reaction" | "revision" | "refund" | "rewards">(
+  const [tab, setTab] = useState<"player" | "reaction" | "refund" | "rewards">(
     "player",
   );
 
