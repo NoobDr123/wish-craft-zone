@@ -1,5 +1,5 @@
 import { encode } from "https://deno.land/std@0.168.0/encoding/hex.ts";
-import Stripe from "npm:stripe@18.5.0";
+import Stripe from "https://esm.sh/stripe@18.5.0?target=deno";
 
 export type StripeEnv = "sandbox" | "live";
 
