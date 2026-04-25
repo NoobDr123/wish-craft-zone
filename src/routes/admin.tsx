@@ -20,6 +20,7 @@ import {
   RotateCcw,
   Video,
   Pencil,
+  Inbox,
   
   LogOut,
   ChevronDown,
@@ -28,6 +29,7 @@ import {
 import { Logo } from "@/components/Logo";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
+import { Textarea } from "@/components/ui/textarea";
 import { useAdminGuard } from "@/hooks/useAdminGuard";
 import { AdminMfaEnroll } from "@/components/admin/AdminMfaEnroll";
 import { AdminMfaChallenge } from "@/components/admin/AdminMfaChallenge";
@@ -60,7 +62,8 @@ type Tab =
   | "samples"
   | "refunds"
   | "reactions"
-  | "revisions";
+  | "revisions"
+  | "support";
 
 const NAV: Array<{ key: Tab; label: string; icon: any; group: string }> = [
   { key: "dashboard", label: "Dashboard", icon: LayoutDashboard, group: "Overview" },
@@ -70,6 +73,7 @@ const NAV: Array<{ key: Tab; label: string; icon: any; group: string }> = [
   { key: "upsells", label: "Upsells", icon: Sparkles, group: "Operations" },
   { key: "emails", label: "Emails", icon: Mail, group: "Operations" },
   { key: "samples", label: "Samples", icon: Music2, group: "Content" },
+  { key: "support", label: "Support inbox", icon: Inbox, group: "Support" },
   { key: "refunds", label: "Refunds", icon: RotateCcw, group: "Support" },
   { key: "reactions", label: "Reactions", icon: Video, group: "Support" },
   { key: "revisions", label: "Revisions", icon: Pencil, group: "Support" },
@@ -188,6 +192,7 @@ function StaffPage() {
           {tab === "refunds" && <RefundsPanel />}
           {tab === "reactions" && <ReactionsPanel />}
           {tab === "revisions" && <RevisionsPanel />}
+          {tab === "support" && <SupportPanel />}
           
         </div>
       </main>
