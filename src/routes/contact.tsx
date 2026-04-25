@@ -1,0 +1,314 @@
+import { createFileRoute } from "@tanstack/react-router";
+import { useState } from "react";
+import { z } from "zod";
+import { SiteHeader } from "@/components/SiteHeader";
+import { SiteFooter } from "@/components/SiteFooter";
+import { Button } from "@/components/ui/button";
+import { Input } from "@/components/ui/input";
+import { Textarea } from "@/components/ui/textarea";
+import { Label } from "@/components/ui/label";
+import {
+  Accordion,
+  AccordionContent,
+  AccordionItem,
+  AccordionTrigger,
+} from "@/components/ui/accordion";
+import { toast } from "sonner";
+
+export const Route = createFileRoute("/contact")({
+  head: () => ({
+    meta: [
+      { title: "Contact Us — RibbonSong" },
+      {
+        name: "description",
+        content:
+          "Get in touch with RibbonSong. Questions about your custom song, your order, or how it works? We're here to help.",
+      },
+      { property: "og:title", content: "Contact Us — RibbonSong" },
+      {
+        property: "og:description",
+        content:
+          "Questions about your custom song or order? Reach the RibbonSong team — we usually reply within a few hours.",
+      },
+    ],
+  }),
+  component: ContactPage,
+});
+
+const contactSchema = z.object({
+  name: z
+    .string()
+    .trim()
+    .nonempty({ message: "Please add your name" })
+    .max(100, { message: "Name must be under 100 characters" }),
+  email: z
+    .string()
+    .trim()
+    .email({ message: "Please enter a valid email" })
+    .max(255, { message: "Email must be under 255 characters" }),
+  orderId: z.string().trim().max(100).optional().or(z.literal("")),
+  message: z
+    .string()
+    .trim()
+    .nonempty({ message: "Please add a message" })
+    .max(2000, { message: "Message must be under 2000 characters" }),
+});
+
+const FAQS = [
+  {
+    q: "How long does it take to get my song?",
+    a: "Standard delivery is within 24 hours. If you chose Rush (48-hour) or scheduled delivery at checkout, we'll honor that timing. You'll get an email the moment it's ready, plus a link to your private listening page.",
+  },
+  {
+    q: "Can I request changes after I hear it?",
+    a: "Yes. Every order includes one free revision — just hit \"Request a revision\" on your listening page and tell us what to tweak (lyrics, tone, tempo, vocals). If you bought Unlimited Edits at checkout, you can revise as many times as you need.",
+  },
+  {
+    q: "What if I don't love it?",
+    a: "We'll keep working with you until you do. If a revision doesn't get you there, reach out to hello@ribbonsong.com and we'll regenerate the song or refund you — your call.",
+  },
+  {
+    q: "How does the \"Re-Found\" reaction reward work?",
+    a: "Send us a video of the recipient hearing the song for the first time. Once we approve it, you get a full refund of your order plus 2 free songs to gift to anyone you choose. Submit your video from your listening page.",
+  },
+  {
+    q: "Can I gift the song to someone?",
+    a: "Absolutely — that's what most people do. At checkout you can choose to send it directly to the recipient on a date you pick (birthday, anniversary, etc.) or get the link yourself to deliver in person.",
+  },
+  {
+    q: "What formats do I get?",
+    a: "You get a high-quality MP3 download, a streaming link to your private listening page, and printable lyrics. Two voice variants are included so you can pick the one you love.",
+  },
+  {
+    q: "Who owns the song?",
+    a: "You do — you have full personal-use rights to share it, play it, and give it as a gift. For commercial use (advertising, resale, sync), email us first.",
+  },
+  {
+    q: "Do you offer refunds?",
+    a: "Yes. If you're not happy after a revision, we'll refund you. Reach out within 30 days of delivery at hello@ribbonsong.com.",
+  },
+];
+
+function ContactPage() {
+  const [name, setName] = useState("");
+  const [email, setEmail] = useState("");
+  const [orderId, setOrderId] = useState("");
+  const [message, setMessage] = useState("");
+  const [submitting, setSubmitting] = useState(false);
+  const [submitted, setSubmitted] = useState(false);
+
+  async function handleSubmit(e: React.FormEvent) {
+    e.preventDefault();
+    setSubmitting(true);
+
+    const parsed = contactSchema.safeParse({ name, email, orderId, message });
+    if (!parsed.success) {
+      const first = parsed.error.issues[0];
+      toast.error(first?.message ?? "Please check the form");
+      setSubmitting(false);
+      return;
+    }
+
+    // Open the user's email client with a pre-filled message — zero infra,
+    // works today, swap for a server endpoint when volume justifies it.
+    const subject = encodeURIComponent(
+      `RibbonSong contact — ${parsed.data.name}${
+        parsed.data.orderId ? ` (Order ${parsed.data.orderId})` : ""
+      }`,
+    );
+    const body = encodeURIComponent(
+      `Name: ${parsed.data.name}\nEmail: ${parsed.data.email}${
+        parsed.data.orderId ? `\nOrder ID: ${parsed.data.orderId}` : ""
+      }\n\n${parsed.data.message}`,
+    );
+    window.location.href = `mailto:hello@ribbonsong.com?subject=${subject}&body=${body}`;
+
+    setSubmitted(true);
+    setSubmitting(false);
+  }
+
+  return (
+    <div className="min-h-screen bg-[#1F1B16] text-[#F6F0E6]">
+      <SiteHeader />
+
+      <main className="mx-auto max-w-[1100px] px-5 pb-20 pt-12 sm:px-6 md:pt-16">
+        {/* Header */}
+        <section className="mx-auto max-w-[720px] text-center">
+          <p className="text-[12px] uppercase tracking-[0.18em] text-[rgba(246,240,230,0.55)]">
+            We're here to help
+          </p>
+          <h1 className="mt-3 font-display text-[40px] font-semibold leading-[1.05] tracking-[-0.02em] md:text-[56px]">
+            Talk to a real human
+          </h1>
+          <p className="mx-auto mt-5 max-w-[560px] text-[16px] leading-[1.55] text-[rgba(246,240,230,0.7)] md:text-[17px]">
+            Most questions are answered below. If yours isn't, send us a note — we usually reply
+            within a few hours.
+          </p>
+        </section>
+
+        {/* Contact + quick info */}
+        <section className="mt-12 grid gap-8 md:mt-16 md:grid-cols-[1.2fr_1fr]">
+          {/* Form */}
+          <div className="rounded-[20px] border border-[rgba(246,240,230,0.12)] bg-[rgba(246,240,230,0.04)] p-6 md:p-8">
+            <h2 className="font-display text-[24px] font-semibold tracking-[-0.01em]">
+              Send us a message
+            </h2>
+            <p className="mt-2 text-[14px] text-[rgba(246,240,230,0.6)]">
+              Have an order already? Drop the order ID so we can find it faster.
+            </p>
+
+            {submitted ? (
+              <div className="mt-6 rounded-[14px] border border-[rgba(229,217,239,0.25)] bg-[rgba(229,217,239,0.06)] p-5 text-[14px] text-[#E5D9EF]">
+                Your email app should have opened with the message pre-filled. If it didn't, just
+                email us directly at{" "}
+                <a className="underline" href="mailto:hello@ribbonsong.com">
+                  hello@ribbonsong.com
+                </a>
+                .
+              </div>
+            ) : (
+              <form onSubmit={handleSubmit} className="mt-6 space-y-4">
+                <div className="space-y-2">
+                  <Label htmlFor="name" className="text-[#F6F0E6]">
+                    Your name
+                  </Label>
+                  <Input
+                    id="name"
+                    value={name}
+                    onChange={(e) => setName(e.target.value)}
+                    maxLength={100}
+                    required
+                    className="border-[rgba(246,240,230,0.2)] bg-[rgba(246,240,230,0.06)] text-[#F6F0E6] placeholder:text-[rgba(246,240,230,0.4)]"
+                    placeholder="Jane Doe"
+                  />
+                </div>
+
+                <div className="space-y-2">
+                  <Label htmlFor="email" className="text-[#F6F0E6]">
+                    Email
+                  </Label>
+                  <Input
+                    id="email"
+                    type="email"
+                    value={email}
+                    onChange={(e) => setEmail(e.target.value)}
+                    maxLength={255}
+                    required
+                    className="border-[rgba(246,240,230,0.2)] bg-[rgba(246,240,230,0.06)] text-[#F6F0E6] placeholder:text-[rgba(246,240,230,0.4)]"
+                    placeholder="you@example.com"
+                  />
+                </div>
+
+                <div className="space-y-2">
+                  <Label htmlFor="orderId" className="text-[#F6F0E6]">
+                    Order ID <span className="text-[rgba(246,240,230,0.5)]">(optional)</span>
+                  </Label>
+                  <Input
+                    id="orderId"
+                    value={orderId}
+                    onChange={(e) => setOrderId(e.target.value)}
+                    maxLength={100}
+                    className="border-[rgba(246,240,230,0.2)] bg-[rgba(246,240,230,0.06)] text-[#F6F0E6] placeholder:text-[rgba(246,240,230,0.4)]"
+                    placeholder="e.g. 8f3a2c…"
+                  />
+                </div>
+
+                <div className="space-y-2">
+                  <Label htmlFor="message" className="text-[#F6F0E6]">
+                    Message
+                  </Label>
+                  <Textarea
+                    id="message"
+                    value={message}
+                    onChange={(e) => setMessage(e.target.value)}
+                    maxLength={2000}
+                    required
+                    rows={6}
+                    className="border-[rgba(246,240,230,0.2)] bg-[rgba(246,240,230,0.06)] text-[#F6F0E6] placeholder:text-[rgba(246,240,230,0.4)]"
+                    placeholder="Tell us what's going on…"
+                  />
+                  <p className="text-right text-[12px] text-[rgba(246,240,230,0.45)]">
+                    {message.length}/2000
+                  </p>
+                </div>
+
+                <Button
+                  type="submit"
+                  disabled={submitting}
+                  className="h-12 w-full rounded-full bg-[#E5D9EF] text-[15px] font-semibold text-[#1F1B16] hover:bg-[#d8c8e6]"
+                >
+                  {submitting ? "Sending…" : "Send message"}
+                </Button>
+              </form>
+            )}
+          </div>
+
+          {/* Quick info card */}
+          <div className="space-y-4">
+            <div className="rounded-[20px] border border-[rgba(246,240,230,0.12)] bg-[rgba(246,240,230,0.04)] p-6">
+              <h3 className="font-display text-[18px] font-semibold">Email</h3>
+              <p className="mt-1 text-[14px] text-[rgba(246,240,230,0.65)]">
+                Fastest way to reach us.
+              </p>
+              <a
+                href="mailto:hello@ribbonsong.com"
+                className="mt-3 inline-block text-[15px] font-medium text-[#E5D9EF] hover:underline"
+              >
+                hello@ribbonsong.com
+              </a>
+            </div>
+
+            <div className="rounded-[20px] border border-[rgba(246,240,230,0.12)] bg-[rgba(246,240,230,0.04)] p-6">
+              <h3 className="font-display text-[18px] font-semibold">Reply time</h3>
+              <p className="mt-1 text-[14px] text-[rgba(246,240,230,0.65)]">
+                We usually answer within a few hours, 7 days a week. Order issues are always top
+                priority.
+              </p>
+            </div>
+
+            <div className="rounded-[20px] border border-[rgba(246,240,230,0.12)] bg-[rgba(246,240,230,0.04)] p-6">
+              <h3 className="font-display text-[18px] font-semibold">Already ordered?</h3>
+              <p className="mt-1 text-[14px] text-[rgba(246,240,230,0.65)]">
+                You can track your order, request revisions, and download your song from your
+                listening page.
+              </p>
+            </div>
+          </div>
+        </section>
+
+        {/* FAQ */}
+        <section id="faq" className="mt-20 md:mt-24">
+          <div className="mx-auto max-w-[720px] text-center">
+            <p className="text-[12px] uppercase tracking-[0.18em] text-[rgba(246,240,230,0.55)]">
+              FAQ
+            </p>
+            <h2 className="mt-3 font-display text-[32px] font-semibold leading-[1.1] tracking-[-0.02em] md:text-[42px]">
+              Quick answers
+            </h2>
+          </div>
+
+          <div className="mx-auto mt-10 max-w-[760px]">
+            <Accordion type="single" collapsible className="space-y-3">
+              {FAQS.map((faq, i) => (
+                <AccordionItem
+                  key={i}
+                  value={`faq-${i}`}
+                  className="overflow-hidden rounded-[14px] border border-[rgba(246,240,230,0.12)] bg-[rgba(246,240,230,0.04)] px-5"
+                >
+                  <AccordionTrigger className="py-5 text-left text-[16px] font-medium text-[#F6F0E6] hover:no-underline md:text-[17px]">
+                    {faq.q}
+                  </AccordionTrigger>
+                  <AccordionContent className="pb-5 text-[15px] leading-[1.6] text-[rgba(246,240,230,0.7)]">
+                    {faq.a}
+                  </AccordionContent>
+                </AccordionItem>
+              ))}
+            </Accordion>
+          </div>
+        </section>
+      </main>
+
+      <SiteFooter />
+    </div>
+  );
+}

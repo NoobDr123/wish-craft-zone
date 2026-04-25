@@ -40,9 +40,9 @@ export function SiteFooter() {
             </Link>
           </li>
           <li>
-            <a href="mailto:hello@ribbonsong.com" className="hover:text-[#E5D9EF]">
+            <Link to="/contact" className="hover:text-[#E5D9EF]">
               Contact
-            </a>
+            </Link>
           </li>
         </ul>
         <div>© {new Date().getFullYear()} RibbonSong</div>
