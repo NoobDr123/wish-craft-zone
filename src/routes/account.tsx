@@ -94,7 +94,7 @@ function AccountPage() {
   }
 
   return (
-    <div className="min-h-screen bg-[#1F1B16] pb-24 text-[#1F1B16]">
+    <div className="min-h-screen bg-[#F6F0E6] pb-24 text-[#1F1B16]">
       {/* Header */}
       <header className="border-b border-[rgba(31,27,22,0.1)] px-5 py-5 sm:px-6">
         <div className="mx-auto flex max-w-5xl items-center justify-between">
