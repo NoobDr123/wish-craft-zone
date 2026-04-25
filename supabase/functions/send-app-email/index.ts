@@ -379,8 +379,10 @@ function songDelivered(d: Record<string, any>) {
   const recipient = escape(d.recipient_name ?? "you");
   const buyer = escape(d.buyer_name ?? "Someone who loves you");
   const listen = String(d.listen_url ?? "");
+  const portal = String(d.portal_url ?? "");
   const note = d.personal_note ? escape(d.personal_note) : null;
   const isRecipient = d.role === "recipient";
+  const promo = d.returning_promo_code ? escape(String(d.returning_promo_code)) : null;
 
   const subject = isRecipient
     ? `${buyer} made you a song 💛`
@@ -392,8 +394,23 @@ function songDelivered(d: Record<string, any>) {
     ? `${buyer} wrote a song for you. It was made one note at a time, with you in mind. Take a quiet moment and press play.`
     : `Your RibbonSong for ${recipient} is finished. Listen to it, share it, or save the link to send later.`;
 
+  const promoBlock = promo
+    ? `<div style="background:#ECE2D0;border-radius:14px;padding:18px;margin:0 0 22px;text-align:center;">
+        <p style="font-size:12px;font-weight:600;letter-spacing:0.14em;text-transform:uppercase;color:#8D6FAF;margin:0 0 6px;">10% off your next song</p>
+        <p style="font-family:'SF Mono',Menlo,monospace;font-size:20px;font-weight:700;letter-spacing:0.1em;color:#1F1B16;margin:0;">${promo}</p>
+        <p style="font-size:12px;color:#5A5148;margin:6px 0 0;">Valid for 180 days</p>
+       </div>`
+    : "";
+
+  const portalBlock = portal && !isRecipient
+    ? `<p style="font-size:14px;color:#5A5148;line-height:1.55;margin:0 0 16px;">
+         Your <a style="color:#8D6FAF;" href="${portal}">song portal</a> has share links, the lyrics,
+         the Re-found program (refund + free songs for a reaction video), and free revisions.
+       </p>`
+    : "";
+
   const html = `<!doctype html>
-<html><body style="margin:0;padding:0;background:#ffffff;font-family:"Instrument Sans",Inter,Arial,sans-serif;">
+<html><body style="margin:0;padding:0;background:#ffffff;font-family:'Instrument Sans',Inter,Arial,sans-serif;">
   <table width="100%" cellpadding="0" cellspacing="0"><tr><td align="center" style="padding:40px 20px;">
     <table width="560" cellpadding="0" cellspacing="0" style="background:#FBF6EC;border-radius:0;padding:40px 28px;max-width:560px;">
       <tr><td>
@@ -404,6 +421,8 @@ function songDelivered(d: Record<string, any>) {
         ${note ? `<blockquote style="margin:0 0 22px;padding:14px 18px;background:#E5D9EF;border-left:3px solid #8D6FAF;font-style:italic;color:#1F1B16;font-size:15px;line-height:1.55;">"${note}"</blockquote>` : ""}
         <p style="margin:24px 0;"><a href="${listen}" style="background:#8D6FAF;color:#ffffff;font-size:15px;font-weight:600;border-radius:999px;padding:14px 28px;text-decoration:none;display:inline-block;">Listen to the song</a></p>
         <p style="font-size:14px;color:#5A5148;line-height:1.55;margin:0 0 16px;">Or copy this link: <a style="color:#8D6FAF;" href="${listen}">${listen}</a></p>
+        ${portalBlock}
+        ${promoBlock}
         <div style="border-top:1px solid #D9CEB9;margin:32px 0 20px;"></div>
         <p style="font-size:12px;line-height:1.6;color:#5A5148;margin:8px 0 0;">Sent from RibbonSong — turning love into songs.</p>
       </td></tr>
@@ -411,7 +430,7 @@ function songDelivered(d: Record<string, any>) {
   </td></tr></table>
 </body></html>`;
 
-  const text = `${heading}\n\n${intro}\n\n${note ? `"${d.personal_note}"\n\n` : ""}Listen: ${listen}\n\n— RibbonSong`;
+  const text = `${heading}\n\n${intro}\n\n${note ? `"${d.personal_note}"\n\n` : ""}Listen: ${listen}\n${portal ? `Portal: ${portal}\n` : ""}${promo ? `\n10% off your next song: ${d.returning_promo_code} (valid 180 days)\n` : ""}\n— RibbonSong`;
 
   return { subject, html, text };
 }
