@@ -681,28 +681,45 @@ function RevisionTab({
       )}
 
       {canSubmit ? (
-        <div className="rounded-2xl border border-[rgba(31,27,22,0.12)] bg-[#FBF6EC] p-6">
-          <h2 className="font-display text-xl">
-            Don't love the lyrics? Let our team help.
-          </h2>
-          <p className="mt-1 text-sm text-[rgba(31,27,22,0.65)]">{helper}</p>
-          <textarea
-            value={notes}
-            onChange={(e) => setNotes(e.target.value.slice(0, 1000))}
-            placeholder="e.g. Slower tempo, change 'fighter' to 'warrior' in verse 2, mention our daughter Mia…"
-            className="mt-3 w-full rounded-xl border border-[rgba(31,27,22,0.2)] bg-white p-3 text-sm text-[#1F1B16] placeholder:text-[rgba(31,27,22,0.4)]"
-            rows={6}
+        <div className="space-y-5">
+          <EditTicket
+            number={1}
+            icon={<Pencil className="h-5 w-5" />}
+            eyebrow="Edit ticket #1 · Tweak the lyrics"
+            title="Don't love a line? Rewrite it free."
+            body="Tell us what should change — a name, a phrase, a whole verse. Our team rewrites and re-records it on us."
           />
-          {submitError && (
-            <p className="mt-2 text-sm text-red-600">{submitError}</p>
-          )}
-          <Button
-            className="mt-4 bg-[#8D6FAF] text-[#FFF7EE] hover:bg-[#6B4F8A]"
-            disabled={notes.trim().length < 10 || busy}
-            onClick={submit}
-          >
-            {busy ? "Submitting…" : hasUnlimited ? "Submit revision" : "Send to our team — it's free"}
-          </Button>
+          <EditTicket
+            number={2}
+            icon={<Music className="h-5 w-5" />}
+            eyebrow="Edit ticket #2 · Change the sound"
+            title="Different tempo or voice? Just say the word."
+            body="Want it slower, faster, or a different vocal style? Mention it below and we'll re-record the whole track."
+          />
+
+          <div className="rounded-2xl border border-[rgba(31,27,22,0.12)] bg-[#FBF6EC] p-6">
+            <p className="text-xs font-semibold uppercase tracking-[0.2em] text-[#8D6FAF]">
+              Editor
+            </p>
+            <h2 className="mt-1 font-display text-xl">{helper}</h2>
+            <textarea
+              value={notes}
+              onChange={(e) => setNotes(e.target.value.slice(0, 1000))}
+              placeholder="e.g. Slower tempo, change 'fighter' to 'warrior' in verse 2, mention our daughter Mia…"
+              className="mt-3 w-full rounded-xl border border-[rgba(31,27,22,0.2)] bg-white p-3 text-sm text-[#1F1B16] placeholder:text-[rgba(31,27,22,0.4)]"
+              rows={6}
+            />
+            {submitError && (
+              <p className="mt-2 text-sm text-red-600">{submitError}</p>
+            )}
+            <Button
+              className="mt-4 bg-[#8D6FAF] text-[#FFF7EE] hover:bg-[#6B4F8A]"
+              disabled={notes.trim().length < 10 || busy}
+              onClick={submit}
+            >
+              {busy ? "Submitting…" : hasUnlimited ? "Submit revision" : "Send to our team — it's free"}
+            </Button>
+          </div>
         </div>
       ) : (
         <div className="rounded-2xl border border-[rgba(31,27,22,0.12)] bg-[#FBF6EC] p-6">
@@ -850,6 +867,7 @@ function RewardsTab({
       <GoldTicket
         icon={<Heart className="h-5 w-5" />}
         eyebrow="Golden ticket #1 · Reaction reward"
+        gold
         title={
           reactionApproved
             ? "Approved! You earned a full refund + 2 free songs"
@@ -924,6 +942,40 @@ function RewardsTab({
   );
 }
 
+function EditTicket({
+  number,
+  icon,
+  eyebrow,
+  title,
+  body,
+}: {
+  number: number;
+  icon: ReactNode;
+  eyebrow: string;
+  title: string;
+  body: string;
+}) {
+  return (
+    <div className="relative overflow-hidden rounded-2xl border border-[rgba(141,111,175,0.3)] bg-gradient-to-br from-[rgba(141,111,175,0.16)] via-[#FBF6EC] to-[rgba(141,111,175,0.10)] p-6 shadow-[0_0_40px_-20px_rgba(141,111,175,0.4)]">
+      <div className="absolute right-5 top-5 font-display text-3xl font-semibold text-[rgba(141,111,175,0.35)]">
+        #{number}
+      </div>
+      <div className="flex items-start gap-4">
+        <div className="flex h-10 w-10 shrink-0 items-center justify-center rounded-full bg-[rgba(141,111,175,0.18)] text-[#8D6FAF]">
+          {icon}
+        </div>
+        <div className="flex-1 pr-8">
+          <p className="text-[10px] font-semibold uppercase tracking-[0.2em] text-[#8D6FAF]">
+            {eyebrow}
+          </p>
+          <h3 className="mt-1 font-display text-lg leading-snug text-[#1F1B16]">{title}</h3>
+          <p className="mt-2 text-sm text-[rgba(31,27,22,0.7)]">{body}</p>
+        </div>
+      </div>
+    </div>
+  );
+}
+
 type GoldTicketCta =
   | { label: string; onClick: () => void; to?: undefined; search?: undefined }
   | { label: string; to: "/create"; search?: { reward?: string; promo?: string }; onClick?: undefined }
@@ -938,6 +990,7 @@ function GoldTicket({
   badge,
   onCopy,
   cta,
+  gold,
 }: {
   icon: ReactNode;
   eyebrow: string;
@@ -947,16 +1000,35 @@ function GoldTicket({
   badge?: string;
   onCopy?: () => void;
   cta?: GoldTicketCta;
+  gold?: boolean;
 }) {
   return (
-    <div className="relative overflow-hidden rounded-2xl border border-[rgba(141,111,175,0.3)] bg-gradient-to-br from-[rgba(141,111,175,0.16)] via-[#FBF6EC] to-[rgba(141,111,175,0.10)] p-6 shadow-[0_0_40px_-20px_rgba(141,111,175,0.4)]">
+    <div
+      className={
+        gold
+          ? "relative overflow-hidden rounded-2xl border border-[rgba(193,154,69,0.45)] bg-gradient-to-br from-[#FCEFC6] via-[#FFF7DD] to-[#F7E5A4] p-6 shadow-[0_0_40px_-18px_rgba(193,154,69,0.55)]"
+          : "relative overflow-hidden rounded-2xl border border-[rgba(141,111,175,0.3)] bg-gradient-to-br from-[rgba(141,111,175,0.16)] via-[#FBF6EC] to-[rgba(141,111,175,0.10)] p-6 shadow-[0_0_40px_-20px_rgba(141,111,175,0.4)]"
+      }
+    >
       <div className="absolute inset-y-0 left-16 hidden w-px bg-[rgba(31,27,22,0.12)] sm:block" />
       <div className="flex items-start gap-4">
-        <div className="flex h-10 w-10 shrink-0 items-center justify-center rounded-full bg-[rgba(141,111,175,0.18)] text-[#8D6FAF]">
+        <div
+          className={
+            gold
+              ? "flex h-10 w-10 shrink-0 items-center justify-center rounded-full bg-[#F2D27A] text-[#7A5A18]"
+              : "flex h-10 w-10 shrink-0 items-center justify-center rounded-full bg-[rgba(141,111,175,0.18)] text-[#8D6FAF]"
+          }
+        >
           {icon}
         </div>
         <div className="flex-1">
-          <p className="text-[10px] font-semibold uppercase tracking-[0.2em] text-[#8D6FAF]">
+          <p
+            className={
+              gold
+                ? "text-[10px] font-semibold uppercase tracking-[0.2em] text-[#A07A1A]"
+                : "text-[10px] font-semibold uppercase tracking-[0.2em] text-[#8D6FAF]"
+            }
+          >
             {eyebrow}
           </p>
           <h3 className="mt-1 font-display text-lg leading-snug text-[#1F1B16]">{title}</h3>
@@ -1041,12 +1113,6 @@ function QuickActions({
     badge?: string;
     accent?: boolean;
   }> = [
-    {
-      icon: <Pencil className="h-6 w-6" />,
-      title: "Change something",
-      sub: "Tweak lyrics, tempo, voice — free",
-      onClick: onEdit,
-    },
     {
       icon: <Video className="h-6 w-6" />,
       title: "Send their reaction",
