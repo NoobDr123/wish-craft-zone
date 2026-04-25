@@ -525,71 +525,72 @@ function FunnelPanel() {
   const [data, setData] = useState<FunnelData | null>(null);
   const [loading, setLoading] = useState(true);
 
-  useEffect(() => {
-    let active = true;
-    (async () => {
-      setLoading(true);
-      const start = rangeStart(range);
-      let q = supabase
-        .from("quiz_events")
-        .select("session_id, event_type, step_index, time_on_step_ms, created_at")
-        .order("created_at", { ascending: false })
-        .limit(10000);
-      if (start) q = q.gte("created_at", start.toISOString());
-      const { data: events } = await q;
-      if (!active) return;
-      const evts = events ?? [];
+  const load = async (signal?: { active: boolean }) => {
+    setLoading(true);
+    const start = rangeStart(range);
+    let q = supabase
+      .from("quiz_events")
+      .select("session_id, event_type, step_index, time_on_step_ms, created_at")
+      .order("created_at", { ascending: false })
+      .limit(10000);
+    if (start) q = q.gte("created_at", start.toISOString());
+    const { data: events } = await q;
+    if (signal && !signal.active) return;
+    const evts = events ?? [];
 
-      const sessionsByType: Record<string, Set<string>> = {};
-      const totalByType: Record<string, number> = {};
-      for (const e of evts) {
-        if (!sessionsByType[e.event_type]) sessionsByType[e.event_type] = new Set();
-        sessionsByType[e.event_type].add(e.session_id);
-        totalByType[e.event_type] = (totalByType[e.event_type] ?? 0) + 1;
-      }
+    const sessionsByType: Record<string, Set<string>> = {};
+    const totalByType: Record<string, number> = {};
+    for (const e of evts) {
+      if (!sessionsByType[e.event_type]) sessionsByType[e.event_type] = new Set();
+      sessionsByType[e.event_type].add(e.session_id);
+      totalByType[e.event_type] = (totalByType[e.event_type] ?? 0) + 1;
+    }
 
-      // Per-question stats
-      const questionStats: FunnelData["questionStats"] = [];
-      for (let i = 0; i < QUESTION_LABELS.length; i++) {
-        const views = evts.filter((e) => e.event_type === "question_view" && e.step_index === i);
-        const answers = evts.filter((e) => e.event_type === "question_answer" && e.step_index === i);
-        const times = answers.map((a) => a.time_on_step_ms ?? 0).filter((t) => t > 0);
-        const avgTimeMs = times.length > 0 ? times.reduce((s, t) => s + t, 0) / times.length : 0;
-        const nextViews = evts.filter((e) => e.event_type === "question_view" && e.step_index === i + 1);
-        const dropoffPct = views.length > 0 ? Math.max(0, ((views.length - nextViews.length) / views.length) * 100) : 0;
-        questionStats.push({
-          stepIndex: i,
-          views: views.length,
-          answers: answers.length,
-          avgTimeMs,
-          dropoffPct: i === QUESTION_LABELS.length - 1 ? 0 : dropoffPct,
-        });
-      }
-
-      // Avg total quiz time
-      const completes = evts.filter((e) => e.event_type === "quiz_complete" && (e.time_on_step_ms ?? 0) > 0);
-      const avgQuizTimeMs =
-        completes.length > 0
-          ? completes.reduce((s, e) => s + (e.time_on_step_ms ?? 0), 0) / completes.length
-          : 0;
-
-      setData({
-        landerViews: totalByType["lander_view"] ?? 0,
-        uniqueLanderSessions: sessionsByType["lander_view"]?.size ?? 0,
-        quizStarts: sessionsByType["quiz_start"]?.size ?? 0,
-        quizCompletes: sessionsByType["quiz_complete"]?.size ?? 0,
-        checkoutViews: sessionsByType["checkout_view"]?.size ?? 0,
-        paymentSuccesses: sessionsByType["payment_success"]?.size ?? 0,
-        paymentFailures: sessionsByType["payment_failed"]?.size ?? 0,
-        questionStats,
-        avgQuizTimeMs,
+    const questionStats: FunnelData["questionStats"] = [];
+    for (let i = 0; i < QUESTION_LABELS.length; i++) {
+      const views = evts.filter((e) => e.event_type === "question_view" && e.step_index === i);
+      const answers = evts.filter((e) => e.event_type === "question_answer" && e.step_index === i);
+      const times = answers.map((a) => a.time_on_step_ms ?? 0).filter((t) => t > 0);
+      const avgTimeMs = times.length > 0 ? times.reduce((s, t) => s + t, 0) / times.length : 0;
+      const nextViews = evts.filter((e) => e.event_type === "question_view" && e.step_index === i + 1);
+      const dropoffPct = views.length > 0 ? Math.max(0, ((views.length - nextViews.length) / views.length) * 100) : 0;
+      questionStats.push({
+        stepIndex: i,
+        views: views.length,
+        answers: answers.length,
+        avgTimeMs,
+        dropoffPct: i === QUESTION_LABELS.length - 1 ? 0 : dropoffPct,
       });
-      setLoading(false);
-    })();
-    return () => {
-      active = false;
-    };
+    }
+
+    const completes = evts.filter((e) => e.event_type === "quiz_complete" && (e.time_on_step_ms ?? 0) > 0);
+    const avgQuizTimeMs =
+      completes.length > 0
+        ? completes.reduce((s, e) => s + (e.time_on_step_ms ?? 0), 0) / completes.length
+        : 0;
+
+    setData({
+      landerViews: totalByType["lander_view"] ?? 0,
+      uniqueLanderSessions: sessionsByType["lander_view"]?.size ?? 0,
+      quizStarts: sessionsByType["quiz_start"]?.size ?? 0,
+      quizCompletes: sessionsByType["quiz_complete"]?.size ?? 0,
+      checkoutViews: sessionsByType["checkout_view"]?.size ?? 0,
+      paymentSuccesses: sessionsByType["payment_success"]?.size ?? 0,
+      paymentFailures: sessionsByType["payment_failed"]?.size ?? 0,
+      questionStats,
+      avgQuizTimeMs,
+    });
+    setLoading(false);
+  };
+
+  useEffect(() => {
+    const signal = { active: true };
+    load(signal);
+    return () => { signal.active = false; };
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [range]);
+
+  useRealtimeRefresh("quiz_events", () => load(), { debounceMs: 1500 });
 
   if (loading || !data) {
     return (
