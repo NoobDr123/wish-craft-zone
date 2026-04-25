@@ -434,12 +434,12 @@ function CreatePage() {
             />
           </Question>
           <Question label="Your email">
-            <TextInput
-              type="email"
+            <EmailInput
               placeholder="you@example.com"
               value={q.buyer_email}
               onChange={(e) => q.set("buyer_email", e.target.value)}
               maxLength={120}
+              name="email"
             />
           </Question>
         </div>
