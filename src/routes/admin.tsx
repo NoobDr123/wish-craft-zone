@@ -140,6 +140,13 @@ function StaffPage() {
           <div className="mt-2 flex items-center gap-2">
             <span className="font-display text-sm">Staff</span>
             <Badge variant="outline" className="text-[10px] px-1.5 py-0">2FA</Badge>
+            <span className="ml-auto inline-flex items-center gap-1.5 text-[10px] text-emerald-600 font-medium">
+              <span className="relative flex h-2 w-2">
+                <span className="absolute inline-flex h-full w-full animate-ping rounded-full bg-emerald-500 opacity-75"></span>
+                <span className="relative inline-flex h-2 w-2 rounded-full bg-emerald-500"></span>
+              </span>
+              LIVE
+            </span>
           </div>
         </div>
         <nav className="flex-1 overflow-y-auto py-3">
