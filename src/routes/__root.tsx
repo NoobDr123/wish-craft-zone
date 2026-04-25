@@ -25,7 +25,9 @@ function NotFoundComponent() {
   );
 }
 
-const metaPixelScript = `!function(f,b,e,v,n,t,s){if(f.fbq)return;n=f.fbq=function(){n.callMethod?n.callMethod.apply(n,arguments):n.queue.push(arguments)};if(!f._fbq)f._fbq=n;n.push=n;n.loaded=!0;n.version='2.0';n.queue=[];t=b.createElement(e);t.async=!0;t.src=v;s=b.getElementsByTagName(e)[0];s.parentNode.insertBefore(t,s)}(window,document,'script','https://connect.facebook.net/en_US/fbevents.js');fbq('init','1397546595537286');fbq('track','PageView');`;
+// Meta Pixel — only fires on the production domain (ribbonsong.com / www.ribbonsong.com).
+// Lovable preview URLs and lovable.dev are excluded so they don't pollute pixel data.
+const metaPixelScript = `(function(){var h=window.location.hostname;if(h!=='ribbonsong.com'&&h!=='www.ribbonsong.com')return;!function(f,b,e,v,n,t,s){if(f.fbq)return;n=f.fbq=function(){n.callMethod?n.callMethod.apply(n,arguments):n.queue.push(arguments)};if(!f._fbq)f._fbq=n;n.push=n;n.loaded=!0;n.version='2.0';n.queue=[];t=b.createElement(e);t.async=!0;t.src=v;s=b.getElementsByTagName(e)[0];s.parentNode.insertBefore(t,s)}(window,document,'script','https://connect.facebook.net/en_US/fbevents.js');fbq('init','1397546595537286');fbq('track','PageView');})();`;
 
 export const Route = createRootRoute({
   head: () => ({
@@ -90,15 +92,9 @@ function RootShell({ children }: { children: React.ReactNode }) {
         <HeadContent />
       </head>
       <body>
-        <noscript>
-          <img
-            height="1"
-            width="1"
-            style={{ display: "none" }}
-            src="https://www.facebook.com/tr?id=1397546595537286&ev=PageView&noscript=1"
-            alt=""
-          />
-        </noscript>
+        {/* Meta Pixel <noscript> fallback removed: it's static HTML and would fire
+            on every hostname (preview, lovable.dev) without a JS hostname guard.
+            The main Pixel script above handles all real users (JS required for Pixel events). */}
         {children}
         <Scripts />
       </body>
