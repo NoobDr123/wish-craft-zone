@@ -109,12 +109,123 @@ function CheckoutPage() {
   }, []);
   const recipient = q.recipient_name || "your loved one";
 
+  // Free-song redemption short-circuit: if the user arrived with a valid
+  // reward code (set on /create), insert a $0 order and route directly to
+  // /processing — no Stripe involvement.
+  const freeRedemptionRef = useRef(false);
+  const [redeemingFree, setRedeemingFree] = useState(false);
+  useEffect(() => {
+    if (!hydrated) return;
+    if (!q.reward_code) return;
+    if (freeRedemptionRef.current) return;
+    freeRedemptionRef.current = true;
+    setRedeemingFree(true);
+    void (async () => {
+      try {
+        const { data: authData } = await supabase.auth.getUser();
+        const userId = authData.user?.id ?? null;
+        const userEmail = authData.user?.email?.toLowerCase() ?? null;
+        if (!userId || !userEmail) {
+          setError("Please log in to redeem your free song.");
+          setRedeemingFree(false);
+          return;
+        }
+
+        const newOrderId =
+          typeof crypto !== "undefined" && "randomUUID" in crypto
+            ? crypto.randomUUID()
+            : `${Date.now()}-${Math.random().toString(36).slice(2)}`;
+
+        const { journeyStageOf, tenseOf } = await import("@/stores/quizStore");
+        const journey = journeyStageOf(q.stage);
+        const tense = tenseOf(q.stage);
+        const relationshipResolved =
+          q.relationship === "Other" && q.relationship_other.trim()
+            ? q.relationship_other.trim()
+            : (q.relationship ?? null);
+
+        const { error: insertError } = await supabase.from("orders").insert({
+          id: newOrderId,
+          user_id: userId,
+          buyer_email: userEmail,
+          buyer_name: q.buyer_name || null,
+          recipient_name: q.recipient_name,
+          relationship: relationshipResolved,
+          genre: q.genre ?? null,
+          tempo: q.tempo ?? null,
+          voice: q.voice ?? null,
+          song_title_idea: q.song_title_idea || null,
+          is_gift: q.is_gift,
+          recipient_email: q.recipient_email || null,
+          delivery_date: q.delivery_date || null,
+          personal_note: q.personal_note || null,
+          amount_cents: 0,
+          currency: "USD",
+          status: "pending_payment",
+          payment_status: "pending",
+          priority: journey === "hospice" ? "hospice" : "standard",
+          quiz_payload: {
+            q1_relationship: q.relationship,
+            q1_recipient_name: q.recipient_name,
+            q3_journey: q.stage,
+            q3_journey_stage: journey,
+            q3_tense: tense,
+            q4_fighting_for: q.fighting_for,
+            q5_qualities: q.qualities,
+            q6_shared_memory: q.shared_memory,
+            q7_theme: q.message,
+            q8_letter: q.personal_words,
+            q9_genre: q.genre,
+            q9_tempo: q.tempo,
+            q9_voice: q.voice,
+            stage: q.stage,
+            message: q.message,
+            fighting_for: q.fighting_for,
+            qualities: q.qualities,
+            shared_memory: q.shared_memory,
+            personal_words: q.personal_words,
+            relationship: relationshipResolved,
+            journey_stage: journey,
+            tense,
+          },
+        });
+        if (insertError) {
+          console.error("[free redemption] order insert failed:", insertError);
+          setError("Could not create your free order. Please try again.");
+          setRedeemingFree(false);
+          return;
+        }
+        q.set("orderId", newOrderId);
+
+        const { data, error: fnError } = await supabase.functions.invoke(
+          "create-checkout",
+          { body: { orderId: newOrderId, rewardCode: q.reward_code } },
+        );
+        if (fnError || !data?.ok) {
+          console.error("[free redemption] create-checkout failed:", fnError, data);
+          setError(data?.error || fnError?.message || "Redemption failed.");
+          setRedeemingFree(false);
+          return;
+        }
+        // Clear the reward code from the store so it can't be reused after.
+        q.set("reward_code", undefined);
+        navigate({ to: "/processing" });
+      } catch (e) {
+        console.error("[free redemption] unexpected:", e);
+        setError("Something went wrong. Please try again.");
+        setRedeemingFree(false);
+      }
+    })();
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [hydrated, q.reward_code]);
+
   // Single-shot kick: use the prefetched checkout from /scratch if it exists,
   // otherwise prefetchCheckout() runs the full flow now. Either way the form
   // mounts as soon as the clientSecret resolves.
   const startedRef = useRef(false);
   useEffect(() => {
     if (!q.recipient_name) return;
+    if (q.reward_code) return; // free path handles it
     if (startedRef.current) return;
     startedRef.current = true;
 
@@ -136,7 +247,7 @@ function CheckoutPage() {
       prefetchCheckout().then(apply);
     }
     // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [q.recipient_name]);
+  }, [q.recipient_name, q.reward_code]);
 
   // Persist buyer email/name to the order as they type (debounced).
   useEffect(() => {
