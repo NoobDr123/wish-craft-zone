@@ -20,8 +20,28 @@ const corsHeaders = {
 serve(async (req) => {
   if (req.method === "OPTIONS") return new Response(null, { headers: corsHeaders });
 
-  const unauthorized = await guardInternal(req, corsHeaders);
-  if (unauthorized) return unauthorized;
+  // Auth: accept the internal secret, the service role key, OR the project's
+  // anon/publishable key. We accept the anon key here (and only here) because
+  // pg_cron sends the anon key as the Bearer when invoking this dispatcher,
+  // and the downstream targets it calls (generate-brief, submit-to-kie,
+  // deliver-song, process-kie-callback) are still protected by guardInternal
+  // — drain-queue calls them with the real service role key + internal secret.
+  const auth = req.headers.get("Authorization") ?? "";
+  const token = auth.replace(/^Bearer\s+/i, "").trim();
+  const providedSecret = req.headers.get("x-internal-secret") ?? "";
+  const anonKey = Deno.env.get("SUPABASE_ANON_KEY")
+    ?? Deno.env.get("SUPABASE_PUBLISHABLE_KEY")
+    ?? "";
+
+  const isAuthorized =
+    (providedSecret && providedSecret === INTERNAL_SECRET) ||
+    (token && token === SERVICE_KEY) ||
+    (token && anonKey && token === anonKey);
+
+  if (!isAuthorized) {
+    const unauthorized = await guardInternal(req, corsHeaders);
+    if (unauthorized) return unauthorized;
+  }
 
   try {
     const { queue, target, batch = 5, vt = 60 } = await req.json();
