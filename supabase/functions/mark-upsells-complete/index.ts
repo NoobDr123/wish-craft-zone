@@ -12,16 +12,12 @@ serve(async (req) => {
   if (req.method === "OPTIONS") return new Response(null, { headers: corsHeaders });
 
   try {
-    // Require the caller to be a logged-in user.
-    const user = await requireUser(req);
-    if (!user) return json({ error: "Unauthorized" }, 401);
-
-    const { orderId } = await req.json();
+    const { orderId, sessionId } = await req.json();
     if (!orderId) return json({ error: "Missing orderId" }, 400);
 
     const { data: order } = await supabase
       .from("orders")
-      .select("status, payment_status, user_id, buyer_email")
+      .select("status, payment_status, user_id, buyer_email, stripe_checkout_session_id, stripe_payment_intent_id")
       .eq("id", orderId)
       .single();
 
@@ -30,16 +26,32 @@ serve(async (req) => {
       return json({ error: "Order not paid" }, 400);
     }
 
-    // Ownership check: the order must belong to the caller (by user_id, or
-    // by buyer_email match for guest orders that haven't been claimed yet).
-    const ownsByUser = order.user_id && order.user_id === user.id;
-    const ownsByEmail = order.buyer_email && user.email
-      && order.buyer_email.toLowerCase() === user.email.toLowerCase();
-    if (!ownsByUser && !ownsByEmail) {
+    // ---- AuthZ: prove the caller owns this order. ----
+    // Two valid paths so this works for ALL payment methods (card / Apple Pay /
+    // Google Pay / Link), where the buyer is typically a guest right after
+    // Stripe checkout and not logged in:
+    //   (a) authed user matches the order, OR
+    //   (b) the Stripe session/PI id from the checkout return URL matches the
+    //       one we stored on the order. The id is unguessable and scoped to
+    //       this single purchase, so it's a safe bearer token.
+    const user = await requireUser(req);
+    const ownsByUser =
+      !!user &&
+      ((order.user_id && order.user_id === user.id) ||
+        (order.buyer_email && user.email &&
+          order.buyer_email.toLowerCase() === user.email.toLowerCase()));
+
+    const ownsBySession =
+      typeof sessionId === "string" &&
+      sessionId.length > 0 &&
+      (order.stripe_checkout_session_id === sessionId ||
+        order.stripe_payment_intent_id === sessionId);
+
+    if (!ownsByUser && !ownsBySession) {
       return json({ error: "Forbidden" }, 403);
     }
 
-    // Already past this stage? No-op.
+    // Already past this stage? No-op (idempotent).
     if (order.status !== "awaiting_upsells" && order.status !== "paid") {
       return json({ ok: true, alreadyAdvanced: true });
     }
