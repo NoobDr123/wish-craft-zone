@@ -708,7 +708,7 @@ function RevisionTab({
 
   const headline = hasUnlimited ? "Revisions" : "Free revision";
   const helper = hasUnlimited
-    ? `You get up to ${cap} revisions on this song. Used ${used} of ${cap}.`
+    ? `Unlimited revisions on this song. ${used} submitted so far.`
     : "You get one free revision per song. Tell us what to change.";
 
   return (
