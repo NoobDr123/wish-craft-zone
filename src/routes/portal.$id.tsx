@@ -5,7 +5,7 @@
 import { createFileRoute, Link, useNavigate, useParams } from "@tanstack/react-router";
 import type { ReactNode } from "react";
 import { useEffect, useMemo, useState } from "react";
-import { Check, Copy, Sparkles, Lock, Share2, Music, Gift, Download, Heart, Ticket } from "lucide-react";
+import { Check, Copy, Lock, Share2, Music, Download, Heart, Ticket } from "lucide-react";
 import { RibbonMark } from "@/components/Logo";
 import { VinylPlayer } from "@/components/VinylPlayer";
 import { Button } from "@/components/ui/button";
