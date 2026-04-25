@@ -157,12 +157,7 @@ export function OrderPortal({ orderId, userId }: { orderId: string; userId: stri
   const revisionCap = order.has_unlimited_edits ? 10 : 1;
   const revisionsUsed = revisions.length;
 
-  const tabs: Array<[typeof tab, string]> = [
-    ["player", "Lyrics & edits"],
-    ["reaction", "Reaction"],
-    ["rewards", "Free gifts"],
-    ["refund", "Help"],
-  ];
+  // Tab labels are rendered by <BigTabBar />; no array needed here.
 
   return (
     <div>
