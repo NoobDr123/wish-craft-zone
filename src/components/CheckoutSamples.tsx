@@ -52,9 +52,8 @@ export default function CheckoutSamples() {
     let cancelled = false;
     (async () => {
       const { data } = await supabase
-        .from("featured_samples")
+        .from("public_featured_samples")
         .select("id,title,for_text,quote,audio_url,recipient_name")
-        .eq("published", true)
         .not("audio_url", "is", null)
         .order("sort_order", { ascending: true })
         .limit(3);
