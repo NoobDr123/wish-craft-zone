@@ -138,7 +138,8 @@ function PortalSong() {
   const delivered = order.status === "delivered" && !!selectedVariant?.audio_url;
   const sharePath = order.share_page_slug ? `/listen/${order.share_page_slug}` : null;
 
-  const revisionCap = order.has_unlimited_edits ? 5 : 1;
+  // Backend hard cap of 15 to prevent abuse, but UI presents as "Unlimited" for upsell purchasers.
+  const revisionCap = order.has_unlimited_edits ? 15 : 1;
   const revisionsUsed = revisions.length;
 
   const tabs: Array<[typeof tab, string]> = [
@@ -219,7 +220,7 @@ function PortalSong() {
               )}
               {order.has_unlimited_edits && (
                 <Badge variant="outline" className="border-[rgba(246,240,230,0.3)] text-[rgba(246,240,230,0.8)]">
-                  Up to 5 edits
+                  Unlimited edits
                 </Badge>
               )}
               {order.is_gift && (
@@ -707,7 +708,7 @@ function RevisionTab({
 
   const headline = hasUnlimited ? "Revisions" : "Free revision";
   const helper = hasUnlimited
-    ? `You get up to ${cap} revisions on this song. Used ${used} of ${cap}.`
+    ? `Unlimited revisions on this song. ${used} submitted so far.`
     : "You get one free revision per song. Tell us what to change.";
 
   return (
@@ -718,7 +719,7 @@ function RevisionTab({
           <div className="flex items-center justify-between">
             <h2 className="font-display text-xl">Your revisions</h2>
             <Badge variant="outline" className="border-[rgba(246,240,230,0.3)] text-[rgba(246,240,230,0.75)]">
-              {used} of {cap} used
+              {hasUnlimited ? `${used} submitted` : `${used} of ${cap} used`}
             </Badge>
           </div>
           <div className="mt-4 space-y-4">
@@ -770,7 +771,7 @@ function RevisionTab({
           </Button>
           {hasUnlimited && (
             <p className="mt-3 text-xs text-[rgba(246,240,230,0.55)]">
-              {remaining} of {cap} revisions remaining.
+              Unlimited revisions included with this song.
             </p>
           )}
         </div>
