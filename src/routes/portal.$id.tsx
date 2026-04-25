@@ -49,7 +49,7 @@ function PortalSong() {
   const { user, loading } = useAuth();
   const navigate = useNavigate();
   const [order, setOrder] = useState<Order | null>(null);
-  const [revision, setRevision] = useState<any>(null);
+  const [revisions, setRevisions] = useState<any[]>([]);
   const [refunds, setRefunds] = useState<any[]>([]);
   const [reactions, setReactions] = useState<any[]>([]);
   const [reward, setReward] = useState<Reward | null>(null);
@@ -77,7 +77,11 @@ function PortalSong() {
 
     const [{ data: rev }, { data: rf }, { data: rx }, { data: rwd }, { data: promos }] =
       await Promise.all([
-        supabase.from("revision_requests").select("*").eq("order_id", id).maybeSingle(),
+        supabase
+          .from("revision_requests")
+          .select("*")
+          .eq("order_id", id)
+          .order("created_at", { ascending: false }),
         supabase
           .from("refund_requests")
           .select("*")
@@ -100,7 +104,7 @@ function PortalSong() {
           .eq("issued_for_order_id", id)
           .order("created_at", { ascending: false }),
       ]);
-    setRevision(rev);
+    setRevisions(rev ?? []);
     setRefunds(rf ?? []);
     setReactions(rx ?? []);
     setReward(rwd ?? null);
@@ -134,10 +138,13 @@ function PortalSong() {
   const delivered = order.status === "delivered" && !!selectedVariant?.audio_url;
   const sharePath = order.share_page_slug ? `/listen/${order.share_page_slug}` : null;
 
+  const revisionCap = order.has_unlimited_edits ? 5 : 1;
+  const revisionsUsed = revisions.length;
+
   const tabs: Array<[typeof tab, string]> = [
     ["player", "Lyrics"],
     ["reaction", "Reaction video"],
-    ["revision", "Free revision"],
+    ["revision", order.has_unlimited_edits ? "Revisions" : "Free revision"],
     ["refund", "Refund / gift card"],
     ["rewards", "Rewards"],
   ];
@@ -212,7 +219,7 @@ function PortalSong() {
               )}
               {order.has_unlimited_edits && (
                 <Badge variant="outline" className="border-[rgba(246,240,230,0.3)] text-[rgba(246,240,230,0.8)]">
-                  Unlimited edits
+                  Up to 5 edits
                 </Badge>
               )}
               {order.is_gift && (
@@ -272,7 +279,10 @@ function PortalSong() {
                 <RevisionTab
                   orderId={order.id}
                   buyerEmail={order.buyer_email}
-                  existing={revision}
+                  revisions={revisions}
+                  cap={revisionCap}
+                  used={revisionsUsed}
+                  hasUnlimited={!!order.has_unlimited_edits}
                   reload={load}
                 />
               )}
@@ -653,12 +663,31 @@ function ReactionTab({ orderId, buyerEmail, userId, reactions, reward, reload }:
 /* Revision tab                                                             */
 /* ----------------------------------------------------------------------- */
 
-function RevisionTab({ orderId, buyerEmail, existing, reload }: any) {
+function RevisionTab({
+  orderId,
+  buyerEmail,
+  revisions,
+  cap,
+  used,
+  hasUnlimited,
+  reload,
+}: {
+  orderId: string;
+  buyerEmail: string;
+  revisions: any[];
+  cap: number;
+  used: number;
+  hasUnlimited: boolean;
+  reload: () => Promise<void>;
+}) {
   const [notes, setNotes] = useState("");
   const [busy, setBusy] = useState(false);
 
+  const remaining = Math.max(0, cap - used);
+  const canSubmit = remaining > 0;
+
   const submit = async () => {
-    if (notes.trim().length < 10) return;
+    if (notes.trim().length < 10 || !canSubmit) return;
     setBusy(true);
     const { error } = await supabase.from("revision_requests").insert({
       order_id: orderId,
@@ -676,47 +705,87 @@ function RevisionTab({ orderId, buyerEmail, existing, reload }: any) {
     await reload();
   };
 
-  if (existing) {
-    return (
-      <div className="rounded-2xl border border-[rgba(246,240,230,0.12)] bg-[rgba(246,240,230,0.04)] p-6">
-        <h2 className="font-display text-xl">Your revision</h2>
-        <Badge variant="outline" className="mt-2 border-[rgba(246,240,230,0.3)] text-[rgba(246,240,230,0.75)]">
-          {existing.status}
-        </Badge>
-        <p className="mt-3 whitespace-pre-wrap text-sm text-[rgba(246,240,230,0.85)]">
-          {existing.notes}
-        </p>
-        <p className="mt-4 text-xs text-[rgba(246,240,230,0.55)]">
-          Free revisions are limited to one per song. Need more changes?{" "}
-          <Link to="/create" className="text-[#E5D9EF] underline">
-            Order another song
-          </Link>
-          .
-        </p>
-      </div>
-    );
-  }
+  const headline = hasUnlimited ? "Revisions" : "Free revision";
+  const helper = hasUnlimited
+    ? `You get up to ${cap} revisions on this song. Used ${used} of ${cap}.`
+    : "You get one free revision per song. Tell us what to change.";
 
   return (
-    <div className="rounded-2xl border border-[rgba(246,240,230,0.12)] bg-[rgba(246,240,230,0.04)] p-6">
-      <h2 className="font-display text-xl">Request a free revision</h2>
-      <p className="mt-1 text-sm text-[rgba(246,240,230,0.65)]">
-        You get one free revision per song. Tell us what to change.
-      </p>
-      <textarea
-        value={notes}
-        onChange={(e) => setNotes(e.target.value.slice(0, 1000))}
-        placeholder="e.g. Slower tempo, change 'fighter' to 'warrior' in verse 2…"
-        className="mt-3 w-full rounded-xl border border-[rgba(246,240,230,0.2)] bg-[rgba(246,240,230,0.06)] p-3 text-sm text-[#F6F0E6] placeholder:text-[rgba(246,240,230,0.4)]"
-        rows={6}
-      />
-      <Button
-        className="mt-4 bg-[#E5D9EF] text-[#1F1B16] hover:bg-[#d8c8e6]"
-        disabled={notes.trim().length < 10 || busy}
-        onClick={submit}
-      >
-        {busy ? "Submitting…" : "Submit revision request"}
-      </Button>
+    <div className="space-y-6">
+      {/* Past revisions */}
+      {revisions.length > 0 && (
+        <div className="rounded-2xl border border-[rgba(246,240,230,0.12)] bg-[rgba(246,240,230,0.04)] p-6">
+          <div className="flex items-center justify-between">
+            <h2 className="font-display text-xl">Your revisions</h2>
+            <Badge variant="outline" className="border-[rgba(246,240,230,0.3)] text-[rgba(246,240,230,0.75)]">
+              {used} of {cap} used
+            </Badge>
+          </div>
+          <div className="mt-4 space-y-4">
+            {revisions.map((r) => (
+              <div
+                key={r.id}
+                className="rounded-xl border border-[rgba(246,240,230,0.1)] bg-[rgba(246,240,230,0.03)] p-4"
+              >
+                <div className="flex items-center justify-between gap-3">
+                  <span className="text-xs text-[rgba(246,240,230,0.55)]">
+                    {new Date(r.created_at).toLocaleString()}
+                  </span>
+                  <Badge
+                    variant="outline"
+                    className="border-[rgba(246,240,230,0.3)] text-[rgba(246,240,230,0.75)]"
+                  >
+                    {r.status}
+                  </Badge>
+                </div>
+                <p className="mt-2 whitespace-pre-wrap text-sm text-[rgba(246,240,230,0.85)]">
+                  {r.notes}
+                </p>
+              </div>
+            ))}
+          </div>
+        </div>
+      )}
+
+      {/* New request OR cap-reached message */}
+      {canSubmit ? (
+        <div className="rounded-2xl border border-[rgba(246,240,230,0.12)] bg-[rgba(246,240,230,0.04)] p-6">
+          <h2 className="font-display text-xl">
+            {revisions.length === 0 ? `Request a ${headline.toLowerCase()}` : "Request another revision"}
+          </h2>
+          <p className="mt-1 text-sm text-[rgba(246,240,230,0.65)]">{helper}</p>
+          <textarea
+            value={notes}
+            onChange={(e) => setNotes(e.target.value.slice(0, 1000))}
+            placeholder="e.g. Slower tempo, change 'fighter' to 'warrior' in verse 2…"
+            className="mt-3 w-full rounded-xl border border-[rgba(246,240,230,0.2)] bg-[rgba(246,240,230,0.06)] p-3 text-sm text-[#F6F0E6] placeholder:text-[rgba(246,240,230,0.4)]"
+            rows={6}
+          />
+          <Button
+            className="mt-4 bg-[#E5D9EF] text-[#1F1B16] hover:bg-[#d8c8e6]"
+            disabled={notes.trim().length < 10 || busy}
+            onClick={submit}
+          >
+            {busy ? "Submitting…" : "Submit revision request"}
+          </Button>
+          {hasUnlimited && (
+            <p className="mt-3 text-xs text-[rgba(246,240,230,0.55)]">
+              {remaining} of {cap} revisions remaining.
+            </p>
+          )}
+        </div>
+      ) : (
+        <div className="rounded-2xl border border-[rgba(246,240,230,0.12)] bg-[rgba(246,240,230,0.04)] p-6">
+          <h2 className="font-display text-xl">No revisions remaining</h2>
+          <p className="mt-2 text-sm text-[rgba(246,240,230,0.7)]">
+            You've used all {cap} {cap === 1 ? "revision" : "revisions"} for this song. Need more changes?{" "}
+            <Link to="/create" className="text-[#E5D9EF] underline">
+              Order another song
+            </Link>
+            .
+          </p>
+        </div>
+      )}
     </div>
   );
 }
