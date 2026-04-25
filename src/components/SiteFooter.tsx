@@ -25,7 +25,7 @@ export function SiteFooter() {
             </a>
           </li>
           <li>
-            <Link to="/login" className="hover:text-[#E5D9EF]">
+            <Link to="/login" search={{ redirect: undefined }} className="hover:text-[#E5D9EF]">
               Track Order
             </Link>
           </li>

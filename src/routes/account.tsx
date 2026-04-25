@@ -43,7 +43,7 @@ function AccountPage() {
 
   useEffect(() => {
     if (!loading && !user) {
-      navigate({ to: "/login", replace: true });
+      navigate({ to: "/login", search: { redirect: undefined }, replace: true });
     }
   }, [user, loading, navigate]);
 

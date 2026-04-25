@@ -7,14 +7,36 @@ import { useAuth } from "@/hooks/useAuth";
 
 export const Route = createFileRoute("/login")({
   component: LoginPage,
+  // Honor `?redirect=/portal/abc123` so users sent to /login from a
+  // protected page land back where they started after sign-in.
+  validateSearch: (search: Record<string, unknown>) => ({
+    redirect: typeof search.redirect === "string" ? search.redirect : undefined,
+  }),
   head: () => ({
     meta: [{ title: "Track your song · RibbonSong" }],
   }),
 });
 
+// Same allowlist semantics as auth.callback — only honor known in-app paths.
+const SAFE_REDIRECT_PREFIXES = [
+  "/dashboard",
+  "/account",
+  "/create",
+  "/portal/",
+  "/listen/",
+];
+function safeRedirectOrNull(target: string | undefined): string | null {
+  if (!target || !target.startsWith("/") || target.startsWith("//")) return null;
+  return SAFE_REDIRECT_PREFIXES.some((p) => target === p || target.startsWith(p))
+    ? target
+    : null;
+}
+
 function LoginPage() {
   const navigate = useNavigate();
   const { user, loading } = useAuth();
+  const { redirect: redirectParam } = Route.useSearch();
+  const safeRedirect = safeRedirectOrNull(redirectParam);
   const [email, setEmail] = useState("");
   const [submitting, setSubmitting] = useState(false);
   const [sent, setSent] = useState(false);
@@ -22,9 +44,11 @@ function LoginPage() {
 
   useEffect(() => {
     if (!loading && user) {
-      navigate({ to: "/account" });
+      // Already signed in — bounce straight to the intended target,
+      // not always /account.
+      navigate({ to: (safeRedirect ?? "/account") as "/account", replace: true });
     }
-  }, [user, loading, navigate]);
+  }, [user, loading, navigate, safeRedirect]);
 
   const handleSubmit = async (e: FormEvent) => {
     e.preventDefault();
@@ -34,10 +58,14 @@ function LoginPage() {
       return;
     }
     setSubmitting(true);
+    // Forward the redirect into the magic link so /auth/callback knows
+    // where to send the user after Supabase exchanges the token.
+    const callbackUrl = new URL(`${window.location.origin}/auth/callback`);
+    if (safeRedirect) callbackUrl.searchParams.set("redirect", safeRedirect);
     const { error: err } = await supabase.auth.signInWithOtp({
       email: email.trim().toLowerCase(),
       options: {
-        emailRedirectTo: `${window.location.origin}/auth/callback`,
+        emailRedirectTo: callbackUrl.toString(),
       },
     });
     setSubmitting(false);

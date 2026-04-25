@@ -50,7 +50,7 @@ export function SiteHeader() {
                   My account
                 </Link>
               ) : (
-                <Link to="/login" className="hidden text-[#5A5148] transition-colors hover:text-[#1F1B16] sm:inline">
+                <Link to="/login" search={{ redirect: undefined }} className="hidden text-[#5A5148] transition-colors hover:text-[#1F1B16] sm:inline">
                   Sign in
                 </Link>
               ))}
