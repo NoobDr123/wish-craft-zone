@@ -87,7 +87,7 @@ function AccountPage() {
 
   if (loading || !user || fetching || orders === null) {
     return (
-      <div className="flex min-h-screen items-center justify-center bg-[#1F1B16] text-[rgba(31,27,22,0.6)]">
+      <div className="flex min-h-screen items-center justify-center bg-[#F6F0E6] text-[rgba(31,27,22,0.6)]">
         <Loader2 className="h-7 w-7 animate-spin" />
       </div>
     );
