@@ -7,12 +7,16 @@ import {
   useStripe,
 } from "@stripe/react-stripe-js";
 import type { StripeElementsOptions } from "@stripe/stripe-js";
-import { getStripe } from "@/lib/stripe";
+import { getStripe, stripeEnvironment } from "@/lib/stripe";
+import { supabase } from "@/integrations/supabase/client";
+import { clearPrefetchedCheckout } from "@/lib/checkoutPrefetch";
 import { CheckCircle2, Gift, ShieldCheck } from "lucide-react";
 
 interface CustomPaymentFormProps {
   clientSecret: string;
   returnUrl: string;
+  /** PaymentIntent id — used to call confirm-payment directly on success. */
+  paymentIntentId?: string;
   email: string;
   amountLabel: string;
   /** Current amount in cents — used to keep Apple/Google Pay sheet in sync after promo edits. */
@@ -56,7 +60,7 @@ export function CustomPaymentForm(props: CustomPaymentFormProps) {
   );
 }
 
-function InnerForm({ returnUrl, email, amountLabel, amountCents, promoVersion, onError, disabled, disabledReason }: CustomPaymentFormProps) {
+function InnerForm({ returnUrl, paymentIntentId, email, amountLabel, amountCents, promoVersion, onError, disabled, disabledReason }: CustomPaymentFormProps) {
   const stripe = useStripe();
   const elements = useElements();
   const [submitting, setSubmitting] = useState(false);
@@ -107,23 +111,52 @@ function InnerForm({ returnUrl, email, amountLabel, amountCents, promoVersion, o
 
   /**
    * Shared finalize logic for BOTH card and wallet (Apple Pay / Google Pay /
-   * Link) confirmation paths. Treat ANY in-flight or terminal-success PI
-   * state as "good enough" and navigate to the return page, which polls
-   * the order until it's marked paid (or times out and forwards to upsells
-   * anyway). This is the safety net that ensures mobile wallet users always
-   * make it to the upsell flow even when:
-   *   - Stripe.js returns no `paymentIntent` (because the wallet sheet
-   *     redirected the page itself)
-   *   - The PI is in `requires_action` (Apple Pay biometric / 3DS)
-   *   - The PI is in `processing` (async ACH-style methods)
-   * The return page already handles all of these via polling +
-   * confirm-payment fallback, so we just need to GET THERE.
+   * Link) confirmation paths.
+   *
+   * Fast path: if Stripe.js returns a `succeeded` PI AND we know the PI id,
+   * call the backend `confirm-payment` function ourselves to mark the order
+   * paid, then jump straight to `/upsell-1` (or `/processing` for fast-track
+   * orders). This avoids the slow polling on `/checkout/return` and is the
+   * fix for "I paid but I never got to the upsell".
+   *
+   * Fallback: any other in-flight terminal state (or no PI at all because the
+   * wallet sheet handled the redirect itself) falls back to navigating to
+   * `returnUrl`, which polls + calls confirm-payment server-side anyway.
    */
-  const finalize = (
-    paymentIntent: { status?: string } | null | undefined,
+  const finalize = async (
+    paymentIntent: { status?: string; id?: string } | null | undefined,
     source: "card" | "express",
-  ): boolean => {
+  ): Promise<boolean> => {
     const status = paymentIntent?.status;
+    const piId = paymentIntent?.id || paymentIntentId;
+
+    // Fast-path: succeeded + we have the PI id → confirm + route directly.
+    if (status === "succeeded" && piId) {
+      trackEvent("payment_success", { status, source, piId, path: "direct" });
+      // Stale checkouts must never be reused after a successful charge.
+      try { clearPrefetchedCheckout(); } catch { /* ignore */ }
+
+      let next = "/upsell-1";
+      try {
+        const { data, error } = await supabase.functions.invoke("confirm-payment", {
+          body: { paymentIntentId: piId, environment: stripeEnvironment },
+        });
+        if (error) {
+          console.warn("[CustomPaymentForm] confirm-payment failed, falling back to return page:", error.message);
+          window.location.assign(returnUrl);
+          return true;
+        }
+        if ((data as any)?.skipUpsells) next = "/processing";
+        console.log("[CustomPaymentForm] confirm-payment ok, routing to", next, data);
+      } catch (e) {
+        console.warn("[CustomPaymentForm] confirm-payment threw, falling back:", e);
+        window.location.assign(returnUrl);
+        return true;
+      }
+      window.location.assign(next);
+      return true;
+    }
+
     const navigatingStatuses = new Set([
       "succeeded",
       "processing",
@@ -131,9 +164,9 @@ function InnerForm({ returnUrl, email, amountLabel, amountCents, promoVersion, o
       "requires_action",
     ]);
 
-    // Successful or in-flight terminal state — go to return page.
+    // Successful or in-flight terminal state without PI id → use return page.
     if (status && navigatingStatuses.has(status)) {
-      trackEvent("payment_success", { status, source });
+      trackEvent("payment_success", { status, source, path: "return_page" });
       window.location.assign(returnUrl);
       return true;
     }
@@ -183,7 +216,7 @@ function InnerForm({ returnUrl, email, amountLabel, amountCents, promoVersion, o
       return;
     }
 
-    if (finalize(paymentIntent, "card")) return;
+    if (await finalize(paymentIntent, "card")) return;
 
     // Truly unexpected — surface a generic error so the user isn't stuck.
     const msg = "Payment is taking longer than expected. Please refresh.";
@@ -231,7 +264,7 @@ function InnerForm({ returnUrl, email, amountLabel, amountCents, promoVersion, o
       return;
     }
 
-    if (finalize(paymentIntent, "express")) return;
+    if (await finalize(paymentIntent, "express")) return;
 
     // Last-resort: PI is in some unhandled state. Navigate to the return
     // page anyway — it polls + calls confirm-payment server-side and will

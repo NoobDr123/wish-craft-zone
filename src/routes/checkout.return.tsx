@@ -53,8 +53,8 @@ function CheckoutReturnPage() {
     // Server-side fallback: ask Stripe directly whether the PI succeeded and
     // mark the order paid. The webhook is supposed to do this, but Apple/Google
     // Pay flows can race the redirect and webhooks aren't always reliable.
-    const callConfirm = async () => {
-      if (!paymentIntentId || confirmCalled) return;
+    const callConfirm = async (): Promise<boolean> => {
+      if (!paymentIntentId || confirmCalled) return false;
       confirmCalled = true;
       try {
         const { data, error } = await supabase.functions.invoke("confirm-payment", {
@@ -62,12 +62,28 @@ function CheckoutReturnPage() {
         });
         if (error) {
           console.warn("confirm-payment error (will keep polling):", error.message);
-        } else {
-          console.log("confirm-payment result:", data);
+          return false;
+        }
+        console.log("confirm-payment result:", data);
+        const result = data as { paid?: boolean; orderId?: string; skipUpsells?: boolean } | null;
+        if (result?.paid && result.orderId) {
+          // Server confirmed the payment — route immediately, don't wait for poll.
+          q.set("orderId", result.orderId);
+          if (paymentIntentId) q.set("checkoutSessionId", paymentIntentId);
+          if (paymentIntentId) {
+            autoLogin(paymentIntentId).catch((e) =>
+              console.error("autoLogin failed (non-fatal):", e),
+            );
+          }
+          setStatus("ready");
+          const next = result.skipUpsells ? "/processing" : "/upsell-1";
+          setTimeout(() => navigate({ to: next }), 400);
+          return true;
         }
       } catch (e) {
         console.warn("confirm-payment threw (will keep polling):", e);
       }
+      return false;
     };
 
     const poll = async () => {
@@ -77,7 +93,8 @@ function CheckoutReturnPage() {
       // with the DB read. By the second poll the order should be marked paid
       // even if the webhook never fired.
       if (attempts === 1) {
-        callConfirm();
+        const confirmed = await callConfirm();
+        if (confirmed || cancelled) return;
       }
 
       const { data: order } = await lookupOrder();
