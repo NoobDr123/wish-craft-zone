@@ -11,7 +11,7 @@ import {
   Section,
   Text,
 } from '@react-email/components'
-import { BRAND, styles } from './_brand'
+import { BRAND, EmailFooter, styles } from './_brand'
 import type { TemplateEntry } from './registry'
 
 interface SongDeliveredEmailProps {
@@ -20,6 +20,7 @@ interface SongDeliveredEmailProps {
   listen_url?: string
   personal_note?: string | null
   role?: 'buyer' | 'recipient'
+  unsubscribe_url?: string
 }
 
 const SongDeliveredEmail = ({
@@ -28,6 +29,7 @@ const SongDeliveredEmail = ({
   listen_url,
   personal_note,
   role,
+  unsubscribe_url,
 }: SongDeliveredEmailProps) => {
   const recipient = recipient_name || 'your loved one'
   const buyer = buyer_name || 'Someone who loves you'
@@ -74,7 +76,7 @@ const SongDeliveredEmail = ({
           </Text>
 
           <div style={styles.divider} />
-          <Text style={styles.footer}>Sent from {BRAND.name} — turning love into songs.</Text>
+          <EmailFooter unsubscribeUrl={unsubscribe_url} />
         </Container>
       </Body>
     </Html>
