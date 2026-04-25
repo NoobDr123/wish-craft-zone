@@ -402,6 +402,8 @@ export type Database = {
           status: string
           stripe_checkout_session_id: string | null
           stripe_customer_id: string | null
+          stripe_env: string | null
+          stripe_fulfillment_synced_at: string | null
           stripe_payment_intent_id: string | null
           stripe_payment_method_id: string | null
           tempo: string | null
@@ -460,6 +462,8 @@ export type Database = {
           status?: string
           stripe_checkout_session_id?: string | null
           stripe_customer_id?: string | null
+          stripe_env?: string | null
+          stripe_fulfillment_synced_at?: string | null
           stripe_payment_intent_id?: string | null
           stripe_payment_method_id?: string | null
           tempo?: string | null
@@ -518,6 +522,8 @@ export type Database = {
           status?: string
           stripe_checkout_session_id?: string | null
           stripe_customer_id?: string | null
+          stripe_env?: string | null
+          stripe_fulfillment_synced_at?: string | null
           stripe_payment_intent_id?: string | null
           stripe_payment_method_id?: string | null
           tempo?: string | null
@@ -599,6 +605,54 @@ export type Database = {
           utm_source?: string | null
         }
         Relationships: []
+      }
+      play_events: {
+        Row: {
+          duration_ms: number | null
+          id: number
+          ip_hash: string | null
+          order_id: string
+          played_at: string
+          source: string | null
+          user_agent: string | null
+          variant_id: string | null
+        }
+        Insert: {
+          duration_ms?: number | null
+          id?: number
+          ip_hash?: string | null
+          order_id: string
+          played_at?: string
+          source?: string | null
+          user_agent?: string | null
+          variant_id?: string | null
+        }
+        Update: {
+          duration_ms?: number | null
+          id?: number
+          ip_hash?: string | null
+          order_id?: string
+          played_at?: string
+          source?: string | null
+          user_agent?: string | null
+          variant_id?: string | null
+        }
+        Relationships: [
+          {
+            foreignKeyName: "play_events_order_id_fkey"
+            columns: ["order_id"]
+            isOneToOne: false
+            referencedRelation: "orders"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "play_events_order_id_fkey"
+            columns: ["order_id"]
+            isOneToOne: false
+            referencedRelation: "public_shared_songs"
+            referencedColumns: ["id"]
+          },
+        ]
       }
       promo_code_redemptions: {
         Row: {
