@@ -3,12 +3,12 @@
 //  1) Listen for chunk-load failures (dynamic import of a hashed chunk that no longer exists)
 //     and force-reload once. This is what happens to customers holding a stale `index.html`
 //     after we redeploy with new bundle hashes.
-//  2) Periodically poll the build manifest fingerprint. If it changed, reload on next nav.
+//  2) Periodically refetch the homepage HTML and compare bundled-asset fingerprints.
+//     If the script tag hashes change, a new build is live → reload on next tab focus.
 
 import { useEffect, useRef } from "react";
 
 const RELOAD_FLAG = "__ribbonsong_chunk_reload__";
-const MANIFEST_PATH = "/__build_id"; // see public/__build_id below
 const POLL_MS = 60_000;
 
 function isChunkLoadError(message: unknown): boolean {
@@ -25,7 +25,6 @@ function isChunkLoadError(message: unknown): boolean {
 
 function reloadOnce(reason: string) {
   if (typeof window === "undefined") return;
-  // Avoid reload loops if reload itself fails
   if (sessionStorage.getItem(RELOAD_FLAG)) {
     console.warn("[StaleBundleGuard] reload already attempted, skipping", reason);
     return;
@@ -35,16 +34,38 @@ function reloadOnce(reason: string) {
   window.location.reload();
 }
 
+// Extract a fingerprint from the current page's bundled asset URLs (which contain
+// the Vite build hash, e.g. /assets/index-D_XjfnCQ.js).
+function currentBundleFingerprint(): string {
+  if (typeof document === "undefined") return "";
+  const scripts = Array.from(document.querySelectorAll<HTMLScriptElement>("script[src]"))
+    .map((s) => s.src)
+    .filter((src) => /\/assets\/.+-[A-Za-z0-9_-]{6,}\.(js|mjs)/.test(src))
+    .sort();
+  return scripts.join("|");
+}
+
+async function fetchHtmlFingerprint(): Promise<string | null> {
+  try {
+    const res = await fetch("/", { cache: "no-store", headers: { Accept: "text/html" } });
+    if (!res.ok) return null;
+    const html = await res.text();
+    const matches = html.match(/\/assets\/[^"'\s]+-[A-Za-z0-9_-]{6,}\.(?:js|mjs)/g) ?? [];
+    return [...new Set(matches)].sort().join("|");
+  } catch {
+    return null;
+  }
+}
+
 export function StaleBundleGuard() {
-  const initialBuildId = useRef<string | null>(null);
+  const initialFingerprint = useRef<string>("");
 
   useEffect(() => {
     if (typeof window === "undefined") return;
 
-    // Clear the reload flag once we've successfully booted on the new bundle
     setTimeout(() => sessionStorage.removeItem(RELOAD_FLAG), 5_000);
+    initialFingerprint.current = currentBundleFingerprint();
 
-    // 1) Catch chunk-load errors from dynamic imports
     const onError = (e: ErrorEvent) => {
       if (isChunkLoadError(e.message) || isChunkLoadError(e.error?.message)) {
         reloadOnce("chunk error event");
@@ -57,29 +78,21 @@ export function StaleBundleGuard() {
     window.addEventListener("error", onError);
     window.addEventListener("unhandledrejection", onUnhandled);
 
-    // 2) Poll a build-id file to detect new deploys, reload on next visibility-gain
     let cancelled = false;
-    const fetchBuildId = async (): Promise<string | null> => {
-      try {
-        const res = await fetch(`${MANIFEST_PATH}?t=${Date.now()}`, { cache: "no-store" });
-        if (!res.ok) return null;
-        return (await res.text()).trim();
-      } catch {
-        return null;
-      }
-    };
-
-    fetchBuildId().then((id) => {
-      initialBuildId.current = id;
-    });
-
     const interval = setInterval(async () => {
       if (cancelled) return;
-      const current = await fetchBuildId();
-      if (!current || !initialBuildId.current) return;
-      if (current !== initialBuildId.current) {
-        // New build deployed — reload only when tab becomes visible to avoid
-        // interrupting an active user mid-action.
+      if (!initialFingerprint.current) {
+        initialFingerprint.current = currentBundleFingerprint();
+        return;
+      }
+      const latest = await fetchHtmlFingerprint();
+      if (!latest) return;
+      // Compare: if none of our currently-loaded chunks appear in the fresh HTML,
+      // the deploy has rolled forward.
+      const loaded = initialFingerprint.current.split("|").filter(Boolean);
+      if (loaded.length === 0) return;
+      const stillPresent = loaded.some((url) => latest.includes(url));
+      if (!stillPresent) {
         if (document.visibilityState === "visible") {
           reloadOnce("new build detected");
         } else {
