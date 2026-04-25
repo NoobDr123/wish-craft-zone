@@ -296,9 +296,7 @@ function CreatePage() {
             placeholder={c4.placeholder}
             value={q.fighting_for}
             onChange={(e) => q.set("fighting_for", e.target.value)}
-            maxLength={200}
             rows={5}
-            showCount
             autoFocus
           />
           <TipChips chips={q4Tips(profile)} />
