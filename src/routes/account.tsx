@@ -240,7 +240,7 @@ function EmptyState() {
       </p>
       <Link
         to="/create"
-        className="mt-5 inline-flex items-center justify-center gap-2 rounded-full bg-[#8D6FAF] px-5 py-2.5 text-sm font-semibold text-[#1F1B16] hover:bg-[#6B4F8A]"
+        className="mt-5 inline-flex items-center justify-center gap-2 rounded-full bg-[#8D6FAF] px-5 py-2.5 text-sm font-semibold text-[#FFF7EE] hover:bg-[#6B4F8A]"
       >
         <Plus className="h-4 w-4" /> Create your first song
       </Link>
