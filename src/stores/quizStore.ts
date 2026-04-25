@@ -122,6 +122,9 @@ export interface QuizState {
   is_rush: boolean;
   has_unlimited_edits: boolean;
 
+  // Free-song reward redemption (set when user enters quiz via ?reward=CODE)
+  reward_code?: string;
+
   set: <K extends keyof QuizState>(key: K, value: QuizState[K]) => void;
   reset: () => void;
 }
@@ -159,7 +162,7 @@ export const useQuizStore = create<QuizState>()(
     (set) => ({
       ...initial,
       set: (key, value) => set({ [key]: value } as Partial<QuizState>),
-      reset: () => set({ ...initial, orderId: undefined }),
+      reset: () => set({ ...initial, orderId: undefined, reward_code: undefined }),
     }),
     { name: "ribbonsong-quiz-v3" },
   ),
