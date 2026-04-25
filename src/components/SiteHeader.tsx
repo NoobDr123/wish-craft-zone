@@ -37,11 +37,11 @@ export function SiteHeader() {
         <div className="mx-auto flex max-w-[1200px] items-center justify-between gap-3 px-4 sm:px-6">
           <Logo />
           <nav className="hidden items-center gap-8 text-[14.5px] font-medium text-[#5A5148] md:flex">
-            <a href="/#listen" className="transition-colors hover:text-[#8D6FAF]">Listen</a>
-            <a href="/#who" className="transition-colors hover:text-[#8D6FAF]">Who it's for</a>
-            <a href="/#how" className="transition-colors hover:text-[#8D6FAF]">How it works</a>
-            <a href="/#stories" className="transition-colors hover:text-[#8D6FAF]">Stories</a>
-            <a href="/#faq" className="transition-colors hover:text-[#8D6FAF]">FAQ</a>
+            <Link to="/" hash="listen" className="transition-colors hover:text-[#8D6FAF]">Listen</Link>
+            <Link to="/" hash="who" className="transition-colors hover:text-[#8D6FAF]">Who it's for</Link>
+            <Link to="/" hash="how" className="transition-colors hover:text-[#8D6FAF]">How it works</Link>
+            <Link to="/" hash="stories" className="transition-colors hover:text-[#8D6FAF]">Stories</Link>
+            <Link to="/" hash="faq" className="transition-colors hover:text-[#8D6FAF]">FAQ</Link>
           </nav>
           <div className="flex items-center gap-3 text-[14.5px] sm:gap-5">
             {!loading &&
