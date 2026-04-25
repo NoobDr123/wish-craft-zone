@@ -18,6 +18,9 @@ verify_jwt = false
 [functions.drain-queue]
 verify_jwt = false
 
+[functions.bootstrap-internal-secret]
+verify_jwt = false
+
 [functions.generate-brief]
 verify_jwt = false
 

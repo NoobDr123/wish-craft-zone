@@ -20,23 +20,16 @@ const corsHeaders = {
 serve(async (req) => {
   if (req.method === "OPTIONS") return new Response(null, { headers: corsHeaders });
 
-  // Auth: accept the internal secret, the service role key, OR the project's
-  // anon/publishable key. We accept the anon key here (and only here) because
-  // pg_cron sends the anon key as the Bearer when invoking this dispatcher,
-  // and the downstream targets it calls (generate-brief, submit-to-kie,
-  // deliver-song, process-kie-callback) are still protected by guardInternal
-  // — drain-queue calls them with the real service role key + internal secret.
+  // Auth: accept the internal secret OR the service role key.
+  // pg_cron sends the internal secret via x-internal-secret (cleanest path).
+  // Edge-to-edge fetches send the service role key as the Bearer.
   const auth = req.headers.get("Authorization") ?? "";
   const token = auth.replace(/^Bearer\s+/i, "").trim();
   const providedSecret = req.headers.get("x-internal-secret") ?? "";
-  const anonKey = Deno.env.get("SUPABASE_ANON_KEY")
-    ?? Deno.env.get("SUPABASE_PUBLISHABLE_KEY")
-    ?? "";
 
   const isAuthorized =
     (providedSecret && providedSecret === INTERNAL_SECRET) ||
-    (token && token === SERVICE_KEY) ||
-    (token && anonKey && token === anonKey);
+    (token && token === SERVICE_KEY);
 
   if (!isAuthorized) {
     const unauthorized = await guardInternal(req, corsHeaders);
@@ -47,13 +40,14 @@ serve(async (req) => {
     const { queue, target, batch = 5, vt = 60 } = await req.json();
     if (!queue || !target) return json({ error: "queue and target required" }, 400);
 
-    // Read a batch from pgmq
-    const { data: msgs, error: readErr } = await supabase
-      .schema("pgmq" as any)
-      .rpc("read", { queue_name: queue, vt, qty: batch } as any);
+    const { data: msgs, error: readErr } = await supabase.rpc("read_queue", {
+      queue_name: queue,
+      batch_size: batch,
+      vt,
+    } as any);
 
     if (readErr) {
-      console.error("pgmq.read error", readErr);
+      console.error("read_queue error", readErr);
       return json({ error: readErr.message }, 500);
     }
 
@@ -78,9 +72,9 @@ serve(async (req) => {
         const body = await res.text().catch(() => "");
 
         if (ok) {
-          await supabase.schema("pgmq" as any).rpc("delete", {
+          await supabase.rpc("delete_queue_message", {
             queue_name: queue,
-            msg_id: m.msg_id,
+            message_id: m.msg_id,
           } as any);
           results.push({ msg_id: m.msg_id, status: "delivered" });
         } else {

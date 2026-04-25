@@ -1372,6 +1372,10 @@ export type Database = {
         Args: { message_id: number; queue_name: string }
         Returns: boolean
       }
+      delete_queue_message: {
+        Args: { message_id: number; queue_name: string }
+        Returns: boolean
+      }
       enqueue_due_deliveries: { Args: never; Returns: number }
       enqueue_email: {
         Args: { payload: Json; queue_name: string }
@@ -1462,6 +1466,14 @@ export type Database = {
         Returns: number
       }
       read_email_batch: {
+        Args: { batch_size: number; queue_name: string; vt: number }
+        Returns: {
+          message: Json
+          msg_id: number
+          read_ct: number
+        }[]
+      }
+      read_queue: {
         Args: { batch_size: number; queue_name: string; vt: number }
         Returns: {
           message: Json
