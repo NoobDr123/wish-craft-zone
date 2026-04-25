@@ -678,10 +678,9 @@ function RevisionTab({
     await reload();
   };
 
-  const headline = hasUnlimited ? "Revisions" : "Free revision";
   const helper = hasUnlimited
     ? `Unlimited revisions on this song. ${used} submitted so far.`
-    : "You get one free revision per song. Tell us what to change.";
+    : "Tell us what to tweak — wording, tempo, voice, anything. We'll re-record it for you, on us.";
 
   return (
     <div className="space-y-6">
@@ -724,13 +723,13 @@ function RevisionTab({
       {canSubmit ? (
         <div className="rounded-2xl border border-[rgba(246,240,230,0.12)] bg-[rgba(246,240,230,0.04)] p-6">
           <h2 className="font-display text-xl">
-            {revisions.length === 0 ? `Request a ${headline.toLowerCase()}` : "Request another revision"}
+            Don't love the lyrics? Let our team help.
           </h2>
           <p className="mt-1 text-sm text-[rgba(246,240,230,0.65)]">{helper}</p>
           <textarea
             value={notes}
             onChange={(e) => setNotes(e.target.value.slice(0, 1000))}
-            placeholder="e.g. Slower tempo, change 'fighter' to 'warrior' in verse 2…"
+            placeholder="e.g. Slower tempo, change 'fighter' to 'warrior' in verse 2, mention our daughter Mia…"
             className="mt-3 w-full rounded-xl border border-[rgba(246,240,230,0.2)] bg-[rgba(246,240,230,0.06)] p-3 text-sm text-[#F6F0E6] placeholder:text-[rgba(246,240,230,0.4)]"
             rows={6}
           />
@@ -739,7 +738,7 @@ function RevisionTab({
             disabled={notes.trim().length < 10 || busy}
             onClick={submit}
           >
-            {busy ? "Submitting…" : "Submit revision request"}
+            {busy ? "Submitting…" : hasUnlimited ? "Submit revision" : "Send to our team — it's free"}
           </Button>
           {hasUnlimited && (
             <p className="mt-3 text-xs text-[rgba(246,240,230,0.55)]">
