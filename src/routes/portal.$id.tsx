@@ -145,9 +145,8 @@ function PortalSong() {
   const tabs: Array<[typeof tab, string]> = [
     ["player", "Lyrics"],
     ["reaction", "Reaction video"],
-    ["revision", order.has_unlimited_edits ? "Revisions" : "Free revision"],
-    ["refund", "Refund / gift card"],
-    ["rewards", "Rewards"],
+    ["refund", "Contact support"],
+    ["rewards", "Free gifts"],
   ];
 
   return (
