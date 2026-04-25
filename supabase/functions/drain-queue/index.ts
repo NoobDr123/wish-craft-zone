@@ -39,6 +39,18 @@ serve(async (req) => {
     (token && anonKey && token === anonKey);
 
   if (!isAuthorized) {
+    console.log("drain-queue auth failed", {
+      hasProvidedSecret: !!providedSecret,
+      providedSecretMatchesInternal: providedSecret === INTERNAL_SECRET,
+      hasToken: !!token,
+      tokenLen: token.length,
+      tokenMatchesService: token === SERVICE_KEY,
+      hasAnonKey: !!anonKey,
+      anonKeyLen: anonKey.length,
+      tokenMatchesAnon: token === anonKey,
+      hasInternalSecret: !!INTERNAL_SECRET,
+      hasServiceKey: !!SERVICE_KEY,
+    });
     const unauthorized = await guardInternal(req, corsHeaders);
     if (unauthorized) return unauthorized;
   }
