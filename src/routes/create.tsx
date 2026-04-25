@@ -511,13 +511,12 @@ function CreatePage() {
                 <p className="font-semibold">Sign in to redeem your free song</p>
                 <p className="mt-1 text-muted-foreground">
                   Reward codes are tied to your account. Please{" "}
-                  <Link
-                    to="/login"
-                    search={{ redirect: `/create?reward=${search.reward}` }}
+                  <a
+                    href={`/login?redirect=${encodeURIComponent(`/create?reward=${search.reward}`)}`}
                     className="font-medium underline"
                   >
                     log in
-                  </Link>{" "}
+                  </a>{" "}
                   to continue.
                 </p>
               </div>
