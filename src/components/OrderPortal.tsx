@@ -681,28 +681,45 @@ function RevisionTab({
       )}
 
       {canSubmit ? (
-        <div className="rounded-2xl border border-[rgba(31,27,22,0.12)] bg-[#FBF6EC] p-6">
-          <h2 className="font-display text-xl">
-            Don't love the lyrics? Let our team help.
-          </h2>
-          <p className="mt-1 text-sm text-[rgba(31,27,22,0.65)]">{helper}</p>
-          <textarea
-            value={notes}
-            onChange={(e) => setNotes(e.target.value.slice(0, 1000))}
-            placeholder="e.g. Slower tempo, change 'fighter' to 'warrior' in verse 2, mention our daughter Mia…"
-            className="mt-3 w-full rounded-xl border border-[rgba(31,27,22,0.2)] bg-white p-3 text-sm text-[#1F1B16] placeholder:text-[rgba(31,27,22,0.4)]"
-            rows={6}
+        <div className="space-y-5">
+          <EditTicket
+            number={1}
+            icon={<Pencil className="h-5 w-5" />}
+            eyebrow="Edit ticket #1 · Tweak the lyrics"
+            title="Don't love a line? Rewrite it free."
+            body="Tell us what should change — a name, a phrase, a whole verse. Our team rewrites and re-records it on us."
           />
-          {submitError && (
-            <p className="mt-2 text-sm text-red-600">{submitError}</p>
-          )}
-          <Button
-            className="mt-4 bg-[#8D6FAF] text-[#FFF7EE] hover:bg-[#6B4F8A]"
-            disabled={notes.trim().length < 10 || busy}
-            onClick={submit}
-          >
-            {busy ? "Submitting…" : hasUnlimited ? "Submit revision" : "Send to our team — it's free"}
-          </Button>
+          <EditTicket
+            number={2}
+            icon={<Music className="h-5 w-5" />}
+            eyebrow="Edit ticket #2 · Change the sound"
+            title="Different tempo or voice? Just say the word."
+            body="Want it slower, faster, or a different vocal style? Mention it below and we'll re-record the whole track."
+          />
+
+          <div className="rounded-2xl border border-[rgba(31,27,22,0.12)] bg-[#FBF6EC] p-6">
+            <p className="text-xs font-semibold uppercase tracking-[0.2em] text-[#8D6FAF]">
+              Editor
+            </p>
+            <h2 className="mt-1 font-display text-xl">{helper}</h2>
+            <textarea
+              value={notes}
+              onChange={(e) => setNotes(e.target.value.slice(0, 1000))}
+              placeholder="e.g. Slower tempo, change 'fighter' to 'warrior' in verse 2, mention our daughter Mia…"
+              className="mt-3 w-full rounded-xl border border-[rgba(31,27,22,0.2)] bg-white p-3 text-sm text-[#1F1B16] placeholder:text-[rgba(31,27,22,0.4)]"
+              rows={6}
+            />
+            {submitError && (
+              <p className="mt-2 text-sm text-red-600">{submitError}</p>
+            )}
+            <Button
+              className="mt-4 bg-[#8D6FAF] text-[#FFF7EE] hover:bg-[#6B4F8A]"
+              disabled={notes.trim().length < 10 || busy}
+              onClick={submit}
+            >
+              {busy ? "Submitting…" : hasUnlimited ? "Submit revision" : "Send to our team — it's free"}
+            </Button>
+          </div>
         </div>
       ) : (
         <div className="rounded-2xl border border-[rgba(31,27,22,0.12)] bg-[#FBF6EC] p-6">
