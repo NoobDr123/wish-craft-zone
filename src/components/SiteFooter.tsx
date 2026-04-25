@@ -15,14 +15,14 @@ export function SiteFooter() {
         </Link>
         <ul className="flex flex-wrap gap-7">
           <li>
-            <a href="/#stories" className="hover:text-[#E5D9EF]">
+            <Link to="/" hash="stories" className="hover:text-[#E5D9EF]">
               Reviews
-            </a>
+            </Link>
           </li>
           <li>
-            <a href="/#press" className="hover:text-[#E5D9EF]">
+            <Link to="/" hash="press" className="hover:text-[#E5D9EF]">
               Press
-            </a>
+            </Link>
           </li>
           <li>
             <Link to="/login" search={{ redirect: undefined }} className="hover:text-[#E5D9EF]">
