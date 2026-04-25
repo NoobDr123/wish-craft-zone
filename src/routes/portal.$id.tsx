@@ -763,11 +763,10 @@ function RevisionTab({
 }
 
 /* ----------------------------------------------------------------------- */
-/* Refund tab                                                               */
+/* Support tab — contact our team (used to be refund/gift card)             */
 /* ----------------------------------------------------------------------- */
 
 function RefundTab({ orderId, buyerEmail, refunds, reload }: any) {
-  const [type, setType] = useState<"refund" | "amazon_gift_card" | "both">("refund");
   const [reason, setReason] = useState("");
   const [busy, setBusy] = useState(false);
 
@@ -777,7 +776,7 @@ function RefundTab({ orderId, buyerEmail, refunds, reload }: any) {
     const { error } = await supabase.from("refund_requests").insert({
       order_id: orderId,
       buyer_email: buyerEmail,
-      request_type: type,
+      request_type: "refund",
       reason: reason.trim(),
     });
     setBusy(false);
@@ -786,44 +785,24 @@ function RefundTab({ orderId, buyerEmail, refunds, reload }: any) {
       return;
     }
     setReason("");
-    toast.success("Request submitted");
+    toast.success("Message sent — our team will reply soon");
     await reload();
   };
 
   return (
     <div className="rounded-2xl border border-[rgba(246,240,230,0.12)] bg-[rgba(246,240,230,0.04)] p-6">
-      <h2 className="font-display text-xl">Refund or Amazon gift card</h2>
+      <h2 className="font-display text-xl">Talk to our team</h2>
       <p className="mt-1 text-sm text-[rgba(246,240,230,0.65)]">
-        Tell us what happened. We review every request personally.
+        Whether you want to say thanks, ask a question, request a refund, or just need a hand —
+        write to us here. A real person reads every message and gets back to you, usually within
+        a few hours.
       </p>
-
-      <div className="mt-4 flex flex-wrap gap-2">
-        {(
-          [
-            ["refund", "Refund"],
-            ["amazon_gift_card", "Amazon gift card"],
-            ["both", "Both"],
-          ] as const
-        ).map(([k, l]) => (
-          <button
-            key={k}
-            onClick={() => setType(k)}
-            className={`rounded-full border px-4 py-1.5 text-sm transition ${
-              type === k
-                ? "border-[#E5D9EF] bg-[#E5D9EF] text-[#1F1B16]"
-                : "border-[rgba(246,240,230,0.2)] bg-transparent text-[rgba(246,240,230,0.75)] hover:border-[rgba(246,240,230,0.4)]"
-            }`}
-          >
-            {l}
-          </button>
-        ))}
-      </div>
 
       <textarea
         value={reason}
         onChange={(e) => setReason(e.target.value.slice(0, 2000))}
-        placeholder="Please tell us what happened (min 20 characters)…"
-        className="mt-3 w-full rounded-xl border border-[rgba(246,240,230,0.2)] bg-[rgba(246,240,230,0.06)] p-3 text-sm text-[#F6F0E6] placeholder:text-[rgba(246,240,230,0.4)]"
+        placeholder="Tell us what's on your mind (min 20 characters)…"
+        className="mt-4 w-full rounded-xl border border-[rgba(246,240,230,0.2)] bg-[rgba(246,240,230,0.06)] p-3 text-sm text-[#F6F0E6] placeholder:text-[rgba(246,240,230,0.4)]"
         rows={6}
       />
       <Button
@@ -831,13 +810,13 @@ function RefundTab({ orderId, buyerEmail, refunds, reload }: any) {
         disabled={reason.trim().length < 20 || busy}
         onClick={submit}
       >
-        {busy ? "Submitting…" : "Submit request"}
+        {busy ? "Sending…" : "Send message"}
       </Button>
 
       {refunds.length > 0 && (
         <div className="mt-6 space-y-2">
           <p className="text-xs uppercase tracking-wider text-[rgba(246,240,230,0.55)]">
-            Your requests
+            Your messages
           </p>
           {refunds.map((r: any) => (
             <div
@@ -845,16 +824,13 @@ function RefundTab({ orderId, buyerEmail, refunds, reload }: any) {
               className="rounded-lg bg-[rgba(246,240,230,0.04)] px-3 py-2 text-sm"
             >
               <div className="flex items-center justify-between">
-                <span className="capitalize text-[rgba(246,240,230,0.85)]">
-                  {r.request_type.replace("_", " ")}
+                <span className="text-[rgba(246,240,230,0.85)]">
+                  {new Date(r.created_at).toLocaleString()}
                 </span>
                 <Badge variant="outline" className="border-[rgba(246,240,230,0.3)] text-[rgba(246,240,230,0.75)]">
                   {r.status}
                 </Badge>
               </div>
-              <p className="mt-1 text-xs text-[rgba(246,240,230,0.55)]">
-                {new Date(r.created_at).toLocaleString()}
-              </p>
             </div>
           ))}
         </div>
