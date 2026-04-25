@@ -4,7 +4,7 @@
 import { Link } from "@tanstack/react-router";
 import type { ReactNode } from "react";
 import { useEffect, useMemo, useState } from "react";
-import { Check, Copy, Lock, Share2, Music, Download, Heart, Ticket } from "lucide-react";
+import { Check, Copy, Share2, Music, Download, Heart, Ticket } from "lucide-react";
 import { VinylPlayer } from "@/components/VinylPlayer";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
@@ -135,16 +135,21 @@ export function OrderPortal({ orderId, userId }: { orderId: string; userId: stri
   const lyrics = (order.brief as any)?.lyrics ?? "";
   const tags = `${order.genre ?? "Acoustic"} · ${order.tempo ?? "Mid-tempo"}`;
   const delivered = order.status === "delivered" && !!selectedVariant?.audio_url;
-  const sharePath = order.share_page_slug ? `/listen/${order.share_page_slug}` : null;
+  // Always provide a shareable URL — fall back to the order id when the
+  // optional pretty slug isn't set yet. The /listen/$id route accepts both.
+  const sharePath = `/listen/${order.share_page_slug ?? order.id}`;
 
-  const revisionCap = order.has_unlimited_edits ? 15 : 1;
+  // Edits cap: free orders get 1 free edit. Unlimited orders are capped at
+  // 10 to protect us from runaway abuse — when they hit the cap the backend
+  // will reject and we surface the error inline (no scary "ran out" copy).
+  const revisionCap = order.has_unlimited_edits ? 10 : 1;
   const revisionsUsed = revisions.length;
 
   const tabs: Array<[typeof tab, string]> = [
-    ["player", "Lyrics"],
-    ["reaction", "Reaction video"],
-    ["refund", "Contact support"],
+    ["player", "Lyrics & edits"],
+    ["reaction", "Reaction"],
     ["rewards", "Free gifts"],
+    ["refund", "Help"],
   ];
 
   return (
@@ -251,7 +256,11 @@ export function OrderPortal({ orderId, userId }: { orderId: string; userId: stri
               />
             )}
             {tab === "rewards" && (
-              <RewardsTab reward={reward} returningPromos={returningPromos} />
+              <RewardsTab
+                reward={reward}
+                returningPromos={returningPromos}
+                onOpenReaction={() => setTab("reaction")}
+              />
             )}
           </div>
         </>
@@ -305,9 +314,6 @@ function VariantSwitcher({
   otherVariant: Variant | undefined;
   onChange: () => Promise<void>;
 }) {
-  const [unlocking, setUnlocking] = useState(false);
-
-  const hasSavedCard = !!order.stripe_payment_method_id;
   const unlocked = !!order.second_variant_unlocked_at;
 
   const select = async (variantId: string) => {
@@ -323,30 +329,10 @@ function VariantSwitcher({
     await onChange();
   };
 
-  const unlock = async () => {
-    if (!hasSavedCard) {
-      toast.error("No saved card — contact support to unlock the second take.");
-      return;
-    }
-    setUnlocking(true);
-    try {
-      const { data, error } = await supabase.functions.invoke("unlock-second-variant", {
-        body: { orderId: order.id },
-      });
-      if (error || (data as any)?.error) {
-        toast.error((data as any)?.error ?? error?.message ?? "Unlock failed");
-        return;
-      }
-      toast.success("Second take unlocked");
-      await onChange();
-    } catch (e: any) {
-      toast.error(e?.message ?? "Unlock failed");
-    } finally {
-      setUnlocking(false);
-    }
-  };
-
-  if (variants.length < 2 && !otherVariant) return null;
+  // Only render when there's actually a second variant unlocked. The old
+  // "$5 unlock" upsell card has been removed — second versions now ship
+  // bundled with the upsell flow, so there's nothing to upsell here.
+  if (!unlocked || variants.length < 2 || !otherVariant) return null;
 
   return (
     <div className="mt-6 rounded-2xl border border-[rgba(31,27,22,0.12)] bg-[#FBF6EC] p-4">
@@ -354,17 +340,13 @@ function VariantSwitcher({
         <p className="text-xs uppercase tracking-wider text-[rgba(31,27,22,0.55)]">
           Two versions of your song
         </p>
-        {unlocked && (
-          <span className="text-xs text-[rgba(31,27,22,0.55)]">Tap to switch</span>
-        )}
+        <span className="text-xs text-[rgba(31,27,22,0.55)]">Tap to switch</span>
       </div>
       <div className="mt-3 grid grid-cols-2 gap-2">
         {[0, 1].map((i) => {
           const v = variants[i];
-          const isFirst = i === 0;
-          const isLockedSecond = !isFirst && !unlocked;
           const active = v && v.id === selectedVariant?.id;
-          const playable = !!v?.audio_url && (isFirst || unlocked);
+          const playable = !!v?.audio_url;
           return (
             <button
               key={v?.id || `slot-${i}`}
@@ -373,46 +355,18 @@ function VariantSwitcher({
               className={`flex items-center justify-between rounded-xl border px-4 py-3 text-sm transition ${
                 active
                   ? "border-[#8D6FAF] bg-[rgba(141,111,175,0.12)] text-[#1F1B16]"
-                  : isLockedSecond
-                    ? "border-[rgba(31,27,22,0.12)] bg-[rgba(31,27,22,0.02)] text-[rgba(31,27,22,0.45)]"
-                    : "border-[rgba(31,27,22,0.15)] bg-transparent text-[rgba(31,27,22,0.7)] hover:border-[rgba(31,27,22,0.3)]"
-              } ${!playable && !isLockedSecond ? "opacity-50 cursor-not-allowed" : ""} ${isLockedSecond ? "cursor-not-allowed" : ""}`}
+                  : "border-[rgba(31,27,22,0.15)] bg-transparent text-[rgba(31,27,22,0.7)] hover:border-[rgba(31,27,22,0.3)]"
+              } ${!playable ? "opacity-50 cursor-not-allowed" : ""}`}
             >
               <span className="flex items-center gap-2">
                 <Music className="h-3.5 w-3.5" />
                 Version {i + 1}
               </span>
               {active && <Check className="h-4 w-4" />}
-              {isLockedSecond && <Lock className="h-3.5 w-3.5" />}
             </button>
           );
         })}
       </div>
-
-      {!unlocked && (
-        <div className="mt-4 rounded-xl border border-[rgba(141,111,175,0.25)] bg-[rgba(141,111,175,0.06)] p-4">
-          <div className="flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between">
-            <div>
-              <p className="text-sm font-medium text-[#8D6FAF]">
-                Hear it sung a different way
-              </p>
-              <p className="mt-0.5 text-xs text-[rgba(31,27,22,0.7)]">
-                Same heartfelt lyrics — a fresh voice and feel. Many people end up loving the second one more.
-              </p>
-            </div>
-            <Button
-              onClick={unlock}
-              disabled={unlocking || !hasSavedCard}
-              className="bg-[#8D6FAF] text-[#FFF7EE] hover:bg-[#6B4F8A] whitespace-nowrap"
-            >
-              {unlocking ? "Unlocking…" : hasSavedCard ? "Unlock for $5" : "No saved card"}
-            </Button>
-          </div>
-          <p className="mt-2 text-[10px] leading-relaxed text-[rgba(31,27,22,0.45)]">
-            We'll make a one-time $5 charge to the card you used at checkout. No subscription.
-          </p>
-        </div>
-      )}
     </div>
   );
 }
@@ -636,6 +590,7 @@ function RevisionTab({
 }) {
   const [notes, setNotes] = useState("");
   const [busy, setBusy] = useState(false);
+  const [submitError, setSubmitError] = useState<string | null>(null);
 
   const remaining = Math.max(0, cap - used);
   const canSubmit = remaining > 0;
@@ -643,6 +598,7 @@ function RevisionTab({
   const submit = async () => {
     if (notes.trim().length < 10 || !canSubmit) return;
     setBusy(true);
+    setSubmitError(null);
     const { error } = await supabase.from("revision_requests").insert({
       order_id: orderId,
       buyer_email: buyerEmail,
@@ -651,7 +607,11 @@ function RevisionTab({
     });
     setBusy(false);
     if (error) {
-      toast.error(error.message);
+      // Backend may reject (e.g. unlimited cap of 10 reached, RLS, etc.).
+      // Surface the error inline — never the scary "you ran out" copy.
+      setSubmitError(
+        "Couldn't send that one through — please try again or message support below.",
+      );
       return;
     }
     setNotes("");
@@ -659,20 +619,39 @@ function RevisionTab({
     await reload();
   };
 
+  // Status copy — keep it positive and concrete.
+  // Free tier: "1 free edit left" / "0 free edits left"
+  // Unlimited: "Unlimited edits included · X used"
+  const remainingLabel = hasUnlimited
+    ? `Unlimited edits · ${used} used`
+    : `${remaining} of ${cap} free edit${cap === 1 ? "" : "s"} left`;
+
   const helper = hasUnlimited
-    ? `Unlimited revisions on this song. ${used} submitted so far.`
-    : "Tell us what to tweak — wording, tempo, voice, anything. We'll re-record it for you, on us.";
+    ? "Tweak as many times as you need — wording, tempo, voice, anything. Our team re-records every revision."
+    : "Tell us what to tweak — wording, tempo, voice, anything. We'll re-record it for you, on us. You get 1 free revision per song.";
 
   return (
     <div className="space-y-6">
+      {/* Always-visible status pill so customers instantly see what they have */}
+      <div className="flex items-center justify-between rounded-2xl border border-[rgba(141,111,175,0.25)] bg-[rgba(141,111,175,0.06)] px-4 py-3">
+        <span className="text-sm font-medium text-[#1F1B16]">Edits on this song</span>
+        <Badge
+          variant="outline"
+          className={
+            hasUnlimited
+              ? "border-[#8D6FAF] bg-[rgba(141,111,175,0.12)] text-[#6B4F8A]"
+              : remaining > 0
+                ? "border-emerald-400 text-emerald-700"
+                : "border-[rgba(31,27,22,0.3)] text-[rgba(31,27,22,0.6)]"
+          }
+        >
+          {remainingLabel}
+        </Badge>
+      </div>
+
       {revisions.length > 0 && (
         <div className="rounded-2xl border border-[rgba(31,27,22,0.12)] bg-[#FBF6EC] p-6">
-          <div className="flex items-center justify-between">
-            <h2 className="font-display text-xl">Your revisions</h2>
-            <Badge variant="outline" className="border-[rgba(31,27,22,0.3)] text-[rgba(31,27,22,0.75)]">
-              {hasUnlimited ? `${used} submitted` : `${used} of ${cap} used`}
-            </Badge>
-          </div>
+          <h2 className="font-display text-xl">Your revisions</h2>
           <div className="mt-4 space-y-4">
             {revisions.map((r) => (
               <div
@@ -712,6 +691,9 @@ function RevisionTab({
             className="mt-3 w-full rounded-xl border border-[rgba(31,27,22,0.2)] bg-white p-3 text-sm text-[#1F1B16] placeholder:text-[rgba(31,27,22,0.4)]"
             rows={6}
           />
+          {submitError && (
+            <p className="mt-2 text-sm text-red-600">{submitError}</p>
+          )}
           <Button
             className="mt-4 bg-[#8D6FAF] text-[#FFF7EE] hover:bg-[#6B4F8A]"
             disabled={notes.trim().length < 10 || busy}
@@ -719,19 +701,15 @@ function RevisionTab({
           >
             {busy ? "Submitting…" : hasUnlimited ? "Submit revision" : "Send to our team — it's free"}
           </Button>
-          {hasUnlimited && (
-            <p className="mt-3 text-xs text-[rgba(31,27,22,0.55)]">
-              Unlimited revisions included with this song.
-            </p>
-          )}
         </div>
       ) : (
         <div className="rounded-2xl border border-[rgba(31,27,22,0.12)] bg-[#FBF6EC] p-6">
-          <h2 className="font-display text-xl">No revisions remaining</h2>
+          <h2 className="font-display text-xl">You've used your free edit</h2>
           <p className="mt-2 text-sm text-[rgba(31,27,22,0.7)]">
-            You've used all {cap} {cap === 1 ? "revision" : "revisions"} for this song. Need more changes?{" "}
+            Need another tweak? Message our team in the Help tab — we're flexible
+            on real fixes. Or{" "}
             <Link to="/create" className="text-[#8D6FAF] underline">
-              Order another song
+              start a new song
             </Link>
             .
           </p>
@@ -825,9 +803,11 @@ function RefundTab({ orderId, buyerEmail, refunds, reload }: any) {
 function RewardsTab({
   reward,
   returningPromos,
+  onOpenReaction,
 }: {
   reward: Reward | null;
   returningPromos: PromoCode[];
+  onOpenReaction: () => void;
 }) {
   const copy = async (code: string) => {
     try {
@@ -839,69 +819,113 @@ function RewardsTab({
   };
 
   const reactionApproved = reward?.status === "approved";
+  const reactionPending = reward?.status === "submitted" || reward?.status === "pending_review";
   const reactionStatus = reward?.status ?? null;
+
+  // Golden Ticket #1 — clickable in three states:
+  //   1. Not submitted yet  → "Upload reaction → unlock 2 free songs" (opens Reaction tab)
+  //   2. Pending review     → status note, no CTA
+  //   3. Approved           → "Use it now → start a free song" (links to /create with reward)
+  const ticket1Cta = !reward
+    ? { label: "Upload reaction → unlock 2 free songs", onClick: onOpenReaction }
+    : reactionApproved
+      ? {
+          label: `Collect your free song → ${reward!.free_songs_remaining} left`,
+          to: "/create" as const,
+          search: { reward: reward!.code },
+        }
+      : null;
 
   return (
     <div className="space-y-5">
       <div className="text-center">
         <h2 className="font-display text-2xl">Two free gifts, just for you</h2>
         <p className="mx-auto mt-1 max-w-md text-sm text-[rgba(31,27,22,0.65)]">
-          Our way of saying thank you. Two golden tickets you can use whenever you'd like.
+          Tap a ticket to use it. They're yours to keep — no expiry pressure.
         </p>
       </div>
 
       <GoldTicket
         icon={<Heart className="h-5 w-5" />}
-        eyebrow="Golden ticket #1"
-        title="Send us their reaction → full refund + 2 free songs"
+        eyebrow="Golden ticket #1 · Reaction reward"
+        title={
+          reactionApproved
+            ? "Approved! You earned a full refund + 2 free songs"
+            : "Send us their reaction → full refund + 2 free songs"
+        }
         body={
           !reward
-            ? "Capture the moment they hear it for the first time, upload it on the Reaction video tab, and once approved we'll refund this order in full and give you 2 free songs to gift to anyone."
+            ? "Film the moment they hear it for the first time. Once we approve it, we refund this order in full AND send you 2 free songs to gift to anyone."
             : reactionApproved
-              ? `Approved! ${reward!.free_songs_remaining} free song${reward!.free_songs_remaining === 1 ? "" : "s"} remaining.`
-              : `Status: ${reactionStatus}. We'll email you as soon as it's reviewed.`
+              ? `Your refund is on the way. Use the code below (or tap the button) to start a free song — ${reward!.free_songs_remaining} remaining.`
+              : reactionPending
+                ? "We're reviewing your reaction video. You'll get an email the moment it's approved (usually within 24h) — then this ticket unlocks instantly."
+                : `Status: ${reactionStatus}. We'll email you as soon as it's reviewed.`
         }
         code={reactionApproved ? reward!.code : null}
         onCopy={reactionApproved ? () => copy(reward!.code) : undefined}
-        ctaLink={
-          reactionApproved
-            ? { to: "/create", search: { reward: reward!.code }, label: "Use it now → start a free song" }
-            : null
-        }
+        cta={ticket1Cta}
       />
 
       {returningPromos.length > 0 ? (
-        returningPromos.map((p, idx) => (
-          <GoldTicket
-            key={p.id}
-            icon={<Ticket className="h-5 w-5" />}
-            eyebrow={returningPromos.length > 1 ? `Golden ticket #${idx + 2}` : "Golden ticket #2"}
-            title={`${p.discount_pct}% off your next song`}
-            body="Saved for the next time someone in your life deserves a song. Works at checkout."
-            code={p.active && p.times_used < p.max_uses ? p.code : null}
-            badge={
-              p.times_used >= p.max_uses
-                ? "Used"
-                : !p.active
-                  ? "Inactive"
-                  : `${p.discount_pct}% off`
-            }
-            onCopy={
-              p.active && p.times_used < p.max_uses ? () => copy(p.code) : undefined
-            }
-          />
-        ))
+        returningPromos.map((p, idx) => {
+          const usable = p.active && p.times_used < p.max_uses;
+          return (
+            <GoldTicket
+              key={p.id}
+              icon={<Ticket className="h-5 w-5" />}
+              eyebrow={
+                returningPromos.length > 1
+                  ? `Golden ticket #${idx + 2} · Loyalty discount`
+                  : "Golden ticket #2 · Loyalty discount"
+              }
+              title={
+                usable
+                  ? `Collect your next song — ${p.discount_pct}% off`
+                  : `${p.discount_pct}% off (used)`
+              }
+              body={
+                usable
+                  ? `Tap below to start a new song with ${p.discount_pct}% off automatically applied at checkout. No code to remember.`
+                  : "You've already redeemed this discount. Order another song any time."
+              }
+              code={usable ? p.code : null}
+              badge={
+                p.times_used >= p.max_uses
+                  ? "Used"
+                  : !p.active
+                    ? "Inactive"
+                    : `${p.discount_pct}% off`
+              }
+              onCopy={usable ? () => copy(p.code) : undefined}
+              cta={
+                usable
+                  ? {
+                      label: `Collect your new song · -${p.discount_pct}%`,
+                      to: "/create" as const,
+                      search: { promo: p.code },
+                    }
+                  : null
+              }
+            />
+          );
+        })
       ) : (
         <GoldTicket
           icon={<Ticket className="h-5 w-5" />}
-          eyebrow="Golden ticket #2"
-          title="A special offer on your next song"
-          body="Once your song is delivered, a personal discount code will appear here for the next time you'd like to send a song."
+          eyebrow="Golden ticket #2 · Loyalty discount"
+          title="A discount on your next song — unlocks at delivery"
+          body="The moment your song lands, a personal discount code appears here. One tap and your next song is cheaper at checkout — automatically."
         />
       )}
     </div>
   );
 }
+
+type GoldTicketCta =
+  | { label: string; onClick: () => void; to?: undefined; search?: undefined }
+  | { label: string; to: "/create"; search?: { reward?: string; promo?: string }; onClick?: undefined }
+  | null;
 
 function GoldTicket({
   icon,
@@ -911,7 +935,7 @@ function GoldTicket({
   code,
   badge,
   onCopy,
-  ctaLink,
+  cta,
 }: {
   icon: ReactNode;
   eyebrow: string;
@@ -920,7 +944,7 @@ function GoldTicket({
   code?: string | null;
   badge?: string;
   onCopy?: () => void;
-  ctaLink?: { to: string; search?: any; label: string } | null;
+  cta?: GoldTicketCta;
 }) {
   return (
     <div className="relative overflow-hidden rounded-2xl border border-[rgba(141,111,175,0.3)] bg-gradient-to-br from-[rgba(141,111,175,0.16)] via-[#FBF6EC] to-[rgba(141,111,175,0.10)] p-6 shadow-[0_0_40px_-20px_rgba(141,111,175,0.4)]">
@@ -960,15 +984,23 @@ function GoldTicket({
             </div>
           )}
 
-          {ctaLink && (
+          {cta && (cta.to ? (
             <Link
-              to={ctaLink.to}
-              search={ctaLink.search}
-              className="mt-3 inline-block text-sm text-[#8D6FAF] underline"
+              to={cta.to}
+              search={cta.search}
+              className="mt-4 inline-flex items-center justify-center rounded-full bg-[#8D6FAF] px-5 py-2.5 text-sm font-semibold text-[#FFF7EE] shadow-sm transition hover:bg-[#6B4F8A]"
             >
-              {ctaLink.label}
+              {cta.label}
             </Link>
-          )}
+          ) : (
+            <button
+              type="button"
+              onClick={cta.onClick}
+              className="mt-4 inline-flex items-center justify-center rounded-full bg-[#8D6FAF] px-5 py-2.5 text-sm font-semibold text-[#FFF7EE] shadow-sm transition hover:bg-[#6B4F8A]"
+            >
+              {cta.label}
+            </button>
+          ))}
         </div>
       </div>
     </div>

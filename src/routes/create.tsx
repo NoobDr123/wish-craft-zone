@@ -29,13 +29,15 @@ import {
   q8Tips,
 } from "@/lib/quizCopy";
 
-type CreateSearch = { reward?: string };
+type CreateSearch = { reward?: string; promo?: string };
 
 export const Route = createFileRoute("/create")({
   component: CreatePage,
   validateSearch: (search: Record<string, unknown>): CreateSearch => {
-    const reward = typeof search.reward === "string" ? search.reward : undefined;
-    return reward ? { reward } : {};
+    const out: CreateSearch = {};
+    if (typeof search.reward === "string") out.reward = search.reward;
+    if (typeof search.promo === "string") out.promo = search.promo;
+    return out;
   },
   head: () => ({
     meta: [
@@ -133,6 +135,18 @@ function CreatePage() {
       });
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [search.reward, user, authLoading]);
+
+  // Stash incoming ?promo=CODE (from Golden Ticket #2) so checkout auto-fills it.
+  useEffect(() => {
+    const promo = search.promo?.trim();
+    if (promo) {
+      try {
+        sessionStorage.setItem("rs_pending_promo", promo);
+      } catch {
+        /* ignore storage failures */
+      }
+    }
+  }, [search.promo]);
 
   // Track quiz_start once per mount
   useEffect(() => {
