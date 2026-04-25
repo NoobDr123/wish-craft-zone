@@ -1533,6 +1533,7 @@ function RefundsPanel() {
     setRows(data ?? []);
   };
   useEffect(() => { load(); }, []);
+  useRealtimeRefresh("refund_requests", () => load());
 
   const update = async (id: string, status: string, notes?: string) => {
     setBusy(id);
@@ -1590,6 +1591,7 @@ function ReactionsPanel() {
     setRows(data ?? []);
   };
   useEffect(() => { load(); }, []);
+  useRealtimeRefresh(["reaction_videos", "reaction_reward_codes"], () => load());
 
   const preview = async (row: any) => {
     if (previews[row.id]) return;
@@ -1700,6 +1702,7 @@ function RevisionsPanel() {
     setRows(data ?? []);
   };
   useEffect(() => { load(); }, []);
+  useRealtimeRefresh("revision_requests", () => load());
   const setStatus = async (id: string, status: string) => {
     await supabase.from("revision_requests").update({ status }).eq("id", id);
     await load();
@@ -1739,6 +1742,7 @@ function SamplesPanel() {
     setSamples(data ?? []);
   };
   useEffect(() => { load(); }, []);
+  useRealtimeRefresh("featured_samples", () => load());
   const togglePublish = async (s: any) => {
     await supabase.from("featured_samples").update({ published: !s.published }).eq("id", s.id);
     load();
