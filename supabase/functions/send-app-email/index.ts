@@ -137,9 +137,106 @@ function render(template: string, d: Record<string, any>) {
       return songDelivered(d);
     case "order_confirmation":
       return orderConfirmation(d);
+    case "reaction-approved":
+      return reactionApproved(d);
+    case "reaction-rejected":
+      return reactionRejected(d);
     default:
       return null;
   }
+}
+
+function reactionApproved(d: Record<string, any>) {
+  const recipient = escape(d.recipient_name ?? "your loved one");
+  const buyer = d.buyer_name ? escape(String(d.buyer_name).split(/\s+/)[0]) : "";
+  const code = escape(d.reward_code ?? "");
+  const freeSongs = Number(d.free_songs ?? 2);
+  const refundCents = Number(d.refund_amount_cents ?? 0);
+  const refundDollars = (refundCents / 100).toFixed(2);
+  const portalUrl = String(d.portal_url ?? "https://ribbonsong.com/dashboard");
+  const createUrl = String(d.create_url ?? `https://ribbonsong.com/create?reward=${code}`);
+
+  const subject = `Your reaction was approved — refund + ${freeSongs} free songs 🎁`;
+  const heading = buyer
+    ? `Thank you, ${buyer}.`
+    : `Thank you for sharing your reaction.`;
+
+  const html = `<!doctype html>
+<html><body style="margin:0;padding:0;background:#ffffff;font-family:'Instrument Sans',Inter,Arial,sans-serif;">
+  <table width="100%" cellpadding="0" cellspacing="0"><tr><td align="center" style="padding:40px 20px;">
+    <table width="560" cellpadding="0" cellspacing="0" style="background:#FBF6EC;padding:40px 28px;max-width:560px;">
+      <tr><td>
+        <p style="font-family:'Fraunces',Georgia,serif;font-size:26px;font-weight:700;color:#1F1B16;margin:0 0 4px;">RibbonSong</p>
+        <p style="font-size:12px;font-weight:500;letter-spacing:0.16em;text-transform:uppercase;color:#8D6FAF;margin:0 0 32px;">Reaction approved</p>
+        <h1 style="font-family:'Fraunces',Georgia,serif;font-size:30px;font-weight:600;line-height:1.15;color:#1F1B16;margin:0 0 16px;">${heading}</h1>
+        <p style="font-size:16px;line-height:1.6;color:#1F1B16;margin:0 0 22px;">
+          We watched your reaction to ${recipient}'s song and it made our day.
+          As promised through our Re-found program, here's what happens now:
+        </p>
+        <ul style="font-size:15px;line-height:1.7;color:#1F1B16;margin:0 0 22px;padding-left:20px;">
+          ${refundCents > 0 ? `<li>We refunded <strong>$${refundDollars}</strong> back to your card. It usually arrives in 5–10 business days.</li>` : ""}
+          <li>You've unlocked <strong>${freeSongs} free songs</strong> on us.</li>
+        </ul>
+        <div style="background:#ffffff;border:1px dashed #8D6FAF;border-radius:14px;padding:20px;text-align:center;margin:0 0 24px;">
+          <p style="font-size:12px;font-weight:600;letter-spacing:0.14em;text-transform:uppercase;color:#8D6FAF;margin:0 0 6px;">Your reward code</p>
+          <p style="font-family:'SF Mono',Menlo,monospace;font-size:24px;font-weight:700;letter-spacing:0.14em;color:#1F1B16;margin:0;">${code}</p>
+        </div>
+        <p style="margin:24px 0;text-align:center;">
+          <a href="${createUrl}" style="background:#8D6FAF;color:#ffffff;font-size:15px;font-weight:600;border-radius:999px;padding:14px 28px;text-decoration:none;display:inline-block;">Create a free song now</a>
+        </p>
+        <p style="font-size:13px;color:#5A5148;text-align:center;margin:0 0 16px;">
+          Or visit your <a href="${portalUrl}" style="color:#8D6FAF;">song portal</a> to see all your rewards.
+        </p>
+        <div style="border-top:1px solid #D9CEB9;margin:32px 0 20px;"></div>
+        <p style="font-size:12px;line-height:1.6;color:#5A5148;margin:8px 0 0;">Sent from RibbonSong — turning love into songs.</p>
+      </td></tr>
+    </table>
+  </td></tr></table>
+</body></html>`;
+
+  const text = `${heading}\n\nWe watched your reaction to ${d.recipient_name}'s song. As promised:\n${refundCents > 0 ? `- We refunded $${refundDollars} to your card.\n` : ""}- You unlocked ${freeSongs} free songs.\n\nYour reward code: ${d.reward_code}\nUse it at ${createUrl}\n\n— RibbonSong`;
+
+  return { subject, html, text };
+}
+
+function reactionRejected(d: Record<string, any>) {
+  const recipient = escape(d.recipient_name ?? "your loved one");
+  const reason = escape(d.reason ?? "");
+  const portalUrl = String(d.portal_url ?? "https://ribbonsong.com/dashboard");
+
+  const subject = `About your reaction video`;
+  const html = `<!doctype html>
+<html><body style="margin:0;padding:0;background:#ffffff;font-family:'Instrument Sans',Inter,Arial,sans-serif;">
+  <table width="100%" cellpadding="0" cellspacing="0"><tr><td align="center" style="padding:40px 20px;">
+    <table width="560" cellpadding="0" cellspacing="0" style="background:#FBF6EC;padding:40px 28px;max-width:560px;">
+      <tr><td>
+        <p style="font-family:'Fraunces',Georgia,serif;font-size:26px;font-weight:700;color:#1F1B16;margin:0 0 4px;">RibbonSong</p>
+        <p style="font-size:12px;font-weight:500;letter-spacing:0.16em;text-transform:uppercase;color:#8D6FAF;margin:0 0 32px;">Re-found program</p>
+        <h1 style="font-family:'Fraunces',Georgia,serif;font-size:28px;font-weight:600;line-height:1.2;color:#1F1B16;margin:0 0 16px;">A note about your reaction video</h1>
+        <p style="font-size:16px;line-height:1.6;color:#1F1B16;margin:0 0 18px;">
+          Thank you for sharing the reaction to ${recipient}'s song. Unfortunately we
+          couldn't approve this submission for the Re-found program.
+        </p>
+        <p style="font-size:15px;line-height:1.6;color:#1F1B16;margin:0 0 18px;background:#ECE2D0;padding:14px 18px;border-radius:8px;">
+          <strong>Reason:</strong> ${reason}
+        </p>
+        <p style="font-size:15px;line-height:1.6;color:#1F1B16;margin:0 0 22px;">
+          You're welcome to upload a new video that captures the moment more clearly.
+          Your song stays yours regardless.
+        </p>
+        <p style="margin:24px 0;text-align:center;">
+          <a href="${portalUrl}" style="background:#8D6FAF;color:#ffffff;font-size:15px;font-weight:600;border-radius:999px;padding:14px 28px;text-decoration:none;display:inline-block;">Upload a new video</a>
+        </p>
+        <div style="border-top:1px solid #D9CEB9;margin:32px 0 20px;"></div>
+        <p style="font-size:12px;line-height:1.6;color:#5A5148;margin:8px 0 0;">Sent from RibbonSong — turning love into songs.</p>
+      </td></tr>
+    </table>
+  </td></tr></table>
+</body></html>`;
+
+  const text = `Thank you for sharing the reaction to ${d.recipient_name}'s song.\n\nUnfortunately we couldn't approve this submission for the Re-found program.\n\nReason: ${d.reason}\n\nYou can upload a new video at ${portalUrl}\n\n— RibbonSong`;
+
+  return { subject, html, text };
 }
 
 function orderConfirmation(d: Record<string, any>) {
