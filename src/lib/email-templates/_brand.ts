@@ -55,7 +55,7 @@ export const styles = {
     textAlign: "center" as const,
   },
   h1: {
-    fontFamily: '"Playfair Display", Georgia, serif',
+    fontFamily: '"Fraunces", "Iowan Old Style", Georgia, serif',
     fontSize: "30px",
     fontWeight: 600 as const,
     lineHeight: "1.15",
