@@ -25,19 +25,17 @@ export const Route = createFileRoute("/")({
   loader: async () => {
     const [heroRes, featuredRes, testimonialRes] = await Promise.all([
       supabase
-        .from("featured_samples")
+        .from("public_featured_samples")
         .select(
           "id,title,quote,for_text,genre_label,cover_image_url,audio_url,lyrics,synced_lyrics,testimonial_slug,recipient_name,relationship",
         )
-        .eq("published", true)
         .eq("id", HERO_SAMPLE_ID)
         .maybeSingle(),
       supabase
-        .from("featured_samples")
+        .from("public_featured_samples")
         .select(
           "id,title,quote,for_text,genre_label,cover_image_url,audio_url,lyrics,synced_lyrics,testimonial_slug,recipient_name,relationship",
         )
-        .eq("published", true)
         .is("testimonial_slug", null)
         .not("audio_url", "is", null)
         // Exclude the current hero song so it doesn't repeat in the grid
@@ -45,9 +43,8 @@ export const Route = createFileRoute("/")({
         .order("sort_order", { ascending: true })
         .limit(6),
       supabase
-        .from("featured_samples")
+        .from("public_featured_samples")
         .select("id,testimonial_slug,audio_url,title")
-        .eq("published", true)
         .not("testimonial_slug", "is", null),
     ]);
     if (heroRes.error) {
@@ -61,7 +58,7 @@ export const Route = createFileRoute("/")({
     }
     const testimonialSongs: Record<string, { id: string; audio_url: string | null; title: string }> = {};
     for (const row of testimonialRes.data ?? []) {
-      if (row.testimonial_slug) {
+      if (row.testimonial_slug && row.id && row.title) {
         testimonialSongs[row.testimonial_slug] = {
           id: row.id,
           audio_url: row.audio_url,

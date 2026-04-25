@@ -1280,9 +1280,9 @@ export type Database = {
           recipient_name: string | null
           relationship: string | null
           sort_order: number | null
-          stage: string | null
-          story_prompt: string | null
+          synced_lyrics: Json | null
           tempo: string | null
+          testimonial_slug: string | null
           title: string | null
           updated_at: string | null
           voice: string | null
@@ -1300,9 +1300,9 @@ export type Database = {
           recipient_name?: string | null
           relationship?: string | null
           sort_order?: number | null
-          stage?: string | null
-          story_prompt?: string | null
+          synced_lyrics?: Json | null
           tempo?: string | null
+          testimonial_slug?: string | null
           title?: string | null
           updated_at?: string | null
           voice?: string | null
@@ -1320,9 +1320,9 @@ export type Database = {
           recipient_name?: string | null
           relationship?: string | null
           sort_order?: number | null
-          stage?: string | null
-          story_prompt?: string | null
+          synced_lyrics?: Json | null
           tempo?: string | null
+          testimonial_slug?: string | null
           title?: string | null
           updated_at?: string | null
           voice?: string | null
