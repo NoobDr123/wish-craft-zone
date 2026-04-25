@@ -2,8 +2,8 @@
 // never share the same login surface — different copy, no "Create your
 // first song" CTA, and the post-auth redirect always points back to /admin.
 
-import { createFileRoute, useNavigate } from "@tanstack/react-router";
-import { useEffect, useState, type FormEvent } from "react";
+import { createFileRoute } from "@tanstack/react-router";
+import { useState, type FormEvent } from "react";
 import { ArrowLeft, Lock, CheckCircle2, Loader2, ShieldCheck } from "lucide-react";
 import { Logo } from "@/components/Logo";
 import { supabase } from "@/integrations/supabase/client";
