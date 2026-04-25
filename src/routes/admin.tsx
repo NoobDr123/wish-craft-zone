@@ -36,6 +36,7 @@ import { AdminMfaEnroll } from "@/components/admin/AdminMfaEnroll";
 import { AdminMfaChallenge } from "@/components/admin/AdminMfaChallenge";
 import { WebhookDebugPanel } from "@/components/admin/WebhookDebugPanel";
 import { supabase } from "@/integrations/supabase/client";
+import { useRealtimeRefresh } from "@/hooks/useRealtimeRefresh";
 
 export const Route = createFileRoute("/admin")({
   component: AdminRoute,
@@ -139,6 +140,13 @@ function StaffPage() {
           <div className="mt-2 flex items-center gap-2">
             <span className="font-display text-sm">Staff</span>
             <Badge variant="outline" className="text-[10px] px-1.5 py-0">2FA</Badge>
+            <span className="ml-auto inline-flex items-center gap-1.5 text-[10px] text-emerald-600 font-medium">
+              <span className="relative flex h-2 w-2">
+                <span className="absolute inline-flex h-full w-full animate-ping rounded-full bg-emerald-500 opacity-75"></span>
+                <span className="relative inline-flex h-2 w-2 rounded-full bg-emerald-500"></span>
+              </span>
+              LIVE
+            </span>
           </div>
         </div>
         <nav className="flex-1 overflow-y-auto py-3">
@@ -310,59 +318,61 @@ function DashboardPanel() {
   const [data, setData] = useState<DashboardData | null>(null);
   const [loading, setLoading] = useState(true);
 
+  const load = async (signal?: { active: boolean }) => {
+    setLoading(true);
+    const start = rangeStart(range);
+    let q = supabase
+      .from("orders")
+      .select("id, amount_paid_cents, amount_cents, payment_status, status, has_3rd_verse, is_rush, has_unlimited_edits, created_at")
+      .not("buyer_email", "like", "pending+%@ribbonsong.com")
+      .order("created_at", { ascending: false })
+      .limit(2000);
+    if (start) q = q.gte("created_at", start.toISOString());
+    const { data: rows } = await q;
+    if (signal && !signal.active) return;
+    const orders = rows ?? [];
+    const paid = orders.filter((o) => o.payment_status === "paid" || o.payment_status === "succeeded");
+    const failed = orders.filter((o) => o.payment_status === "failed");
+    const pending = orders.filter((o) => o.payment_status === "pending");
+    const revenueCents = paid.reduce((s, o) => s + (o.amount_paid_cents ?? 0), 0);
+    const aovCents = paid.length > 0 ? Math.round(revenueCents / paid.length) : 0;
+
+    const byDay: Record<string, { cents: number; orders: number }> = {};
+    for (const o of paid) {
+      const d = new Date(o.created_at).toISOString().slice(0, 10);
+      if (!byDay[d]) byDay[d] = { cents: 0, orders: 0 };
+      byDay[d].cents += o.amount_paid_cents ?? 0;
+      byDay[d].orders += 1;
+    }
+    const dailySales = Object.entries(byDay)
+      .map(([date, v]) => ({ date, cents: v.cents, orders: v.orders }))
+      .sort((a, b) => a.date.localeCompare(b.date));
+
+    setData({
+      revenueCents,
+      orderCount: orders.length,
+      paidCount: paid.length,
+      pendingCount: pending.length,
+      failedCount: failed.length,
+      aovCents,
+      upsellCounts: {
+        extra_verse: paid.filter((o) => o.has_3rd_verse).length,
+        rush_delivery: paid.filter((o) => o.is_rush).length,
+        unlimited_edits: paid.filter((o) => o.has_unlimited_edits).length,
+      },
+      dailySales,
+    });
+    setLoading(false);
+  };
+
   useEffect(() => {
-    let active = true;
-    (async () => {
-      setLoading(true);
-      const start = rangeStart(range);
-      let q = supabase
-        .from("orders")
-        .select("id, amount_paid_cents, amount_cents, payment_status, status, has_3rd_verse, is_rush, has_unlimited_edits, created_at")
-        .not("buyer_email", "like", "pending+%@ribbonsong.com")
-        .order("created_at", { ascending: false })
-        .limit(2000);
-      if (start) q = q.gte("created_at", start.toISOString());
-      const { data: rows } = await q;
-      if (!active) return;
-      const orders = rows ?? [];
-      const paid = orders.filter((o) => o.payment_status === "paid" || o.payment_status === "succeeded");
-      const failed = orders.filter((o) => o.payment_status === "failed");
-      const pending = orders.filter((o) => o.payment_status === "pending");
-      const revenueCents = paid.reduce((s, o) => s + (o.amount_paid_cents ?? 0), 0);
-      const aovCents = paid.length > 0 ? Math.round(revenueCents / paid.length) : 0;
-
-      // Daily sales
-      const byDay: Record<string, { cents: number; orders: number }> = {};
-      for (const o of paid) {
-        const d = new Date(o.created_at).toISOString().slice(0, 10);
-        if (!byDay[d]) byDay[d] = { cents: 0, orders: 0 };
-        byDay[d].cents += o.amount_paid_cents ?? 0;
-        byDay[d].orders += 1;
-      }
-      const dailySales = Object.entries(byDay)
-        .map(([date, v]) => ({ date, cents: v.cents, orders: v.orders }))
-        .sort((a, b) => a.date.localeCompare(b.date));
-
-      setData({
-        revenueCents,
-        orderCount: orders.length,
-        paidCount: paid.length,
-        pendingCount: pending.length,
-        failedCount: failed.length,
-        aovCents,
-        upsellCounts: {
-          extra_verse: paid.filter((o) => o.has_3rd_verse).length,
-          rush_delivery: paid.filter((o) => o.is_rush).length,
-          unlimited_edits: paid.filter((o) => o.has_unlimited_edits).length,
-        },
-        dailySales,
-      });
-      setLoading(false);
-    })();
-    return () => {
-      active = false;
-    };
+    const signal = { active: true };
+    load(signal);
+    return () => { signal.active = false; };
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [range]);
+
+  useRealtimeRefresh("orders", () => load());
 
   if (loading || !data) {
     return (
@@ -515,71 +525,72 @@ function FunnelPanel() {
   const [data, setData] = useState<FunnelData | null>(null);
   const [loading, setLoading] = useState(true);
 
-  useEffect(() => {
-    let active = true;
-    (async () => {
-      setLoading(true);
-      const start = rangeStart(range);
-      let q = supabase
-        .from("quiz_events")
-        .select("session_id, event_type, step_index, time_on_step_ms, created_at")
-        .order("created_at", { ascending: false })
-        .limit(10000);
-      if (start) q = q.gte("created_at", start.toISOString());
-      const { data: events } = await q;
-      if (!active) return;
-      const evts = events ?? [];
+  const load = async (signal?: { active: boolean }) => {
+    setLoading(true);
+    const start = rangeStart(range);
+    let q = supabase
+      .from("quiz_events")
+      .select("session_id, event_type, step_index, time_on_step_ms, created_at")
+      .order("created_at", { ascending: false })
+      .limit(10000);
+    if (start) q = q.gte("created_at", start.toISOString());
+    const { data: events } = await q;
+    if (signal && !signal.active) return;
+    const evts = events ?? [];
 
-      const sessionsByType: Record<string, Set<string>> = {};
-      const totalByType: Record<string, number> = {};
-      for (const e of evts) {
-        if (!sessionsByType[e.event_type]) sessionsByType[e.event_type] = new Set();
-        sessionsByType[e.event_type].add(e.session_id);
-        totalByType[e.event_type] = (totalByType[e.event_type] ?? 0) + 1;
-      }
+    const sessionsByType: Record<string, Set<string>> = {};
+    const totalByType: Record<string, number> = {};
+    for (const e of evts) {
+      if (!sessionsByType[e.event_type]) sessionsByType[e.event_type] = new Set();
+      sessionsByType[e.event_type].add(e.session_id);
+      totalByType[e.event_type] = (totalByType[e.event_type] ?? 0) + 1;
+    }
 
-      // Per-question stats
-      const questionStats: FunnelData["questionStats"] = [];
-      for (let i = 0; i < QUESTION_LABELS.length; i++) {
-        const views = evts.filter((e) => e.event_type === "question_view" && e.step_index === i);
-        const answers = evts.filter((e) => e.event_type === "question_answer" && e.step_index === i);
-        const times = answers.map((a) => a.time_on_step_ms ?? 0).filter((t) => t > 0);
-        const avgTimeMs = times.length > 0 ? times.reduce((s, t) => s + t, 0) / times.length : 0;
-        const nextViews = evts.filter((e) => e.event_type === "question_view" && e.step_index === i + 1);
-        const dropoffPct = views.length > 0 ? Math.max(0, ((views.length - nextViews.length) / views.length) * 100) : 0;
-        questionStats.push({
-          stepIndex: i,
-          views: views.length,
-          answers: answers.length,
-          avgTimeMs,
-          dropoffPct: i === QUESTION_LABELS.length - 1 ? 0 : dropoffPct,
-        });
-      }
-
-      // Avg total quiz time
-      const completes = evts.filter((e) => e.event_type === "quiz_complete" && (e.time_on_step_ms ?? 0) > 0);
-      const avgQuizTimeMs =
-        completes.length > 0
-          ? completes.reduce((s, e) => s + (e.time_on_step_ms ?? 0), 0) / completes.length
-          : 0;
-
-      setData({
-        landerViews: totalByType["lander_view"] ?? 0,
-        uniqueLanderSessions: sessionsByType["lander_view"]?.size ?? 0,
-        quizStarts: sessionsByType["quiz_start"]?.size ?? 0,
-        quizCompletes: sessionsByType["quiz_complete"]?.size ?? 0,
-        checkoutViews: sessionsByType["checkout_view"]?.size ?? 0,
-        paymentSuccesses: sessionsByType["payment_success"]?.size ?? 0,
-        paymentFailures: sessionsByType["payment_failed"]?.size ?? 0,
-        questionStats,
-        avgQuizTimeMs,
+    const questionStats: FunnelData["questionStats"] = [];
+    for (let i = 0; i < QUESTION_LABELS.length; i++) {
+      const views = evts.filter((e) => e.event_type === "question_view" && e.step_index === i);
+      const answers = evts.filter((e) => e.event_type === "question_answer" && e.step_index === i);
+      const times = answers.map((a) => a.time_on_step_ms ?? 0).filter((t) => t > 0);
+      const avgTimeMs = times.length > 0 ? times.reduce((s, t) => s + t, 0) / times.length : 0;
+      const nextViews = evts.filter((e) => e.event_type === "question_view" && e.step_index === i + 1);
+      const dropoffPct = views.length > 0 ? Math.max(0, ((views.length - nextViews.length) / views.length) * 100) : 0;
+      questionStats.push({
+        stepIndex: i,
+        views: views.length,
+        answers: answers.length,
+        avgTimeMs,
+        dropoffPct: i === QUESTION_LABELS.length - 1 ? 0 : dropoffPct,
       });
-      setLoading(false);
-    })();
-    return () => {
-      active = false;
-    };
+    }
+
+    const completes = evts.filter((e) => e.event_type === "quiz_complete" && (e.time_on_step_ms ?? 0) > 0);
+    const avgQuizTimeMs =
+      completes.length > 0
+        ? completes.reduce((s, e) => s + (e.time_on_step_ms ?? 0), 0) / completes.length
+        : 0;
+
+    setData({
+      landerViews: totalByType["lander_view"] ?? 0,
+      uniqueLanderSessions: sessionsByType["lander_view"]?.size ?? 0,
+      quizStarts: sessionsByType["quiz_start"]?.size ?? 0,
+      quizCompletes: sessionsByType["quiz_complete"]?.size ?? 0,
+      checkoutViews: sessionsByType["checkout_view"]?.size ?? 0,
+      paymentSuccesses: sessionsByType["payment_success"]?.size ?? 0,
+      paymentFailures: sessionsByType["payment_failed"]?.size ?? 0,
+      questionStats,
+      avgQuizTimeMs,
+    });
+    setLoading(false);
+  };
+
+  useEffect(() => {
+    const signal = { active: true };
+    load(signal);
+    return () => { signal.active = false; };
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [range]);
+
+  useRealtimeRefresh("quiz_events", () => load(), { debounceMs: 1500 });
 
   if (loading || !data) {
     return (
@@ -715,68 +726,71 @@ function CrmPanel() {
   const [emailLogs, setEmailLogs] = useState<Record<string, any[]>>({});
   const [quizEvents, setQuizEvents] = useState<Record<string, any[]>>({});
 
-  useEffect(() => {
-    let active = true;
-    (async () => {
-      setLoading(true);
-      const { data: orders } = await supabase
-        .from("orders")
-        .select("*")
-        .not("buyer_email", "like", "pending+%@ribbonsong.com")
-        .order("created_at", { ascending: false })
-        .limit(2000);
-      if (!active) return;
+  const load = async (signal?: { active: boolean }) => {
+    setLoading(true);
+    const { data: orders } = await supabase
+      .from("orders")
+      .select("*")
+      .not("buyer_email", "like", "pending+%@ribbonsong.com")
+      .order("created_at", { ascending: false })
+      .limit(2000);
+    if (signal && !signal.active) return;
 
-      const map: Record<string, CrmCustomer> = {};
-      for (const o of orders ?? []) {
-        const email = (o.buyer_email ?? "").toLowerCase();
-        if (!email) continue;
-        if (!map[email]) {
-          map[email] = {
-            email,
-            totalSpentCents: 0,
-            orderCount: 0,
-            lastOrderAt: o.created_at,
-            firstOrderAt: o.created_at,
-            paidCount: 0,
-            pendingCount: 0,
-            failedCount: 0,
-            hasUpsells: false,
-            isGift: false,
-            buyerName: o.buyer_name ?? o.customer_name ?? null,
-            orders: [],
-            emails: [],
-          };
-        }
-        const c = map[email];
-        c.orders.push(o);
-        c.orderCount += 1;
-        if (o.payment_status === "paid" || o.payment_status === "succeeded") {
-          c.paidCount += 1;
-          c.totalSpentCents += o.amount_paid_cents ?? 0;
-        } else if (o.payment_status === "failed") {
-          c.failedCount += 1;
-        } else {
-          c.pendingCount += 1;
-        }
-        if (o.has_3rd_verse || o.is_rush || o.has_unlimited_edits) c.hasUpsells = true;
-        if (o.is_gift) c.isGift = true;
-        if (o.created_at > c.lastOrderAt) c.lastOrderAt = o.created_at;
-        if (o.created_at < c.firstOrderAt) c.firstOrderAt = o.created_at;
-        if (!c.buyerName && (o.buyer_name || o.customer_name)) {
-          c.buyerName = o.buyer_name ?? o.customer_name;
-        }
+    const map: Record<string, CrmCustomer> = {};
+    for (const o of orders ?? []) {
+      const email = (o.buyer_email ?? "").toLowerCase();
+      if (!email) continue;
+      if (!map[email]) {
+        map[email] = {
+          email,
+          totalSpentCents: 0,
+          orderCount: 0,
+          lastOrderAt: o.created_at,
+          firstOrderAt: o.created_at,
+          paidCount: 0,
+          pendingCount: 0,
+          failedCount: 0,
+          hasUpsells: false,
+          isGift: false,
+          buyerName: o.buyer_name ?? o.customer_name ?? null,
+          orders: [],
+          emails: [],
+        };
       }
+      const c = map[email];
+      c.orders.push(o);
+      c.orderCount += 1;
+      if (o.payment_status === "paid" || o.payment_status === "succeeded") {
+        c.paidCount += 1;
+        c.totalSpentCents += o.amount_paid_cents ?? 0;
+      } else if (o.payment_status === "failed") {
+        c.failedCount += 1;
+      } else {
+        c.pendingCount += 1;
+      }
+      if (o.has_3rd_verse || o.is_rush || o.has_unlimited_edits) c.hasUpsells = true;
+      if (o.is_gift) c.isGift = true;
+      if (o.created_at > c.lastOrderAt) c.lastOrderAt = o.created_at;
+      if (o.created_at < c.firstOrderAt) c.firstOrderAt = o.created_at;
+      if (!c.buyerName && (o.buyer_name || o.customer_name)) {
+        c.buyerName = o.buyer_name ?? o.customer_name;
+      }
+    }
 
-      setCustomers(
-        Object.values(map).sort((a, b) => b.totalSpentCents - a.totalSpentCents),
-      );
-      setLoading(false);
-    })();
-    return () => {
-      active = false;
-    };
+    setCustomers(
+      Object.values(map).sort((a, b) => b.totalSpentCents - a.totalSpentCents),
+    );
+    setLoading(false);
+  };
+
+  useEffect(() => {
+    const signal = { active: true };
+    load(signal);
+    return () => { signal.active = false; };
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
+
+  useRealtimeRefresh("orders", () => load());
 
   const filtered = customers.filter((c) => {
     if (!search) return true;
@@ -1022,32 +1036,35 @@ function UpsellsPanel() {
   const [range, setRange] = useState<Range>("30d");
   const [data, setData] = useState<{ events: any[]; orders: any[] } | null>(null);
 
+  const load = async (signal?: { active: boolean }) => {
+    const start = rangeStart(range);
+    let eq = supabase
+      .from("quiz_events")
+      .select("event_type, upsell_type, amount_cents, created_at, session_id")
+      .in("event_type", ["upsell_view", "upsell_accept", "upsell_decline"])
+      .order("created_at", { ascending: false })
+      .limit(5000);
+    if (start) eq = eq.gte("created_at", start.toISOString());
+    let oq = supabase
+      .from("orders")
+      .select("has_3rd_verse, is_rush, has_unlimited_edits, payment_status, created_at")
+      .not("buyer_email", "like", "pending+%@ribbonsong.com")
+      .order("created_at", { ascending: false })
+      .limit(2000);
+    if (start) oq = oq.gte("created_at", start.toISOString());
+    const [{ data: events }, { data: orders }] = await Promise.all([eq, oq]);
+    if (signal && !signal.active) return;
+    setData({ events: events ?? [], orders: orders ?? [] });
+  };
+
   useEffect(() => {
-    let active = true;
-    (async () => {
-      const start = rangeStart(range);
-      let eq = supabase
-        .from("quiz_events")
-        .select("event_type, upsell_type, amount_cents, created_at, session_id")
-        .in("event_type", ["upsell_view", "upsell_accept", "upsell_decline"])
-        .order("created_at", { ascending: false })
-        .limit(5000);
-      if (start) eq = eq.gte("created_at", start.toISOString());
-      let oq = supabase
-        .from("orders")
-        .select("has_3rd_verse, is_rush, has_unlimited_edits, payment_status, created_at")
-        .not("buyer_email", "like", "pending+%@ribbonsong.com")
-        .order("created_at", { ascending: false })
-        .limit(2000);
-      if (start) oq = oq.gte("created_at", start.toISOString());
-      const [{ data: events }, { data: orders }] = await Promise.all([eq, oq]);
-      if (!active) return;
-      setData({ events: events ?? [], orders: orders ?? [] });
-    })();
-    return () => {
-      active = false;
-    };
+    const signal = { active: true };
+    load(signal);
+    return () => { signal.active = false; };
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [range]);
+
+  useRealtimeRefresh(["quiz_events", "orders"], () => load(), { debounceMs: 1500 });
 
   if (!data) return <div className="text-muted-foreground">Loading…</div>;
 
@@ -1151,6 +1168,7 @@ function OrdersPanel() {
   const [filter, setFilter] = useState<"all" | "flagged" | "in_progress" | "paid" | "failed">("all");
 
   useEffect(() => { load(); }, [filter]);
+  useRealtimeRefresh("orders", () => load());
 
   const load = async () => {
     let q = supabase
@@ -1283,30 +1301,35 @@ function EmailsPanel() {
   const [statusFilter, setStatusFilter] = useState<string>("all");
   const [search, setSearch] = useState("");
 
+  const load = async (signal?: { active: boolean }) => {
+    setLoading(true);
+    let q = supabase
+      .from("email_send_log")
+      .select("id, message_id, template_name, recipient_email, status, error_message, created_at, metadata")
+      .order("created_at", { ascending: false })
+      .limit(2000);
+    const start = rangeStart(range);
+    if (start) q = q.gte("created_at", start.toISOString());
+    const { data } = await q;
+    const { data: sup } = await supabase
+      .from("suppressed_emails")
+      .select("id, email, reason, created_at")
+      .order("created_at", { ascending: false })
+      .limit(500);
+    if (signal && !signal.active) return;
+    setRows((data ?? []) as EmailRow[]);
+    setSuppressed((sup ?? []) as any);
+    setLoading(false);
+  };
+
   useEffect(() => {
-    let active = true;
-    (async () => {
-      setLoading(true);
-      let q = supabase
-        .from("email_send_log")
-        .select("id, message_id, template_name, recipient_email, status, error_message, created_at, metadata")
-        .order("created_at", { ascending: false })
-        .limit(2000);
-      const start = rangeStart(range);
-      if (start) q = q.gte("created_at", start.toISOString());
-      const { data } = await q;
-      const { data: sup } = await supabase
-        .from("suppressed_emails")
-        .select("id, email, reason, created_at")
-        .order("created_at", { ascending: false })
-        .limit(500);
-      if (!active) return;
-      setRows((data ?? []) as EmailRow[]);
-      setSuppressed((sup ?? []) as any);
-      setLoading(false);
-    })();
-    return () => { active = false; };
+    const signal = { active: true };
+    load(signal);
+    return () => { signal.active = false; };
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [range]);
+
+  useRealtimeRefresh(["email_send_log", "suppressed_emails"], () => load(), { debounceMs: 1000 });
 
   // Dedupe to latest status per message_id
   const deduped = (() => {
@@ -1510,6 +1533,7 @@ function RefundsPanel() {
     setRows(data ?? []);
   };
   useEffect(() => { load(); }, []);
+  useRealtimeRefresh("refund_requests", () => load());
 
   const update = async (id: string, status: string, notes?: string) => {
     setBusy(id);
@@ -1567,6 +1591,7 @@ function ReactionsPanel() {
     setRows(data ?? []);
   };
   useEffect(() => { load(); }, []);
+  useRealtimeRefresh(["reaction_videos", "reaction_reward_codes"], () => load());
 
   const preview = async (row: any) => {
     if (previews[row.id]) return;
@@ -1677,6 +1702,7 @@ function RevisionsPanel() {
     setRows(data ?? []);
   };
   useEffect(() => { load(); }, []);
+  useRealtimeRefresh("revision_requests", () => load());
   const setStatus = async (id: string, status: string) => {
     await supabase.from("revision_requests").update({ status }).eq("id", id);
     await load();
@@ -1716,6 +1742,7 @@ function SamplesPanel() {
     setSamples(data ?? []);
   };
   useEffect(() => { load(); }, []);
+  useRealtimeRefresh("featured_samples", () => load());
   const togglePublish = async (s: any) => {
     await supabase.from("featured_samples").update({ published: !s.published }).eq("id", s.id);
     load();
@@ -1784,11 +1811,13 @@ function SupportPanel() {
 
   useEffect(() => {
     loadThreads();
-    // poll for new messages every 20s
-    const t = setInterval(loadThreads, 20000);
-    return () => clearInterval(t);
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [filter]);
+
+  useRealtimeRefresh(["support_threads", "support_messages"], () => {
+    loadThreads();
+    if (selectedId) loadMessages(selectedId);
+  }, { debounceMs: 500 });
 
   useEffect(() => {
     if (selectedId) {
