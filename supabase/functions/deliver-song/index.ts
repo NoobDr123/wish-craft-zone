@@ -68,6 +68,7 @@ serve(async (req) => {
               listen_url: listenUrl,
               personal_note: order.personal_note ?? null,
               role: t.role,
+              delivery_tier: order.delivery_tier ?? "standard",
             },
           }),
         });

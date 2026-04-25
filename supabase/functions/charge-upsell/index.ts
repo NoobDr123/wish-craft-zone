@@ -8,12 +8,23 @@ const supabase = createClient(
 );
 
 // Upsell catalog. Server is the source of truth — never trust client amounts.
-const UPSELL_PRICES: Record<string, { amount: number; flagColumn: string | null }> = {
+// `tier` (when present) upgrades the order's delivery_tier. rush_24h beats
+// express_48h; we never downgrade.
+const UPSELL_PRICES: Record<
+  string,
+  { amount: number; flagColumn: string | null; tier?: "rush_24h" | "express_48h" }
+> = {
   extra_verse: { amount: 1999, flagColumn: "has_3rd_verse" },
-  rush_delivery: { amount: 2999, flagColumn: "is_rush" },
+  rush_delivery: { amount: 2999, flagColumn: "is_rush", tier: "rush_24h" },
   unlimited_edits: { amount: 3299, flagColumn: "has_unlimited_edits" },
   // Downsell after declining the 24h rush — 48h delivery for $19.99.
-  delivery_48h: { amount: 1999, flagColumn: "is_rush" },
+  delivery_48h: { amount: 1999, flagColumn: "is_rush", tier: "express_48h" },
+};
+
+const TIER_RANK: Record<string, number> = {
+  standard: 0,
+  express_48h: 1,
+  rush_24h: 2,
 };
 
 serve(async (req) => {
@@ -43,7 +54,7 @@ serve(async (req) => {
     const { data: order, error } = await supabase
       .from("orders")
       .select(
-        "user_id, buyer_email, status, stripe_customer_id, stripe_payment_method_id, stripe_checkout_session_id, product_config",
+        "user_id, buyer_email, status, stripe_customer_id, stripe_payment_method_id, stripe_checkout_session_id, product_config, delivery_tier",
       )
       .eq("id", orderId)
       .single();
@@ -98,6 +109,14 @@ serve(async (req) => {
         productConfig[upsellType] = true;
         const updates: Record<string, unknown> = { product_config: productConfig };
         if (upsell.flagColumn) updates[upsell.flagColumn] = true;
+
+        // Upgrade delivery_tier only if the new tier outranks the current one.
+        if (upsell.tier) {
+          const currentRank = TIER_RANK[(order.delivery_tier as string) ?? "standard"] ?? 0;
+          const newRank = TIER_RANK[upsell.tier] ?? 0;
+          if (newRank > currentRank) updates.delivery_tier = upsell.tier;
+        }
+
         await supabase.from("orders").update(updates).eq("id", orderId);
 
         return json({ success: true });

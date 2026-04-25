@@ -87,19 +87,20 @@ serve(async (req) => {
     // 1 variant (per spec). Pick first with audio.
     const chosen = validVariants[0];
 
-    // Compute scheduled delivery: respect gift delivery_date; otherwise
-    // priority => same day ASAP; otherwise next day.
+    // Compute scheduled delivery based on tier (under-promise / over-deliver):
+    //   standard    => 24h after song is ready (promised 5 days on landing)
+    //   express_48h => 12h (promised 48h)
+    //   rush_24h    => 7h  (promised 24h)
+    // (Gift delivery_date branching removed for now — will revisit later.)
     const now = new Date();
-    let scheduled: Date;
-    if (order.is_gift && order.delivery_date) {
-      const giftDate = new Date(order.delivery_date);
-      scheduled = giftDate > now ? giftDate : now;
-    } else if (order.priority === "priority" || order.is_rush) {
-      scheduled = now; // ASAP
-    } else {
-      // Standard: next day
-      scheduled = new Date(now.getTime() + 24 * 60 * 60 * 1000);
-    }
+    const tierDelayHours: Record<string, number> = {
+      standard: 24,
+      express_48h: 12,
+      rush_24h: 7,
+    };
+    const tier = (order.delivery_tier as string) || (order.is_rush ? "rush_24h" : "standard");
+    const delayHours = tierDelayHours[tier] ?? 24;
+    const scheduled = new Date(now.getTime() + delayHours * 60 * 60 * 1000);
 
     const slug = order.share_page_slug ?? finalOrderId;
 
@@ -119,6 +120,8 @@ serve(async (req) => {
     await logEvent(finalOrderId, "ready_to_deliver", {
       scheduled_delivery_at: scheduled.toISOString(),
       variant_id: chosen.id,
+      delivery_tier: tier,
+      delay_hours: delayHours,
     });
 
     // If scheduled is now or past, enqueue immediately

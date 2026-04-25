@@ -115,7 +115,13 @@ async function handlePaymentSucceeded(pi: any) {
       extra_verse: "has_3rd_verse",
       rush_delivery: "is_rush",
       unlimited_edits: "has_unlimited_edits",
+      delivery_48h: "is_rush",
     };
+    const tierMap: Record<string, "rush_24h" | "express_48h" | undefined> = {
+      rush_delivery: "rush_24h",
+      delivery_48h: "express_48h",
+    };
+    const tierRank: Record<string, number> = { standard: 0, express_48h: 1, rush_24h: 2 };
     const flagColumn = flagMap[upsellType];
     if (!flagColumn) {
       console.warn("Unknown upsellType:", upsellType);
@@ -124,22 +130,28 @@ async function handlePaymentSucceeded(pi: any) {
 
     const { data: order } = await supabase
       .from("orders")
-      .select("product_config, amount_paid_cents")
+      .select("product_config, amount_paid_cents, delivery_tier")
       .eq("id", orderId)
       .single();
 
     const productConfig = (order?.product_config as Record<string, boolean>) || {};
     productConfig[upsellType] = true;
 
-    await supabase
-      .from("orders")
-      .update({
-        [flagColumn]: true,
-        product_config: productConfig,
-        amount_paid_cents:
-          (order?.amount_paid_cents ?? 0) + (pi.amount_received ?? pi.amount ?? 0),
-      })
-      .eq("id", orderId);
+    const updates: Record<string, unknown> = {
+      [flagColumn]: true,
+      product_config: productConfig,
+      amount_paid_cents:
+        (order?.amount_paid_cents ?? 0) + (pi.amount_received ?? pi.amount ?? 0),
+    };
+
+    const newTier = tierMap[upsellType];
+    if (newTier) {
+      const currentRank = tierRank[(order?.delivery_tier as string) ?? "standard"] ?? 0;
+      const newRank = tierRank[newTier] ?? 0;
+      if (newRank > currentRank) updates.delivery_tier = newTier;
+    }
+
+    await supabase.from("orders").update(updates).eq("id", orderId);
 
     await supabase.from("job_events").insert({
       order_id: orderId,

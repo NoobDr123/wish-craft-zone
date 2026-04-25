@@ -367,6 +367,7 @@ export type Database = {
           customer_name: string | null
           delivered_at: string | null
           delivery_date: string | null
+          delivery_tier: string
           discount_cents: number
           flag_reason: string | null
           flagged_for_review: boolean
@@ -424,6 +425,7 @@ export type Database = {
           customer_name?: string | null
           delivered_at?: string | null
           delivery_date?: string | null
+          delivery_tier?: string
           discount_cents?: number
           flag_reason?: string | null
           flagged_for_review?: boolean
@@ -481,6 +483,7 @@ export type Database = {
           customer_name?: string | null
           delivered_at?: string | null
           delivery_date?: string | null
+          delivery_tier?: string
           discount_cents?: number
           flag_reason?: string | null
           flagged_for_review?: boolean
