@@ -306,7 +306,7 @@ function InnerForm({ returnUrl, paymentIntentId, email, amountLabel, amountCents
           onConfirm={handleExpressConfirm}
           options={{
             buttonHeight: 48,
-            paymentMethods: { applePay: "never", googlePay: "never", link: "always" },
+            paymentMethods: { applePay: "never", googlePay: "never", link: "auto" },
             layout: {
               maxColumns: 1,
               maxRows: 0,
