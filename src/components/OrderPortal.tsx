@@ -314,9 +314,6 @@ function VariantSwitcher({
   otherVariant: Variant | undefined;
   onChange: () => Promise<void>;
 }) {
-  const [unlocking, setUnlocking] = useState(false);
-
-  const hasSavedCard = !!order.stripe_payment_method_id;
   const unlocked = !!order.second_variant_unlocked_at;
 
   const select = async (variantId: string) => {
@@ -332,30 +329,10 @@ function VariantSwitcher({
     await onChange();
   };
 
-  const unlock = async () => {
-    if (!hasSavedCard) {
-      toast.error("No saved card — contact support to unlock the second take.");
-      return;
-    }
-    setUnlocking(true);
-    try {
-      const { data, error } = await supabase.functions.invoke("unlock-second-variant", {
-        body: { orderId: order.id },
-      });
-      if (error || (data as any)?.error) {
-        toast.error((data as any)?.error ?? error?.message ?? "Unlock failed");
-        return;
-      }
-      toast.success("Second take unlocked");
-      await onChange();
-    } catch (e: any) {
-      toast.error(e?.message ?? "Unlock failed");
-    } finally {
-      setUnlocking(false);
-    }
-  };
-
-  if (variants.length < 2 && !otherVariant) return null;
+  // Only render when there's actually a second variant unlocked. The old
+  // "$5 unlock" upsell card has been removed — second versions now ship
+  // bundled with the upsell flow, so there's nothing to upsell here.
+  if (!unlocked || variants.length < 2 || !otherVariant) return null;
 
   return (
     <div className="mt-6 rounded-2xl border border-[rgba(31,27,22,0.12)] bg-[#FBF6EC] p-4">
@@ -363,17 +340,13 @@ function VariantSwitcher({
         <p className="text-xs uppercase tracking-wider text-[rgba(31,27,22,0.55)]">
           Two versions of your song
         </p>
-        {unlocked && (
-          <span className="text-xs text-[rgba(31,27,22,0.55)]">Tap to switch</span>
-        )}
+        <span className="text-xs text-[rgba(31,27,22,0.55)]">Tap to switch</span>
       </div>
       <div className="mt-3 grid grid-cols-2 gap-2">
         {[0, 1].map((i) => {
           const v = variants[i];
-          const isFirst = i === 0;
-          const isLockedSecond = !isFirst && !unlocked;
           const active = v && v.id === selectedVariant?.id;
-          const playable = !!v?.audio_url && (isFirst || unlocked);
+          const playable = !!v?.audio_url;
           return (
             <button
               key={v?.id || `slot-${i}`}
@@ -382,46 +355,18 @@ function VariantSwitcher({
               className={`flex items-center justify-between rounded-xl border px-4 py-3 text-sm transition ${
                 active
                   ? "border-[#8D6FAF] bg-[rgba(141,111,175,0.12)] text-[#1F1B16]"
-                  : isLockedSecond
-                    ? "border-[rgba(31,27,22,0.12)] bg-[rgba(31,27,22,0.02)] text-[rgba(31,27,22,0.45)]"
-                    : "border-[rgba(31,27,22,0.15)] bg-transparent text-[rgba(31,27,22,0.7)] hover:border-[rgba(31,27,22,0.3)]"
-              } ${!playable && !isLockedSecond ? "opacity-50 cursor-not-allowed" : ""} ${isLockedSecond ? "cursor-not-allowed" : ""}`}
+                  : "border-[rgba(31,27,22,0.15)] bg-transparent text-[rgba(31,27,22,0.7)] hover:border-[rgba(31,27,22,0.3)]"
+              } ${!playable ? "opacity-50 cursor-not-allowed" : ""}`}
             >
               <span className="flex items-center gap-2">
                 <Music className="h-3.5 w-3.5" />
                 Version {i + 1}
               </span>
               {active && <Check className="h-4 w-4" />}
-              {isLockedSecond && <Lock className="h-3.5 w-3.5" />}
             </button>
           );
         })}
       </div>
-
-      {!unlocked && (
-        <div className="mt-4 rounded-xl border border-[rgba(141,111,175,0.25)] bg-[rgba(141,111,175,0.06)] p-4">
-          <div className="flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between">
-            <div>
-              <p className="text-sm font-medium text-[#8D6FAF]">
-                Hear it sung a different way
-              </p>
-              <p className="mt-0.5 text-xs text-[rgba(31,27,22,0.7)]">
-                Same heartfelt lyrics — a fresh voice and feel. Many people end up loving the second one more.
-              </p>
-            </div>
-            <Button
-              onClick={unlock}
-              disabled={unlocking || !hasSavedCard}
-              className="bg-[#8D6FAF] text-[#FFF7EE] hover:bg-[#6B4F8A] whitespace-nowrap"
-            >
-              {unlocking ? "Unlocking…" : hasSavedCard ? "Unlock for $5" : "No saved card"}
-            </Button>
-          </div>
-          <p className="mt-2 text-[10px] leading-relaxed text-[rgba(31,27,22,0.45)]">
-            We'll make a one-time $5 charge to the card you used at checkout. No subscription.
-          </p>
-        </div>
-      )}
     </div>
   );
 }
