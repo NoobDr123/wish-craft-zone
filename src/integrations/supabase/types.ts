@@ -1367,6 +1367,13 @@ export type Database = {
       }
     }
     Functions: {
+      admin_force_deliver_ready_orders: {
+        Args: never
+        Returns: {
+          enqueued_msg_id: number
+          order_id: string
+        }[]
+      }
       claim_my_guest_orders: { Args: never; Returns: number }
       delete_email: {
         Args: { message_id: number; queue_name: string }
