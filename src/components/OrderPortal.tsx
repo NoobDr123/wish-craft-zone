@@ -1042,12 +1042,6 @@ function QuickActions({
     accent?: boolean;
   }> = [
     {
-      icon: <Pencil className="h-6 w-6" />,
-      title: "Change something",
-      sub: "Tweak lyrics, tempo, voice — free",
-      onClick: onEdit,
-    },
-    {
       icon: <Video className="h-6 w-6" />,
       title: "Send their reaction",
       sub: "Get your money back + 2 free songs",
