@@ -320,6 +320,7 @@ function DashboardPanel() {
       let q = supabase
         .from("orders")
         .select("id, amount_paid_cents, amount_cents, payment_status, status, has_3rd_verse, is_rush, has_unlimited_edits, created_at")
+        .not("buyer_email", "like", "pending+%@ribbonsong.com")
         .order("created_at", { ascending: false })
         .limit(2000);
       if (start) q = q.gte("created_at", start.toISOString());
@@ -723,6 +724,7 @@ function CrmPanel() {
       const { data: orders } = await supabase
         .from("orders")
         .select("*")
+        .not("buyer_email", "like", "pending+%@ribbonsong.com")
         .order("created_at", { ascending: false })
         .limit(2000);
       if (!active) return;
@@ -1036,6 +1038,7 @@ function UpsellsPanel() {
       let oq = supabase
         .from("orders")
         .select("has_3rd_verse, is_rush, has_unlimited_edits, payment_status, created_at")
+        .not("buyer_email", "like", "pending+%@ribbonsong.com")
         .order("created_at", { ascending: false })
         .limit(2000);
       if (start) oq = oq.gte("created_at", start.toISOString());
@@ -1155,6 +1158,7 @@ function OrdersPanel() {
     let q = supabase
       .from("orders")
       .select("id, recipient_name, buyer_email, status, priority, flagged_for_review, flag_reason, created_at, scheduled_delivery_at, delivered_at, is_gift, brief_score, amount_paid_cents, payment_status")
+      .not("buyer_email", "like", "pending+%@ribbonsong.com")
       .order("created_at", { ascending: false })
       .limit(200);
     if (filter === "flagged") q = q.eq("flagged_for_review", true);
