@@ -518,6 +518,7 @@ function CheckoutPage() {
               <CustomPaymentForm
                 key={paymentIntentId}
                 clientSecret={clientSecret}
+                paymentIntentId={paymentIntentId}
                 email={email.trim().toLowerCase()}
                 amountLabel={
                   promoApplied
