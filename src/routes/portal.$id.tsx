@@ -232,11 +232,12 @@ function PortalSong() {
               )}
             </div>
 
-            {/* Share + regenerate quick actions */}
-            <ActionsRow
-              order={order}
+            {/* Share + download */}
+            <ShareSection
+              audioUrl={selectedVariant?.audio_url}
+              title={title}
+              recipientName={order.recipient_name}
               sharePath={sharePath}
-              onRegenerated={load}
             />
 
             {/* Tabs */}
