@@ -1657,31 +1657,3 @@ function SamplesPanel() {
   );
 }
 
-function IpAllowlistPanel() {
-  const [rows, setRows] = useState<any[]>([]);
-  const load = async () => {
-    const { data } = await supabase.from("admin_ip_allowlist").select("*").order("created_at", { ascending: false });
-    setRows(data ?? []);
-  };
-  useEffect(() => { load(); }, []);
-  return (
-    <>
-      <h1 className="mb-6 font-display text-3xl font-semibold">IP allowlist</h1>
-      <div className="rounded-2xl border border-border bg-card overflow-hidden">
-        <table className="w-full text-sm">
-          <thead className="bg-muted/30 text-left"><tr><th className="p-3">IP</th><th className="p-3">Label</th><th className="p-3">Notes</th><th className="p-3">Added</th></tr></thead>
-          <tbody>
-            {rows.map((r) => (
-              <tr key={r.id} className="border-t border-border/40">
-                <td className="p-3 font-mono">{r.ip_address}</td>
-                <td className="p-3">{r.label}</td>
-                <td className="p-3 text-xs text-muted-foreground">{r.notes}</td>
-                <td className="p-3 text-xs">{new Date(r.created_at).toLocaleDateString()}</td>
-              </tr>
-            ))}
-          </tbody>
-        </table>
-      </div>
-    </>
-  );
-}
