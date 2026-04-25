@@ -7,6 +7,7 @@ interface AudioPlayerProps {
   artist?: string;
   variant?: "compact" | "full";
   lyrics?: string;
+  onFirstPlay?: () => void;
 }
 
 function formatTime(time: number) {
@@ -22,11 +23,13 @@ export function AudioPlayer({
   artist,
   variant = "compact",
   lyrics,
+  onFirstPlay,
 }: AudioPlayerProps) {
   const audioRef = useRef<HTMLAudioElement | null>(null);
   const [isPlaying, setIsPlaying] = useState(false);
   const [currentTime, setCurrentTime] = useState(0);
   const [duration, setDuration] = useState(0);
+  const firstPlayFiredRef = useRef(false);
 
   useEffect(() => {
     const audio = audioRef.current;
@@ -53,6 +56,10 @@ export function AudioPlayer({
     } else {
       audio.play().catch(() => undefined);
       setIsPlaying(true);
+      if (!firstPlayFiredRef.current) {
+        firstPlayFiredRef.current = true;
+        onFirstPlay?.();
+      }
     }
   };
 
