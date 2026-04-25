@@ -63,6 +63,28 @@ function InnerForm({ returnUrl, email, amountLabel, amountCents, promoVersion, o
   const [errorMsg, setErrorMsg] = useState<string | null>(null);
   const [walletReady, setWalletReady] = useState(false);
 
+  // Fire Meta Pixel InitiateCheckout exactly once when the payment form
+  // mounts. This is the standard funnel signal Meta uses to optimize ad
+  // delivery — without it, ads spend less efficiently.
+  useEffect(() => {
+    try {
+      const fbq = (window as any).fbq;
+      if (typeof fbq !== "function") return;
+      if (sessionStorage.getItem("rs_px_initcheckout_fired")) return;
+      fbq("track", "InitiateCheckout", {
+        value: Number((amountCents / 100).toFixed(2)),
+        currency: "USD",
+        content_type: "product",
+        content_name: "RibbonSong Personalized Song",
+      });
+      sessionStorage.setItem("rs_px_initcheckout_fired", "true");
+    } catch {
+      /* never block checkout on pixel failures */
+    }
+    // Only fire once per session — amountCents change after promo doesn't re-fire.
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, []);
+
   // When the server-side PaymentIntent amount changes (promo applied),
   // pull the updated amount into Elements so the Apple/Google Pay sheet
   // and PaymentElement reflect the new total.
