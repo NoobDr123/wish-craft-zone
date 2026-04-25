@@ -135,16 +135,21 @@ export function OrderPortal({ orderId, userId }: { orderId: string; userId: stri
   const lyrics = (order.brief as any)?.lyrics ?? "";
   const tags = `${order.genre ?? "Acoustic"} · ${order.tempo ?? "Mid-tempo"}`;
   const delivered = order.status === "delivered" && !!selectedVariant?.audio_url;
-  const sharePath = order.share_page_slug ? `/listen/${order.share_page_slug}` : null;
+  // Always provide a shareable URL — fall back to the order id when the
+  // optional pretty slug isn't set yet. The /listen/$id route accepts both.
+  const sharePath = `/listen/${order.share_page_slug ?? order.id}`;
 
-  const revisionCap = order.has_unlimited_edits ? 15 : 1;
+  // Edits cap: free orders get 1 free edit. Unlimited orders are capped at
+  // 10 to protect us from runaway abuse — when they hit the cap the backend
+  // will reject and we surface the error inline (no scary "ran out" copy).
+  const revisionCap = order.has_unlimited_edits ? 10 : 1;
   const revisionsUsed = revisions.length;
 
   const tabs: Array<[typeof tab, string]> = [
-    ["player", "Lyrics"],
-    ["reaction", "Reaction video"],
-    ["refund", "Contact support"],
+    ["player", "Lyrics & edits"],
+    ["reaction", "Reaction"],
     ["rewards", "Free gifts"],
+    ["refund", "Help"],
   ];
 
   return (
