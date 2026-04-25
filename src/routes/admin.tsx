@@ -1038,6 +1038,7 @@ function UpsellsPanel() {
       let oq = supabase
         .from("orders")
         .select("has_3rd_verse, is_rush, has_unlimited_edits, payment_status, created_at")
+        .not("buyer_email", "like", "pending+%@ribbonsong.com")
         .order("created_at", { ascending: false })
         .limit(2000);
       if (start) oq = oq.gte("created_at", start.toISOString());
