@@ -2,6 +2,7 @@ import { useEffect, useMemo, useRef, useState } from "react";
 import { createFileRoute, Link, useNavigate, useSearch } from "@tanstack/react-router";
 import { QuizShell } from "@/components/QuizShell";
 import {
+  EmailInput,
   ListSelect,
   PillSelect,
   Question,
