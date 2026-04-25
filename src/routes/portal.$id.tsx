@@ -719,7 +719,7 @@ function RevisionTab({
           <div className="flex items-center justify-between">
             <h2 className="font-display text-xl">Your revisions</h2>
             <Badge variant="outline" className="border-[rgba(246,240,230,0.3)] text-[rgba(246,240,230,0.75)]">
-              {used} of {cap} used
+              {hasUnlimited ? `${used} submitted` : `${used} of ${cap} used`}
             </Badge>
           </div>
           <div className="mt-4 space-y-4">
