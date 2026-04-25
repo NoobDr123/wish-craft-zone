@@ -206,7 +206,7 @@ export const useQuizStore = create<QuizState>()(
       set: (key, value) => set({ [key]: value } as Partial<QuizState>),
       reset: () => set({ ...initial, orderId: undefined, reward_code: undefined }),
     }),
-    { name: "ribbonsong-quiz-v3" },
+    { name: "ribbonsong-quiz-v3", storage: createJSONStorage(() => ttlStorage) },
   ),
 );
 
