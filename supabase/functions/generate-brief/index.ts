@@ -224,7 +224,7 @@ SOUND DIRECTION
 
 REQUIREMENTS
 - Structure: [Verse 1], [Chorus], ${verseCount === 3 ? "[Verse 2], [Chorus], [Verse 3], [Bridge], [Chorus], [Outro]" : "[Verse 2], [Bridge], [Chorus], [Outro]"}
-- Total length: 2:30–3:30 of singable lyrics
+- Total length: ${verseCount === 3 ? "3:30–4:30" : "2:30–3:30"} of singable lyrics
 - Use the recipient's name at least twice
 - Weave in 2-3 specific details from the story above
 - Respect the tense rules above EXACTLY
