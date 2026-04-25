@@ -218,7 +218,7 @@ export function OrderPortal({ orderId, userId }: { orderId: string; userId: stri
           <div className="mt-8">
             {tab === "player" && (
               <div className="space-y-6">
-                <pre className="whitespace-pre-wrap rounded-2xl border border-[rgba(31,27,22,0.12)] bg-[rgba(31,27,22,0.04)] p-6 font-sans text-[15px] leading-relaxed text-[#1F1B16]">
+                <pre className="whitespace-pre-wrap rounded-2xl border border-[rgba(31,27,22,0.12)] bg-[#FBF6EC] p-6 font-sans text-[15px] leading-relaxed text-[#1F1B16]">
                   {lyrics}
                 </pre>
                 <RevisionTab
@@ -267,7 +267,7 @@ export function OrderPortal({ orderId, userId }: { orderId: string; userId: stri
 function InProgressCard({ order }: { order: Order }) {
   const stage = STAGE_MAP[order.status] ?? { label: "In progress", pct: 15 };
   return (
-    <div className="rounded-3xl border border-[rgba(31,27,22,0.12)] bg-[rgba(31,27,22,0.04)] p-8 text-center">
+    <div className="rounded-3xl border border-[rgba(31,27,22,0.12)] bg-[#FBF6EC] p-8 text-center">
       <p className="text-xs font-semibold uppercase tracking-[0.2em] text-[#8D6FAF]">
         {stage.label}
       </p>
@@ -349,7 +349,7 @@ function VariantSwitcher({
   if (variants.length < 2 && !otherVariant) return null;
 
   return (
-    <div className="mt-6 rounded-2xl border border-[rgba(31,27,22,0.12)] bg-[rgba(31,27,22,0.04)] p-4">
+    <div className="mt-6 rounded-2xl border border-[rgba(31,27,22,0.12)] bg-[#FBF6EC] p-4">
       <div className="flex items-center justify-between gap-3">
         <p className="text-xs uppercase tracking-wider text-[rgba(31,27,22,0.55)]">
           Two versions of your song
@@ -463,7 +463,7 @@ function ShareSection({
   };
 
   return (
-    <div className="mt-8 rounded-2xl border border-[rgba(31,27,22,0.12)] bg-[rgba(31,27,22,0.04)] p-6 text-center">
+    <div className="mt-8 rounded-2xl border border-[rgba(31,27,22,0.12)] bg-[#FBF6EC] p-6 text-center">
       <h3 className="font-display text-xl">Share it with {recipientName}</h3>
       <p className="mx-auto mt-1 max-w-md text-sm text-[rgba(31,27,22,0.65)]">
         Send the private link, or download the file and send it however feels right —
@@ -541,7 +541,7 @@ function ReactionTab({ orderId, buyerEmail, userId, reactions, reward, reload }:
   };
 
   return (
-    <div className="rounded-2xl border border-[rgba(31,27,22,0.12)] bg-[rgba(31,27,22,0.04)] p-6">
+    <div className="rounded-2xl border border-[rgba(31,27,22,0.12)] bg-[#FBF6EC] p-6">
       <div className="flex items-start justify-between gap-3">
         <div>
           <h2 className="font-display text-xl">Re-Found reaction reward</h2>
@@ -552,7 +552,7 @@ function ReactionTab({ orderId, buyerEmail, userId, reactions, reward, reload }:
           </p>
         </div>
         {reward?.status === "approved" && (
-          <Badge className="bg-emerald-500/20 text-emerald-300 border-emerald-500/40">
+          <Badge className="bg-emerald-100 text-emerald-800 border-emerald-300">
             Approved
           </Badge>
         )}
@@ -568,10 +568,10 @@ function ReactionTab({ orderId, buyerEmail, userId, reactions, reward, reload }:
         value={caption}
         onChange={(e) => setCaption(e.target.value.slice(0, 280))}
         placeholder="Caption (optional)"
-        className="mt-3 w-full rounded-xl border border-[rgba(31,27,22,0.2)] bg-[rgba(31,27,22,0.06)] p-3 text-sm text-[#1F1B16] placeholder:text-[rgba(31,27,22,0.4)]"
+        className="mt-3 w-full rounded-xl border border-[rgba(31,27,22,0.2)] bg-white p-3 text-sm text-[#1F1B16] placeholder:text-[rgba(31,27,22,0.4)]"
         rows={3}
       />
-      {err && <p className="mt-2 text-sm text-red-400">{err}</p>}
+      {err && <p className="mt-2 text-sm text-red-600">{err}</p>}
       <Button
         className="mt-4 bg-[#8D6FAF] text-[#FFF7EE] hover:bg-[#6B4F8A]"
         disabled={!file || busy}
@@ -588,7 +588,7 @@ function ReactionTab({ orderId, buyerEmail, userId, reactions, reward, reload }:
           {reactions.map((r: any) => (
             <div
               key={r.id}
-              className="flex items-center justify-between rounded-lg bg-[rgba(31,27,22,0.04)] px-3 py-2 text-sm"
+              className="flex items-center justify-between rounded-lg bg-[#FBF6EC] px-3 py-2 text-sm"
             >
               <span className="text-[rgba(31,27,22,0.75)]">
                 {new Date(r.created_at).toLocaleString()}
@@ -597,9 +597,9 @@ function ReactionTab({ orderId, buyerEmail, userId, reactions, reward, reload }:
                 variant="outline"
                 className={
                   r.status === "approved"
-                    ? "border-emerald-500/40 text-emerald-300"
+                    ? "border-emerald-400 text-emerald-700"
                     : r.status === "rejected"
-                      ? "border-red-500/40 text-red-300"
+                      ? "border-red-400 text-red-700"
                       : "border-[rgba(31,27,22,0.3)] text-[rgba(31,27,22,0.7)]"
                 }
               >
@@ -666,7 +666,7 @@ function RevisionTab({
   return (
     <div className="space-y-6">
       {revisions.length > 0 && (
-        <div className="rounded-2xl border border-[rgba(31,27,22,0.12)] bg-[rgba(31,27,22,0.04)] p-6">
+        <div className="rounded-2xl border border-[rgba(31,27,22,0.12)] bg-[#FBF6EC] p-6">
           <div className="flex items-center justify-between">
             <h2 className="font-display text-xl">Your revisions</h2>
             <Badge variant="outline" className="border-[rgba(31,27,22,0.3)] text-[rgba(31,27,22,0.75)]">
@@ -677,7 +677,7 @@ function RevisionTab({
             {revisions.map((r) => (
               <div
                 key={r.id}
-                className="rounded-xl border border-[rgba(31,27,22,0.1)] bg-[rgba(31,27,22,0.03)] p-4"
+                className="rounded-xl border border-[rgba(31,27,22,0.1)] bg-[#FBF6EC] p-4"
               >
                 <div className="flex items-center justify-between gap-3">
                   <span className="text-xs text-[rgba(31,27,22,0.55)]">
@@ -700,7 +700,7 @@ function RevisionTab({
       )}
 
       {canSubmit ? (
-        <div className="rounded-2xl border border-[rgba(31,27,22,0.12)] bg-[rgba(31,27,22,0.04)] p-6">
+        <div className="rounded-2xl border border-[rgba(31,27,22,0.12)] bg-[#FBF6EC] p-6">
           <h2 className="font-display text-xl">
             Don't love the lyrics? Let our team help.
           </h2>
@@ -709,7 +709,7 @@ function RevisionTab({
             value={notes}
             onChange={(e) => setNotes(e.target.value.slice(0, 1000))}
             placeholder="e.g. Slower tempo, change 'fighter' to 'warrior' in verse 2, mention our daughter Mia…"
-            className="mt-3 w-full rounded-xl border border-[rgba(31,27,22,0.2)] bg-[rgba(31,27,22,0.06)] p-3 text-sm text-[#1F1B16] placeholder:text-[rgba(31,27,22,0.4)]"
+            className="mt-3 w-full rounded-xl border border-[rgba(31,27,22,0.2)] bg-white p-3 text-sm text-[#1F1B16] placeholder:text-[rgba(31,27,22,0.4)]"
             rows={6}
           />
           <Button
@@ -726,7 +726,7 @@ function RevisionTab({
           )}
         </div>
       ) : (
-        <div className="rounded-2xl border border-[rgba(31,27,22,0.12)] bg-[rgba(31,27,22,0.04)] p-6">
+        <div className="rounded-2xl border border-[rgba(31,27,22,0.12)] bg-[#FBF6EC] p-6">
           <h2 className="font-display text-xl">No revisions remaining</h2>
           <p className="mt-2 text-sm text-[rgba(31,27,22,0.7)]">
             You've used all {cap} {cap === 1 ? "revision" : "revisions"} for this song. Need more changes?{" "}
@@ -769,7 +769,7 @@ function RefundTab({ orderId, buyerEmail, refunds, reload }: any) {
   };
 
   return (
-    <div className="rounded-2xl border border-[rgba(31,27,22,0.12)] bg-[rgba(31,27,22,0.04)] p-6">
+    <div className="rounded-2xl border border-[rgba(31,27,22,0.12)] bg-[#FBF6EC] p-6">
       <h2 className="font-display text-xl">Talk to our team</h2>
       <p className="mt-1 text-sm text-[rgba(31,27,22,0.65)]">
         Whether you want to say thanks, ask a question, request a refund, or just need a hand —
@@ -781,7 +781,7 @@ function RefundTab({ orderId, buyerEmail, refunds, reload }: any) {
         value={reason}
         onChange={(e) => setReason(e.target.value.slice(0, 2000))}
         placeholder="Tell us what's on your mind (min 20 characters)…"
-        className="mt-4 w-full rounded-xl border border-[rgba(31,27,22,0.2)] bg-[rgba(31,27,22,0.06)] p-3 text-sm text-[#1F1B16] placeholder:text-[rgba(31,27,22,0.4)]"
+        className="mt-4 w-full rounded-xl border border-[rgba(31,27,22,0.2)] bg-white p-3 text-sm text-[#1F1B16] placeholder:text-[rgba(31,27,22,0.4)]"
         rows={6}
       />
       <Button
@@ -800,7 +800,7 @@ function RefundTab({ orderId, buyerEmail, refunds, reload }: any) {
           {refunds.map((r: any) => (
             <div
               key={r.id}
-              className="rounded-lg bg-[rgba(31,27,22,0.04)] px-3 py-2 text-sm"
+              className="rounded-lg bg-[#FBF6EC] px-3 py-2 text-sm"
             >
               <div className="flex items-center justify-between">
                 <span className="text-[rgba(31,27,22,0.85)]">
@@ -923,7 +923,7 @@ function GoldTicket({
   ctaLink?: { to: string; search?: any; label: string } | null;
 }) {
   return (
-    <div className="relative overflow-hidden rounded-2xl border border-[rgba(141,111,175,0.3)] bg-gradient-to-br from-[rgba(141,111,175,0.10)] via-[rgba(31,27,22,0.04)] to-[rgba(141,111,175,0.06)] p-6 shadow-[0_0_40px_-20px_rgba(141,111,175,0.4)]">
+    <div className="relative overflow-hidden rounded-2xl border border-[rgba(141,111,175,0.3)] bg-gradient-to-br from-[rgba(141,111,175,0.16)] via-[#FBF6EC] to-[rgba(141,111,175,0.10)] p-6 shadow-[0_0_40px_-20px_rgba(141,111,175,0.4)]">
       <div className="absolute inset-y-0 left-16 hidden w-px bg-[rgba(31,27,22,0.12)] sm:block" />
       <div className="flex items-start gap-4">
         <div className="flex h-10 w-10 shrink-0 items-center justify-center rounded-full bg-[rgba(141,111,175,0.18)] text-[#8D6FAF]">
@@ -942,7 +942,7 @@ function GoldTicket({
                 {code}
               </code>
               {badge && (
-                <Badge variant="outline" className="border-emerald-500/40 text-emerald-300">
+                <Badge variant="outline" className="border-emerald-400 text-emerald-700">
                   {badge}
                 </Badge>
               )}

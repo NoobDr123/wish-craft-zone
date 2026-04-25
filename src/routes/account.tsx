@@ -166,7 +166,7 @@ function AccountPage() {
             {activeOrder && <OrderPortal orderId={activeOrder.id} userId={user.id} />}
 
             {/* Help footer */}
-            <section className="mt-12 rounded-2xl border border-[rgba(31,27,22,0.1)] bg-[rgba(31,27,22,0.03)] p-5 text-center">
+            <section className="mt-12 rounded-2xl border border-[rgba(31,27,22,0.1)] bg-[#FBF6EC] p-5 text-center">
               <p className="text-sm text-[rgba(31,27,22,0.65)]">
                 Need anything else? Email us at{" "}
                 <a
@@ -230,7 +230,7 @@ function OrderSwitcher({
 
 function EmptyState() {
   return (
-    <div className="rounded-3xl border border-dashed border-[rgba(31,27,22,0.2)] bg-[rgba(31,27,22,0.03)] p-10 text-center">
+    <div className="rounded-3xl border border-dashed border-[rgba(31,27,22,0.2)] bg-[#FBF6EC] p-10 text-center">
       <div className="mx-auto flex h-12 w-12 items-center justify-center rounded-full bg-[rgba(141,111,175,0.18)]">
         <Sparkles className="h-6 w-6 text-[#8D6FAF]" />
       </div>
