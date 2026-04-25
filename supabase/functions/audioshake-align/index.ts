@@ -12,6 +12,7 @@
 // Auth: INTERNAL_TRIGGER_SECRET header OR service-role JWT.
 
 import { createClient } from "https://esm.sh/@supabase/supabase-js@2.45.0";
+import { isInternalRequest } from "../_shared/auth.ts";
 
 const corsHeaders = {
   "Access-Control-Allow-Origin": "*",
@@ -43,29 +44,12 @@ Deno.serve(async (req) => {
     return new Response(null, { headers: corsHeaders });
 
   try {
-    // --- Auth ---
-    const internalSecret = Deno.env.get("INTERNAL_TRIGGER_SECRET");
-    const provided = req.headers.get("x-internal-secret");
-    let authorized = !!internalSecret && provided === internalSecret;
-
-    if (!authorized) {
-      const auth = req.headers.get("Authorization") ?? "";
-      const token = auth.replace(/^Bearer\s+/i, "");
-      if (token) {
-        try {
-          const parts = token.split(".");
-          if (parts.length === 3) {
-            const payload = JSON.parse(
-              atob(parts[1].replace(/-/g, "+").replace(/_/g, "/")),
-            );
-            if (payload?.role === "service_role") authorized = true;
-          }
-        } catch {
-          /* not a JWT */
-        }
-      }
+    // --- Auth: INTERNAL_TRIGGER_SECRET header OR verified service-role JWT.
+    // CRITICAL: do NOT base64-decode the JWT and trust `role` — that's
+    // forgeable. isInternalRequest verifies the signature.
+    if (!(await isInternalRequest(req))) {
+      return json({ error: "Unauthorized" }, 401);
     }
-    if (!authorized) return json({ error: "Unauthorized" }, 401);
 
     const apiKey = Deno.env.get("AUDIOSHAKE_API_KEY");
     if (!apiKey) return json({ error: "AUDIOSHAKE_API_KEY not configured" }, 500);
