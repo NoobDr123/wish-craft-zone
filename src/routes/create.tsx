@@ -335,9 +335,7 @@ function CreatePage() {
             placeholder={c6.placeholder}
             value={q.shared_memory}
             onChange={(e) => q.set("shared_memory", e.target.value)}
-            maxLength={300}
             rows={5}
-            showCount
           />
           <TipChips chips={q6Tips(profile)} />
         </Question>
