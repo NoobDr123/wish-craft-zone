@@ -2,7 +2,7 @@
 // Anyone with the URL can play. Loads order by share_page_slug or id.
 
 import { createFileRoute, Link, notFound } from "@tanstack/react-router";
-import { useEffect, useState } from "react";
+import { useEffect, useRef, useState } from "react";
 import { AudioPlayer } from "@/components/AudioPlayer";
 import { RibbonMark } from "@/components/Logo";
 import { supabase } from "@/integrations/supabase/client";
