@@ -286,7 +286,9 @@ function InnerForm({ returnUrl, paymentIntentId, email, amountLabel, amountCents
           options={{
             buttonHeight: 48,
             buttonTheme: { applePay: "black", googlePay: "black" },
-            paymentMethods: { applePay: "always", googlePay: "always", link: "auto" },
+            // Link is disabled so buyers stay fully on-site (link.com would
+            // pull them off our checkout). Apple Pay / Google Pay only.
+            paymentMethods: { applePay: "always", googlePay: "always", link: "never" },
             layout: {
               maxColumns: 1,
               maxRows: 0,
