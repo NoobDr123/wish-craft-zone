@@ -76,7 +76,7 @@ const SongDeliveredEmail = ({
           </Text>
 
           <div style={styles.divider} />
-          <Text style={styles.footer}>Sent from {BRAND.name} — turning love into songs.</Text>
+          <EmailFooter unsubscribeUrl={unsubscribe_url} />
         </Container>
       </Body>
     </Html>
