@@ -1,5 +1,5 @@
 import { useEffect, useMemo, useRef, useState } from "react";
-import { createFileRoute, Link, useNavigate } from "@tanstack/react-router";
+import { createFileRoute, Link, useNavigate, useSearch } from "@tanstack/react-router";
 import { QuizShell } from "@/components/QuizShell";
 import {
   ListSelect,
@@ -11,6 +11,9 @@ import {
 } from "@/components/QuizInputs";
 import { useQuizStore } from "@/stores/quizStore";
 import { track, ensureSession } from "@/lib/tracking";
+import { supabase } from "@/integrations/supabase/client";
+import { useAuth } from "@/hooks/useAuth";
+import { Gift, AlertCircle } from "lucide-react";
 import {
   getProfile,
   journeyOptions,
@@ -25,8 +28,14 @@ import {
   q8Tips,
 } from "@/lib/quizCopy";
 
+type CreateSearch = { reward?: string };
+
 export const Route = createFileRoute("/create")({
   component: CreatePage,
+  validateSearch: (search: Record<string, unknown>): CreateSearch => {
+    const reward = typeof search.reward === "string" ? search.reward : undefined;
+    return reward ? { reward } : {};
+  },
   head: () => ({
     meta: [
       { title: "Create Their Song · RibbonSong" },
@@ -83,9 +92,46 @@ type Step = {
 function CreatePage() {
   const navigate = useNavigate();
   const q = useQuizStore();
+  const search = useSearch({ from: "/create" });
+  const { user, loading: authLoading } = useAuth();
   const [index, setIndex] = useState(0);
   const stepEnteredAt = useRef<number>(Date.now());
   const quizStartedAt = useRef<number | null>(null);
+
+  // Reward code validation state
+  const [rewardStatus, setRewardStatus] = useState<
+    "idle" | "validating" | "valid" | "invalid" | "needs_login"
+  >("idle");
+  const [rewardError, setRewardError] = useState<string | null>(null);
+  const [rewardRemaining, setRewardRemaining] = useState<number | null>(null);
+
+  // Validate ?reward=CODE on mount (and whenever auth resolves)
+  useEffect(() => {
+    const code = search.reward?.trim();
+    if (!code) return;
+    if (authLoading) return;
+    if (!user) {
+      setRewardStatus("needs_login");
+      return;
+    }
+    setRewardStatus("validating");
+    setRewardError(null);
+    void supabase.functions
+      .invoke("redeem-reward-code", { body: { code } })
+      .then(({ data, error }) => {
+        if (error || !data?.ok) {
+          setRewardStatus("invalid");
+          setRewardError(data?.error || error?.message || "Invalid code");
+          return;
+        }
+        setRewardStatus("valid");
+        setRewardRemaining(data.free_songs_remaining ?? null);
+        q.set("reward_code", data.code);
+        // Pre-fill buyer email from logged-in user so the delivery step is skippable.
+        if (user.email && !q.buyer_email) q.set("buyer_email", user.email);
+      });
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [search.reward, user, authLoading]);
 
   // Track quiz_start once per mount
   useEffect(() => {
@@ -430,21 +476,79 @@ function CreatePage() {
   const back = () => setIndex(Math.max(0, safeIndex - 1));
 
   return (
-    <QuizShell
-      current={safeIndex + 1}
-      total={total}
-      chapter={step.chapter}
-      title={step.title}
-      subtitle={step.subtitle}
-      onNext={next}
-      onBack={safeIndex > 0 ? back : undefined}
-      isValid={valid}
-      nextLabel={
-        step.nextLabel ?? (safeIndex === total - 1 ? "Finish" : "Continue")
-      }
-      optional={step.optional}
-    >
-      {step.render()}
-    </QuizShell>
+    <>
+      {(rewardStatus === "valid" ||
+        rewardStatus === "validating" ||
+        rewardStatus === "needs_login" ||
+        rewardStatus === "invalid") && (
+        <div className="mx-auto max-w-2xl px-5 pt-4">
+          {rewardStatus === "valid" && (
+            <div className="flex items-start gap-3 rounded-2xl border border-success/40 bg-success/10 p-4 text-sm text-foreground">
+              <Gift className="mt-0.5 h-5 w-5 shrink-0 text-success" />
+              <div>
+                <p className="font-semibold">Free song unlocked 🎁</p>
+                <p className="mt-1 text-muted-foreground">
+                  Reward code <span className="font-mono">{search.reward}</span>{" "}
+                  applied. You won't be charged for this song.
+                  {rewardRemaining !== null
+                    ? ` ${rewardRemaining} free song${
+                        rewardRemaining === 1 ? "" : "s"
+                      } remaining on this code after redemption.`
+                    : ""}
+                </p>
+              </div>
+            </div>
+          )}
+          {rewardStatus === "validating" && (
+            <div className="rounded-2xl border border-border bg-muted/40 p-4 text-sm text-muted-foreground">
+              Validating reward code…
+            </div>
+          )}
+          {rewardStatus === "needs_login" && (
+            <div className="flex items-start gap-3 rounded-2xl border border-primary/40 bg-primary/5 p-4 text-sm text-foreground">
+              <AlertCircle className="mt-0.5 h-5 w-5 shrink-0 text-primary" />
+              <div>
+                <p className="font-semibold">Sign in to redeem your free song</p>
+                <p className="mt-1 text-muted-foreground">
+                  Reward codes are tied to your account. Please{" "}
+                  <a
+                    href={`/login?redirect=${encodeURIComponent(`/create?reward=${search.reward}`)}`}
+                    className="font-medium underline"
+                  >
+                    log in
+                  </a>{" "}
+                  to continue.
+                </p>
+              </div>
+            </div>
+          )}
+          {rewardStatus === "invalid" && (
+            <div className="flex items-start gap-3 rounded-2xl border border-destructive/40 bg-destructive/5 p-4 text-sm text-foreground">
+              <AlertCircle className="mt-0.5 h-5 w-5 shrink-0 text-destructive" />
+              <div>
+                <p className="font-semibold">Reward code couldn't be applied</p>
+                <p className="mt-1 text-muted-foreground">{rewardError}</p>
+              </div>
+            </div>
+          )}
+        </div>
+      )}
+      <QuizShell
+        current={safeIndex + 1}
+        total={total}
+        chapter={step.chapter}
+        title={step.title}
+        subtitle={step.subtitle}
+        onNext={next}
+        onBack={safeIndex > 0 ? back : undefined}
+        isValid={valid}
+        nextLabel={
+          step.nextLabel ?? (safeIndex === total - 1 ? "Finish" : "Continue")
+        }
+        optional={step.optional}
+      >
+        {step.render()}
+      </QuizShell>
+    </>
   );
 }
