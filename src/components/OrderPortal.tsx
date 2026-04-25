@@ -388,15 +388,46 @@ function ShareSection({
   recipientName: string;
   sharePath: string | null;
 }) {
+  const shareUrl = sharePath ? `https://ribbonsong.com${sharePath}` : "";
+  const shareText = `${recipientName}'s RibbonSong is ready. Listen here: ${shareUrl}`;
+  const encodedShareText = encodeURIComponent(shareText);
+  const encodedShareUrl = encodeURIComponent(shareUrl);
+
   const copyShare = async () => {
-    if (!sharePath || typeof window === "undefined") return;
-    const url = `${window.location.origin}${sharePath}`;
+    if (!shareUrl) return;
     try {
-      await navigator.clipboard.writeText(url);
+      await navigator.clipboard.writeText(shareUrl);
       toast.success("Share link copied");
     } catch {
       toast.error("Could not copy");
     }
+  };
+
+  const copyMessage = async () => {
+    if (!shareUrl) return;
+    try {
+      await navigator.clipboard.writeText(shareText);
+      toast.success("Share message copied");
+    } catch {
+      toast.error("Could not copy");
+    }
+  };
+
+  const openNativeShare = async () => {
+    if (!shareUrl || typeof navigator === "undefined") return;
+    if (navigator.share) {
+      try {
+        await navigator.share({
+          title: `A RibbonSong for ${recipientName}`,
+          text: `${recipientName}'s RibbonSong is ready.`,
+          url: shareUrl,
+        });
+        return;
+      } catch {
+        return;
+      }
+    }
+    await copyMessage();
   };
 
   const downloadSong = async () => {
@@ -426,7 +457,7 @@ function ShareSection({
         text, email, or save it forever.
       </p>
       <div className="mt-4 flex flex-wrap justify-center gap-2">
-        {sharePath && (
+        {shareUrl && (
           <Button
             variant="outline"
             size="sm"
@@ -446,7 +477,50 @@ function ShareSection({
           </Button>
         )}
       </div>
+      {shareUrl && (
+        <div className="mt-4 border-t border-[rgba(31,27,22,0.1)] pt-4">
+          <p className="text-xs font-medium uppercase tracking-[0.16em] text-[rgba(31,27,22,0.5)]">
+            Share with message
+          </p>
+          <div className="mt-3 grid grid-cols-2 gap-2 sm:grid-cols-5">
+            <ShareOption href={`https://wa.me/?text=${encodedShareText}`} label="WhatsApp" />
+            <ShareOption href={`fb-messenger://share/?link=${encodedShareUrl}`} label="Messenger" />
+            <ShareOption href={`sms:?&body=${encodedShareText}`} label="Text" />
+            <ShareOption
+              href={`mailto:?subject=${encodeURIComponent(`A RibbonSong for ${recipientName}`)}&body=${encodedShareText}`}
+              label="Email"
+            />
+            <button
+              type="button"
+              onClick={openNativeShare}
+              className="rounded-xl border border-[rgba(31,27,22,0.14)] bg-[rgba(255,247,238,0.65)] px-3 py-2 text-xs font-medium text-[#1F1B16] transition hover:bg-[rgba(141,111,175,0.1)]"
+            >
+              More
+            </button>
+          </div>
+          <button
+            type="button"
+            onClick={copyMessage}
+            className="mt-3 inline-flex items-center gap-1 text-xs font-medium text-[rgba(31,27,22,0.62)] underline underline-offset-4 hover:text-[#1F1B16]"
+          >
+            <Copy className="h-3 w-3" /> Copy message: {recipientName}'s RibbonSong is ready
+          </button>
+        </div>
+      )}
     </div>
+  );
+}
+
+function ShareOption({ href, label }: { href: string; label: string }) {
+  return (
+    <a
+      href={href}
+      target="_blank"
+      rel="noreferrer"
+      className="rounded-xl border border-[rgba(31,27,22,0.14)] bg-[rgba(255,247,238,0.65)] px-3 py-2 text-xs font-medium text-[#1F1B16] transition hover:bg-[rgba(141,111,175,0.1)]"
+    >
+      {label}
+    </a>
   );
 }
 
