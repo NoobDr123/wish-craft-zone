@@ -220,7 +220,7 @@ function PortalSong() {
               )}
               {order.has_unlimited_edits && (
                 <Badge variant="outline" className="border-[rgba(246,240,230,0.3)] text-[rgba(246,240,230,0.8)]">
-                  Up to 5 edits
+                  Unlimited edits
                 </Badge>
               )}
               {order.is_gift && (
