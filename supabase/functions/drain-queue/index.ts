@@ -4,9 +4,11 @@
 
 import { serve } from "https://deno.land/std@0.168.0/http/server.ts";
 import { createClient } from "npm:@supabase/supabase-js@2";
+import { guardInternal } from "../_shared/auth.ts";
 
 const SUPABASE_URL = Deno.env.get("SUPABASE_URL")!;
 const SERVICE_KEY = Deno.env.get("SUPABASE_SERVICE_ROLE_KEY")!;
+const INTERNAL_SECRET = Deno.env.get("INTERNAL_TRIGGER_SECRET")!;
 
 const supabase = createClient(SUPABASE_URL, SERVICE_KEY);
 
@@ -17,6 +19,9 @@ const corsHeaders = {
 
 serve(async (req) => {
   if (req.method === "OPTIONS") return new Response(null, { headers: corsHeaders });
+
+  const unauthorized = await guardInternal(req, corsHeaders);
+  if (unauthorized) return unauthorized;
 
   try {
     const { queue, target, batch = 5, vt = 60 } = await req.json();
@@ -44,6 +49,7 @@ serve(async (req) => {
           headers: {
             "Content-Type": "application/json",
             Authorization: `Bearer ${SERVICE_KEY}`,
+            "x-internal-secret": INTERNAL_SECRET,
           },
           body: JSON.stringify(payload),
         });

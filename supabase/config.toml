@@ -7,7 +7,7 @@ verify_jwt = false
 verify_jwt = false
 
 [functions.mark-upsells-complete]
-verify_jwt = false
+verify_jwt = true
 
 [functions.payments-webhook]
 verify_jwt = false

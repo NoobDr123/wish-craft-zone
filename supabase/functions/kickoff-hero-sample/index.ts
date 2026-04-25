@@ -2,14 +2,18 @@
 // using the INTERNAL_TRIGGER_SECRET available in env. Safe to delete after use.
 
 import { serve } from "https://deno.land/std@0.168.0/http/server.ts";
+import { guardInternal } from "../_shared/auth.ts";
 
 const corsHeaders = {
   "Access-Control-Allow-Origin": "*",
-  "Access-Control-Allow-Headers": "authorization, x-client-info, apikey, content-type",
+  "Access-Control-Allow-Headers": "authorization, x-client-info, apikey, content-type, x-internal-secret",
 };
 
 serve(async (req) => {
   if (req.method === "OPTIONS") return new Response(null, { headers: corsHeaders });
+
+  const unauthorized = await guardInternal(req, corsHeaders);
+  if (unauthorized) return unauthorized;
 
   try {
     const { sampleId, taskId, mode = "generate" } = await req.json();

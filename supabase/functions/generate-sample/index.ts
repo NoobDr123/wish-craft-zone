@@ -11,6 +11,7 @@ import {
   type BriefScore,
   type SongBrief,
 } from "../_shared/claude.ts";
+import { isInternalRequest, requireUser } from "../_shared/auth.ts";
 
 const supabase = createClient(
   Deno.env.get("SUPABASE_URL")!,
@@ -40,45 +41,21 @@ serve(async (req) => {
 
   try {
     // Two ways to authorize:
-    //   1. Service-role key in `x-service-key` header (internal batch triggers)
-    //   2. Logged-in admin user (Authorization: Bearer <jwt>)
-    const internalSecret = Deno.env.get("INTERNAL_TRIGGER_SECRET");
-    const providedSecret = req.headers.get("x-internal-secret");
-    const isInternal =
-      !!internalSecret && !!providedSecret && providedSecret === internalSecret;
+    //   1. Internal trigger (INTERNAL_TRIGGER_SECRET header) OR verified
+    //      service-role JWT — handled by isInternalRequest (signature-checked).
+    //   2. Logged-in admin user.
+    let authorized = await isInternalRequest(req);
 
-    if (!isInternal) {
-      const authHeader = req.headers.get("Authorization") ?? "";
-      const token = authHeader.replace(/^Bearer\s+/i, "");
-      if (!token) return json({ error: "Unauthorized" }, 401);
+    if (!authorized) {
+      const user = await requireUser(req);
+      if (!user) return json({ error: "Unauthorized" }, 401);
 
-      // Service-role JWT bypass (decode payload, check role claim)
-      let isServiceRoleJwt = false;
-      try {
-        const parts = token.split(".");
-        if (parts.length === 3) {
-          const payload = JSON.parse(atob(parts[1].replace(/-/g, "+").replace(/_/g, "/")));
-          if (payload?.role === "service_role") isServiceRoleJwt = true;
-        }
-      } catch {
-        /* not a JWT */
-      }
-
-      if (!isServiceRoleJwt) {
-        const userClient = createClient(
-          Deno.env.get("SUPABASE_URL")!,
-          Deno.env.get("SUPABASE_ANON_KEY")!,
-          { global: { headers: { Authorization: `Bearer ${token}` } } },
-        );
-        const { data: userData } = await userClient.auth.getUser();
-        if (!userData?.user) return json({ error: "Unauthorized" }, 401);
-
-        const { data: isAdmin } = await supabase.rpc("has_role", {
-          _user_id: userData.user.id,
-          _role: "admin",
-        });
-        if (!isAdmin) return json({ error: "Forbidden" }, 403);
-      }
+      const { data: isAdmin } = await supabase.rpc("has_role", {
+        _user_id: user.id,
+        _role: "admin",
+      });
+      if (!isAdmin) return json({ error: "Forbidden" }, 403);
+      authorized = true;
     }
 
     const { sampleId } = await req.json();

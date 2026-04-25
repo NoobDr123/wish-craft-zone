@@ -11,6 +11,7 @@ import {
   type BriefScore,
   type SongBrief,
 } from "../_shared/claude.ts";
+import { guardInternal } from "../_shared/auth.ts";
 
 const supabase = createClient(
   Deno.env.get("SUPABASE_URL")!,
@@ -24,6 +25,9 @@ const MAX_RETRIES = 2;
 
 serve(async (req) => {
   if (req.method === "OPTIONS") return new Response(null, { headers: corsHeaders });
+
+  const unauthorized = await guardInternal(req, corsHeaders);
+  if (unauthorized) return unauthorized;
 
   try {
     const { orderId } = await req.json();

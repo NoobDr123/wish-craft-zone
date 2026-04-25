@@ -10,6 +10,7 @@
 // Auth: INTERNAL_TRIGGER_SECRET header OR service-role JWT.
 
 import { createClient } from "https://esm.sh/@supabase/supabase-js@2.45.0";
+import { isInternalRequest } from "../_shared/auth.ts";
 
 const corsHeaders = {
   "Access-Control-Allow-Origin": "*",
@@ -33,30 +34,11 @@ Deno.serve(async (req) => {
   try {
     // Two auth paths:
     //  1. INTERNAL_TRIGGER_SECRET via x-internal-secret header (DB trigger)
-    //  2. Service-role JWT in Authorization (manual invocation / batch jobs)
-    const internalSecret = Deno.env.get("INTERNAL_TRIGGER_SECRET");
-    const provided = req.headers.get("x-internal-secret");
-    let authorized = !!internalSecret && provided === internalSecret;
-
-    if (!authorized) {
-      const auth = req.headers.get("Authorization") ?? "";
-      const token = auth.replace(/^Bearer\s+/i, "");
-      if (token) {
-        try {
-          const parts = token.split(".");
-          if (parts.length === 3) {
-            const payload = JSON.parse(
-              atob(parts[1].replace(/-/g, "+").replace(/_/g, "/")),
-            );
-            if (payload?.role === "service_role") authorized = true;
-          }
-        } catch {
-          /* not a JWT */
-        }
-      }
+    //  2. Verified service-role JWT in Authorization (manual / batch jobs)
+    // CRITICAL: do NOT trust unverified JWT payload — see _shared/auth.ts.
+    if (!(await isInternalRequest(req))) {
+      return json({ error: "Unauthorized" }, 401);
     }
-
-    if (!authorized) return json({ error: "Unauthorized" }, 401);
 
     const { sampleId } = await req.json();
     if (!sampleId) return json({ error: "sampleId required" }, 400);
