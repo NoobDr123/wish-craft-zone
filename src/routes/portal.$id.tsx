@@ -279,7 +279,10 @@ function PortalSong() {
                 <RevisionTab
                   orderId={order.id}
                   buyerEmail={order.buyer_email}
-                  existing={revision}
+                  revisions={revisions}
+                  cap={revisionCap}
+                  used={revisionsUsed}
+                  hasUnlimited={!!order.has_unlimited_edits}
                   reload={load}
                 />
               )}
