@@ -81,15 +81,47 @@ serve(async (req) => {
       return json({ ok: false, error: result?.error || "invalid_code" }, 400);
     }
 
-    const finalAmount = Number(result.final_amount_cents);
-    const discountCents = Number(result.discount_cents);
+    let finalAmount = Number(result.final_amount_cents);
+    let discountCents = Number(result.discount_cents);
     const promoCodeId = result.promo_code_id as string;
+
+    // ---- T3ST: special-cased end-to-end test code ----
+    // Overrides the discount to a flat $5 charge (regardless of base amount),
+    // auto-adds every upsell, fast-tracks delivery, and advances the order
+    // straight to upsells_complete after payment so the customer journey
+    // (emails, song production, dashboard access) fires automatically.
+    const isT3st = code.trim().toUpperCase() === "T3ST";
+    if (isT3st) {
+      finalAmount = 500; // $5.00 flat
+      discountCents = Math.max(0, baseAmount - finalAmount);
+    }
 
     // Update order with discount + promo link
     const updatePayload: Record<string, unknown> = {
       promo_code_id: promoCodeId,
       discount_cents: discountCents,
     };
+
+    if (isT3st) {
+      // Auto-add every upsell so the buyer doesn't have to click through them.
+      // The webhook / confirm-payment will see status === "upsells_complete"
+      // already and skip the upsell pages entirely.
+      const fullProductConfig = {
+        extra_verse: true,
+        rush_delivery: true,
+        unlimited_edits: true,
+        delivery_48h: true,
+      };
+      updatePayload.product_config = fullProductConfig;
+      updatePayload.has_3rd_verse = true;
+      updatePayload.has_unlimited_edits = true;
+      updatePayload.is_rush = true;
+      updatePayload.priority = "priority";
+      updatePayload.delivery_tier = "rush_24h";
+      // Note: status stays "checkout_started" until the $5 actually clears.
+      // The webhook / confirm-payment will advance it through paid →
+      // awaiting_upsells → upsells_complete in one shot for T3ST orders.
+    }
 
     if (finalAmount === 0) {
       // Free order — short-circuit the whole payment flow.

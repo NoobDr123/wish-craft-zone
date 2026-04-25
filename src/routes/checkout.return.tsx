@@ -117,7 +117,12 @@ function CheckoutReturnPage() {
         }
 
         setStatus("ready");
-        setTimeout(() => navigate({ to: "/upsell-1" }), 800);
+        // T3ST end-to-end test orders pre-add every upsell and advance the
+        // status straight to upsells_complete, so skip the upsell pages and
+        // jump straight to /processing where the song is being generated.
+        const skipUpsells = order.status === "upsells_complete";
+        const nextRoute = skipUpsells ? "/processing" : "/upsell-1";
+        setTimeout(() => navigate({ to: nextRoute }), 800);
         return;
       }
 
