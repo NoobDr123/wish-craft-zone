@@ -141,9 +141,98 @@ function render(template: string, d: Record<string, any>) {
       return reactionApproved(d);
     case "reaction-rejected":
       return reactionRejected(d);
+    case "support-notification":
+      return supportNotification(d);
+    case "support-acknowledgment":
+      return supportAcknowledgment(d);
+    case "support-reply":
+      return supportReply(d);
     default:
       return null;
   }
+}
+
+function supportNotification(d: Record<string, any>) {
+  const name = escape(d.sender_name ?? "Someone");
+  const senderEmail = escape(d.sender_email ?? "");
+  const subjectLine = escape(d.subject ?? "New support message");
+  const body = escape(d.body ?? "").replace(/\n/g, "<br/>");
+  const orderId = d.order_id_text ? escape(String(d.order_id_text)) : "";
+  const inboxUrl = String(d.inbox_url ?? "https://ribbonsong.com/admin");
+
+  const subject = `[Support] ${d.subject ?? "New message"} — ${d.sender_name ?? ""}`;
+
+  const html = `<!doctype html>
+<html><body style="margin:0;padding:0;background:#ffffff;font-family:'Instrument Sans',Inter,Arial,sans-serif;">
+  <table width="100%" cellpadding="0" cellspacing="0"><tr><td align="center" style="padding:32px 16px;">
+    <table width="560" cellpadding="0" cellspacing="0" style="background:#FBF6EC;padding:32px 24px;max-width:560px;">
+      <tr><td>
+        <p style="font-size:12px;font-weight:600;letter-spacing:0.16em;text-transform:uppercase;color:#8D6FAF;margin:0 0 16px;">New support message</p>
+        <h1 style="font-family:'Fraunces',Georgia,serif;font-size:22px;font-weight:600;line-height:1.2;color:#1F1B16;margin:0 0 16px;">${subjectLine}</h1>
+        <table width="100%" cellpadding="0" cellspacing="0" style="margin:0 0 18px;">
+          <tr><td style="padding:6px 0;font-size:13px;color:#5A5148;">From</td><td style="padding:6px 0;font-size:13px;color:#1F1B16;font-weight:600;text-align:right;">${name} &lt;${senderEmail}&gt;</td></tr>
+          ${orderId ? `<tr><td style="padding:6px 0;font-size:13px;color:#5A5148;">Order</td><td style="padding:6px 0;font-size:13px;color:#1F1B16;font-weight:600;text-align:right;">${orderId}</td></tr>` : ""}
+        </table>
+        <div style="background:#ffffff;border:1px solid #D9CEB9;border-radius:8px;padding:16px;font-size:14px;line-height:1.6;color:#1F1B16;margin:0 0 22px;">${body}</div>
+        <p style="margin:0;text-align:center;">
+          <a href="${inboxUrl}" style="background:#8D6FAF;color:#ffffff;font-size:14px;font-weight:600;border-radius:999px;padding:12px 24px;text-decoration:none;display:inline-block;">Open inbox</a>
+        </p>
+      </td></tr>
+    </table>
+  </td></tr></table>
+</body></html>`;
+
+  const text = `New support message: ${d.subject}\nFrom: ${d.sender_name} <${d.sender_email}>\n${orderId ? `Order: ${d.order_id_text}\n` : ""}\n${d.body}\n\nReply in the admin inbox: ${inboxUrl}`;
+  return { subject, html, text };
+}
+
+function supportAcknowledgment(d: Record<string, any>) {
+  const name = escape(String(d.sender_name ?? "").split(/\s+/)[0] || "there");
+  const subject = `We got your message — RibbonSong`;
+  const html = `<!doctype html>
+<html><body style="margin:0;padding:0;background:#ffffff;font-family:'Instrument Sans',Inter,Arial,sans-serif;">
+  <table width="100%" cellpadding="0" cellspacing="0"><tr><td align="center" style="padding:40px 20px;">
+    <table width="560" cellpadding="0" cellspacing="0" style="background:#FBF6EC;padding:40px 28px;max-width:560px;">
+      <tr><td>
+        <p style="font-family:'Fraunces',Georgia,serif;font-size:26px;font-weight:700;color:#1F1B16;margin:0 0 4px;">RibbonSong</p>
+        <p style="font-size:12px;font-weight:500;letter-spacing:0.16em;text-transform:uppercase;color:#8D6FAF;margin:0 0 28px;">Message received</p>
+        <h1 style="font-family:'Fraunces',Georgia,serif;font-size:28px;font-weight:600;line-height:1.2;color:#1F1B16;margin:0 0 16px;">Thanks ${name} — we got it.</h1>
+        <p style="font-size:16px;line-height:1.6;color:#1F1B16;margin:0 0 16px;">A real human on our team will read your message and reply within a few hours (usually faster).</p>
+        <p style="font-size:14px;line-height:1.6;color:#5A5148;margin:0 0 16px;">If it's about an existing order, having your order ID handy will help us move quickly.</p>
+        <div style="border-top:1px solid #D9CEB9;margin:24px 0 16px;"></div>
+        <p style="font-size:12px;line-height:1.6;color:#5A5148;margin:0;">— The RibbonSong team</p>
+      </td></tr>
+    </table>
+  </td></tr></table>
+</body></html>`;
+  const text = `Thanks ${name} — we got your message.\n\nA real human will reply within a few hours.\n\n— The RibbonSong team`;
+  return { subject, html, text };
+}
+
+function supportReply(d: Record<string, any>) {
+  const name = escape(String(d.sender_name ?? "").split(/\s+/)[0] || "there");
+  const body = escape(d.body ?? "").replace(/\n/g, "<br/>");
+  const originalSubject = String(d.original_subject ?? "your message");
+  const subject = `Re: ${originalSubject}`;
+
+  const html = `<!doctype html>
+<html><body style="margin:0;padding:0;background:#ffffff;font-family:'Instrument Sans',Inter,Arial,sans-serif;">
+  <table width="100%" cellpadding="0" cellspacing="0"><tr><td align="center" style="padding:40px 20px;">
+    <table width="560" cellpadding="0" cellspacing="0" style="background:#FBF6EC;padding:40px 28px;max-width:560px;">
+      <tr><td>
+        <p style="font-family:'Fraunces',Georgia,serif;font-size:26px;font-weight:700;color:#1F1B16;margin:0 0 4px;">RibbonSong</p>
+        <p style="font-size:12px;font-weight:500;letter-spacing:0.16em;text-transform:uppercase;color:#8D6FAF;margin:0 0 28px;">A reply from our team</p>
+        <h1 style="font-family:'Fraunces',Georgia,serif;font-size:24px;font-weight:600;line-height:1.25;color:#1F1B16;margin:0 0 18px;">Hi ${name},</h1>
+        <div style="font-size:16px;line-height:1.65;color:#1F1B16;margin:0 0 22px;">${body}</div>
+        <p style="font-size:14px;color:#5A5148;line-height:1.55;margin:0 0 8px;">Just hit reply if you need anything else — your reply lands straight in our inbox.</p>
+        <div style="border-top:1px solid #D9CEB9;margin:24px 0 16px;"></div>
+        <p style="font-size:12px;line-height:1.6;color:#5A5148;margin:0;">— The RibbonSong team</p>
+      </td></tr>
+    </table>
+  </td></tr></table>
+</body></html>`;
+  const text = `Hi ${name},\n\n${d.body}\n\nJust hit reply if you need anything else.\n\n— The RibbonSong team`;
+  return { subject, html, text };
 }
 
 function reactionApproved(d: Record<string, any>) {
