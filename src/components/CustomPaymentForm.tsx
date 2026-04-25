@@ -66,6 +66,7 @@ function InnerForm({ returnUrl, paymentIntentId, email, amountLabel, amountCents
   const [submitting, setSubmitting] = useState(false);
   const [errorMsg, setErrorMsg] = useState<string | null>(null);
   const [walletReady, setWalletReady] = useState(false);
+  const [linkReady, setLinkReady] = useState(false);
 
   // Fire Meta Pixel InitiateCheckout exactly once when the payment form
   // mounts. This is the standard funnel signal Meta uses to optimize ad
@@ -276,12 +277,7 @@ function InnerForm({ returnUrl, paymentIntentId, email, amountLabel, amountCents
 
   return (
     <div className="space-y-5 p-4 md:p-6">
-      {/* Apple Pay / Google Pay — one-tap row.
-          Link is intentionally excluded here because the Express Checkout
-          version of Link redirects buyers to link.com. Inline Link autofill
-          is enabled inside the PaymentElement below, which keeps everything
-          on-site (Stripe shows a small "Pay faster with Link" prompt and
-          auto-fills saved cards without leaving the page). */}
+      {/* Apple Pay / Google Pay — one-tap row at the top. */}
       <div className={walletReady ? "" : "hidden"}>
         <ExpressCheckoutElement
           onReady={({ availablePaymentMethods }) => {
@@ -299,6 +295,28 @@ function InnerForm({ returnUrl, paymentIntentId, email, amountLabel, amountCents
             },
           }}
         />
+      </div>
+
+      {/* Link — rendered as its own button BELOW Apple/Google Pay. */}
+      <div className={linkReady ? "" : "hidden"}>
+        <ExpressCheckoutElement
+          onReady={({ availablePaymentMethods }) => {
+            if (availablePaymentMethods) setLinkReady(true);
+          }}
+          onConfirm={handleExpressConfirm}
+          options={{
+            buttonHeight: 48,
+            paymentMethods: { applePay: "never", googlePay: "never", link: "auto" },
+            layout: {
+              maxColumns: 1,
+              maxRows: 0,
+              overflow: "never",
+            },
+          }}
+        />
+      </div>
+
+      {(walletReady || linkReady) && (
         <div className="my-4 flex items-center gap-3">
           <div className="h-px flex-1 bg-border" />
           <span className="text-xs font-medium uppercase tracking-wider text-muted-foreground">
@@ -306,7 +324,7 @@ function InnerForm({ returnUrl, paymentIntentId, email, amountLabel, amountCents
           </span>
           <div className="h-px flex-1 bg-border" />
         </div>
-      </div>
+      )}
 
       {/* Card form — wallets disabled (handled by Express row above), but
           Link is enabled INLINE so buyers who have a Link account get
