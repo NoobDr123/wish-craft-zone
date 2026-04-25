@@ -1,0 +1,1 @@
+DROP TABLE IF EXISTS public.admin_ip_allowlist CASCADE;

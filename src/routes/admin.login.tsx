@@ -22,18 +22,9 @@ export const Route = createFileRoute("/admin/login")({
 });
 
 function AdminLoginRoute() {
-  // The login page itself is intentionally NOT behind the IP allowlist gate.
-  // Reason: the bootstrap flow (first-time IP allowlist setup) requires an
-  // authenticated admin session. If the gate wraps /admin/login, an unauth'd
-  // visitor in bootstrap mode gets redirected back to /admin/login by the
-  // bootstrap component → infinite loop / stuck on "Loading…".
-  //
-  // Real protection lives on /admin (and the API routes the admin uses),
-  // which require both a valid session AND an allowlisted IP. Exposing the
-  // login form alone reveals nothing — sign-in still requires a known staff
-  // email + a 2FA challenge on the next step.
   return <AdminLoginPage />;
 }
+
 
 function AdminLoginPage() {
   const [email, setEmail] = useState("");
