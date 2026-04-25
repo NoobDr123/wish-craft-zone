@@ -245,13 +245,6 @@ export type Database = {
             referencedRelation: "orders"
             referencedColumns: ["id"]
           },
-          {
-            foreignKeyName: "job_events_order_id_fkey"
-            columns: ["order_id"]
-            isOneToOne: false
-            referencedRelation: "public_shared_songs"
-            referencedColumns: ["id"]
-          },
         ]
       }
       kie_callbacks: {
@@ -288,13 +281,6 @@ export type Database = {
             columns: ["order_id"]
             isOneToOne: false
             referencedRelation: "orders"
-            referencedColumns: ["id"]
-          },
-          {
-            foreignKeyName: "kie_callbacks_order_id_fkey"
-            columns: ["order_id"]
-            isOneToOne: false
-            referencedRelation: "public_shared_songs"
             referencedColumns: ["id"]
           },
         ]
@@ -528,13 +514,6 @@ export type Database = {
             referencedColumns: ["id"]
           },
           {
-            foreignKeyName: "orders_parent_order_id_fkey"
-            columns: ["parent_order_id"]
-            isOneToOne: false
-            referencedRelation: "public_shared_songs"
-            referencedColumns: ["id"]
-          },
-          {
             foreignKeyName: "orders_promo_code_id_fkey"
             columns: ["promo_code_id"]
             isOneToOne: false
@@ -647,13 +626,6 @@ export type Database = {
             referencedRelation: "orders"
             referencedColumns: ["id"]
           },
-          {
-            foreignKeyName: "play_events_order_id_fkey"
-            columns: ["order_id"]
-            isOneToOne: false
-            referencedRelation: "public_shared_songs"
-            referencedColumns: ["id"]
-          },
         ]
       }
       promo_code_redemptions: {
@@ -752,13 +724,6 @@ export type Database = {
             referencedColumns: ["id"]
           },
           {
-            foreignKeyName: "promo_codes_issued_for_order_id_fkey"
-            columns: ["issued_for_order_id"]
-            isOneToOne: false
-            referencedRelation: "public_shared_songs"
-            referencedColumns: ["id"]
-          },
-          {
             foreignKeyName: "promo_codes_issued_for_reward_code_id_fkey"
             columns: ["issued_for_reward_code_id"]
             isOneToOne: false
@@ -826,6 +791,48 @@ export type Database = {
           testimonial_slug?: string | null
           title?: string | null
           updated_at?: string | null
+          voice?: string | null
+        }
+        Relationships: []
+      }
+      public_shared_songs: {
+        Row: {
+          audio_variants: Json | null
+          brief: Json | null
+          delivered_at: string | null
+          genre: string | null
+          id: string
+          recipient_name: string | null
+          selected_variant_id: string | null
+          share_page_slug: string | null
+          song_title_idea: string | null
+          tempo: string | null
+          voice: string | null
+        }
+        Insert: {
+          audio_variants?: Json | null
+          brief?: Json | null
+          delivered_at?: string | null
+          genre?: string | null
+          id: string
+          recipient_name?: string | null
+          selected_variant_id?: string | null
+          share_page_slug?: string | null
+          song_title_idea?: string | null
+          tempo?: string | null
+          voice?: string | null
+        }
+        Update: {
+          audio_variants?: Json | null
+          brief?: Json | null
+          delivered_at?: string | null
+          genre?: string | null
+          id?: string
+          recipient_name?: string | null
+          selected_variant_id?: string | null
+          share_page_slug?: string | null
+          song_title_idea?: string | null
+          tempo?: string | null
           voice?: string | null
         }
         Relationships: []
@@ -998,13 +1005,6 @@ export type Database = {
             referencedRelation: "orders"
             referencedColumns: ["id"]
           },
-          {
-            foreignKeyName: "reaction_videos_order_id_fkey"
-            columns: ["order_id"]
-            isOneToOne: false
-            referencedRelation: "public_shared_songs"
-            referencedColumns: ["id"]
-          },
         ]
       }
       refund_requests: {
@@ -1064,13 +1064,6 @@ export type Database = {
             referencedRelation: "orders"
             referencedColumns: ["id"]
           },
-          {
-            foreignKeyName: "refund_requests_order_id_fkey"
-            columns: ["order_id"]
-            isOneToOne: false
-            referencedRelation: "public_shared_songs"
-            referencedColumns: ["id"]
-          },
         ]
       }
       revision_requests: {
@@ -1119,13 +1112,6 @@ export type Database = {
             columns: ["order_id"]
             isOneToOne: false
             referencedRelation: "orders"
-            referencedColumns: ["id"]
-          },
-          {
-            foreignKeyName: "revision_requests_order_id_fkey"
-            columns: ["order_id"]
-            isOneToOne: false
-            referencedRelation: "public_shared_songs"
             referencedColumns: ["id"]
           },
         ]
@@ -1302,48 +1288,6 @@ export type Database = {
       }
     }
     Views: {
-      public_shared_songs: {
-        Row: {
-          audio_variants: Json | null
-          brief: Json | null
-          delivered_at: string | null
-          genre: string | null
-          id: string | null
-          recipient_name: string | null
-          selected_variant_id: string | null
-          share_page_slug: string | null
-          song_title_idea: string | null
-          tempo: string | null
-          voice: string | null
-        }
-        Insert: {
-          audio_variants?: Json | null
-          brief?: Json | null
-          delivered_at?: string | null
-          genre?: string | null
-          id?: string | null
-          recipient_name?: string | null
-          selected_variant_id?: string | null
-          share_page_slug?: string | null
-          song_title_idea?: string | null
-          tempo?: string | null
-          voice?: string | null
-        }
-        Update: {
-          audio_variants?: Json | null
-          brief?: Json | null
-          delivered_at?: string | null
-          genre?: string | null
-          id?: string | null
-          recipient_name?: string | null
-          selected_variant_id?: string | null
-          share_page_slug?: string | null
-          song_title_idea?: string | null
-          tempo?: string | null
-          voice?: string | null
-        }
-        Relationships: []
-      }
       user_mfa_status: {
         Row: {
           created_at: string | null
