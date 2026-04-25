@@ -374,9 +374,7 @@ function CreatePage() {
             placeholder={c8.placeholder}
             value={q.personal_words}
             onChange={(e) => q.set("personal_words", e.target.value)}
-            maxLength={800}
             rows={8}
-            showCount
             autoFocus
           />
           <TipChips
