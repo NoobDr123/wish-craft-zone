@@ -95,6 +95,7 @@ serve(async (req) => {
           stripe_customer_id: pi.customer as string | null,
           stripe_payment_intent_id: pi.id,
           stripe_payment_method_id: pi.payment_method as string | null,
+          stripe_env: env,
           payment_status: "paid",
           amount_paid_cents: pi.amount_received ?? pi.amount ?? 0,
           status: "awaiting_upsells",
