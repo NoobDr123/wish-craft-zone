@@ -1393,6 +1393,19 @@ export type Database = {
         Returns: number
       }
       generate_reward_code: { Args: never; Returns: string }
+      get_public_shared_song: {
+        Args: { _id: string }
+        Returns: {
+          audio_variants: Json
+          brief: Json
+          genre: string
+          id: string
+          recipient_name: string
+          selected_variant_id: string
+          share_page_slug: string
+          tempo: string
+        }[]
+      }
       has_role: {
         Args: {
           _role: Database["public"]["Enums"]["app_role"]
