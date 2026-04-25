@@ -335,6 +335,18 @@ function CheckoutPage() {
   }
 
 
+  if (redeemingFree) {
+    return (
+      <div className="flex min-h-screen flex-col items-center justify-center gap-4 bg-gradient-warm px-6 text-center">
+        <Logo />
+        <h1 className="font-display text-2xl font-semibold">Redeeming your free song…</h1>
+        <p className="max-w-md text-sm text-muted-foreground">
+          Applying your reward code and queuing your song. This usually takes just a moment.
+        </p>
+      </div>
+    );
+  }
+
   return (
     <div className="min-h-screen bg-gradient-warm pb-32 lg:pb-16">
       <PaymentTestModeBanner />
