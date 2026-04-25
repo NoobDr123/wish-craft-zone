@@ -256,7 +256,11 @@ export function OrderPortal({ orderId, userId }: { orderId: string; userId: stri
               />
             )}
             {tab === "rewards" && (
-              <RewardsTab reward={reward} returningPromos={returningPromos} />
+              <RewardsTab
+                reward={reward}
+                returningPromos={returningPromos}
+                onOpenReaction={() => setTab("reaction")}
+              />
             )}
           </div>
         </>
