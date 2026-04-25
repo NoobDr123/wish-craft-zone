@@ -70,6 +70,24 @@ async function handlePaymentSucceeded(pi: any, env: StripeEnv) {
 
   // ---- Base order ----
   if (kind === "base_order" || (!upsellType && !kind)) {
+    // Detect T3ST end-to-end test orders so we can fast-track straight to
+    // upsells_complete (upsells are pre-added by apply-promo-code).
+    const { data: existingOrder } = await supabase
+      .from("orders")
+      .select("promo_code_id")
+      .eq("id", orderId)
+      .maybeSingle();
+
+    let isT3st = false;
+    if (existingOrder?.promo_code_id) {
+      const { data: promo } = await supabase
+        .from("promo_codes")
+        .select("code")
+        .eq("id", existingOrder.promo_code_id)
+        .maybeSingle();
+      isT3st = (promo?.code || "").toUpperCase() === "T3ST";
+    }
+
     await supabase
       .from("orders")
       .update({
@@ -79,7 +97,8 @@ async function handlePaymentSucceeded(pi: any, env: StripeEnv) {
         stripe_env: env,
         payment_status: "paid",
         amount_paid_cents: pi.amount_received ?? pi.amount ?? 0,
-        status: "awaiting_upsells",
+        // T3ST: skip upsell pages — fires the brief-generation trigger immediately.
+        status: isT3st ? "upsells_complete" : "awaiting_upsells",
       })
       .eq("id", orderId);
 
@@ -89,6 +108,7 @@ async function handlePaymentSucceeded(pi: any, env: StripeEnv) {
       payload: {
         paymentIntentId: pi.id,
         amount: pi.amount_received ?? pi.amount,
+        t3st: isT3st,
       },
     });
 
