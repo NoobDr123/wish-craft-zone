@@ -320,6 +320,7 @@ function DashboardPanel() {
       let q = supabase
         .from("orders")
         .select("id, amount_paid_cents, amount_cents, payment_status, status, has_3rd_verse, is_rush, has_unlimited_edits, created_at")
+        .not("buyer_email", "like", "pending+%@ribbonsong.com")
         .order("created_at", { ascending: false })
         .limit(2000);
       if (start) q = q.gte("created_at", start.toISOString());
