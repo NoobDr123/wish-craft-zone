@@ -92,9 +92,46 @@ type Step = {
 function CreatePage() {
   const navigate = useNavigate();
   const q = useQuizStore();
+  const search = useSearch({ from: "/create" });
+  const { user, loading: authLoading } = useAuth();
   const [index, setIndex] = useState(0);
   const stepEnteredAt = useRef<number>(Date.now());
   const quizStartedAt = useRef<number | null>(null);
+
+  // Reward code validation state
+  const [rewardStatus, setRewardStatus] = useState<
+    "idle" | "validating" | "valid" | "invalid" | "needs_login"
+  >("idle");
+  const [rewardError, setRewardError] = useState<string | null>(null);
+  const [rewardRemaining, setRewardRemaining] = useState<number | null>(null);
+
+  // Validate ?reward=CODE on mount (and whenever auth resolves)
+  useEffect(() => {
+    const code = search.reward?.trim();
+    if (!code) return;
+    if (authLoading) return;
+    if (!user) {
+      setRewardStatus("needs_login");
+      return;
+    }
+    setRewardStatus("validating");
+    setRewardError(null);
+    void supabase.functions
+      .invoke("redeem-reward-code", { body: { code } })
+      .then(({ data, error }) => {
+        if (error || !data?.ok) {
+          setRewardStatus("invalid");
+          setRewardError(data?.error || error?.message || "Invalid code");
+          return;
+        }
+        setRewardStatus("valid");
+        setRewardRemaining(data.free_songs_remaining ?? null);
+        q.set("reward_code", data.code);
+        // Pre-fill buyer email from logged-in user so the delivery step is skippable.
+        if (user.email && !q.buyer_email) q.set("buyer_email", user.email);
+      });
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [search.reward, user, authLoading]);
 
   // Track quiz_start once per mount
   useEffect(() => {
