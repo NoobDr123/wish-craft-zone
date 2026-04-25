@@ -50,7 +50,7 @@ serve(async (req) => {
 
     const slug = order.share_page_slug ?? order.id;
     const listenUrl = `${SITE_URL}/listen/${slug}`;
-    const portalUrl = `${SITE_URL}/portal/${order.id}`;
+    const portalUrl = "";
 
     // Auto-issue a 10%-off returning-customer promo (idempotent: skip if a
     // returning code already exists for this order).

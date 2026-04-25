@@ -28,14 +28,10 @@ export const Route = createFileRoute("/listen/$id")({
     ],
   }),
   loader: async ({ params }) => {
-    // Reads from the safe `public_shared_songs` view — no buyer email, no Stripe IDs,
-    // no personal notes are exposed publicly.
+    // Reads through a safe public RPC — no buyer email, no Stripe IDs,
+    // no personal notes are exposed publicly, and no login is required.
     const { data, error } = await (supabase as any)
-      .from("public_shared_songs")
-      .select(
-        "id, recipient_name, audio_variants, selected_variant_id, brief, genre, tempo, share_page_slug",
-      )
-      .or(`share_page_slug.eq.${params.id},id.eq.${params.id}`)
+      .rpc("get_public_shared_song", { _id: params.id })
       .maybeSingle();
 
     if (error || !data) throw notFound();

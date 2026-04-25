@@ -1,12 +1,12 @@
-// Legacy route — redirects to the unified /account?order=$id page.
+// Legacy email route — redirects to the public listen page.
 
 import { createFileRoute, redirect } from "@tanstack/react-router";
 
 export const Route = createFileRoute("/portal/$id")({
   beforeLoad: ({ params }) => {
     throw redirect({
-      to: "/account",
-      search: { order: params.id },
+      to: "/listen/$id",
+      params: { id: params.id },
       replace: true,
     });
   },
