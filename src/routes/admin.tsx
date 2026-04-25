@@ -32,8 +32,6 @@ import { useAdminGuard } from "@/hooks/useAdminGuard";
 import { AdminMfaEnroll } from "@/components/admin/AdminMfaEnroll";
 import { AdminMfaChallenge } from "@/components/admin/AdminMfaChallenge";
 import { supabase } from "@/integrations/supabase/client";
-import { AdminIpGate } from "@/components/admin/AdminIpGate";
-import { AdminIpBootstrap } from "@/components/admin/AdminIpBootstrap";
 
 export const Route = createFileRoute("/admin")({
   component: AdminRoute,
