@@ -20,6 +20,7 @@ import {
   RotateCcw,
   Video,
   Pencil,
+  Inbox,
   
   LogOut,
   ChevronDown,
@@ -28,6 +29,7 @@ import {
 import { Logo } from "@/components/Logo";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
+import { Textarea } from "@/components/ui/textarea";
 import { useAdminGuard } from "@/hooks/useAdminGuard";
 import { AdminMfaEnroll } from "@/components/admin/AdminMfaEnroll";
 import { AdminMfaChallenge } from "@/components/admin/AdminMfaChallenge";
@@ -60,7 +62,8 @@ type Tab =
   | "samples"
   | "refunds"
   | "reactions"
-  | "revisions";
+  | "revisions"
+  | "support";
 
 const NAV: Array<{ key: Tab; label: string; icon: any; group: string }> = [
   { key: "dashboard", label: "Dashboard", icon: LayoutDashboard, group: "Overview" },
@@ -70,6 +73,7 @@ const NAV: Array<{ key: Tab; label: string; icon: any; group: string }> = [
   { key: "upsells", label: "Upsells", icon: Sparkles, group: "Operations" },
   { key: "emails", label: "Emails", icon: Mail, group: "Operations" },
   { key: "samples", label: "Samples", icon: Music2, group: "Content" },
+  { key: "support", label: "Support inbox", icon: Inbox, group: "Support" },
   { key: "refunds", label: "Refunds", icon: RotateCcw, group: "Support" },
   { key: "reactions", label: "Reactions", icon: Video, group: "Support" },
   { key: "revisions", label: "Revisions", icon: Pencil, group: "Support" },
@@ -188,6 +192,7 @@ function StaffPage() {
           {tab === "refunds" && <RefundsPanel />}
           {tab === "reactions" && <ReactionsPanel />}
           {tab === "revisions" && <RevisionsPanel />}
+          {tab === "support" && <SupportPanel />}
           
         </div>
       </main>
@@ -1737,3 +1742,245 @@ function SamplesPanel() {
   );
 }
 
+
+/* =====================================================================
+   Support inbox
+   ===================================================================== */
+
+function SupportPanel() {
+  const [threads, setThreads] = useState<any[]>([]);
+  const [filter, setFilter] = useState<"all" | "new" | "open" | "closed">("all");
+  const [selectedId, setSelectedId] = useState<string | null>(null);
+  const [messages, setMessages] = useState<any[]>([]);
+  const [reply, setReply] = useState("");
+  const [sending, setSending] = useState(false);
+  const [closeAfter, setCloseAfter] = useState(false);
+
+  const loadThreads = async () => {
+    let q = supabase
+      .from("support_threads")
+      .select("id, sender_name, sender_email, subject, status, last_activity_at, order_id_text")
+      .order("last_activity_at", { ascending: false })
+      .limit(200);
+    if (filter !== "all") q = q.eq("status", filter);
+    const { data } = await q;
+    setThreads(data ?? []);
+    if (!selectedId && data && data.length > 0) setSelectedId(data[0].id);
+  };
+
+  const loadMessages = async (threadId: string) => {
+    const { data } = await supabase
+      .from("support_messages")
+      .select("id, direction, body, created_at, author_user_id")
+      .eq("thread_id", threadId)
+      .order("created_at", { ascending: true });
+    setMessages(data ?? []);
+  };
+
+  useEffect(() => {
+    loadThreads();
+    // poll for new messages every 20s
+    const t = setInterval(loadThreads, 20000);
+    return () => clearInterval(t);
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [filter]);
+
+  useEffect(() => {
+    if (selectedId) {
+      loadMessages(selectedId);
+      // mark "new" -> "open" once admin opens it
+      supabase.from("support_threads").update({ status: "open" }).eq("id", selectedId).eq("status", "new").then(() => loadThreads());
+    }
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [selectedId]);
+
+  const selected = threads.find((t) => t.id === selectedId);
+
+  const sendReply = async () => {
+    if (!selectedId || !reply.trim() || sending) return;
+    setSending(true);
+    try {
+      const { data, error } = await supabase.functions.invoke("reply-support-message", {
+        body: { threadId: selectedId, body: reply.trim(), closeThread: closeAfter },
+      });
+      if (error || (data && (data as any).error)) {
+        throw new Error(error?.message ?? (data as any)?.error ?? "Send failed");
+      }
+      setReply("");
+      setCloseAfter(false);
+      await loadMessages(selectedId);
+      await loadThreads();
+    } catch (e: any) {
+      alert(`Reply failed: ${e?.message ?? "unknown error"}`);
+    } finally {
+      setSending(false);
+    }
+  };
+
+  const setStatus = async (status: string) => {
+    if (!selectedId) return;
+    await supabase.from("support_threads").update({ status }).eq("id", selectedId);
+    await loadThreads();
+  };
+
+  const newCount = threads.filter((t) => t.status === "new").length;
+
+  return (
+    <>
+      <div className="mb-6 flex items-center justify-between">
+        <div>
+          <h1 className="font-display text-3xl font-semibold">Support inbox</h1>
+          <p className="mt-1 text-sm text-muted-foreground">
+            Messages from the contact form. Replies email the customer directly.
+          </p>
+        </div>
+        <div className="flex gap-2">
+          {(["all", "new", "open", "closed"] as const).map((f) => (
+            <button
+              key={f}
+              onClick={() => {
+                setFilter(f);
+                setSelectedId(null);
+              }}
+              className={`rounded-md border px-3 py-1.5 text-xs capitalize transition-colors ${
+                filter === f
+                  ? "border-primary bg-primary text-primary-foreground"
+                  : "border-border bg-card hover:border-primary/40"
+              }`}
+            >
+              {f}
+              {f === "new" && newCount > 0 && (
+                <span className="ml-1.5 rounded-full bg-destructive px-1.5 text-[10px] font-bold text-destructive-foreground">
+                  {newCount}
+                </span>
+              )}
+            </button>
+          ))}
+        </div>
+      </div>
+
+      <div className="grid gap-4 lg:grid-cols-[340px_1fr]">
+        {/* Thread list */}
+        <div className="rounded-2xl border border-border bg-card overflow-hidden">
+          {threads.length === 0 ? (
+            <div className="p-8 text-center text-sm text-muted-foreground">
+              No messages.
+            </div>
+          ) : (
+            <ul className="max-h-[70vh] overflow-y-auto divide-y divide-border/40">
+              {threads.map((t) => (
+                <li key={t.id}>
+                  <button
+                    onClick={() => setSelectedId(t.id)}
+                    className={`w-full px-4 py-3 text-left transition-colors ${
+                      selectedId === t.id
+                        ? "bg-primary/10"
+                        : "hover:bg-muted/40"
+                    }`}
+                  >
+                    <div className="flex items-center justify-between gap-2">
+                      <span className="truncate text-sm font-medium">{t.sender_name}</span>
+                      {t.status === "new" && (
+                        <Badge className="shrink-0 text-[10px]">new</Badge>
+                      )}
+                      {t.status === "closed" && (
+                        <Badge variant="outline" className="shrink-0 text-[10px]">
+                          closed
+                        </Badge>
+                      )}
+                    </div>
+                    <div className="mt-0.5 truncate text-xs text-muted-foreground">
+                      {t.subject}
+                    </div>
+                    <div className="mt-1 text-[11px] text-muted-foreground/70">
+                      {new Date(t.last_activity_at).toLocaleString()}
+                    </div>
+                  </button>
+                </li>
+              ))}
+            </ul>
+          )}
+        </div>
+
+        {/* Detail */}
+        <div className="rounded-2xl border border-border bg-card flex flex-col min-h-[70vh]">
+          {!selected ? (
+            <div className="flex-1 flex items-center justify-center text-sm text-muted-foreground">
+              Select a message to view it.
+            </div>
+          ) : (
+            <>
+              <div className="border-b border-border p-5">
+                <div className="flex items-start justify-between gap-3">
+                  <div className="min-w-0">
+                    <h2 className="font-display text-xl font-semibold truncate">
+                      {selected.subject}
+                    </h2>
+                    <p className="mt-1 text-sm text-muted-foreground">
+                      {selected.sender_name} · {selected.sender_email}
+                      {selected.order_id_text ? ` · Order ${selected.order_id_text}` : ""}
+                    </p>
+                  </div>
+                  <div className="flex shrink-0 gap-2">
+                    {selected.status !== "closed" ? (
+                      <Button size="sm" variant="outline" onClick={() => setStatus("closed")}>
+                        Mark closed
+                      </Button>
+                    ) : (
+                      <Button size="sm" variant="outline" onClick={() => setStatus("open")}>
+                        Reopen
+                      </Button>
+                    )}
+                  </div>
+                </div>
+              </div>
+
+              <div className="flex-1 overflow-y-auto p-5 space-y-3">
+                {messages.map((m) => (
+                  <div
+                    key={m.id}
+                    className={`max-w-[85%] rounded-2xl px-4 py-3 text-sm whitespace-pre-wrap ${
+                      m.direction === "inbound"
+                        ? "bg-muted/50 text-foreground"
+                        : "ml-auto bg-primary/15 text-foreground"
+                    }`}
+                  >
+                    <div className="mb-1 text-[11px] font-medium uppercase tracking-wider text-muted-foreground">
+                      {m.direction === "inbound" ? selected.sender_name : "You"} ·{" "}
+                      {new Date(m.created_at).toLocaleString()}
+                    </div>
+                    {m.body}
+                  </div>
+                ))}
+              </div>
+
+              <div className="border-t border-border p-4 space-y-3">
+                <Textarea
+                  rows={4}
+                  placeholder={`Reply to ${selected.sender_name}…`}
+                  value={reply}
+                  onChange={(e) => setReply(e.target.value)}
+                  maxLength={10000}
+                  className="resize-none"
+                />
+                <div className="flex items-center justify-between gap-3">
+                  <label className="flex items-center gap-2 text-xs text-muted-foreground">
+                    <input
+                      type="checkbox"
+                      checked={closeAfter}
+                      onChange={(e) => setCloseAfter(e.target.checked)}
+                    />
+                    Close thread after sending
+                  </label>
+                  <Button onClick={sendReply} disabled={!reply.trim() || sending}>
+                    {sending ? "Sending…" : "Send reply"}
+                  </Button>
+                </div>
+              </div>
+            </>
+          )}
+        </div>
+      </div>
+    </>
+  );
+}

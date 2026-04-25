@@ -14,6 +14,7 @@ import {
   AccordionTrigger,
 } from "@/components/ui/accordion";
 import { toast } from "sonner";
+import { supabase } from "@/integrations/supabase/client";
 
 export const Route = createFileRoute("/contact")({
   head: () => ({
@@ -99,6 +100,7 @@ function ContactPage() {
 
   async function handleSubmit(e: React.FormEvent) {
     e.preventDefault();
+    if (submitting) return;
     setSubmitting(true);
 
     const parsed = contactSchema.safeParse({ name, email, orderId, message });
@@ -109,22 +111,29 @@ function ContactPage() {
       return;
     }
 
-    // Open the user's email client with a pre-filled message — zero infra,
-    // works today, swap for a server endpoint when volume justifies it.
-    const subject = encodeURIComponent(
-      `RibbonSong contact — ${parsed.data.name}${
-        parsed.data.orderId ? ` (Order ${parsed.data.orderId})` : ""
-      }`,
-    );
-    const body = encodeURIComponent(
-      `Name: ${parsed.data.name}\nEmail: ${parsed.data.email}${
-        parsed.data.orderId ? `\nOrder ID: ${parsed.data.orderId}` : ""
-      }\n\n${parsed.data.message}`,
-    );
-    window.location.href = `mailto:hello@ribbonsong.com?subject=${subject}&body=${body}`;
-
-    setSubmitted(true);
-    setSubmitting(false);
+    try {
+      const { data, error } = await supabase.functions.invoke(
+        "submit-support-message",
+        {
+          body: {
+            name: parsed.data.name,
+            email: parsed.data.email,
+            orderId: parsed.data.orderId || null,
+            message: parsed.data.message,
+          },
+        },
+      );
+      if (error || (data && (data as any).error)) {
+        throw new Error(error?.message ?? (data as any)?.error ?? "Send failed");
+      }
+      setSubmitted(true);
+      toast.success("Message sent — we'll reply by email shortly.");
+    } catch (err: any) {
+      console.error("contact submit failed", err);
+      toast.error(err?.message ?? "Couldn't send. Try emailing hello@ribbonsong.com instead.");
+    } finally {
+      setSubmitting(false);
+    }
   }
 
   return (
@@ -159,8 +168,9 @@ function ContactPage() {
 
             {submitted ? (
               <div className="mt-6 rounded-[14px] border border-[rgba(229,217,239,0.25)] bg-[rgba(229,217,239,0.06)] p-5 text-[14px] text-[#E5D9EF]">
-                Your email app should have opened with the message pre-filled. If it didn't, just
-                email us directly at{" "}
+                Got it — your message is in our inbox. We'll reply to{" "}
+                <span className="font-semibold">{email}</span> within a few hours. If anything
+                urgent, you can also email us directly at{" "}
                 <a className="underline" href="mailto:hello@ribbonsong.com">
                   hello@ribbonsong.com
                 </a>
