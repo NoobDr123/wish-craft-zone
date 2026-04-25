@@ -7,12 +7,16 @@ import {
   useStripe,
 } from "@stripe/react-stripe-js";
 import type { StripeElementsOptions } from "@stripe/stripe-js";
-import { getStripe } from "@/lib/stripe";
+import { getStripe, stripeEnvironment } from "@/lib/stripe";
+import { supabase } from "@/integrations/supabase/client";
+import { clearPrefetchedCheckout } from "@/lib/checkoutPrefetch";
 import { CheckCircle2, Gift, ShieldCheck } from "lucide-react";
 
 interface CustomPaymentFormProps {
   clientSecret: string;
   returnUrl: string;
+  /** PaymentIntent id — used to call confirm-payment directly on success. */
+  paymentIntentId?: string;
   email: string;
   amountLabel: string;
   /** Current amount in cents — used to keep Apple/Google Pay sheet in sync after promo edits. */
