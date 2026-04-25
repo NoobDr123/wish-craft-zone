@@ -49,7 +49,7 @@ function PortalSong() {
   const { user, loading } = useAuth();
   const navigate = useNavigate();
   const [order, setOrder] = useState<Order | null>(null);
-  const [revision, setRevision] = useState<any>(null);
+  const [revisions, setRevisions] = useState<any[]>([]);
   const [refunds, setRefunds] = useState<any[]>([]);
   const [reactions, setReactions] = useState<any[]>([]);
   const [reward, setReward] = useState<Reward | null>(null);
