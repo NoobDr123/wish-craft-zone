@@ -3,8 +3,9 @@
 // free revision, and refund/gift-card request.
 
 import { createFileRoute, Link, useNavigate, useParams } from "@tanstack/react-router";
+import type { ReactNode } from "react";
 import { useEffect, useMemo, useState } from "react";
-import { Check, Copy, Sparkles, Lock, Share2, Music, Gift } from "lucide-react";
+import { Check, Copy, Lock, Share2, Music, Download, Heart, Ticket } from "lucide-react";
 import { RibbonMark } from "@/components/Logo";
 import { VinylPlayer } from "@/components/VinylPlayer";
 import { Button } from "@/components/ui/button";
@@ -54,7 +55,7 @@ function PortalSong() {
   const [reactions, setReactions] = useState<any[]>([]);
   const [reward, setReward] = useState<Reward | null>(null);
   const [returningPromos, setReturningPromos] = useState<PromoCode[]>([]);
-  const [tab, setTab] = useState<"player" | "reaction" | "revision" | "refund" | "rewards">(
+  const [tab, setTab] = useState<"player" | "reaction" | "refund" | "rewards">(
     "player",
   );
 
@@ -145,9 +146,8 @@ function PortalSong() {
   const tabs: Array<[typeof tab, string]> = [
     ["player", "Lyrics"],
     ["reaction", "Reaction video"],
-    ["revision", order.has_unlimited_edits ? "Revisions" : "Free revision"],
-    ["refund", "Refund / gift card"],
-    ["rewards", "Rewards"],
+    ["refund", "Contact support"],
+    ["rewards", "Free gifts"],
   ];
 
   return (
@@ -233,11 +233,12 @@ function PortalSong() {
               )}
             </div>
 
-            {/* Share + regenerate quick actions */}
-            <ActionsRow
-              order={order}
+            {/* Share + download */}
+            <ShareSection
+              audioUrl={selectedVariant?.audio_url}
+              title={title}
+              recipientName={order.recipient_name}
               sharePath={sharePath}
-              onRegenerated={load}
             />
 
             {/* Tabs */}
@@ -262,9 +263,20 @@ function PortalSong() {
 
             <div className="mt-8">
               {tab === "player" && (
-                <pre className="whitespace-pre-wrap rounded-2xl border border-[rgba(246,240,230,0.12)] bg-[rgba(246,240,230,0.04)] p-6 font-sans text-[15px] leading-relaxed text-[#F6F0E6]">
-                  {lyrics}
-                </pre>
+                <div className="space-y-6">
+                  <pre className="whitespace-pre-wrap rounded-2xl border border-[rgba(246,240,230,0.12)] bg-[rgba(246,240,230,0.04)] p-6 font-sans text-[15px] leading-relaxed text-[#F6F0E6]">
+                    {lyrics}
+                  </pre>
+                  <RevisionTab
+                    orderId={order.id}
+                    buyerEmail={order.buyer_email}
+                    revisions={revisions}
+                    cap={revisionCap}
+                    used={revisionsUsed}
+                    hasUnlimited={!!order.has_unlimited_edits}
+                    reload={load}
+                  />
+                </div>
               )}
               {tab === "reaction" && (
                 <ReactionTab
@@ -273,17 +285,6 @@ function PortalSong() {
                   userId={user!.id}
                   reactions={reactions}
                   reward={reward}
-                  reload={load}
-                />
-              )}
-              {tab === "revision" && (
-                <RevisionTab
-                  orderId={order.id}
-                  buyerEmail={order.buyer_email}
-                  revisions={revisions}
-                  cap={revisionCap}
-                  used={revisionsUsed}
-                  hasUnlimited={!!order.has_unlimited_edits}
                   reload={load}
                 />
               )}
@@ -371,56 +372,65 @@ function VariantSwitcher({
     <div className="mt-6 rounded-2xl border border-[rgba(246,240,230,0.12)] bg-[rgba(246,240,230,0.04)] p-4">
       <div className="flex items-center justify-between gap-3">
         <p className="text-xs uppercase tracking-wider text-[rgba(246,240,230,0.55)]">
-          Two takes were generated
+          Two versions of your song
         </p>
-        {!unlocked && otherVariant && !otherVariant.audio_url ? null : (
-          <span className="text-xs text-[rgba(246,240,230,0.55)]">
-            {canSwitch ? "Tap to switch" : ""}
-          </span>
+        {unlocked && (
+          <span className="text-xs text-[rgba(246,240,230,0.55)]">Tap to switch</span>
         )}
       </div>
       <div className="mt-3 grid grid-cols-2 gap-2">
-        {variants.map((v, i) => {
-          const active = v.id === selectedVariant?.id;
-          const isOther = v.id !== selectedVariant?.id;
-          const locked = isOther && !unlocked && variants.length === 1; // only one came back; unlock will fetch second
+        {[0, 1].map((i) => {
+          const v = variants[i];
+          const isFirst = i === 0;
+          const isLockedSecond = !isFirst && !unlocked;
+          const active = v && v.id === selectedVariant?.id;
+          const playable = !!v?.audio_url && (isFirst || unlocked);
           return (
             <button
-              key={v.id || i}
-              onClick={() => v.audio_url && select(v.id)}
-              disabled={!v.audio_url}
+              key={v?.id || `slot-${i}`}
+              onClick={() => playable && v && select(v.id)}
+              disabled={!playable}
               className={`flex items-center justify-between rounded-xl border px-4 py-3 text-sm transition ${
                 active
                   ? "border-[#E5D9EF] bg-[rgba(229,217,239,0.12)] text-[#F6F0E6]"
-                  : "border-[rgba(246,240,230,0.15)] bg-transparent text-[rgba(246,240,230,0.7)] hover:border-[rgba(246,240,230,0.3)]"
-              } ${!v.audio_url ? "opacity-50 cursor-not-allowed" : ""}`}
+                  : isLockedSecond
+                    ? "border-[rgba(246,240,230,0.12)] bg-[rgba(246,240,230,0.02)] text-[rgba(246,240,230,0.45)]"
+                    : "border-[rgba(246,240,230,0.15)] bg-transparent text-[rgba(246,240,230,0.7)] hover:border-[rgba(246,240,230,0.3)]"
+              } ${!playable && !isLockedSecond ? "opacity-50 cursor-not-allowed" : ""} ${isLockedSecond ? "cursor-not-allowed" : ""}`}
             >
               <span className="flex items-center gap-2">
                 <Music className="h-3.5 w-3.5" />
-                Take {i + 1}
+                Version {i + 1}
               </span>
               {active && <Check className="h-4 w-4" />}
-              {locked && <Lock className="h-3.5 w-3.5" />}
+              {isLockedSecond && <Lock className="h-3.5 w-3.5" />}
             </button>
           );
         })}
       </div>
 
       {!unlocked && (
-        <div className="mt-4 flex flex-col gap-3 rounded-xl border border-[rgba(229,217,239,0.25)] bg-[rgba(229,217,239,0.06)] p-4 sm:flex-row sm:items-center sm:justify-between">
-          <div>
-            <p className="text-sm font-medium text-[#E5D9EF]">Unlock the second take</p>
-            <p className="mt-0.5 text-xs text-[rgba(246,240,230,0.65)]">
-              Same lyrics, a different feel. One-time $5 charge to your saved card.
-            </p>
+        <div className="mt-4 rounded-xl border border-[rgba(229,217,239,0.25)] bg-[rgba(229,217,239,0.06)] p-4">
+          <div className="flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between">
+            <div>
+              <p className="text-sm font-medium text-[#E5D9EF]">
+                Hear it sung a different way
+              </p>
+              <p className="mt-0.5 text-xs text-[rgba(246,240,230,0.7)]">
+                Same heartfelt lyrics — a fresh voice and feel. Many people end up loving the second one more.
+              </p>
+            </div>
+            <Button
+              onClick={unlock}
+              disabled={unlocking || !hasSavedCard}
+              className="bg-[#E5D9EF] text-[#1F1B16] hover:bg-[#d8c8e6] whitespace-nowrap"
+            >
+              {unlocking ? "Unlocking…" : hasSavedCard ? "Unlock for $5" : "No saved card"}
+            </Button>
           </div>
-          <Button
-            onClick={unlock}
-            disabled={unlocking || !hasSavedCard}
-            className="bg-[#E5D9EF] text-[#1F1B16] hover:bg-[#d8c8e6]"
-          >
-            {unlocking ? "Charging…" : hasSavedCard ? "Unlock for $5" : "No saved card"}
-          </Button>
+          <p className="mt-2 text-[10px] leading-relaxed text-[rgba(246,240,230,0.45)]">
+            We'll make a one-time $5 charge to the card you used at checkout. No subscription.
+          </p>
         </div>
       )}
     </div>
@@ -428,23 +438,20 @@ function VariantSwitcher({
 }
 
 /* ----------------------------------------------------------------------- */
-/* Share link + regeneration                                               */
+/* Share section — share link + download                                    */
 /* ----------------------------------------------------------------------- */
 
-function ActionsRow({
-  order,
+function ShareSection({
+  audioUrl,
+  title,
+  recipientName,
   sharePath,
-  onRegenerated,
 }: {
-  order: Order;
+  audioUrl: string | undefined;
+  title: string;
+  recipientName: string;
   sharePath: string | null;
-  onRegenerated: () => Promise<void>;
 }) {
-  const [regenOpen, setRegenOpen] = useState(false);
-  const [notes, setNotes] = useState("");
-  const [submitting, setSubmitting] = useState(false);
-  const regenUsed = !!order.regeneration_used_at;
-
   const copyShare = async () => {
     if (!sharePath || typeof window === "undefined") return;
     const url = `${window.location.origin}${sharePath}`;
@@ -456,87 +463,53 @@ function ActionsRow({
     }
   };
 
-  const submitRegen = async () => {
-    if (notes.trim().length < 10) {
-      toast.error("Please describe the change (min 10 chars)");
-      return;
-    }
-    setSubmitting(true);
+  const downloadSong = async () => {
+    if (!audioUrl) return;
     try {
-      const { data, error } = await supabase.functions.invoke("regenerate-song", {
-        body: { orderId: order.id, changeNotes: notes.trim() },
-      });
-      if (error || (data as any)?.error) {
-        toast.error((data as any)?.error ?? error?.message ?? "Regenerate failed");
-        return;
-      }
-      toast.success("Regenerating — we'll email you when ready");
-      setNotes("");
-      setRegenOpen(false);
-      await onRegenerated();
-    } catch (e: any) {
-      toast.error(e?.message ?? "Regenerate failed");
-    } finally {
-      setSubmitting(false);
+      const res = await fetch(audioUrl);
+      const blob = await res.blob();
+      const url = URL.createObjectURL(blob);
+      const a = document.createElement("a");
+      a.href = url;
+      const safeName = `${title} — for ${recipientName}`.replace(/[^a-z0-9 ._-]/gi, "").trim();
+      a.download = `${safeName || "ribbonsong"}.mp3`;
+      document.body.appendChild(a);
+      a.click();
+      a.remove();
+      URL.revokeObjectURL(url);
+    } catch {
+      toast.error("Could not download — try again or right-click the player to save.");
     }
   };
 
   return (
-    <div className="mt-4 flex flex-wrap justify-center gap-2">
-      {sharePath && (
-        <Button
-          variant="outline"
-          size="sm"
-          onClick={copyShare}
-          className="border-[rgba(246,240,230,0.2)] bg-transparent text-[#F6F0E6] hover:bg-[rgba(246,240,230,0.08)]"
-        >
-          <Share2 className="mr-2 h-3.5 w-3.5" /> Copy share link
-        </Button>
-      )}
-      {!regenUsed && (
-        <Button
-          variant="outline"
-          size="sm"
-          onClick={() => setRegenOpen((v) => !v)}
-          className="border-[rgba(246,240,230,0.2)] bg-transparent text-[#F6F0E6] hover:bg-[rgba(246,240,230,0.08)]"
-        >
-          <Sparkles className="mr-2 h-3.5 w-3.5" /> Regenerate (1 free)
-        </Button>
-      )}
-
-      {regenOpen && (
-        <div className="mt-2 w-full rounded-2xl border border-[rgba(246,240,230,0.12)] bg-[rgba(246,240,230,0.04)] p-5">
-          <h3 className="font-display text-lg">What should we change?</h3>
-          <p className="mt-1 text-xs text-[rgba(246,240,230,0.6)]">
-            One free full regeneration per order. We'll re-write the lyrics + re-record from scratch.
-          </p>
-          <textarea
-            value={notes}
-            onChange={(e) => setNotes(e.target.value.slice(0, 1000))}
-            placeholder="e.g. Slower tempo, mention our daughter Mia, change 'fighter' to 'warrior' in verse 2…"
-            rows={5}
-            className="mt-3 w-full rounded-xl border border-[rgba(246,240,230,0.2)] bg-[rgba(246,240,230,0.06)] p-3 text-sm text-[#F6F0E6] placeholder:text-[rgba(246,240,230,0.4)]"
-          />
-          <div className="mt-3 flex justify-end gap-2">
-            <Button
-              variant="outline"
-              size="sm"
-              onClick={() => setRegenOpen(false)}
-              className="border-[rgba(246,240,230,0.2)] bg-transparent text-[#F6F0E6] hover:bg-[rgba(246,240,230,0.08)]"
-            >
-              Cancel
-            </Button>
-            <Button
-              size="sm"
-              onClick={submitRegen}
-              disabled={submitting}
-              className="bg-[#E5D9EF] text-[#1F1B16] hover:bg-[#d8c8e6]"
-            >
-              {submitting ? "Submitting…" : "Regenerate"}
-            </Button>
-          </div>
-        </div>
-      )}
+    <div className="mt-8 rounded-2xl border border-[rgba(246,240,230,0.12)] bg-[rgba(246,240,230,0.04)] p-6 text-center">
+      <h3 className="font-display text-xl">Share it with {recipientName}</h3>
+      <p className="mx-auto mt-1 max-w-md text-sm text-[rgba(246,240,230,0.65)]">
+        Send the private link, or download the file and send it however feels right —
+        text, email, or save it forever.
+      </p>
+      <div className="mt-4 flex flex-wrap justify-center gap-2">
+        {sharePath && (
+          <Button
+            variant="outline"
+            size="sm"
+            onClick={copyShare}
+            className="border-[rgba(246,240,230,0.2)] bg-transparent text-[#F6F0E6] hover:bg-[rgba(246,240,230,0.08)]"
+          >
+            <Share2 className="mr-2 h-3.5 w-3.5" /> Copy share link
+          </Button>
+        )}
+        {audioUrl && (
+          <Button
+            size="sm"
+            onClick={downloadSong}
+            className="bg-[#E5D9EF] text-[#1F1B16] hover:bg-[#d8c8e6]"
+          >
+            <Download className="mr-2 h-3.5 w-3.5" /> Download song
+          </Button>
+        )}
+      </div>
     </div>
   );
 }
@@ -706,10 +679,9 @@ function RevisionTab({
     await reload();
   };
 
-  const headline = hasUnlimited ? "Revisions" : "Free revision";
   const helper = hasUnlimited
     ? `Unlimited revisions on this song. ${used} submitted so far.`
-    : "You get one free revision per song. Tell us what to change.";
+    : "Tell us what to tweak — wording, tempo, voice, anything. We'll re-record it for you, on us.";
 
   return (
     <div className="space-y-6">
@@ -752,13 +724,13 @@ function RevisionTab({
       {canSubmit ? (
         <div className="rounded-2xl border border-[rgba(246,240,230,0.12)] bg-[rgba(246,240,230,0.04)] p-6">
           <h2 className="font-display text-xl">
-            {revisions.length === 0 ? `Request a ${headline.toLowerCase()}` : "Request another revision"}
+            Don't love the lyrics? Let our team help.
           </h2>
           <p className="mt-1 text-sm text-[rgba(246,240,230,0.65)]">{helper}</p>
           <textarea
             value={notes}
             onChange={(e) => setNotes(e.target.value.slice(0, 1000))}
-            placeholder="e.g. Slower tempo, change 'fighter' to 'warrior' in verse 2…"
+            placeholder="e.g. Slower tempo, change 'fighter' to 'warrior' in verse 2, mention our daughter Mia…"
             className="mt-3 w-full rounded-xl border border-[rgba(246,240,230,0.2)] bg-[rgba(246,240,230,0.06)] p-3 text-sm text-[#F6F0E6] placeholder:text-[rgba(246,240,230,0.4)]"
             rows={6}
           />
@@ -767,7 +739,7 @@ function RevisionTab({
             disabled={notes.trim().length < 10 || busy}
             onClick={submit}
           >
-            {busy ? "Submitting…" : "Submit revision request"}
+            {busy ? "Submitting…" : hasUnlimited ? "Submit revision" : "Send to our team — it's free"}
           </Button>
           {hasUnlimited && (
             <p className="mt-3 text-xs text-[rgba(246,240,230,0.55)]">
@@ -792,11 +764,10 @@ function RevisionTab({
 }
 
 /* ----------------------------------------------------------------------- */
-/* Refund tab                                                               */
+/* Support tab — contact our team (used to be refund/gift card)             */
 /* ----------------------------------------------------------------------- */
 
 function RefundTab({ orderId, buyerEmail, refunds, reload }: any) {
-  const [type, setType] = useState<"refund" | "amazon_gift_card" | "both">("refund");
   const [reason, setReason] = useState("");
   const [busy, setBusy] = useState(false);
 
@@ -806,7 +777,7 @@ function RefundTab({ orderId, buyerEmail, refunds, reload }: any) {
     const { error } = await supabase.from("refund_requests").insert({
       order_id: orderId,
       buyer_email: buyerEmail,
-      request_type: type,
+      request_type: "refund",
       reason: reason.trim(),
     });
     setBusy(false);
@@ -815,44 +786,24 @@ function RefundTab({ orderId, buyerEmail, refunds, reload }: any) {
       return;
     }
     setReason("");
-    toast.success("Request submitted");
+    toast.success("Message sent — our team will reply soon");
     await reload();
   };
 
   return (
     <div className="rounded-2xl border border-[rgba(246,240,230,0.12)] bg-[rgba(246,240,230,0.04)] p-6">
-      <h2 className="font-display text-xl">Refund or Amazon gift card</h2>
+      <h2 className="font-display text-xl">Talk to our team</h2>
       <p className="mt-1 text-sm text-[rgba(246,240,230,0.65)]">
-        Tell us what happened. We review every request personally.
+        Whether you want to say thanks, ask a question, request a refund, or just need a hand —
+        write to us here. A real person reads every message and gets back to you, usually within
+        a few hours.
       </p>
-
-      <div className="mt-4 flex flex-wrap gap-2">
-        {(
-          [
-            ["refund", "Refund"],
-            ["amazon_gift_card", "Amazon gift card"],
-            ["both", "Both"],
-          ] as const
-        ).map(([k, l]) => (
-          <button
-            key={k}
-            onClick={() => setType(k)}
-            className={`rounded-full border px-4 py-1.5 text-sm transition ${
-              type === k
-                ? "border-[#E5D9EF] bg-[#E5D9EF] text-[#1F1B16]"
-                : "border-[rgba(246,240,230,0.2)] bg-transparent text-[rgba(246,240,230,0.75)] hover:border-[rgba(246,240,230,0.4)]"
-            }`}
-          >
-            {l}
-          </button>
-        ))}
-      </div>
 
       <textarea
         value={reason}
         onChange={(e) => setReason(e.target.value.slice(0, 2000))}
-        placeholder="Please tell us what happened (min 20 characters)…"
-        className="mt-3 w-full rounded-xl border border-[rgba(246,240,230,0.2)] bg-[rgba(246,240,230,0.06)] p-3 text-sm text-[#F6F0E6] placeholder:text-[rgba(246,240,230,0.4)]"
+        placeholder="Tell us what's on your mind (min 20 characters)…"
+        className="mt-4 w-full rounded-xl border border-[rgba(246,240,230,0.2)] bg-[rgba(246,240,230,0.06)] p-3 text-sm text-[#F6F0E6] placeholder:text-[rgba(246,240,230,0.4)]"
         rows={6}
       />
       <Button
@@ -860,13 +811,13 @@ function RefundTab({ orderId, buyerEmail, refunds, reload }: any) {
         disabled={reason.trim().length < 20 || busy}
         onClick={submit}
       >
-        {busy ? "Submitting…" : "Submit request"}
+        {busy ? "Sending…" : "Send message"}
       </Button>
 
       {refunds.length > 0 && (
         <div className="mt-6 space-y-2">
           <p className="text-xs uppercase tracking-wider text-[rgba(246,240,230,0.55)]">
-            Your requests
+            Your messages
           </p>
           {refunds.map((r: any) => (
             <div
@@ -874,16 +825,13 @@ function RefundTab({ orderId, buyerEmail, refunds, reload }: any) {
               className="rounded-lg bg-[rgba(246,240,230,0.04)] px-3 py-2 text-sm"
             >
               <div className="flex items-center justify-between">
-                <span className="capitalize text-[rgba(246,240,230,0.85)]">
-                  {r.request_type.replace("_", " ")}
+                <span className="text-[rgba(246,240,230,0.85)]">
+                  {new Date(r.created_at).toLocaleString()}
                 </span>
                 <Badge variant="outline" className="border-[rgba(246,240,230,0.3)] text-[rgba(246,240,230,0.75)]">
                   {r.status}
                 </Badge>
               </div>
-              <p className="mt-1 text-xs text-[rgba(246,240,230,0.55)]">
-                {new Date(r.created_at).toLocaleString()}
-              </p>
             </div>
           ))}
         </div>
@@ -912,102 +860,142 @@ function RewardsTab({
     }
   };
 
+  const reactionApproved = reward?.status === "approved";
+  const reactionStatus = reward?.status ?? null;
+
   return (
-    <div className="space-y-4">
-      {/* Reaction reward */}
-      <div className="rounded-2xl border border-[rgba(246,240,230,0.12)] bg-[rgba(246,240,230,0.04)] p-6">
-        <div className="flex items-start gap-3">
-          <Gift className="mt-1 h-5 w-5 text-[#E5D9EF]" />
-          <div className="flex-1">
-            <h2 className="font-display text-xl">Reaction reward (2 free songs)</h2>
-            {!reward && (
-              <p className="mt-2 text-sm text-[rgba(246,240,230,0.65)]">
-                Submit a reaction video on the previous tab. Once approved, your code unlocks here
-                and you can send 2 free songs to anyone.
-              </p>
-            )}
-            {reward && reward.status !== "approved" && (
-              <p className="mt-2 text-sm text-[rgba(246,240,230,0.65)]">
-                Status:{" "}
-                <Badge variant="outline" className="ml-1 border-[rgba(246,240,230,0.3)] text-[rgba(246,240,230,0.75)]">
-                  {reward.status}
-                </Badge>
-              </p>
-            )}
-            {reward && reward.status === "approved" && (
-              <>
-                <p className="mt-2 text-sm text-[rgba(246,240,230,0.7)]">
-                  <span className="font-medium text-[#F6F0E6]">{reward.free_songs_remaining}</span>{" "}
-                  free song{reward.free_songs_remaining === 1 ? "" : "s"} remaining
-                </p>
-                <div className="mt-3 flex items-center gap-2 rounded-xl border border-[rgba(229,217,239,0.3)] bg-[rgba(229,217,239,0.08)] px-4 py-3">
-                  <code className="flex-1 font-mono text-sm font-semibold text-[#E5D9EF]">
-                    {reward.code}
-                  </code>
-                  <Button
-                    variant="outline"
-                    size="sm"
-                    onClick={() => copy(reward.code)}
-                    className="border-[rgba(229,217,239,0.4)] bg-transparent text-[#E5D9EF] hover:bg-[rgba(229,217,239,0.1)]"
-                  >
-                    <Copy className="mr-1.5 h-3.5 w-3.5" />
-                    Copy
-                  </Button>
-                </div>
-                <Link
-                  to="/create"
-                  search={{ reward: reward.code } as any}
-                  className="mt-3 inline-block text-sm text-[#E5D9EF] underline"
-                >
-                  Use it now → start a free song
-                </Link>
-              </>
-            )}
-          </div>
-        </div>
+    <div className="space-y-5">
+      <div className="text-center">
+        <h2 className="font-display text-2xl">Two free gifts, just for you</h2>
+        <p className="mx-auto mt-1 max-w-md text-sm text-[rgba(246,240,230,0.65)]">
+          Our way of saying thank you. Two golden tickets you can use whenever you'd like.
+        </p>
       </div>
 
-      {/* Returning customer 10% codes */}
-      {returningPromos.length > 0 && (
-        <div className="rounded-2xl border border-[rgba(246,240,230,0.12)] bg-[rgba(246,240,230,0.04)] p-6">
-          <h2 className="font-display text-xl">Your 10% off code</h2>
-          <p className="mt-1 text-sm text-[rgba(246,240,230,0.65)]">
-            Saved for next time you order — works at checkout.
+      {/* Ticket 1 — Reaction reward (refund + 2 free songs) */}
+      <GoldTicket
+        icon={<Heart className="h-5 w-5" />}
+        eyebrow="Golden ticket #1"
+        title="Send us their reaction → full refund + 2 free songs"
+        body={
+          !reward
+            ? "Capture the moment they hear it for the first time, upload it on the Reaction video tab, and once approved we'll refund this order in full and give you 2 free songs to gift to anyone."
+            : reactionApproved
+              ? `Approved! ${reward!.free_songs_remaining} free song${reward!.free_songs_remaining === 1 ? "" : "s"} remaining.`
+              : `Status: ${reactionStatus}. We'll email you as soon as it's reviewed.`
+        }
+        code={reactionApproved ? reward!.code : null}
+        onCopy={reactionApproved ? () => copy(reward!.code) : undefined}
+        ctaLink={
+          reactionApproved
+            ? { to: "/create", search: { reward: reward!.code }, label: "Use it now → start a free song" }
+            : null
+        }
+      />
+
+      {/* Ticket 2 — Returning customer discount */}
+      {returningPromos.length > 0 ? (
+        returningPromos.map((p, idx) => (
+          <GoldTicket
+            key={p.id}
+            icon={<Ticket className="h-5 w-5" />}
+            eyebrow={returningPromos.length > 1 ? `Golden ticket #${idx + 2}` : "Golden ticket #2"}
+            title={`${p.discount_pct}% off your next song`}
+            body="Saved for the next time someone in your life deserves a song. Works at checkout."
+            code={p.active && p.times_used < p.max_uses ? p.code : null}
+            badge={
+              p.times_used >= p.max_uses
+                ? "Used"
+                : !p.active
+                  ? "Inactive"
+                  : `${p.discount_pct}% off`
+            }
+            onCopy={
+              p.active && p.times_used < p.max_uses ? () => copy(p.code) : undefined
+            }
+          />
+        ))
+      ) : (
+        <GoldTicket
+          icon={<Ticket className="h-5 w-5" />}
+          eyebrow="Golden ticket #2"
+          title="A special offer on your next song"
+          body="Once your song is delivered, a personal discount code will appear here for the next time you'd like to send a song."
+        />
+      )}
+    </div>
+  );
+}
+
+function GoldTicket({
+  icon,
+  eyebrow,
+  title,
+  body,
+  code,
+  badge,
+  onCopy,
+  ctaLink,
+}: {
+  icon: ReactNode;
+  eyebrow: string;
+  title: string;
+  body: string;
+  code?: string | null;
+  badge?: string;
+  onCopy?: () => void;
+  ctaLink?: { to: string; search?: any; label: string } | null;
+}) {
+  return (
+    <div className="relative overflow-hidden rounded-2xl border border-[rgba(229,217,239,0.3)] bg-gradient-to-br from-[rgba(229,217,239,0.10)] via-[rgba(246,240,230,0.04)] to-[rgba(229,217,239,0.06)] p-6 shadow-[0_0_40px_-20px_rgba(229,217,239,0.4)]">
+      {/* perforated edge accent */}
+      <div className="absolute inset-y-0 left-16 hidden w-px bg-[rgba(246,240,230,0.12)] sm:block" />
+      <div className="flex items-start gap-4">
+        <div className="flex h-10 w-10 shrink-0 items-center justify-center rounded-full bg-[rgba(229,217,239,0.18)] text-[#E5D9EF]">
+          {icon}
+        </div>
+        <div className="flex-1">
+          <p className="text-[10px] font-semibold uppercase tracking-[0.2em] text-[#E5D9EF]">
+            {eyebrow}
           </p>
-          <div className="mt-3 space-y-2">
-            {returningPromos.map((p) => (
-              <div
-                key={p.id}
-                className="flex items-center gap-2 rounded-xl border border-[rgba(246,240,230,0.15)] bg-[rgba(246,240,230,0.04)] px-4 py-3"
-              >
-                <code className="flex-1 font-mono text-sm font-semibold text-[#F6F0E6]">
-                  {p.code}
-                </code>
-                <Badge
-                  variant="outline"
-                  className={
-                    p.times_used >= p.max_uses || !p.active
-                      ? "border-[rgba(246,240,230,0.2)] text-[rgba(246,240,230,0.4)]"
-                      : "border-emerald-500/40 text-emerald-300"
-                  }
-                >
-                  {p.times_used >= p.max_uses ? "Used" : !p.active ? "Inactive" : `${p.discount_pct}% off`}
+          <h3 className="mt-1 font-display text-lg leading-snug text-[#F6F0E6]">{title}</h3>
+          <p className="mt-2 text-sm text-[rgba(246,240,230,0.7)]">{body}</p>
+
+          {code && (
+            <div className="mt-4 flex items-center gap-2 rounded-xl border border-[rgba(229,217,239,0.3)] bg-[rgba(229,217,239,0.08)] px-4 py-3">
+              <code className="flex-1 font-mono text-sm font-semibold text-[#E5D9EF]">
+                {code}
+              </code>
+              {badge && (
+                <Badge variant="outline" className="border-emerald-500/40 text-emerald-300">
+                  {badge}
                 </Badge>
+              )}
+              {onCopy && (
                 <Button
                   variant="outline"
                   size="sm"
-                  onClick={() => copy(p.code)}
-                  className="border-[rgba(246,240,230,0.2)] bg-transparent text-[#F6F0E6] hover:bg-[rgba(246,240,230,0.08)]"
-                  disabled={p.times_used >= p.max_uses || !p.active}
+                  onClick={onCopy}
+                  className="border-[rgba(229,217,239,0.4)] bg-transparent text-[#E5D9EF] hover:bg-[rgba(229,217,239,0.1)]"
                 >
                   <Copy className="mr-1.5 h-3.5 w-3.5" />
                   Copy
                 </Button>
-              </div>
-            ))}
-          </div>
+              )}
+            </div>
+          )}
+
+          {ctaLink && (
+            <Link
+              to={ctaLink.to}
+              search={ctaLink.search}
+              className="mt-3 inline-block text-sm text-[#E5D9EF] underline"
+            >
+              {ctaLink.label}
+            </Link>
+          )}
         </div>
-      )}
+      </div>
     </div>
   );
 }
