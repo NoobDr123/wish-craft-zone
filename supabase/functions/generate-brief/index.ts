@@ -106,17 +106,19 @@ serve(async (req) => {
       final_score: bestScore.overall,
     });
 
-    // Enqueue Suno submission.
-    const { error: enqueueErr } = await supabase.rpc("pgmq_send", {
+    // Enqueue Suno submission via the public enqueue_job RPC (pgmq schema is
+    // not exposed through PostgREST, so we wrap it in a security-definer fn).
+    const { error: enqueueErr } = await supabase.rpc("enqueue_job" as any, {
       queue_name: "submit_to_kie",
-      msg: { orderId },
+      payload: { orderId },
     } as any);
 
-    // Fallback: most pgmq deployments expose pgmq.send; try that if pgmq_send isn't a wrapper.
     if (enqueueErr) {
-      await supabase
-        .schema("pgmq" as any)
-        .rpc("send", { queue_name: "submit_to_kie", msg: { orderId } } as any);
+      console.error("enqueue submit_to_kie failed", enqueueErr);
+      await logEvent(orderId, "enqueue_failed", {
+        queue: "submit_to_kie",
+        error: enqueueErr.message,
+      });
     }
 
     return json({ ok: true, attempts, score: bestScore.overall });

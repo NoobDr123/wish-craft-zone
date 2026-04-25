@@ -128,12 +128,20 @@ serve(async (req) => {
       delay_hours: delayHours,
     });
 
-    // If scheduled is now or past, enqueue immediately
+    // If scheduled is now or past, enqueue immediately via the public RPC
+    // (pgmq schema is not reachable through PostgREST directly).
     if (scheduled <= now) {
-      await supabase.schema("pgmq" as any).rpc("send", {
+      const { error: enqueueErr } = await supabase.rpc("enqueue_job" as any, {
         queue_name: "deliver_song",
-        msg: { orderId: finalOrderId },
+        payload: { orderId: finalOrderId },
       } as any);
+      if (enqueueErr) {
+        console.error("enqueue deliver_song failed", enqueueErr);
+        await logEvent(finalOrderId, "enqueue_failed", {
+          queue: "deliver_song",
+          error: enqueueErr.message,
+        });
+      }
     }
 
     return json({ ok: true, scheduled: scheduled.toISOString() });
