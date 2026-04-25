@@ -40,13 +40,14 @@ serve(async (req) => {
     const { queue, target, batch = 5, vt = 60 } = await req.json();
     if (!queue || !target) return json({ error: "queue and target required" }, 400);
 
-    // Read a batch from pgmq
-    const { data: msgs, error: readErr } = await supabase
-      .schema("pgmq" as any)
-      .rpc("read", { queue_name: queue, vt, qty: batch } as any);
+    const { data: msgs, error: readErr } = await supabase.rpc("read_queue", {
+      queue_name: queue,
+      batch_size: batch,
+      vt,
+    } as any);
 
     if (readErr) {
-      console.error("pgmq.read error", readErr);
+      console.error("read_queue error", readErr);
       return json({ error: readErr.message }, 500);
     }
 
@@ -71,9 +72,9 @@ serve(async (req) => {
         const body = await res.text().catch(() => "");
 
         if (ok) {
-          await supabase.schema("pgmq" as any).rpc("delete", {
+          await supabase.rpc("delete_queue_message", {
             queue_name: queue,
-            msg_id: m.msg_id,
+            message_id: m.msg_id,
           } as any);
           results.push({ msg_id: m.msg_id, status: "delivered" });
         } else {
