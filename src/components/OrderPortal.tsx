@@ -1008,3 +1008,161 @@ function GoldTicket({
     </div>
   );
 }
+
+/* ----------------------------------------------------------------------- */
+/* Big obvious quick-action grid — sits between the player and the tabs.   */
+/* Designed so the four most common things to do are unmissable.           */
+/* ----------------------------------------------------------------------- */
+
+function QuickActions({
+  recipientName,
+  onEdit,
+  onReaction,
+  onGifts,
+  onHelp,
+  hasReward,
+  hasPromos,
+}: {
+  recipientName: string;
+  onEdit: () => void;
+  onReaction: () => void;
+  onGifts: () => void;
+  onHelp: () => void;
+  hasReward: boolean;
+  hasPromos: boolean;
+}) {
+  const giftCount = (hasReward ? 1 : 0) + (hasPromos ? 1 : 0);
+
+  const items: Array<{
+    icon: ReactNode;
+    title: string;
+    sub: string;
+    onClick: () => void;
+    badge?: string;
+    accent?: boolean;
+  }> = [
+    {
+      icon: <Pencil className="h-6 w-6" />,
+      title: "Change something",
+      sub: "Tweak lyrics, tempo, voice — free",
+      onClick: onEdit,
+    },
+    {
+      icon: <Video className="h-6 w-6" />,
+      title: "Send their reaction",
+      sub: "Get your money back + 2 free songs",
+      onClick: onReaction,
+      accent: true,
+    },
+    {
+      icon: <Gift className="h-6 w-6" />,
+      title: "Open free gifts",
+      sub: giftCount > 0 ? `You have ${giftCount} unlocked` : "Unlocks at delivery",
+      onClick: onGifts,
+      badge: giftCount > 0 ? String(giftCount) : undefined,
+    },
+    {
+      icon: <MessageCircle className="h-6 w-6" />,
+      title: "Talk to a human",
+      sub: "Real reply, usually within hours",
+      onClick: onHelp,
+    },
+  ];
+
+  return (
+    <section className="mt-10">
+      <div className="text-center">
+        <p className="text-xs font-semibold uppercase tracking-[0.2em] text-[#8D6FAF]">
+          What's next?
+        </p>
+        <h3 className="mt-1 font-display text-2xl text-[#1F1B16]">
+          Pick what you'd like to do for {recipientName}
+        </h3>
+      </div>
+      <div className="mt-5 grid grid-cols-1 gap-3 sm:grid-cols-2">
+        {items.map((it) => (
+          <button
+            key={it.title}
+            type="button"
+            onClick={it.onClick}
+            className={`group relative flex items-center gap-4 rounded-2xl border p-5 text-left transition hover:-translate-y-px hover:shadow-md ${
+              it.accent
+                ? "border-[rgba(141,111,175,0.45)] bg-gradient-to-br from-[rgba(141,111,175,0.16)] via-[#FBF6EC] to-[rgba(141,111,175,0.08)]"
+                : "border-[rgba(31,27,22,0.12)] bg-[#FBF6EC] hover:border-[rgba(141,111,175,0.4)]"
+            }`}
+          >
+            <span
+              className={`flex h-12 w-12 shrink-0 items-center justify-center rounded-full ${
+                it.accent
+                  ? "bg-[#8D6FAF] text-[#FFF7EE]"
+                  : "bg-[rgba(141,111,175,0.18)] text-[#8D6FAF]"
+              }`}
+            >
+              {it.icon}
+            </span>
+            <span className="flex-1">
+              <span className="block text-[16px] font-semibold text-[#1F1B16]">
+                {it.title}
+              </span>
+              <span className="mt-0.5 block text-[13px] text-[rgba(31,27,22,0.65)]">
+                {it.sub}
+              </span>
+            </span>
+            {it.badge && (
+              <span className="ml-2 inline-flex h-6 min-w-[24px] items-center justify-center rounded-full bg-[#8D6FAF] px-2 text-xs font-semibold text-[#FFF7EE]">
+                {it.badge}
+              </span>
+            )}
+            <span className="text-[rgba(31,27,22,0.4)] transition group-hover:translate-x-0.5 group-hover:text-[#8D6FAF]">
+              →
+            </span>
+          </button>
+        ))}
+      </div>
+    </section>
+  );
+}
+
+/* ----------------------------------------------------------------------- */
+/* Big tab bar — icon + label, easy to scan, sticky on mobile.             */
+/* ----------------------------------------------------------------------- */
+
+type TabKey = "player" | "reaction" | "refund" | "rewards";
+
+function BigTabBar({
+  tab,
+  setTab,
+}: {
+  tab: TabKey;
+  setTab: (t: TabKey) => void;
+}) {
+  const items: Array<{ key: TabKey; label: string; icon: ReactNode }> = [
+    { key: "player", label: "Lyrics & edits", icon: <Pencil className="h-4 w-4" /> },
+    { key: "reaction", label: "Reaction", icon: <Video className="h-4 w-4" /> },
+    { key: "rewards", label: "Free gifts", icon: <Gift className="h-4 w-4" /> },
+    { key: "refund", label: "Help", icon: <MessageCircle className="h-4 w-4" /> },
+  ];
+
+  return (
+    <nav className="mt-12 grid grid-cols-2 gap-2 sm:grid-cols-4">
+      {items.map((it) => {
+        const active = tab === it.key;
+        return (
+          <button
+            key={it.key}
+            type="button"
+            onClick={() => setTab(it.key)}
+            className={`flex items-center justify-center gap-2 rounded-full border px-4 py-3 text-sm font-semibold transition ${
+              active
+                ? "border-[#8D6FAF] bg-[#8D6FAF] text-[#FFF7EE] shadow-[0_4px_14px_rgba(141,111,175,0.3)]"
+                : "border-[rgba(31,27,22,0.15)] bg-[#FBF6EC] text-[rgba(31,27,22,0.7)] hover:border-[#8D6FAF] hover:text-[#1F1B16]"
+            }`}
+          >
+            {it.icon}
+            {it.label}
+          </button>
+        );
+      })}
+    </nav>
+  );
+}
