@@ -1168,6 +1168,7 @@ function OrdersPanel() {
   const [filter, setFilter] = useState<"all" | "flagged" | "in_progress" | "paid" | "failed">("all");
 
   useEffect(() => { load(); }, [filter]);
+  useRealtimeRefresh("orders", () => load());
 
   const load = async () => {
     let q = supabase
