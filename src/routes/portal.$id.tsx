@@ -937,7 +937,7 @@ function GoldTicket({
   onCopy,
   ctaLink,
 }: {
-  icon: React.ReactNode;
+  icon: ReactNode;
   eyebrow: string;
   title: string;
   body: string;
