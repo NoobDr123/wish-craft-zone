@@ -92,15 +92,15 @@ function RootShell({ children }: { children: React.ReactNode }) {
         <HeadContent />
       </head>
       <body>
-        <noscript>
-          <img
-            height="1"
-            width="1"
-            style={{ display: "none" }}
-            src="https://www.facebook.com/tr?id=1397546595537286&ev=PageView&noscript=1"
-            alt=""
+        {/* Meta Pixel <noscript> fallback — only emitted on the production hostname.
+            Rendered server-side so non-prod (preview, lovable.dev) never ships the tracking img. */}
+        {process.env.NODE_ENV === "production" ? (
+          <noscript
+            dangerouslySetInnerHTML={{
+              __html: `<script>(function(){var h=window.location.hostname;if(h==='ribbonsong.com'||h==='www.ribbonsong.com'){document.write('<img height="1" width="1" style="display:none" src="https://www.facebook.com/tr?id=1397546595537286&ev=PageView&noscript=1" alt=""/>')}})();</script>`,
+            }}
           />
-        </noscript>
+        ) : null}
         {children}
         <Scripts />
       </body>
