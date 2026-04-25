@@ -87,20 +87,20 @@ function AccountPage() {
 
   if (loading || !user || fetching || orders === null) {
     return (
-      <div className="flex min-h-screen items-center justify-center bg-[#1F1B16] text-[rgba(246,240,230,0.6)]">
+      <div className="flex min-h-screen items-center justify-center bg-[#1F1B16] text-[rgba(31,27,22,0.6)]">
         <Loader2 className="h-7 w-7 animate-spin" />
       </div>
     );
   }
 
   return (
-    <div className="min-h-screen bg-[#1F1B16] pb-24 text-[#F6F0E6]">
+    <div className="min-h-screen bg-[#1F1B16] pb-24 text-[#1F1B16]">
       {/* Header */}
-      <header className="border-b border-[rgba(246,240,230,0.1)] px-5 py-5 sm:px-6">
+      <header className="border-b border-[rgba(31,27,22,0.1)] px-5 py-5 sm:px-6">
         <div className="mx-auto flex max-w-5xl items-center justify-between">
           <Link
             to="/"
-            className="inline-flex items-center gap-2 font-display text-[18px] font-semibold tracking-[-0.02em] text-[#F6F0E6]"
+            className="inline-flex items-center gap-2 font-display text-[18px] font-semibold tracking-[-0.02em] text-[#1F1B16]"
           >
             <RibbonMark className="h-6 w-6" />
             RibbonSong
@@ -108,19 +108,19 @@ function AccountPage() {
           <div className="flex items-center gap-3 sm:gap-4 text-sm">
             <Link
               to="/"
-              className="hidden sm:inline-flex items-center gap-1.5 text-[rgba(246,240,230,0.6)] hover:text-[#F6F0E6]"
+              className="hidden sm:inline-flex items-center gap-1.5 text-[rgba(31,27,22,0.6)] hover:text-[#1F1B16]"
             >
               <ArrowLeft className="h-3.5 w-3.5" /> Home
             </Link>
             <Link
               to="/create"
-              className="inline-flex items-center gap-1.5 rounded-full bg-[#E5D9EF] px-4 py-2 font-medium text-[#1F1B16] hover:bg-[#d8c8e6]"
+              className="inline-flex items-center gap-1.5 rounded-full bg-[#8D6FAF] px-4 py-2 font-medium text-[#1F1B16] hover:bg-[#6B4F8A]"
             >
               <Plus className="h-3.5 w-3.5" /> New song
             </Link>
             <button
               onClick={handleSignOut}
-              className="text-[rgba(246,240,230,0.6)] hover:text-[#F6F0E6]"
+              className="text-[rgba(31,27,22,0.6)] hover:text-[#1F1B16]"
               aria-label="Sign out"
             >
               <LogOut className="h-4 w-4" />
@@ -146,13 +146,13 @@ function AccountPage() {
             {/* Heading for the selected order */}
             {activeOrder && (
               <div className="mb-6 mt-2 text-center sm:mb-8">
-                <p className="text-xs font-semibold uppercase tracking-[0.2em] text-[#E5D9EF]">
+                <p className="text-xs font-semibold uppercase tracking-[0.2em] text-[#8D6FAF]">
                   {orders.length > 1 ? "Now showing" : "Your song"}
                 </p>
                 <h1 className="mt-1 font-display text-3xl font-semibold sm:text-4xl">
                   For {activeOrder.recipient_name}
                 </h1>
-                <p className="mt-1 text-xs text-[rgba(246,240,230,0.5)]">
+                <p className="mt-1 text-xs text-[rgba(31,27,22,0.5)]">
                   Ordered{" "}
                   {new Date(activeOrder.created_at).toLocaleDateString("en-US", {
                     month: "short",
@@ -166,12 +166,12 @@ function AccountPage() {
             {activeOrder && <OrderPortal orderId={activeOrder.id} userId={user.id} />}
 
             {/* Help footer */}
-            <section className="mt-12 rounded-2xl border border-[rgba(246,240,230,0.1)] bg-[rgba(246,240,230,0.03)] p-5 text-center">
-              <p className="text-sm text-[rgba(246,240,230,0.65)]">
+            <section className="mt-12 rounded-2xl border border-[rgba(31,27,22,0.1)] bg-[rgba(31,27,22,0.03)] p-5 text-center">
+              <p className="text-sm text-[rgba(31,27,22,0.65)]">
                 Need anything else? Email us at{" "}
                 <a
                   href="mailto:hello@ribbonsong.com"
-                  className="font-medium text-[#E5D9EF] underline-offset-4 hover:underline"
+                  className="font-medium text-[#8D6FAF] underline-offset-4 hover:underline"
                 >
                   hello@ribbonsong.com
                 </a>
@@ -197,7 +197,7 @@ function OrderSwitcher({
 }) {
   return (
     <div className="mb-8">
-      <p className="mb-2 text-xs uppercase tracking-wider text-[rgba(246,240,230,0.55)]">
+      <p className="mb-2 text-xs uppercase tracking-wider text-[rgba(31,27,22,0.55)]">
         Your songs ({orders.length})
       </p>
       <div className="flex gap-2 overflow-x-auto pb-1 -mx-1 px-1 [scrollbar-width:thin]">
@@ -210,15 +210,15 @@ function OrderSwitcher({
               onClick={() => onSelect(o.id)}
               className={`group flex shrink-0 items-center gap-2 rounded-full border px-4 py-2 text-sm transition ${
                 active
-                  ? "border-[#E5D9EF] bg-[rgba(229,217,239,0.14)] text-[#F6F0E6]"
-                  : "border-[rgba(246,240,230,0.15)] bg-transparent text-[rgba(246,240,230,0.7)] hover:border-[rgba(246,240,230,0.3)] hover:text-[#F6F0E6]"
+                  ? "border-[#8D6FAF] bg-[rgba(141,111,175,0.14)] text-[#1F1B16]"
+                  : "border-[rgba(31,27,22,0.15)] bg-transparent text-[rgba(31,27,22,0.7)] hover:border-[rgba(31,27,22,0.3)] hover:text-[#1F1B16]"
               }`}
             >
               <Music2 className="h-3.5 w-3.5" />
               <span className="font-medium">{o.recipient_name}</span>
               {o.is_gift && <Gift className="h-3 w-3 opacity-60" />}
               {inProgress && (
-                <span className="ml-1 inline-flex h-1.5 w-1.5 animate-pulse rounded-full bg-[#E5D9EF]" />
+                <span className="ml-1 inline-flex h-1.5 w-1.5 animate-pulse rounded-full bg-[#8D6FAF]" />
               )}
             </button>
           );
@@ -230,17 +230,17 @@ function OrderSwitcher({
 
 function EmptyState() {
   return (
-    <div className="rounded-3xl border border-dashed border-[rgba(246,240,230,0.2)] bg-[rgba(246,240,230,0.03)] p-10 text-center">
-      <div className="mx-auto flex h-12 w-12 items-center justify-center rounded-full bg-[rgba(229,217,239,0.18)]">
-        <Sparkles className="h-6 w-6 text-[#E5D9EF]" />
+    <div className="rounded-3xl border border-dashed border-[rgba(31,27,22,0.2)] bg-[rgba(31,27,22,0.03)] p-10 text-center">
+      <div className="mx-auto flex h-12 w-12 items-center justify-center rounded-full bg-[rgba(141,111,175,0.18)]">
+        <Sparkles className="h-6 w-6 text-[#8D6FAF]" />
       </div>
       <h2 className="mt-4 font-display text-2xl">No songs yet</h2>
-      <p className="mt-2 text-sm text-[rgba(246,240,230,0.65)]">
+      <p className="mt-2 text-sm text-[rgba(31,27,22,0.65)]">
         When you create a RibbonSong, it'll show up here forever.
       </p>
       <Link
         to="/create"
-        className="mt-5 inline-flex items-center justify-center gap-2 rounded-full bg-[#E5D9EF] px-5 py-2.5 text-sm font-semibold text-[#1F1B16] hover:bg-[#d8c8e6]"
+        className="mt-5 inline-flex items-center justify-center gap-2 rounded-full bg-[#8D6FAF] px-5 py-2.5 text-sm font-semibold text-[#1F1B16] hover:bg-[#6B4F8A]"
       >
         <Plus className="h-4 w-4" /> Create your first song
       </Link>

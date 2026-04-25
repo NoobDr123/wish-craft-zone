@@ -125,7 +125,7 @@ export function OrderPortal({ orderId, userId }: { orderId: string; userId: stri
 
   if (!order) {
     return (
-      <div className="flex items-center justify-center py-20 text-[rgba(246,240,230,0.6)]">
+      <div className="flex items-center justify-center py-20 text-[rgba(31,27,22,0.6)]">
         Loading…
       </div>
     );
@@ -165,27 +165,27 @@ export function OrderPortal({ orderId, userId }: { orderId: string; userId: stri
 
           <div className="mt-8 flex flex-wrap justify-center gap-2 text-xs">
             {order.has_3rd_verse && (
-              <Badge variant="outline" className="border-[rgba(246,240,230,0.3)] text-[rgba(246,240,230,0.8)]">
+              <Badge variant="outline" className="border-[rgba(31,27,22,0.3)] text-[rgba(31,27,22,0.8)]">
                 3rd verse
               </Badge>
             )}
             {order.is_rush && (
-              <Badge variant="outline" className="border-[rgba(246,240,230,0.3)] text-[rgba(246,240,230,0.8)]">
+              <Badge variant="outline" className="border-[rgba(31,27,22,0.3)] text-[rgba(31,27,22,0.8)]">
                 Rush
               </Badge>
             )}
             {order.has_unlimited_edits && (
-              <Badge variant="outline" className="border-[rgba(246,240,230,0.3)] text-[rgba(246,240,230,0.8)]">
+              <Badge variant="outline" className="border-[rgba(31,27,22,0.3)] text-[rgba(31,27,22,0.8)]">
                 Unlimited edits
               </Badge>
             )}
             {order.is_gift && (
-              <Badge variant="outline" className="border-[rgba(246,240,230,0.3)] text-[rgba(246,240,230,0.8)]">
+              <Badge variant="outline" className="border-[rgba(31,27,22,0.3)] text-[rgba(31,27,22,0.8)]">
                 Gift
               </Badge>
             )}
             {order.source_kind === "free_reward" && (
-              <Badge className="bg-[#E5D9EF] text-[#1F1B16]">Free song reward</Badge>
+              <Badge className="bg-[#8D6FAF] text-[#FFF7EE]">Free song reward</Badge>
             )}
           </div>
 
@@ -196,20 +196,20 @@ export function OrderPortal({ orderId, userId }: { orderId: string; userId: stri
             sharePath={sharePath}
           />
 
-          <nav className="mt-10 flex justify-center gap-1 border-b border-[rgba(246,240,230,0.15)] overflow-x-auto">
+          <nav className="mt-10 flex justify-center gap-1 border-b border-[rgba(31,27,22,0.15)] overflow-x-auto">
             {tabs.map(([k, l]) => (
               <button
                 key={k}
                 onClick={() => setTab(k)}
                 className={`relative whitespace-nowrap px-4 py-3 text-sm transition ${
                   tab === k
-                    ? "font-semibold text-[#F6F0E6]"
-                    : "text-[rgba(246,240,230,0.55)] hover:text-[#F6F0E6]"
+                    ? "font-semibold text-[#1F1B16]"
+                    : "text-[rgba(31,27,22,0.55)] hover:text-[#1F1B16]"
                 }`}
               >
                 {l}
                 {tab === k && (
-                  <span className="absolute inset-x-2 -bottom-px h-0.5 bg-[#E5D9EF]" />
+                  <span className="absolute inset-x-2 -bottom-px h-0.5 bg-[#8D6FAF]" />
                 )}
               </button>
             ))}
@@ -218,7 +218,7 @@ export function OrderPortal({ orderId, userId }: { orderId: string; userId: stri
           <div className="mt-8">
             {tab === "player" && (
               <div className="space-y-6">
-                <pre className="whitespace-pre-wrap rounded-2xl border border-[rgba(246,240,230,0.12)] bg-[rgba(246,240,230,0.04)] p-6 font-sans text-[15px] leading-relaxed text-[#F6F0E6]">
+                <pre className="whitespace-pre-wrap rounded-2xl border border-[rgba(31,27,22,0.12)] bg-[rgba(31,27,22,0.04)] p-6 font-sans text-[15px] leading-relaxed text-[#1F1B16]">
                   {lyrics}
                 </pre>
                 <RevisionTab
@@ -267,23 +267,23 @@ export function OrderPortal({ orderId, userId }: { orderId: string; userId: stri
 function InProgressCard({ order }: { order: Order }) {
   const stage = STAGE_MAP[order.status] ?? { label: "In progress", pct: 15 };
   return (
-    <div className="rounded-3xl border border-[rgba(246,240,230,0.12)] bg-[rgba(246,240,230,0.04)] p-8 text-center">
-      <p className="text-xs font-semibold uppercase tracking-[0.2em] text-[#E5D9EF]">
+    <div className="rounded-3xl border border-[rgba(31,27,22,0.12)] bg-[rgba(31,27,22,0.04)] p-8 text-center">
+      <p className="text-xs font-semibold uppercase tracking-[0.2em] text-[#8D6FAF]">
         {stage.label}
       </p>
       <h2 className="mt-2 font-display text-3xl font-semibold">
         Your song for {order.recipient_name}
       </h2>
-      <p className="mt-2 text-sm text-[rgba(246,240,230,0.65)]">
+      <p className="mt-2 text-sm text-[rgba(31,27,22,0.65)]">
         We'll email you the moment it's ready. No need to refresh — this page updates on its own.
       </p>
-      <div className="mx-auto mt-6 h-2 max-w-md overflow-hidden rounded-full bg-[rgba(246,240,230,0.1)]">
+      <div className="mx-auto mt-6 h-2 max-w-md overflow-hidden rounded-full bg-[rgba(31,27,22,0.1)]">
         <div
-          className="h-full rounded-full bg-[#E5D9EF] transition-all duration-700"
+          className="h-full rounded-full bg-[#8D6FAF] transition-all duration-700"
           style={{ width: `${stage.pct}%` }}
         />
       </div>
-      <p className="mt-3 text-xs text-[rgba(246,240,230,0.5)]">{stage.pct}% complete</p>
+      <p className="mt-3 text-xs text-[rgba(31,27,22,0.5)]">{stage.pct}% complete</p>
     </div>
   );
 }
@@ -349,13 +349,13 @@ function VariantSwitcher({
   if (variants.length < 2 && !otherVariant) return null;
 
   return (
-    <div className="mt-6 rounded-2xl border border-[rgba(246,240,230,0.12)] bg-[rgba(246,240,230,0.04)] p-4">
+    <div className="mt-6 rounded-2xl border border-[rgba(31,27,22,0.12)] bg-[rgba(31,27,22,0.04)] p-4">
       <div className="flex items-center justify-between gap-3">
-        <p className="text-xs uppercase tracking-wider text-[rgba(246,240,230,0.55)]">
+        <p className="text-xs uppercase tracking-wider text-[rgba(31,27,22,0.55)]">
           Two versions of your song
         </p>
         {unlocked && (
-          <span className="text-xs text-[rgba(246,240,230,0.55)]">Tap to switch</span>
+          <span className="text-xs text-[rgba(31,27,22,0.55)]">Tap to switch</span>
         )}
       </div>
       <div className="mt-3 grid grid-cols-2 gap-2">
@@ -372,10 +372,10 @@ function VariantSwitcher({
               disabled={!playable}
               className={`flex items-center justify-between rounded-xl border px-4 py-3 text-sm transition ${
                 active
-                  ? "border-[#E5D9EF] bg-[rgba(229,217,239,0.12)] text-[#F6F0E6]"
+                  ? "border-[#8D6FAF] bg-[rgba(141,111,175,0.12)] text-[#1F1B16]"
                   : isLockedSecond
-                    ? "border-[rgba(246,240,230,0.12)] bg-[rgba(246,240,230,0.02)] text-[rgba(246,240,230,0.45)]"
-                    : "border-[rgba(246,240,230,0.15)] bg-transparent text-[rgba(246,240,230,0.7)] hover:border-[rgba(246,240,230,0.3)]"
+                    ? "border-[rgba(31,27,22,0.12)] bg-[rgba(31,27,22,0.02)] text-[rgba(31,27,22,0.45)]"
+                    : "border-[rgba(31,27,22,0.15)] bg-transparent text-[rgba(31,27,22,0.7)] hover:border-[rgba(31,27,22,0.3)]"
               } ${!playable && !isLockedSecond ? "opacity-50 cursor-not-allowed" : ""} ${isLockedSecond ? "cursor-not-allowed" : ""}`}
             >
               <span className="flex items-center gap-2">
@@ -390,25 +390,25 @@ function VariantSwitcher({
       </div>
 
       {!unlocked && (
-        <div className="mt-4 rounded-xl border border-[rgba(229,217,239,0.25)] bg-[rgba(229,217,239,0.06)] p-4">
+        <div className="mt-4 rounded-xl border border-[rgba(141,111,175,0.25)] bg-[rgba(141,111,175,0.06)] p-4">
           <div className="flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between">
             <div>
-              <p className="text-sm font-medium text-[#E5D9EF]">
+              <p className="text-sm font-medium text-[#8D6FAF]">
                 Hear it sung a different way
               </p>
-              <p className="mt-0.5 text-xs text-[rgba(246,240,230,0.7)]">
+              <p className="mt-0.5 text-xs text-[rgba(31,27,22,0.7)]">
                 Same heartfelt lyrics — a fresh voice and feel. Many people end up loving the second one more.
               </p>
             </div>
             <Button
               onClick={unlock}
               disabled={unlocking || !hasSavedCard}
-              className="bg-[#E5D9EF] text-[#1F1B16] hover:bg-[#d8c8e6] whitespace-nowrap"
+              className="bg-[#8D6FAF] text-[#FFF7EE] hover:bg-[#6B4F8A] whitespace-nowrap"
             >
               {unlocking ? "Unlocking…" : hasSavedCard ? "Unlock for $5" : "No saved card"}
             </Button>
           </div>
-          <p className="mt-2 text-[10px] leading-relaxed text-[rgba(246,240,230,0.45)]">
+          <p className="mt-2 text-[10px] leading-relaxed text-[rgba(31,27,22,0.45)]">
             We'll make a one-time $5 charge to the card you used at checkout. No subscription.
           </p>
         </div>
@@ -463,9 +463,9 @@ function ShareSection({
   };
 
   return (
-    <div className="mt-8 rounded-2xl border border-[rgba(246,240,230,0.12)] bg-[rgba(246,240,230,0.04)] p-6 text-center">
+    <div className="mt-8 rounded-2xl border border-[rgba(31,27,22,0.12)] bg-[rgba(31,27,22,0.04)] p-6 text-center">
       <h3 className="font-display text-xl">Share it with {recipientName}</h3>
-      <p className="mx-auto mt-1 max-w-md text-sm text-[rgba(246,240,230,0.65)]">
+      <p className="mx-auto mt-1 max-w-md text-sm text-[rgba(31,27,22,0.65)]">
         Send the private link, or download the file and send it however feels right —
         text, email, or save it forever.
       </p>
@@ -475,7 +475,7 @@ function ShareSection({
             variant="outline"
             size="sm"
             onClick={copyShare}
-            className="border-[rgba(246,240,230,0.2)] bg-transparent text-[#F6F0E6] hover:bg-[rgba(246,240,230,0.08)]"
+            className="border-[rgba(31,27,22,0.2)] bg-transparent text-[#1F1B16] hover:bg-[rgba(31,27,22,0.08)]"
           >
             <Share2 className="mr-2 h-3.5 w-3.5" /> Copy share link
           </Button>
@@ -484,7 +484,7 @@ function ShareSection({
           <Button
             size="sm"
             onClick={downloadSong}
-            className="bg-[#E5D9EF] text-[#1F1B16] hover:bg-[#d8c8e6]"
+            className="bg-[#8D6FAF] text-[#FFF7EE] hover:bg-[#6B4F8A]"
           >
             <Download className="mr-2 h-3.5 w-3.5" /> Download song
           </Button>
@@ -541,14 +541,14 @@ function ReactionTab({ orderId, buyerEmail, userId, reactions, reward, reload }:
   };
 
   return (
-    <div className="rounded-2xl border border-[rgba(246,240,230,0.12)] bg-[rgba(246,240,230,0.04)] p-6">
+    <div className="rounded-2xl border border-[rgba(31,27,22,0.12)] bg-[rgba(31,27,22,0.04)] p-6">
       <div className="flex items-start justify-between gap-3">
         <div>
           <h2 className="font-display text-xl">Re-Found reaction reward</h2>
-          <p className="mt-1 text-sm text-[rgba(246,240,230,0.65)]">
+          <p className="mt-1 text-sm text-[rgba(31,27,22,0.65)]">
             Send us the moment they hear it for the first time. When approved, we'll{" "}
-            <span className="font-medium text-[#F6F0E6]">refund your order in full</span> and give you{" "}
-            <span className="font-medium text-[#F6F0E6]">2 free songs</span> to gift to anyone.
+            <span className="font-medium text-[#1F1B16]">refund your order in full</span> and give you{" "}
+            <span className="font-medium text-[#1F1B16]">2 free songs</span> to gift to anyone.
           </p>
         </div>
         {reward?.status === "approved" && (
@@ -562,18 +562,18 @@ function ReactionTab({ orderId, buyerEmail, userId, reactions, reward, reload }:
         type="file"
         accept="video/mp4,video/quicktime,video/webm"
         onChange={(e) => setFile(e.target.files?.[0] ?? null)}
-        className="mt-5 block w-full text-sm text-[rgba(246,240,230,0.7)] file:mr-3 file:rounded-full file:border-0 file:bg-[#E5D9EF] file:px-4 file:py-2 file:text-sm file:font-medium file:text-[#1F1B16]"
+        className="mt-5 block w-full text-sm text-[rgba(31,27,22,0.7)] file:mr-3 file:rounded-full file:border-0 file:bg-[#8D6FAF] file:px-4 file:py-2 file:text-sm file:font-medium file:text-[#FFF7EE]"
       />
       <textarea
         value={caption}
         onChange={(e) => setCaption(e.target.value.slice(0, 280))}
         placeholder="Caption (optional)"
-        className="mt-3 w-full rounded-xl border border-[rgba(246,240,230,0.2)] bg-[rgba(246,240,230,0.06)] p-3 text-sm text-[#F6F0E6] placeholder:text-[rgba(246,240,230,0.4)]"
+        className="mt-3 w-full rounded-xl border border-[rgba(31,27,22,0.2)] bg-[rgba(31,27,22,0.06)] p-3 text-sm text-[#1F1B16] placeholder:text-[rgba(31,27,22,0.4)]"
         rows={3}
       />
       {err && <p className="mt-2 text-sm text-red-400">{err}</p>}
       <Button
-        className="mt-4 bg-[#E5D9EF] text-[#1F1B16] hover:bg-[#d8c8e6]"
+        className="mt-4 bg-[#8D6FAF] text-[#FFF7EE] hover:bg-[#6B4F8A]"
         disabled={!file || busy}
         onClick={upload}
       >
@@ -582,15 +582,15 @@ function ReactionTab({ orderId, buyerEmail, userId, reactions, reward, reload }:
 
       {reactions.length > 0 && (
         <div className="mt-6 space-y-2">
-          <p className="text-xs uppercase tracking-wider text-[rgba(246,240,230,0.55)]">
+          <p className="text-xs uppercase tracking-wider text-[rgba(31,27,22,0.55)]">
             Your submissions
           </p>
           {reactions.map((r: any) => (
             <div
               key={r.id}
-              className="flex items-center justify-between rounded-lg bg-[rgba(246,240,230,0.04)] px-3 py-2 text-sm"
+              className="flex items-center justify-between rounded-lg bg-[rgba(31,27,22,0.04)] px-3 py-2 text-sm"
             >
-              <span className="text-[rgba(246,240,230,0.75)]">
+              <span className="text-[rgba(31,27,22,0.75)]">
                 {new Date(r.created_at).toLocaleString()}
               </span>
               <Badge
@@ -600,7 +600,7 @@ function ReactionTab({ orderId, buyerEmail, userId, reactions, reward, reload }:
                     ? "border-emerald-500/40 text-emerald-300"
                     : r.status === "rejected"
                       ? "border-red-500/40 text-red-300"
-                      : "border-[rgba(246,240,230,0.3)] text-[rgba(246,240,230,0.7)]"
+                      : "border-[rgba(31,27,22,0.3)] text-[rgba(31,27,22,0.7)]"
                 }
               >
                 {r.status}
@@ -666,10 +666,10 @@ function RevisionTab({
   return (
     <div className="space-y-6">
       {revisions.length > 0 && (
-        <div className="rounded-2xl border border-[rgba(246,240,230,0.12)] bg-[rgba(246,240,230,0.04)] p-6">
+        <div className="rounded-2xl border border-[rgba(31,27,22,0.12)] bg-[rgba(31,27,22,0.04)] p-6">
           <div className="flex items-center justify-between">
             <h2 className="font-display text-xl">Your revisions</h2>
-            <Badge variant="outline" className="border-[rgba(246,240,230,0.3)] text-[rgba(246,240,230,0.75)]">
+            <Badge variant="outline" className="border-[rgba(31,27,22,0.3)] text-[rgba(31,27,22,0.75)]">
               {hasUnlimited ? `${used} submitted` : `${used} of ${cap} used`}
             </Badge>
           </div>
@@ -677,20 +677,20 @@ function RevisionTab({
             {revisions.map((r) => (
               <div
                 key={r.id}
-                className="rounded-xl border border-[rgba(246,240,230,0.1)] bg-[rgba(246,240,230,0.03)] p-4"
+                className="rounded-xl border border-[rgba(31,27,22,0.1)] bg-[rgba(31,27,22,0.03)] p-4"
               >
                 <div className="flex items-center justify-between gap-3">
-                  <span className="text-xs text-[rgba(246,240,230,0.55)]">
+                  <span className="text-xs text-[rgba(31,27,22,0.55)]">
                     {new Date(r.created_at).toLocaleString()}
                   </span>
                   <Badge
                     variant="outline"
-                    className="border-[rgba(246,240,230,0.3)] text-[rgba(246,240,230,0.75)]"
+                    className="border-[rgba(31,27,22,0.3)] text-[rgba(31,27,22,0.75)]"
                   >
                     {r.status}
                   </Badge>
                 </div>
-                <p className="mt-2 whitespace-pre-wrap text-sm text-[rgba(246,240,230,0.85)]">
+                <p className="mt-2 whitespace-pre-wrap text-sm text-[rgba(31,27,22,0.85)]">
                   {r.notes}
                 </p>
               </div>
@@ -700,37 +700,37 @@ function RevisionTab({
       )}
 
       {canSubmit ? (
-        <div className="rounded-2xl border border-[rgba(246,240,230,0.12)] bg-[rgba(246,240,230,0.04)] p-6">
+        <div className="rounded-2xl border border-[rgba(31,27,22,0.12)] bg-[rgba(31,27,22,0.04)] p-6">
           <h2 className="font-display text-xl">
             Don't love the lyrics? Let our team help.
           </h2>
-          <p className="mt-1 text-sm text-[rgba(246,240,230,0.65)]">{helper}</p>
+          <p className="mt-1 text-sm text-[rgba(31,27,22,0.65)]">{helper}</p>
           <textarea
             value={notes}
             onChange={(e) => setNotes(e.target.value.slice(0, 1000))}
             placeholder="e.g. Slower tempo, change 'fighter' to 'warrior' in verse 2, mention our daughter Mia…"
-            className="mt-3 w-full rounded-xl border border-[rgba(246,240,230,0.2)] bg-[rgba(246,240,230,0.06)] p-3 text-sm text-[#F6F0E6] placeholder:text-[rgba(246,240,230,0.4)]"
+            className="mt-3 w-full rounded-xl border border-[rgba(31,27,22,0.2)] bg-[rgba(31,27,22,0.06)] p-3 text-sm text-[#1F1B16] placeholder:text-[rgba(31,27,22,0.4)]"
             rows={6}
           />
           <Button
-            className="mt-4 bg-[#E5D9EF] text-[#1F1B16] hover:bg-[#d8c8e6]"
+            className="mt-4 bg-[#8D6FAF] text-[#FFF7EE] hover:bg-[#6B4F8A]"
             disabled={notes.trim().length < 10 || busy}
             onClick={submit}
           >
             {busy ? "Submitting…" : hasUnlimited ? "Submit revision" : "Send to our team — it's free"}
           </Button>
           {hasUnlimited && (
-            <p className="mt-3 text-xs text-[rgba(246,240,230,0.55)]">
+            <p className="mt-3 text-xs text-[rgba(31,27,22,0.55)]">
               Unlimited revisions included with this song.
             </p>
           )}
         </div>
       ) : (
-        <div className="rounded-2xl border border-[rgba(246,240,230,0.12)] bg-[rgba(246,240,230,0.04)] p-6">
+        <div className="rounded-2xl border border-[rgba(31,27,22,0.12)] bg-[rgba(31,27,22,0.04)] p-6">
           <h2 className="font-display text-xl">No revisions remaining</h2>
-          <p className="mt-2 text-sm text-[rgba(246,240,230,0.7)]">
+          <p className="mt-2 text-sm text-[rgba(31,27,22,0.7)]">
             You've used all {cap} {cap === 1 ? "revision" : "revisions"} for this song. Need more changes?{" "}
-            <Link to="/create" className="text-[#E5D9EF] underline">
+            <Link to="/create" className="text-[#8D6FAF] underline">
               Order another song
             </Link>
             .
@@ -769,9 +769,9 @@ function RefundTab({ orderId, buyerEmail, refunds, reload }: any) {
   };
 
   return (
-    <div className="rounded-2xl border border-[rgba(246,240,230,0.12)] bg-[rgba(246,240,230,0.04)] p-6">
+    <div className="rounded-2xl border border-[rgba(31,27,22,0.12)] bg-[rgba(31,27,22,0.04)] p-6">
       <h2 className="font-display text-xl">Talk to our team</h2>
-      <p className="mt-1 text-sm text-[rgba(246,240,230,0.65)]">
+      <p className="mt-1 text-sm text-[rgba(31,27,22,0.65)]">
         Whether you want to say thanks, ask a question, request a refund, or just need a hand —
         write to us here. A real person reads every message and gets back to you, usually within
         a few hours.
@@ -781,11 +781,11 @@ function RefundTab({ orderId, buyerEmail, refunds, reload }: any) {
         value={reason}
         onChange={(e) => setReason(e.target.value.slice(0, 2000))}
         placeholder="Tell us what's on your mind (min 20 characters)…"
-        className="mt-4 w-full rounded-xl border border-[rgba(246,240,230,0.2)] bg-[rgba(246,240,230,0.06)] p-3 text-sm text-[#F6F0E6] placeholder:text-[rgba(246,240,230,0.4)]"
+        className="mt-4 w-full rounded-xl border border-[rgba(31,27,22,0.2)] bg-[rgba(31,27,22,0.06)] p-3 text-sm text-[#1F1B16] placeholder:text-[rgba(31,27,22,0.4)]"
         rows={6}
       />
       <Button
-        className="mt-4 bg-[#E5D9EF] text-[#1F1B16] hover:bg-[#d8c8e6]"
+        className="mt-4 bg-[#8D6FAF] text-[#FFF7EE] hover:bg-[#6B4F8A]"
         disabled={reason.trim().length < 20 || busy}
         onClick={submit}
       >
@@ -794,19 +794,19 @@ function RefundTab({ orderId, buyerEmail, refunds, reload }: any) {
 
       {refunds.length > 0 && (
         <div className="mt-6 space-y-2">
-          <p className="text-xs uppercase tracking-wider text-[rgba(246,240,230,0.55)]">
+          <p className="text-xs uppercase tracking-wider text-[rgba(31,27,22,0.55)]">
             Your messages
           </p>
           {refunds.map((r: any) => (
             <div
               key={r.id}
-              className="rounded-lg bg-[rgba(246,240,230,0.04)] px-3 py-2 text-sm"
+              className="rounded-lg bg-[rgba(31,27,22,0.04)] px-3 py-2 text-sm"
             >
               <div className="flex items-center justify-between">
-                <span className="text-[rgba(246,240,230,0.85)]">
+                <span className="text-[rgba(31,27,22,0.85)]">
                   {new Date(r.created_at).toLocaleString()}
                 </span>
-                <Badge variant="outline" className="border-[rgba(246,240,230,0.3)] text-[rgba(246,240,230,0.75)]">
+                <Badge variant="outline" className="border-[rgba(31,27,22,0.3)] text-[rgba(31,27,22,0.75)]">
                   {r.status}
                 </Badge>
               </div>
@@ -845,7 +845,7 @@ function RewardsTab({
     <div className="space-y-5">
       <div className="text-center">
         <h2 className="font-display text-2xl">Two free gifts, just for you</h2>
-        <p className="mx-auto mt-1 max-w-md text-sm text-[rgba(246,240,230,0.65)]">
+        <p className="mx-auto mt-1 max-w-md text-sm text-[rgba(31,27,22,0.65)]">
           Our way of saying thank you. Two golden tickets you can use whenever you'd like.
         </p>
       </div>
@@ -923,22 +923,22 @@ function GoldTicket({
   ctaLink?: { to: string; search?: any; label: string } | null;
 }) {
   return (
-    <div className="relative overflow-hidden rounded-2xl border border-[rgba(229,217,239,0.3)] bg-gradient-to-br from-[rgba(229,217,239,0.10)] via-[rgba(246,240,230,0.04)] to-[rgba(229,217,239,0.06)] p-6 shadow-[0_0_40px_-20px_rgba(229,217,239,0.4)]">
-      <div className="absolute inset-y-0 left-16 hidden w-px bg-[rgba(246,240,230,0.12)] sm:block" />
+    <div className="relative overflow-hidden rounded-2xl border border-[rgba(141,111,175,0.3)] bg-gradient-to-br from-[rgba(141,111,175,0.10)] via-[rgba(31,27,22,0.04)] to-[rgba(141,111,175,0.06)] p-6 shadow-[0_0_40px_-20px_rgba(141,111,175,0.4)]">
+      <div className="absolute inset-y-0 left-16 hidden w-px bg-[rgba(31,27,22,0.12)] sm:block" />
       <div className="flex items-start gap-4">
-        <div className="flex h-10 w-10 shrink-0 items-center justify-center rounded-full bg-[rgba(229,217,239,0.18)] text-[#E5D9EF]">
+        <div className="flex h-10 w-10 shrink-0 items-center justify-center rounded-full bg-[rgba(141,111,175,0.18)] text-[#8D6FAF]">
           {icon}
         </div>
         <div className="flex-1">
-          <p className="text-[10px] font-semibold uppercase tracking-[0.2em] text-[#E5D9EF]">
+          <p className="text-[10px] font-semibold uppercase tracking-[0.2em] text-[#8D6FAF]">
             {eyebrow}
           </p>
-          <h3 className="mt-1 font-display text-lg leading-snug text-[#F6F0E6]">{title}</h3>
-          <p className="mt-2 text-sm text-[rgba(246,240,230,0.7)]">{body}</p>
+          <h3 className="mt-1 font-display text-lg leading-snug text-[#1F1B16]">{title}</h3>
+          <p className="mt-2 text-sm text-[rgba(31,27,22,0.7)]">{body}</p>
 
           {code && (
-            <div className="mt-4 flex items-center gap-2 rounded-xl border border-[rgba(229,217,239,0.3)] bg-[rgba(229,217,239,0.08)] px-4 py-3">
-              <code className="flex-1 font-mono text-sm font-semibold text-[#E5D9EF]">
+            <div className="mt-4 flex items-center gap-2 rounded-xl border border-[rgba(141,111,175,0.3)] bg-[rgba(141,111,175,0.08)] px-4 py-3">
+              <code className="flex-1 font-mono text-sm font-semibold text-[#8D6FAF]">
                 {code}
               </code>
               {badge && (
@@ -951,7 +951,7 @@ function GoldTicket({
                   variant="outline"
                   size="sm"
                   onClick={onCopy}
-                  className="border-[rgba(229,217,239,0.4)] bg-transparent text-[#E5D9EF] hover:bg-[rgba(229,217,239,0.1)]"
+                  className="border-[rgba(141,111,175,0.4)] bg-transparent text-[#8D6FAF] hover:bg-[rgba(141,111,175,0.1)]"
                 >
                   <Copy className="mr-1.5 h-3.5 w-3.5" />
                   Copy
@@ -964,7 +964,7 @@ function GoldTicket({
             <Link
               to={ctaLink.to}
               search={ctaLink.search}
-              className="mt-3 inline-block text-sm text-[#E5D9EF] underline"
+              className="mt-3 inline-block text-sm text-[#8D6FAF] underline"
             >
               {ctaLink.label}
             </Link>
