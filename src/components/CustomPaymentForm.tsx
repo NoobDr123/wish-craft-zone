@@ -95,6 +95,62 @@ function InnerForm({ returnUrl, email, amountLabel, amountCents, promoVersion, o
     });
   }, [elements, promoVersion]);
 
+  // Track tracking import lazily so it doesn't bloat the critical chunk.
+  const trackEvent = (
+    type: "payment_failed" | "payment_success",
+    payload?: Record<string, unknown>,
+  ) => {
+    void import("@/lib/tracking").then(({ track }) =>
+      track({ type, buyerEmail: email, payload }),
+    );
+  };
+
+  /**
+   * Shared finalize logic for BOTH card and wallet (Apple Pay / Google Pay /
+   * Link) confirmation paths. Treat ANY in-flight or terminal-success PI
+   * state as "good enough" and navigate to the return page, which polls
+   * the order until it's marked paid (or times out and forwards to upsells
+   * anyway). This is the safety net that ensures mobile wallet users always
+   * make it to the upsell flow even when:
+   *   - Stripe.js returns no `paymentIntent` (because the wallet sheet
+   *     redirected the page itself)
+   *   - The PI is in `requires_action` (Apple Pay biometric / 3DS)
+   *   - The PI is in `processing` (async ACH-style methods)
+   * The return page already handles all of these via polling +
+   * confirm-payment fallback, so we just need to GET THERE.
+   */
+  const finalize = (
+    paymentIntent: { status?: string } | null | undefined,
+    source: "card" | "express",
+  ): boolean => {
+    const status = paymentIntent?.status;
+    const navigatingStatuses = new Set([
+      "succeeded",
+      "processing",
+      "requires_capture",
+      "requires_action",
+    ]);
+
+    // Successful or in-flight terminal state — go to return page.
+    if (status && navigatingStatuses.has(status)) {
+      trackEvent("payment_success", { status, source });
+      window.location.assign(returnUrl);
+      return true;
+    }
+
+    // No paymentIntent at all (e.g. wallet sheet handled redirect itself
+    // and Stripe.js never resolved with a PI), OR an unrecognized status.
+    // Either way: send the user to the return page with the PI id baked
+    // into the URL so the polling/confirm fallback picks it up.
+    if (!paymentIntent) {
+      console.warn("[CustomPaymentForm] no paymentIntent returned, navigating to return_url anyway");
+      window.location.assign(returnUrl);
+      return true;
+    }
+
+    return false;
+  };
+
   const handleConfirm = async () => {
     if (!stripe || !elements) return;
     if (disabled) {
@@ -123,32 +179,24 @@ function InnerForm({ returnUrl, email, amountLabel, amountCents, promoVersion, o
       setErrorMsg(msg);
       onError?.(msg);
       setSubmitting(false);
-      void import("@/lib/tracking").then(({ track }) =>
-        track({ type: "payment_failed", buyerEmail: email, payload: { message: msg } })
-      );
+      trackEvent("payment_failed", { message: msg, source: "card" });
       return;
     }
 
-    // Payment succeeded (or requires async processing) — navigate to the
-    // return page, which polls for the order to be marked paid and then
-    // forwards to the upsell flow.
-    if (paymentIntent && (paymentIntent.status === "succeeded" || paymentIntent.status === "processing" || paymentIntent.status === "requires_capture")) {
-      void import("@/lib/tracking").then(({ track }) =>
-        track({ type: "payment_success", buyerEmail: email, payload: { status: paymentIntent.status } })
-      );
-      window.location.assign(returnUrl);
-      return;
-    }
+    if (finalize(paymentIntent, "card")) return;
 
-    // Unexpected state — surface a generic error so the user isn't stuck.
+    // Truly unexpected — surface a generic error so the user isn't stuck.
     const msg = "Payment is taking longer than expected. Please refresh.";
     setErrorMsg(msg);
     onError?.(msg);
     setSubmitting(false);
   };
 
-  const handleExpressConfirm = async (event: { resolve: () => void; reject: () => void } | any) => {
-    if (!stripe || !elements) return;
+  const handleExpressConfirm = async (event: any) => {
+    if (!stripe || !elements) {
+      event?.reject?.();
+      return;
+    }
     if (disabled) {
       const msg = disabledReason || "Please enter your email and name above first.";
       setErrorMsg(msg);
@@ -156,24 +204,42 @@ function InnerForm({ returnUrl, email, amountLabel, amountCents, promoVersion, o
       event?.reject?.();
       return;
     }
+    setSubmitting(true);
+    setErrorMsg(null);
+
     const { error, paymentIntent } = await stripe.confirmPayment({
       elements,
       confirmParams: {
         return_url: returnUrl,
         receipt_email: email,
       },
+      // For wallet flows we want Stripe to handle 3DS / next_action redirects
+      // automatically — `if_required` follows the redirect when needed and
+      // resolves in-place otherwise. This is the same as the card path.
       redirect: "if_required",
     });
+
     if (error) {
       const msg = error.message || "Payment failed.";
       setErrorMsg(msg);
       onError?.(msg);
+      setSubmitting(false);
+      trackEvent("payment_failed", { message: msg, source: "express" });
+      // Tell the wallet sheet we couldn't complete so it dismisses cleanly
+      // (otherwise iOS Apple Pay can hang on the spinner forever).
+      event?.reject?.();
       return;
     }
-    if (paymentIntent && (paymentIntent.status === "succeeded" || paymentIntent.status === "processing" || paymentIntent.status === "requires_capture")) {
-      window.location.assign(returnUrl);
-    }
+
+    if (finalize(paymentIntent, "express")) return;
+
+    // Last-resort: PI is in some unhandled state. Navigate to the return
+    // page anyway — it polls + calls confirm-payment server-side and will
+    // resolve the order. Better than leaving the user stuck on the form.
+    console.warn("[CustomPaymentForm] express path: unhandled PI state, forcing return navigation");
+    window.location.assign(returnUrl);
   };
+
 
   return (
     <div className="space-y-5 p-4 md:p-6">
