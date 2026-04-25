@@ -1,0 +1,1 @@
+UPDATE public.featured_samples SET cover_image_url = '/featured-samples/we-made-it-for-mom.jpg', updated_at = now() WHERE id = 'd14f8ca3-ec11-45c7-b52d-a2671284357c';
