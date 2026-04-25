@@ -437,23 +437,20 @@ function VariantSwitcher({
 }
 
 /* ----------------------------------------------------------------------- */
-/* Share link + regeneration                                               */
+/* Share section — share link + download                                    */
 /* ----------------------------------------------------------------------- */
 
-function ActionsRow({
-  order,
+function ShareSection({
+  audioUrl,
+  title,
+  recipientName,
   sharePath,
-  onRegenerated,
 }: {
-  order: Order;
+  audioUrl: string | undefined;
+  title: string;
+  recipientName: string;
   sharePath: string | null;
-  onRegenerated: () => Promise<void>;
 }) {
-  const [regenOpen, setRegenOpen] = useState(false);
-  const [notes, setNotes] = useState("");
-  const [submitting, setSubmitting] = useState(false);
-  const regenUsed = !!order.regeneration_used_at;
-
   const copyShare = async () => {
     if (!sharePath || typeof window === "undefined") return;
     const url = `${window.location.origin}${sharePath}`;
@@ -465,87 +462,53 @@ function ActionsRow({
     }
   };
 
-  const submitRegen = async () => {
-    if (notes.trim().length < 10) {
-      toast.error("Please describe the change (min 10 chars)");
-      return;
-    }
-    setSubmitting(true);
+  const downloadSong = async () => {
+    if (!audioUrl) return;
     try {
-      const { data, error } = await supabase.functions.invoke("regenerate-song", {
-        body: { orderId: order.id, changeNotes: notes.trim() },
-      });
-      if (error || (data as any)?.error) {
-        toast.error((data as any)?.error ?? error?.message ?? "Regenerate failed");
-        return;
-      }
-      toast.success("Regenerating — we'll email you when ready");
-      setNotes("");
-      setRegenOpen(false);
-      await onRegenerated();
-    } catch (e: any) {
-      toast.error(e?.message ?? "Regenerate failed");
-    } finally {
-      setSubmitting(false);
+      const res = await fetch(audioUrl);
+      const blob = await res.blob();
+      const url = URL.createObjectURL(blob);
+      const a = document.createElement("a");
+      a.href = url;
+      const safeName = `${title} — for ${recipientName}`.replace(/[^a-z0-9 ._-]/gi, "").trim();
+      a.download = `${safeName || "ribbonsong"}.mp3`;
+      document.body.appendChild(a);
+      a.click();
+      a.remove();
+      URL.revokeObjectURL(url);
+    } catch {
+      toast.error("Could not download — try again or right-click the player to save.");
     }
   };
 
   return (
-    <div className="mt-4 flex flex-wrap justify-center gap-2">
-      {sharePath && (
-        <Button
-          variant="outline"
-          size="sm"
-          onClick={copyShare}
-          className="border-[rgba(246,240,230,0.2)] bg-transparent text-[#F6F0E6] hover:bg-[rgba(246,240,230,0.08)]"
-        >
-          <Share2 className="mr-2 h-3.5 w-3.5" /> Copy share link
-        </Button>
-      )}
-      {!regenUsed && (
-        <Button
-          variant="outline"
-          size="sm"
-          onClick={() => setRegenOpen((v) => !v)}
-          className="border-[rgba(246,240,230,0.2)] bg-transparent text-[#F6F0E6] hover:bg-[rgba(246,240,230,0.08)]"
-        >
-          <Sparkles className="mr-2 h-3.5 w-3.5" /> Regenerate (1 free)
-        </Button>
-      )}
-
-      {regenOpen && (
-        <div className="mt-2 w-full rounded-2xl border border-[rgba(246,240,230,0.12)] bg-[rgba(246,240,230,0.04)] p-5">
-          <h3 className="font-display text-lg">What should we change?</h3>
-          <p className="mt-1 text-xs text-[rgba(246,240,230,0.6)]">
-            One free full regeneration per order. We'll re-write the lyrics + re-record from scratch.
-          </p>
-          <textarea
-            value={notes}
-            onChange={(e) => setNotes(e.target.value.slice(0, 1000))}
-            placeholder="e.g. Slower tempo, mention our daughter Mia, change 'fighter' to 'warrior' in verse 2…"
-            rows={5}
-            className="mt-3 w-full rounded-xl border border-[rgba(246,240,230,0.2)] bg-[rgba(246,240,230,0.06)] p-3 text-sm text-[#F6F0E6] placeholder:text-[rgba(246,240,230,0.4)]"
-          />
-          <div className="mt-3 flex justify-end gap-2">
-            <Button
-              variant="outline"
-              size="sm"
-              onClick={() => setRegenOpen(false)}
-              className="border-[rgba(246,240,230,0.2)] bg-transparent text-[#F6F0E6] hover:bg-[rgba(246,240,230,0.08)]"
-            >
-              Cancel
-            </Button>
-            <Button
-              size="sm"
-              onClick={submitRegen}
-              disabled={submitting}
-              className="bg-[#E5D9EF] text-[#1F1B16] hover:bg-[#d8c8e6]"
-            >
-              {submitting ? "Submitting…" : "Regenerate"}
-            </Button>
-          </div>
-        </div>
-      )}
+    <div className="mt-8 rounded-2xl border border-[rgba(246,240,230,0.12)] bg-[rgba(246,240,230,0.04)] p-6 text-center">
+      <h3 className="font-display text-xl">Share it with {recipientName}</h3>
+      <p className="mx-auto mt-1 max-w-md text-sm text-[rgba(246,240,230,0.65)]">
+        Send the private link, or download the file and send it however feels right —
+        text, email, or save it forever.
+      </p>
+      <div className="mt-4 flex flex-wrap justify-center gap-2">
+        {sharePath && (
+          <Button
+            variant="outline"
+            size="sm"
+            onClick={copyShare}
+            className="border-[rgba(246,240,230,0.2)] bg-transparent text-[#F6F0E6] hover:bg-[rgba(246,240,230,0.08)]"
+          >
+            <Share2 className="mr-2 h-3.5 w-3.5" /> Copy share link
+          </Button>
+        )}
+        {audioUrl && (
+          <Button
+            size="sm"
+            onClick={downloadSong}
+            className="bg-[#E5D9EF] text-[#1F1B16] hover:bg-[#d8c8e6]"
+          >
+            <Download className="mr-2 h-3.5 w-3.5" /> Download song
+          </Button>
+        )}
+      </div>
     </div>
   );
 }
