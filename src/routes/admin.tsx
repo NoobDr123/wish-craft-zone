@@ -1811,11 +1811,13 @@ function SupportPanel() {
 
   useEffect(() => {
     loadThreads();
-    // poll for new messages every 20s
-    const t = setInterval(loadThreads, 20000);
-    return () => clearInterval(t);
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [filter]);
+
+  useRealtimeRefresh(["support_threads", "support_messages"], () => {
+    loadThreads();
+    if (selectedId) loadMessages(selectedId);
+  }, { debounceMs: 500 });
 
   useEffect(() => {
     if (selectedId) {
