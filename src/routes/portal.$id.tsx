@@ -771,7 +771,7 @@ function RevisionTab({
           </Button>
           {hasUnlimited && (
             <p className="mt-3 text-xs text-[rgba(246,240,230,0.55)]">
-              {remaining} of {cap} revisions remaining.
+              Unlimited revisions included with this song.
             </p>
           )}
         </div>
