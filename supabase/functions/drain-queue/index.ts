@@ -20,41 +20,18 @@ const corsHeaders = {
 serve(async (req) => {
   if (req.method === "OPTIONS") return new Response(null, { headers: corsHeaders });
 
-  // Auth: accept the internal secret, the service role key, OR the project's
-  // anon/publishable key. We accept the anon key here (and only here) because
-  // pg_cron sends the anon key as the Bearer when invoking this dispatcher,
-  // and the downstream targets it calls (generate-brief, submit-to-kie,
-  // deliver-song, process-kie-callback) are still protected by guardInternal
-  // — drain-queue calls them with the real service role key + internal secret.
+  // Auth: accept the internal secret OR the service role key.
+  // pg_cron sends the internal secret via x-internal-secret (cleanest path).
+  // Edge-to-edge fetches send the service role key as the Bearer.
   const auth = req.headers.get("Authorization") ?? "";
   const token = auth.replace(/^Bearer\s+/i, "").trim();
   const providedSecret = req.headers.get("x-internal-secret") ?? "";
 
-  // The edge runtime exposes both SUPABASE_ANON_KEY and SUPABASE_PUBLISHABLE_KEY,
-  // but in this project SUPABASE_ANON_KEY is set to a truncated/legacy value
-  // (length ~46) while SUPABASE_PUBLISHABLE_KEY contains the real JWT (length ~208)
-  // that pg_cron actually sends. Accept either — match against both.
-  const anonKey1 = Deno.env.get("SUPABASE_ANON_KEY") ?? "";
-  const anonKey2 = Deno.env.get("SUPABASE_PUBLISHABLE_KEY") ?? "";
-
   const isAuthorized =
     (providedSecret && providedSecret === INTERNAL_SECRET) ||
-    (token && token === SERVICE_KEY) ||
-    (token && anonKey1 && token === anonKey1) ||
-    (token && anonKey2 && token === anonKey2);
+    (token && token === SERVICE_KEY);
 
   if (!isAuthorized) {
-    console.log("drain-queue auth failed", {
-      hasProvidedSecret: !!providedSecret,
-      tokenLen: token.length,
-      tokenStart: token.slice(0, 20),
-      tokenMatchesService: token === SERVICE_KEY,
-      anonKey1Len: anonKey1.length,
-      anonKey1Start: anonKey1.slice(0, 20),
-      anonKey2Len: anonKey2.length,
-      tokenMatchesAnon1: token === anonKey1,
-      tokenMatchesAnon2: token === anonKey2,
-    });
     const unauthorized = await guardInternal(req, corsHeaders);
     if (unauthorized) return unauthorized;
   }
