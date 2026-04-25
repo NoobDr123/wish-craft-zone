@@ -942,6 +942,40 @@ function RewardsTab({
   );
 }
 
+function EditTicket({
+  number,
+  icon,
+  eyebrow,
+  title,
+  body,
+}: {
+  number: number;
+  icon: ReactNode;
+  eyebrow: string;
+  title: string;
+  body: string;
+}) {
+  return (
+    <div className="relative overflow-hidden rounded-2xl border border-[rgba(141,111,175,0.3)] bg-gradient-to-br from-[rgba(141,111,175,0.16)] via-[#FBF6EC] to-[rgba(141,111,175,0.10)] p-6 shadow-[0_0_40px_-20px_rgba(141,111,175,0.4)]">
+      <div className="absolute right-5 top-5 font-display text-3xl font-semibold text-[rgba(141,111,175,0.35)]">
+        #{number}
+      </div>
+      <div className="flex items-start gap-4">
+        <div className="flex h-10 w-10 shrink-0 items-center justify-center rounded-full bg-[rgba(141,111,175,0.18)] text-[#8D6FAF]">
+          {icon}
+        </div>
+        <div className="flex-1 pr-8">
+          <p className="text-[10px] font-semibold uppercase tracking-[0.2em] text-[#8D6FAF]">
+            {eyebrow}
+          </p>
+          <h3 className="mt-1 font-display text-lg leading-snug text-[#1F1B16]">{title}</h3>
+          <p className="mt-2 text-sm text-[rgba(31,27,22,0.7)]">{body}</p>
+        </div>
+      </div>
+    </div>
+  );
+}
+
 type GoldTicketCta =
   | { label: string; onClick: () => void; to?: undefined; search?: undefined }
   | { label: string; to: "/create"; search?: { reward?: string; promo?: string }; onClick?: undefined }
