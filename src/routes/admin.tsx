@@ -726,68 +726,71 @@ function CrmPanel() {
   const [emailLogs, setEmailLogs] = useState<Record<string, any[]>>({});
   const [quizEvents, setQuizEvents] = useState<Record<string, any[]>>({});
 
-  useEffect(() => {
-    let active = true;
-    (async () => {
-      setLoading(true);
-      const { data: orders } = await supabase
-        .from("orders")
-        .select("*")
-        .not("buyer_email", "like", "pending+%@ribbonsong.com")
-        .order("created_at", { ascending: false })
-        .limit(2000);
-      if (!active) return;
+  const load = async (signal?: { active: boolean }) => {
+    setLoading(true);
+    const { data: orders } = await supabase
+      .from("orders")
+      .select("*")
+      .not("buyer_email", "like", "pending+%@ribbonsong.com")
+      .order("created_at", { ascending: false })
+      .limit(2000);
+    if (signal && !signal.active) return;
 
-      const map: Record<string, CrmCustomer> = {};
-      for (const o of orders ?? []) {
-        const email = (o.buyer_email ?? "").toLowerCase();
-        if (!email) continue;
-        if (!map[email]) {
-          map[email] = {
-            email,
-            totalSpentCents: 0,
-            orderCount: 0,
-            lastOrderAt: o.created_at,
-            firstOrderAt: o.created_at,
-            paidCount: 0,
-            pendingCount: 0,
-            failedCount: 0,
-            hasUpsells: false,
-            isGift: false,
-            buyerName: o.buyer_name ?? o.customer_name ?? null,
-            orders: [],
-            emails: [],
-          };
-        }
-        const c = map[email];
-        c.orders.push(o);
-        c.orderCount += 1;
-        if (o.payment_status === "paid" || o.payment_status === "succeeded") {
-          c.paidCount += 1;
-          c.totalSpentCents += o.amount_paid_cents ?? 0;
-        } else if (o.payment_status === "failed") {
-          c.failedCount += 1;
-        } else {
-          c.pendingCount += 1;
-        }
-        if (o.has_3rd_verse || o.is_rush || o.has_unlimited_edits) c.hasUpsells = true;
-        if (o.is_gift) c.isGift = true;
-        if (o.created_at > c.lastOrderAt) c.lastOrderAt = o.created_at;
-        if (o.created_at < c.firstOrderAt) c.firstOrderAt = o.created_at;
-        if (!c.buyerName && (o.buyer_name || o.customer_name)) {
-          c.buyerName = o.buyer_name ?? o.customer_name;
-        }
+    const map: Record<string, CrmCustomer> = {};
+    for (const o of orders ?? []) {
+      const email = (o.buyer_email ?? "").toLowerCase();
+      if (!email) continue;
+      if (!map[email]) {
+        map[email] = {
+          email,
+          totalSpentCents: 0,
+          orderCount: 0,
+          lastOrderAt: o.created_at,
+          firstOrderAt: o.created_at,
+          paidCount: 0,
+          pendingCount: 0,
+          failedCount: 0,
+          hasUpsells: false,
+          isGift: false,
+          buyerName: o.buyer_name ?? o.customer_name ?? null,
+          orders: [],
+          emails: [],
+        };
       }
+      const c = map[email];
+      c.orders.push(o);
+      c.orderCount += 1;
+      if (o.payment_status === "paid" || o.payment_status === "succeeded") {
+        c.paidCount += 1;
+        c.totalSpentCents += o.amount_paid_cents ?? 0;
+      } else if (o.payment_status === "failed") {
+        c.failedCount += 1;
+      } else {
+        c.pendingCount += 1;
+      }
+      if (o.has_3rd_verse || o.is_rush || o.has_unlimited_edits) c.hasUpsells = true;
+      if (o.is_gift) c.isGift = true;
+      if (o.created_at > c.lastOrderAt) c.lastOrderAt = o.created_at;
+      if (o.created_at < c.firstOrderAt) c.firstOrderAt = o.created_at;
+      if (!c.buyerName && (o.buyer_name || o.customer_name)) {
+        c.buyerName = o.buyer_name ?? o.customer_name;
+      }
+    }
 
-      setCustomers(
-        Object.values(map).sort((a, b) => b.totalSpentCents - a.totalSpentCents),
-      );
-      setLoading(false);
-    })();
-    return () => {
-      active = false;
-    };
+    setCustomers(
+      Object.values(map).sort((a, b) => b.totalSpentCents - a.totalSpentCents),
+    );
+    setLoading(false);
+  };
+
+  useEffect(() => {
+    const signal = { active: true };
+    load(signal);
+    return () => { signal.active = false; };
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
+
+  useRealtimeRefresh("orders", () => load());
 
   const filtered = customers.filter((c) => {
     if (!search) return true;
