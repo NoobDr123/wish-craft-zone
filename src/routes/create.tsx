@@ -1,5 +1,6 @@
 import { useEffect, useMemo, useRef, useState } from "react";
-import { createFileRoute, Link, useNavigate } from "@tanstack/react-router";
+import { createFileRoute, Link, useNavigate, useSearch } from "@tanstack/react-router";
+import { z } from "zod";
 import { QuizShell } from "@/components/QuizShell";
 import {
   ListSelect,
@@ -11,6 +12,9 @@ import {
 } from "@/components/QuizInputs";
 import { useQuizStore } from "@/stores/quizStore";
 import { track, ensureSession } from "@/lib/tracking";
+import { supabase } from "@/integrations/supabase/client";
+import { Gift } from "lucide-react";
+import { toast } from "sonner";
 import {
   getProfile,
   journeyOptions,
@@ -25,8 +29,13 @@ import {
   q8Tips,
 } from "@/lib/quizCopy";
 
+const createSearchSchema = z.object({
+  reward: z.string().trim().min(3).max(64).optional(),
+});
+
 export const Route = createFileRoute("/create")({
   component: CreatePage,
+  validateSearch: createSearchSchema,
   head: () => ({
     meta: [
       { title: "Create Their Song · RibbonSong" },
