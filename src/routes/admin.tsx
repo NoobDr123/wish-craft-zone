@@ -1543,8 +1543,17 @@ function RefundsPanel() {
 function ReactionsPanel() {
   const [rows, setRows] = useState<any[]>([]);
   const [previews, setPreviews] = useState<Record<string, string>>({});
+  const [busy, setBusy] = useState<string | null>(null);
+  const [error, setError] = useState<string | null>(null);
+  const [rejectFor, setRejectFor] = useState<string | null>(null);
+  const [rejectReason, setRejectReason] = useState("");
+
   const load = async () => {
-    const { data } = await supabase.from("reaction_videos").select("*").order("created_at", { ascending: false }).limit(100);
+    const { data } = await supabase
+      .from("reaction_videos")
+      .select("*")
+      .order("created_at", { ascending: false })
+      .limit(100);
     setRows(data ?? []);
   };
   useEffect(() => { load(); }, []);
@@ -1554,24 +1563,95 @@ function ReactionsPanel() {
     const { data } = await supabase.storage.from("reactions").createSignedUrl(row.storage_path, 3600);
     if (data?.signedUrl) setPreviews((p) => ({ ...p, [row.id]: data.signedUrl }));
   };
-  const setStatus = async (id: string, status: string) => {
-    await supabase.from("reaction_videos").update({ status }).eq("id", id);
-    await load();
+
+  const approve = async (id: string) => {
+    setBusy(id);
+    setError(null);
+    const { data, error: fnErr } = await supabase.functions.invoke("approve-reaction", {
+      body: { reactionVideoId: id },
+    });
+    if (fnErr || data?.error) {
+      setError(data?.error || fnErr?.message || "Approval failed");
+    } else {
+      await load();
+    }
+    setBusy(null);
+  };
+
+  const reject = async (id: string, reason: string) => {
+    if (!reason.trim()) {
+      setError("Please provide a rejection reason.");
+      return;
+    }
+    setBusy(id);
+    setError(null);
+    const { data, error: fnErr } = await supabase.functions.invoke("reject-reaction", {
+      body: { reactionVideoId: id, reason: reason.trim() },
+    });
+    if (fnErr || data?.error) {
+      setError(data?.error || fnErr?.message || "Rejection failed");
+    } else {
+      setRejectFor(null);
+      setRejectReason("");
+      await load();
+    }
+    setBusy(null);
   };
 
   return (
     <>
-      <h1 className="mb-6 font-display text-3xl font-semibold">Reactions</h1>
+      <h1 className="mb-2 font-display text-3xl font-semibold">Reactions</h1>
+      <p className="mb-6 text-sm text-muted-foreground">
+        Approving issues a reward code (2 free songs) and refunds the original purchase via Stripe.
+      </p>
+      {error && (
+        <div className="mb-4 rounded-lg border border-destructive/40 bg-destructive/5 p-3 text-sm text-destructive">
+          {error}
+        </div>
+      )}
       <div className="grid grid-cols-1 gap-6 md:grid-cols-2">
         {rows.map((r) => (
           <div key={r.id} className="rounded-2xl border border-border bg-card p-5">
             <div className="flex justify-between"><p className="font-medium text-sm">{r.buyer_email}</p><Badge variant="outline">{r.status}</Badge></div>
             {r.caption && <p className="mt-3 text-sm italic text-muted-foreground">"{r.caption}"</p>}
             {previews[r.id] ? <video controls src={previews[r.id]} className="mt-3 w-full rounded-lg bg-black" /> : <Button variant="outline" size="sm" className="mt-3" onClick={() => preview(r)}>Load preview</Button>}
-            <div className="mt-3 flex gap-2">
-              <Button size="sm" variant="outline" onClick={() => setStatus(r.id, "approved")} disabled={r.status === "approved"}>Approve</Button>
-              <Button size="sm" variant="outline" onClick={() => setStatus(r.id, "rejected")} disabled={r.status === "rejected"}>Reject</Button>
-            </div>
+            {rejectFor === r.id ? (
+              <div className="mt-3 space-y-2">
+                <textarea
+                  value={rejectReason}
+                  onChange={(e) => setRejectReason(e.target.value)}
+                  placeholder="Reason (shown to customer in email)…"
+                  className="w-full rounded-md border border-border bg-background p-2 text-sm"
+                  rows={3}
+                />
+                <div className="flex gap-2">
+                  <Button size="sm" variant="destructive" disabled={busy === r.id} onClick={() => reject(r.id, rejectReason)}>
+                    Confirm reject
+                  </Button>
+                  <Button size="sm" variant="outline" onClick={() => { setRejectFor(null); setRejectReason(""); }}>
+                    Cancel
+                  </Button>
+                </div>
+              </div>
+            ) : (
+              <div className="mt-3 flex gap-2">
+                <Button
+                  size="sm"
+                  onClick={() => approve(r.id)}
+                  disabled={busy === r.id || r.status === "approved" || r.status === "rejected"}
+                >
+                  {busy === r.id ? "Approving…" : "Approve + Refund"}
+                </Button>
+                <Button
+                  size="sm"
+                  variant="outline"
+                  onClick={() => setRejectFor(r.id)}
+                  disabled={busy === r.id || r.status === "approved" || r.status === "rejected"}
+                >
+                  Reject
+                </Button>
+              </div>
+            )}
           </div>
         ))}
         {rows.length === 0 && <p className="col-span-full text-center text-muted-foreground py-12">No reaction videos.</p>}
