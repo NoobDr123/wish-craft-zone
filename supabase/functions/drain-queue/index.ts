@@ -47,8 +47,10 @@ serve(async (req) => {
     console.log("drain-queue auth failed", {
       hasProvidedSecret: !!providedSecret,
       tokenLen: token.length,
+      tokenStart: token.slice(0, 20),
       tokenMatchesService: token === SERVICE_KEY,
       anonKey1Len: anonKey1.length,
+      anonKey1Start: anonKey1.slice(0, 20),
       anonKey2Len: anonKey2.length,
       tokenMatchesAnon1: token === anonKey1,
       tokenMatchesAnon2: token === anonKey2,
