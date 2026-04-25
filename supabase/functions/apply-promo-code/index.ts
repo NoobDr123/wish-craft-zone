@@ -85,14 +85,23 @@ serve(async (req) => {
     let discountCents = Number(result.discount_cents);
     const promoCodeId = result.promo_code_id as string;
 
-    // ---- T3ST: special-cased end-to-end test code ----
-    // Overrides the discount to a flat $5 charge (regardless of base amount),
-    // auto-adds every upsell, fast-tracks delivery, and advances the order
-    // straight to upsells_complete after payment so the customer journey
-    // (emails, song production, dashboard access) fires automatically.
-    const isT3st = code.trim().toUpperCase() === "T3ST";
+    // ---- Special-cased test codes ----
+    // T3ST  → flat $5 base + auto-adds every upsell + fast-tracks delivery.
+    // T3ST2 → flat $2 base. Does NOT auto-add upsells; if buyer takes any,
+    //          they're charged at 1% of normal price (handled in charge-upsell).
+    // T3ST1 → flat $1 base. Upsells charge at full price.
+    const upperCode = code.trim().toUpperCase();
+    const isT3st = upperCode === "T3ST";
+    const isT3st2 = upperCode === "T3ST2";
+    const isT3st1 = upperCode === "T3ST1";
     if (isT3st) {
       finalAmount = 500; // $5.00 flat
+      discountCents = Math.max(0, baseAmount - finalAmount);
+    } else if (isT3st2) {
+      finalAmount = 200; // $2.00 flat
+      discountCents = Math.max(0, baseAmount - finalAmount);
+    } else if (isT3st1) {
+      finalAmount = 100; // $1.00 flat
       discountCents = Math.max(0, baseAmount - finalAmount);
     }
 

@@ -54,12 +54,26 @@ serve(async (req) => {
     const { data: order, error } = await supabase
       .from("orders")
       .select(
-        "user_id, buyer_email, status, stripe_customer_id, stripe_payment_method_id, stripe_checkout_session_id, stripe_payment_intent_id, product_config, delivery_tier",
+        "user_id, buyer_email, status, stripe_customer_id, stripe_payment_method_id, stripe_checkout_session_id, stripe_payment_intent_id, product_config, delivery_tier, promo_code_id",
       )
       .eq("id", orderId)
       .single();
 
     if (error || !order) return json({ success: false, reason: "order_not_found" }, 404);
+
+    // ---- T3ST2 special case: 99% off any upsell taken ----
+    let chargeAmount = upsell.amount;
+    if (order.promo_code_id) {
+      const { data: promo } = await supabase
+        .from("promo_codes")
+        .select("code")
+        .eq("id", order.promo_code_id)
+        .maybeSingle();
+      if (promo?.code?.toUpperCase() === "T3ST2") {
+        // 99% off, with a 50¢ Stripe minimum.
+        chargeAmount = Math.max(50, Math.round(upsell.amount * 0.01));
+      }
+    }
 
     const ownsViaAuth =
       (authedUserId && order.user_id && order.user_id === authedUserId) ||
@@ -96,13 +110,13 @@ serve(async (req) => {
 
     try {
       const pi = await stripe.paymentIntents.create({
-        amount: upsell.amount,
+        amount: chargeAmount,
         currency: "usd",
         customer: order.stripe_customer_id,
         payment_method: order.stripe_payment_method_id,
         off_session: true,
         confirm: true,
-        metadata: { orderId, upsellType },
+        metadata: { orderId, upsellType, originalAmount: String(upsell.amount) },
         description: `RibbonSong upsell: ${upsellType}`,
       });
 
