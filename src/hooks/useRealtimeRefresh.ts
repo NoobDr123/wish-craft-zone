@@ -26,10 +26,9 @@ export function useRealtimeRefresh(
     };
 
     const channelName = `admin-rt-${list.join("-")}-${Math.random().toString(36).slice(2, 8)}`;
-    let channel = supabase.channel(channelName);
+    let channel: any = supabase.channel(channelName);
     for (const table of list) {
       channel = channel.on(
-        // @ts-expect-error - postgres_changes is a valid event for realtime
         "postgres_changes",
         { event: "*", schema: "public", table },
         () => trigger(),
