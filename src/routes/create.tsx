@@ -375,6 +375,7 @@ function CreatePage() {
       subtitle: "We'll email you when it is ready, usually within 5 days.",
       isValid: (s) =>
         s.buyer_name.trim().length > 1 && emailRe.test(s.buyer_email),
+      nextLabel: "Review my order",
       render: () => (
         <div className="space-y-6">
           <Question label="Your name">
@@ -394,74 +395,6 @@ function CreatePage() {
               maxLength={120}
             />
           </Question>
-        </div>
-      ),
-    },
-
-    // 10. Gift toggle
-    {
-      chapter: "Delivery",
-      title: "Send it directly to them?",
-      subtitle: "Or keep it private and share it your own way.",
-      isValid: (s) =>
-        !s.is_gift || s.recipient_email === "" || emailRe.test(s.recipient_email),
-      nextLabel: "Review my order",
-      render: () => (
-        <div className="space-y-6">
-          <Question label="Send as a gift?">
-            <div className="flex items-start gap-4">
-              <button
-                type="button"
-                onClick={() => q.set("is_gift", !q.is_gift)}
-                className={`relative h-7 w-12 shrink-0 rounded-full transition-colors ${
-                  q.is_gift ? "bg-primary" : "bg-border"
-                }`}
-                aria-pressed={q.is_gift}
-              >
-                <span
-                  className={`absolute top-0.5 h-6 w-6 rounded-full bg-card shadow-soft transition-all ${
-                    q.is_gift ? "left-[22px]" : "left-0.5"
-                  }`}
-                />
-              </button>
-              <span className="text-sm leading-relaxed text-muted-foreground">
-                {q.is_gift
-                  ? "We will deliver the song to them on a date you choose."
-                  : "We will send it to you to share however you like."}
-              </span>
-            </div>
-          </Question>
-
-          {q.is_gift && (
-            <div className="space-y-6 rounded-3xl border border-dashed border-border bg-secondary/40 p-6 animate-in fade-in slide-in-from-top-2">
-              <Question label="Their email (optional)">
-                <TextInput
-                  type="email"
-                  placeholder="recipient@example.com"
-                  value={q.recipient_email}
-                  onChange={(e) => q.set("recipient_email", e.target.value)}
-                  maxLength={120}
-                />
-              </Question>
-              <Question label="Delivery date (optional)">
-                <TextInput
-                  type="date"
-                  value={q.delivery_date}
-                  onChange={(e) => q.set("delivery_date", e.target.value)}
-                />
-              </Question>
-              <Question label="A personal note (optional)">
-                <TextArea
-                  placeholder="A few warm words to greet them when they open the gift…"
-                  value={q.personal_note}
-                  onChange={(e) => q.set("personal_note", e.target.value)}
-                  maxLength={300}
-                  rows={3}
-                  showCount
-                />
-              </Question>
-            </div>
-          )}
         </div>
       ),
     },
