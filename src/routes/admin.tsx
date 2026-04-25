@@ -1301,30 +1301,35 @@ function EmailsPanel() {
   const [statusFilter, setStatusFilter] = useState<string>("all");
   const [search, setSearch] = useState("");
 
+  const load = async (signal?: { active: boolean }) => {
+    setLoading(true);
+    let q = supabase
+      .from("email_send_log")
+      .select("id, message_id, template_name, recipient_email, status, error_message, created_at, metadata")
+      .order("created_at", { ascending: false })
+      .limit(2000);
+    const start = rangeStart(range);
+    if (start) q = q.gte("created_at", start.toISOString());
+    const { data } = await q;
+    const { data: sup } = await supabase
+      .from("suppressed_emails")
+      .select("id, email, reason, created_at")
+      .order("created_at", { ascending: false })
+      .limit(500);
+    if (signal && !signal.active) return;
+    setRows((data ?? []) as EmailRow[]);
+    setSuppressed((sup ?? []) as any);
+    setLoading(false);
+  };
+
   useEffect(() => {
-    let active = true;
-    (async () => {
-      setLoading(true);
-      let q = supabase
-        .from("email_send_log")
-        .select("id, message_id, template_name, recipient_email, status, error_message, created_at, metadata")
-        .order("created_at", { ascending: false })
-        .limit(2000);
-      const start = rangeStart(range);
-      if (start) q = q.gte("created_at", start.toISOString());
-      const { data } = await q;
-      const { data: sup } = await supabase
-        .from("suppressed_emails")
-        .select("id, email, reason, created_at")
-        .order("created_at", { ascending: false })
-        .limit(500);
-      if (!active) return;
-      setRows((data ?? []) as EmailRow[]);
-      setSuppressed((sup ?? []) as any);
-      setLoading(false);
-    })();
-    return () => { active = false; };
+    const signal = { active: true };
+    load(signal);
+    return () => { signal.active = false; };
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [range]);
+
+  useRealtimeRefresh(["email_send_log", "suppressed_emails"], () => load(), { debounceMs: 1000 });
 
   // Dedupe to latest status per message_id
   const deduped = (() => {
