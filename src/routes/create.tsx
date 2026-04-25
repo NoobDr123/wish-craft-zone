@@ -28,11 +28,14 @@ import {
   q8Tips,
 } from "@/lib/quizCopy";
 
+type CreateSearch = { reward?: string };
+
 export const Route = createFileRoute("/create")({
   component: CreatePage,
-  validateSearch: (search: Record<string, unknown>) => ({
-    reward: typeof search.reward === "string" ? search.reward : undefined,
-  }),
+  validateSearch: (search: Record<string, unknown>): CreateSearch => {
+    const reward = typeof search.reward === "string" ? search.reward : undefined;
+    return reward ? { reward } : {};
+  },
   head: () => ({
     meta: [
       { title: "Create Their Song · RibbonSong" },
