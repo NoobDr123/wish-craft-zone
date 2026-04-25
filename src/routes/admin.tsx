@@ -1036,32 +1036,35 @@ function UpsellsPanel() {
   const [range, setRange] = useState<Range>("30d");
   const [data, setData] = useState<{ events: any[]; orders: any[] } | null>(null);
 
+  const load = async (signal?: { active: boolean }) => {
+    const start = rangeStart(range);
+    let eq = supabase
+      .from("quiz_events")
+      .select("event_type, upsell_type, amount_cents, created_at, session_id")
+      .in("event_type", ["upsell_view", "upsell_accept", "upsell_decline"])
+      .order("created_at", { ascending: false })
+      .limit(5000);
+    if (start) eq = eq.gte("created_at", start.toISOString());
+    let oq = supabase
+      .from("orders")
+      .select("has_3rd_verse, is_rush, has_unlimited_edits, payment_status, created_at")
+      .not("buyer_email", "like", "pending+%@ribbonsong.com")
+      .order("created_at", { ascending: false })
+      .limit(2000);
+    if (start) oq = oq.gte("created_at", start.toISOString());
+    const [{ data: events }, { data: orders }] = await Promise.all([eq, oq]);
+    if (signal && !signal.active) return;
+    setData({ events: events ?? [], orders: orders ?? [] });
+  };
+
   useEffect(() => {
-    let active = true;
-    (async () => {
-      const start = rangeStart(range);
-      let eq = supabase
-        .from("quiz_events")
-        .select("event_type, upsell_type, amount_cents, created_at, session_id")
-        .in("event_type", ["upsell_view", "upsell_accept", "upsell_decline"])
-        .order("created_at", { ascending: false })
-        .limit(5000);
-      if (start) eq = eq.gte("created_at", start.toISOString());
-      let oq = supabase
-        .from("orders")
-        .select("has_3rd_verse, is_rush, has_unlimited_edits, payment_status, created_at")
-        .not("buyer_email", "like", "pending+%@ribbonsong.com")
-        .order("created_at", { ascending: false })
-        .limit(2000);
-      if (start) oq = oq.gte("created_at", start.toISOString());
-      const [{ data: events }, { data: orders }] = await Promise.all([eq, oq]);
-      if (!active) return;
-      setData({ events: events ?? [], orders: orders ?? [] });
-    })();
-    return () => {
-      active = false;
-    };
+    const signal = { active: true };
+    load(signal);
+    return () => { signal.active = false; };
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [range]);
+
+  useRealtimeRefresh(["quiz_events", "orders"], () => load(), { debounceMs: 1500 });
 
   if (!data) return <div className="text-muted-foreground">Loading…</div>;
 
