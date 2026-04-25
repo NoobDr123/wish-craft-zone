@@ -8,7 +8,7 @@ function redactEmail(email: string | null | undefined): string {
   return `${localPart[0]}***@${domain}`
 }
 
-export const Route = createFileRoute("/email/unsubscribe")({
+export const Route = createFileRoute("/api/email/unsubscribe")({
   server: {
     handlers: {
       GET: async ({ request }) => {

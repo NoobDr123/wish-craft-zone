@@ -31,6 +31,7 @@ import { Route as CheckoutReturnRouteImport } from './routes/checkout.return'
 import { Route as AuthCallbackRouteImport } from './routes/auth.callback'
 import { Route as AdminLoginRouteImport } from './routes/admin.login'
 import { Route as LovableEmailSuppressionRouteImport } from './routes/lovable/email/suppression'
+import { Route as ApiEmailUnsubscribeRouteImport } from './routes/api/email/unsubscribe'
 import { Route as LovableEmailTransactionalSendRouteImport } from './routes/lovable/email/transactional/send'
 import { Route as LovableEmailTransactionalPreviewRouteImport } from './routes/lovable/email/transactional/preview'
 import { Route as LovableEmailQueueProcessRouteImport } from './routes/lovable/email/queue/process'
@@ -147,6 +148,11 @@ const LovableEmailSuppressionRoute = LovableEmailSuppressionRouteImport.update({
   path: '/lovable/email/suppression',
   getParentRoute: () => rootRouteImport,
 } as any)
+const ApiEmailUnsubscribeRoute = ApiEmailUnsubscribeRouteImport.update({
+  id: '/api/email/unsubscribe',
+  path: '/api/email/unsubscribe',
+  getParentRoute: () => rootRouteImport,
+} as any)
 const LovableEmailTransactionalSendRoute =
   LovableEmailTransactionalSendRouteImport.update({
     id: '/lovable/email/transactional/send',
@@ -198,6 +204,7 @@ export interface FileRoutesByFullPath {
   '/email/unsubscribe': typeof EmailUnsubscribeRoute
   '/listen/$id': typeof ListenIdRoute
   '/portal/$id': typeof PortalIdRoute
+  '/api/email/unsubscribe': typeof ApiEmailUnsubscribeRoute
   '/lovable/email/suppression': typeof LovableEmailSuppressionRoute
   '/lovable/email/auth/preview': typeof LovableEmailAuthPreviewRoute
   '/lovable/email/auth/webhook': typeof LovableEmailAuthWebhookRoute
@@ -227,6 +234,7 @@ export interface FileRoutesByTo {
   '/email/unsubscribe': typeof EmailUnsubscribeRoute
   '/listen/$id': typeof ListenIdRoute
   '/portal/$id': typeof PortalIdRoute
+  '/api/email/unsubscribe': typeof ApiEmailUnsubscribeRoute
   '/lovable/email/suppression': typeof LovableEmailSuppressionRoute
   '/lovable/email/auth/preview': typeof LovableEmailAuthPreviewRoute
   '/lovable/email/auth/webhook': typeof LovableEmailAuthWebhookRoute
@@ -257,6 +265,7 @@ export interface FileRoutesById {
   '/email/unsubscribe': typeof EmailUnsubscribeRoute
   '/listen/$id': typeof ListenIdRoute
   '/portal/$id': typeof PortalIdRoute
+  '/api/email/unsubscribe': typeof ApiEmailUnsubscribeRoute
   '/lovable/email/suppression': typeof LovableEmailSuppressionRoute
   '/lovable/email/auth/preview': typeof LovableEmailAuthPreviewRoute
   '/lovable/email/auth/webhook': typeof LovableEmailAuthWebhookRoute
@@ -288,6 +297,7 @@ export interface FileRouteTypes {
     | '/email/unsubscribe'
     | '/listen/$id'
     | '/portal/$id'
+    | '/api/email/unsubscribe'
     | '/lovable/email/suppression'
     | '/lovable/email/auth/preview'
     | '/lovable/email/auth/webhook'
@@ -317,6 +327,7 @@ export interface FileRouteTypes {
     | '/email/unsubscribe'
     | '/listen/$id'
     | '/portal/$id'
+    | '/api/email/unsubscribe'
     | '/lovable/email/suppression'
     | '/lovable/email/auth/preview'
     | '/lovable/email/auth/webhook'
@@ -346,6 +357,7 @@ export interface FileRouteTypes {
     | '/email/unsubscribe'
     | '/listen/$id'
     | '/portal/$id'
+    | '/api/email/unsubscribe'
     | '/lovable/email/suppression'
     | '/lovable/email/auth/preview'
     | '/lovable/email/auth/webhook'
@@ -374,6 +386,7 @@ export interface RootRouteChildren {
   EmailUnsubscribeRoute: typeof EmailUnsubscribeRoute
   ListenIdRoute: typeof ListenIdRoute
   PortalIdRoute: typeof PortalIdRoute
+  ApiEmailUnsubscribeRoute: typeof ApiEmailUnsubscribeRoute
   LovableEmailSuppressionRoute: typeof LovableEmailSuppressionRoute
   LovableEmailAuthPreviewRoute: typeof LovableEmailAuthPreviewRoute
   LovableEmailAuthWebhookRoute: typeof LovableEmailAuthWebhookRoute
@@ -538,6 +551,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof LovableEmailSuppressionRouteImport
       parentRoute: typeof rootRouteImport
     }
+    '/api/email/unsubscribe': {
+      id: '/api/email/unsubscribe'
+      path: '/api/email/unsubscribe'
+      fullPath: '/api/email/unsubscribe'
+      preLoaderRoute: typeof ApiEmailUnsubscribeRouteImport
+      parentRoute: typeof rootRouteImport
+    }
     '/lovable/email/transactional/send': {
       id: '/lovable/email/transactional/send'
       path: '/lovable/email/transactional/send'
@@ -618,6 +638,7 @@ const rootRouteChildren: RootRouteChildren = {
   EmailUnsubscribeRoute: EmailUnsubscribeRoute,
   ListenIdRoute: ListenIdRoute,
   PortalIdRoute: PortalIdRoute,
+  ApiEmailUnsubscribeRoute: ApiEmailUnsubscribeRoute,
   LovableEmailSuppressionRoute: LovableEmailSuppressionRoute,
   LovableEmailAuthPreviewRoute: LovableEmailAuthPreviewRoute,
   LovableEmailAuthWebhookRoute: LovableEmailAuthWebhookRoute,
