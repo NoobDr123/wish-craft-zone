@@ -4,7 +4,7 @@
 import { Link } from "@tanstack/react-router";
 import type { ReactNode } from "react";
 import { useEffect, useMemo, useState } from "react";
-import { Check, Copy, Lock, Share2, Music, Download, Heart, Ticket } from "lucide-react";
+import { Check, Copy, Share2, Music, Download, Heart, Ticket } from "lucide-react";
 import { VinylPlayer } from "@/components/VinylPlayer";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
