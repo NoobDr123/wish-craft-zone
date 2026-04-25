@@ -77,7 +77,11 @@ function PortalSong() {
 
     const [{ data: rev }, { data: rf }, { data: rx }, { data: rwd }, { data: promos }] =
       await Promise.all([
-        supabase.from("revision_requests").select("*").eq("order_id", id).maybeSingle(),
+        supabase
+          .from("revision_requests")
+          .select("*")
+          .eq("order_id", id)
+          .order("created_at", { ascending: false }),
         supabase
           .from("refund_requests")
           .select("*")
@@ -100,7 +104,7 @@ function PortalSong() {
           .eq("issued_for_order_id", id)
           .order("created_at", { ascending: false }),
       ]);
-    setRevision(rev);
+    setRevisions(rev ?? []);
     setRefunds(rf ?? []);
     setReactions(rx ?? []);
     setReward(rwd ?? null);
