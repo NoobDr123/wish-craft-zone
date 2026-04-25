@@ -54,7 +54,7 @@ serve(async (req) => {
     const { data: order, error } = await supabase
       .from("orders")
       .select(
-        "user_id, buyer_email, status, stripe_customer_id, stripe_payment_method_id, stripe_checkout_session_id, product_config, delivery_tier",
+        "user_id, buyer_email, status, stripe_customer_id, stripe_payment_method_id, stripe_checkout_session_id, stripe_payment_intent_id, product_config, delivery_tier",
       )
       .eq("id", orderId)
       .single();
@@ -64,10 +64,13 @@ serve(async (req) => {
     const ownsViaAuth =
       (authedUserId && order.user_id && order.user_id === authedUserId) ||
       (authedEmail && order.buyer_email && order.buyer_email.toLowerCase() === authedEmail);
+    // Accept either the legacy checkout session id OR the current PaymentIntent id
+    // as buyer proof — the client now stores the PI id as checkoutSessionId.
     const ownsViaSession =
       typeof sessionId === "string" &&
       sessionId.length > 0 &&
-      order.stripe_checkout_session_id === sessionId;
+      (order.stripe_checkout_session_id === sessionId ||
+        order.stripe_payment_intent_id === sessionId);
 
     if (!ownsViaAuth && !ownsViaSession) {
       return json({ success: false, reason: "unauthorized" }, 401);
