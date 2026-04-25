@@ -36,6 +36,7 @@ import { AdminMfaEnroll } from "@/components/admin/AdminMfaEnroll";
 import { AdminMfaChallenge } from "@/components/admin/AdminMfaChallenge";
 import { WebhookDebugPanel } from "@/components/admin/WebhookDebugPanel";
 import { supabase } from "@/integrations/supabase/client";
+import { useRealtimeRefresh } from "@/hooks/useRealtimeRefresh";
 
 export const Route = createFileRoute("/admin")({
   component: AdminRoute,
