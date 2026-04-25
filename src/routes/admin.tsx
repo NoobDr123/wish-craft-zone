@@ -188,7 +188,7 @@ function StaffPage() {
           {tab === "refunds" && <RefundsPanel />}
           {tab === "reactions" && <ReactionsPanel />}
           {tab === "revisions" && <RevisionsPanel />}
-          {tab === "ips" && <IpAllowlistPanel />}
+          
         </div>
       </main>
     </div>
