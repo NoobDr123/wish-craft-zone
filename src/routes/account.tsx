@@ -179,11 +179,11 @@ function AccountPage() {
                         </span>
                       </p>
                       <Link
-                        to="/listen/$id"
+                        to="/portal/$id"
                         params={{ id: o.id }}
                         className="mt-3 inline-flex items-center gap-1.5 rounded-full bg-primary px-4 py-2 text-xs font-semibold text-primary-foreground shadow-soft transition-colors hover:bg-primary-hover"
                       >
-                        <Music2 className="h-3.5 w-3.5" /> Open song
+                        <Music2 className="h-3.5 w-3.5" /> Manage order
                       </Link>
                     </div>
                   </div>
