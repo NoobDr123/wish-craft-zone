@@ -794,6 +794,69 @@ export type Database = {
           },
         ]
       }
+      public_featured_samples: {
+        Row: {
+          audio_url: string | null
+          cover_image_url: string | null
+          created_at: string | null
+          for_text: string | null
+          genre: string | null
+          genre_label: string | null
+          id: string
+          lyrics: string | null
+          quote: string | null
+          recipient_name: string | null
+          relationship: string | null
+          sort_order: number | null
+          synced_lyrics: Json | null
+          tempo: string | null
+          testimonial_slug: string | null
+          title: string | null
+          updated_at: string | null
+          voice: string | null
+        }
+        Insert: {
+          audio_url?: string | null
+          cover_image_url?: string | null
+          created_at?: string | null
+          for_text?: string | null
+          genre?: string | null
+          genre_label?: string | null
+          id: string
+          lyrics?: string | null
+          quote?: string | null
+          recipient_name?: string | null
+          relationship?: string | null
+          sort_order?: number | null
+          synced_lyrics?: Json | null
+          tempo?: string | null
+          testimonial_slug?: string | null
+          title?: string | null
+          updated_at?: string | null
+          voice?: string | null
+        }
+        Update: {
+          audio_url?: string | null
+          cover_image_url?: string | null
+          created_at?: string | null
+          for_text?: string | null
+          genre?: string | null
+          genre_label?: string | null
+          id?: string
+          lyrics?: string | null
+          quote?: string | null
+          recipient_name?: string | null
+          relationship?: string | null
+          sort_order?: number | null
+          synced_lyrics?: Json | null
+          tempo?: string | null
+          testimonial_slug?: string | null
+          title?: string | null
+          updated_at?: string | null
+          voice?: string | null
+        }
+        Relationships: []
+      }
       quiz_events: {
         Row: {
           amount_cents: number | null
@@ -1266,69 +1329,6 @@ export type Database = {
       }
     }
     Views: {
-      public_featured_samples: {
-        Row: {
-          audio_url: string | null
-          cover_image_url: string | null
-          created_at: string | null
-          for_text: string | null
-          genre: string | null
-          genre_label: string | null
-          id: string | null
-          lyrics: string | null
-          quote: string | null
-          recipient_name: string | null
-          relationship: string | null
-          sort_order: number | null
-          synced_lyrics: Json | null
-          tempo: string | null
-          testimonial_slug: string | null
-          title: string | null
-          updated_at: string | null
-          voice: string | null
-        }
-        Insert: {
-          audio_url?: string | null
-          cover_image_url?: string | null
-          created_at?: string | null
-          for_text?: string | null
-          genre?: string | null
-          genre_label?: string | null
-          id?: string | null
-          lyrics?: string | null
-          quote?: string | null
-          recipient_name?: string | null
-          relationship?: string | null
-          sort_order?: number | null
-          synced_lyrics?: Json | null
-          tempo?: string | null
-          testimonial_slug?: string | null
-          title?: string | null
-          updated_at?: string | null
-          voice?: string | null
-        }
-        Update: {
-          audio_url?: string | null
-          cover_image_url?: string | null
-          created_at?: string | null
-          for_text?: string | null
-          genre?: string | null
-          genre_label?: string | null
-          id?: string | null
-          lyrics?: string | null
-          quote?: string | null
-          recipient_name?: string | null
-          relationship?: string | null
-          sort_order?: number | null
-          synced_lyrics?: Json | null
-          tempo?: string | null
-          testimonial_slug?: string | null
-          title?: string | null
-          updated_at?: string | null
-          voice?: string | null
-        }
-        Relationships: []
-      }
       public_shared_songs: {
         Row: {
           audio_variants: Json | null
