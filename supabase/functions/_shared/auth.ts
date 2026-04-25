@@ -41,18 +41,6 @@ export async function isInternalRequest(req: Request): Promise<boolean> {
   const serviceRoleKey = Deno.env.get("SUPABASE_SERVICE_ROLE_KEY");
   if (serviceRoleKey && token === serviceRoleKey) return true;
 
-  // Also accept the project's anon/publishable key. This is the bearer
-  // pg_cron sends to drain-queue (we don't want to expose the real service
-  // role key inside cron.job.command, which is readable by other DB roles).
-  // Anyone with the anon key can already make arbitrary unauthenticated
-  // requests to the project — accepting it here only lets them poke our
-  // queue dispatcher. The downstream targets (generate-brief, deliver-song,
-  // submit-to-kie, process-kie-callback) still require this same check, and
-  // drain-queue calls them with the real service role key.
-  const anonKey = Deno.env.get("SUPABASE_ANON_KEY")
-    ?? Deno.env.get("SUPABASE_PUBLISHABLE_KEY");
-  if (anonKey && token === anonKey) return true;
-
   // Otherwise: verify via Supabase Auth — getUser validates the signature
   // against the project JWKS. If the token is a forged unsigned JWT,
   // getUser returns no user.
