@@ -7,7 +7,7 @@ import { useState, type FormEvent } from "react";
 import { ArrowLeft, Lock, CheckCircle2, Loader2, ShieldCheck } from "lucide-react";
 import { Logo } from "@/components/Logo";
 import { supabase } from "@/integrations/supabase/client";
-import { useAuth } from "@/hooks/useAuth";
+
 
 export const Route = createFileRoute("/admin/login")({
   component: AdminLoginRoute,
