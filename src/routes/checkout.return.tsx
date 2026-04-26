@@ -112,17 +112,26 @@ function CheckoutReturnPage() {
         if (paymentIntentId) q.set("checkoutSessionId", paymentIntentId);
         else if (sessionId) q.set("checkoutSessionId", sessionId);
 
-        // Fire Meta Pixel Purchase event ONCE
+        // Fire Meta Pixel Purchase event ONCE.
+        // Pass eventID = order.id so future server-side CAPI events dedupe
+        // against this browser event in Meta Ads Manager.
         try {
           const fbq = (window as any).fbq;
           if (typeof fbq === "function" && !localStorage.getItem("rs_px_fired")) {
             const cents = order.amount_paid_cents || order.amount_cents || 0;
-            fbq("track", "Purchase", {
-              value: Number((cents / 100).toFixed(2)),
-              currency: (order.currency || "USD").toUpperCase(),
-              content_type: "product",
-              content_name: "RibbonSong Personalized Song",
-            });
+            fbq(
+              "track",
+              "Purchase",
+              {
+                value: Number((cents / 100).toFixed(2)),
+                currency: (order.currency || "USD").toUpperCase(),
+                content_type: "product",
+                content_name: "RibbonSong Personalized Song",
+                content_ids: [order.id],
+                order_id: order.id,
+              },
+              { eventID: order.id },
+            );
             localStorage.setItem("rs_px_fired", "true");
           }
         } catch {
