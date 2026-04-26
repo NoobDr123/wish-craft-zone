@@ -40,9 +40,9 @@ function CheckoutPage() {
   const [hydrated, setHydrated] = useState(() => useQuizStore.persist.hasHydrated());
   const [email, setEmail] = useState(q.buyer_email || "");
   const [name, setName] = useState(q.buyer_name || "");
-  const [clientSecret, setClientSecret] = useState<string | null>(null);
-  const [paymentIntentId, setPaymentIntentId] = useState<string | null>(null);
   const [orderId, setOrderId] = useState<string | null>(q.orderId || null);
+  const [creatingOrder, setCreatingOrder] = useState(false);
+  const [amountVersion, setAmountVersion] = useState(0);
   const [error, setError] = useState<string | null>(null);
   const [reviewOpen, setReviewOpen] = useState(false);
 
