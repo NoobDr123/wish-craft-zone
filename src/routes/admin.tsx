@@ -1057,6 +1057,7 @@ function UpsellsPanel() {
 
   const load = async (signal?: { active: boolean }) => {
     const start = rangeStart(range);
+    const allowed = await fetchAllowedSessionIds(start?.toISOString());
     let eq = supabase
       .from("quiz_events")
       .select("event_type, upsell_type, amount_cents, created_at, session_id")
@@ -1073,7 +1074,9 @@ function UpsellsPanel() {
     if (start) oq = oq.gte("created_at", start.toISOString());
     const [{ data: events }, { data: orders }] = await Promise.all([eq, oq]);
     if (signal && !signal.active) return;
-    setData({ events: events ?? [], orders: orders ?? [] });
+    // Filter quiz events to production-host sessions only.
+    const filteredEvents = (events ?? []).filter((e) => allowed.has(e.session_id));
+    setData({ events: filteredEvents, orders: orders ?? [] });
   };
 
   useEffect(() => {
