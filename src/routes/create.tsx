@@ -289,7 +289,7 @@ function CreatePage() {
       chapter: "Their fight",
       title: c4.question,
       subtitle: c4.helper,
-      isValid: (s) => s.fighting_for.trim().length >= 15,
+      isValid: (s) => s.fighting_for.trim().length >= 1,
       render: () => (
         <Question label={c4.sublabel}>
           <TextArea
@@ -309,7 +309,7 @@ function CreatePage() {
       chapter: "Their soul",
       title: c5.question,
       subtitle: c5.helper,
-      isValid: (s) => s.qualities.trim().length >= 15,
+      isValid: (s) => s.qualities.trim().length >= 1,
       render: () => (
         <Question label={c5.sublabel}>
           <TextArea
@@ -328,7 +328,7 @@ function CreatePage() {
       chapter: "Their soul",
       title: c6.question,
       subtitle: c6.helper,
-      isValid: (s) => s.shared_memory.trim().length >= 15,
+      isValid: (s) => s.shared_memory.trim().length >= 1,
       render: () => (
         <Question label={c6.sublabel}>
           <TextArea
@@ -367,7 +367,7 @@ function CreatePage() {
       chapter: "The message",
       title: c8.question,
       subtitle: c8.helper,
-      isValid: (s) => s.personal_words.trim().length >= 40,
+      isValid: (s) => s.personal_words.trim().length >= 1,
       render: () => (
         <Question label={c8.sublabel}>
           <TextArea
