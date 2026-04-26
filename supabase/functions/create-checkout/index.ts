@@ -7,53 +7,59 @@ const supabase = createClient(
   Deno.env.get("SUPABASE_SERVICE_ROLE_KEY")!,
 );
 
-type CachedPrice = { id: string; amount: number; currency: string };
-const priceCache = new Map<StripeEnv, CachedPrice>();
-
-async function getBasePrice(env: StripeEnv) {
-  const cached = priceCache.get(env);
-  if (cached) return cached;
-  const stripe = createStripeClient(env);
-  const prices = await stripe.prices.list({ lookup_keys: ["ribbonsong_base"] });
-  if (!prices.data.length) throw new Error("Base price not found");
-  const p = prices.data[0];
-  if (!p.unit_amount) throw new Error("Base price has no unit amount");
-  const value: CachedPrice = { id: p.id, amount: p.unit_amount, currency: p.currency };
-  priceCache.set(env, value);
-  return value;
-}
-
 serve(async (req) => {
   if (req.method === "OPTIONS") return new Response(null, { headers: corsHeaders });
 
+  let parsedBody: any = {};
   try {
-    const body = await req.json();
-    const { orderId, environment, rewardCode } = body;
-    if (!orderId || typeof orderId !== "string") {
-      return json({ error: "Missing orderId" }, 400);
-    }
+    parsedBody = await req.json();
+  } catch (_) {
+    return json({ error: "invalid_json" }, 400);
+  }
 
-    // ---- Free song reward path ----
-    if (rewardCode && typeof rewardCode === "string") {
-      return await handleFreeSongRedemption(orderId, rewardCode.trim(), req);
-    }
+  const { orderId, environment, rewardCode, returnUrl } = parsedBody;
+  if (!orderId || typeof orderId !== "string") {
+    return json({ error: "missing_order_id" }, 400);
+  }
 
-    const env = (environment || "sandbox") as StripeEnv;
+  // ---- Free song reward path ----
+  if (rewardCode && typeof rewardCode === "string") {
+    return await handleFreeSongRedemption(orderId, rewardCode.trim(), req);
+  }
+
+  const env = (environment === "live" ? "live" : "sandbox") as StripeEnv;
+
+  console.log(`[create-checkout] start order=${orderId} env=${env}`);
+
+  try {
     const stripe = createStripeClient(env);
 
-    const price = await getBasePrice(env);
-
-    const { data: existingOrder } = await supabase
+    const { data: existingOrder, error: orderErr } = await supabase
       .from("orders")
-      .select("buyer_email, stripe_customer_id, stripe_env")
+      .select(
+        "id, buyer_email, buyer_name, recipient_name, amount_cents, currency, stripe_customer_id, stripe_env, stripe_checkout_session_id, payment_status",
+      )
       .eq("id", orderId)
       .maybeSingle();
 
-    let customerId = existingOrder?.stripe_env === env ? existingOrder?.stripe_customer_id ?? null : null;
+    if (orderErr) {
+      console.error("[create-checkout] order lookup failed:", orderErr);
+      return json({ error: "order_lookup_failed", detail: orderErr.message }, 500);
+    }
+    if (!existingOrder) {
+      return json({ error: "order_not_found" }, 404);
+    }
+    if (existingOrder.payment_status === "paid") {
+      return json({ error: "order_already_paid" }, 400);
+    }
+
+    const amountCents = existingOrder.amount_cents ?? 4999;
+    const currency = (existingOrder.currency || "USD").toLowerCase();
+
+    // Validate / refresh customer
+    let customerId =
+      existingOrder.stripe_env === env ? existingOrder.stripe_customer_id ?? null : null;
     if (customerId) {
-      // Verify the cached customer still exists in this Stripe environment.
-      // It may have been deleted, or the connection may have been swapped to
-      // a different underlying account, leaving us with a stale ID.
       try {
         const existing = await stripe.customers.retrieve(customerId);
         if ((existing as any).deleted) customerId = null;
@@ -62,35 +68,69 @@ serve(async (req) => {
           console.warn(`[create-checkout] stale customer ${customerId}, recreating`);
           customerId = null;
         } else {
+          console.error("[create-checkout] customer retrieve failed:", err?.message || err);
           throw err;
         }
       }
     }
     if (!customerId) {
+      const realEmail =
+        existingOrder.buyer_email && !existingOrder.buyer_email.startsWith("pending+")
+          ? existingOrder.buyer_email
+          : undefined;
       const customer = await stripe.customers.create({
-        email:
-          existingOrder?.buyer_email && !existingOrder.buyer_email.startsWith("pending+")
-            ? existingOrder.buyer_email
-            : undefined,
+        email: realEmail,
+        name: existingOrder.buyer_name || undefined,
         metadata: { orderId },
       });
       customerId = customer.id;
+      console.log(`[create-checkout] created new customer ${customerId} for order ${orderId}`);
     }
 
-    const paymentIntent = await stripe.paymentIntents.create({
-      amount: price.amount,
-      currency: price.currency,
+    // Build the embedded Checkout Session.
+    // We use price_data so any promo-applied amount (stored on the order) is
+    // honored without needing to re-create or sync Stripe Price objects.
+    const productName = existingOrder.recipient_name
+      ? `RibbonSong personalized song for ${existingOrder.recipient_name}`
+      : "RibbonSong personalized song";
+
+    const finalReturnUrl =
+      typeof returnUrl === "string" && returnUrl.length > 0
+        ? returnUrl
+        : "https://ribbonsong.com/checkout/return?session_id={CHECKOUT_SESSION_ID}";
+
+    const session = await stripe.checkout.sessions.create({
+      mode: "payment",
+      ui_mode: "embedded",
       customer: customerId,
-      setup_future_usage: "off_session",
-      payment_method_types: ["card", "link"],
+      line_items: [
+        {
+          quantity: 1,
+          price_data: {
+            currency,
+            unit_amount: amountCents,
+            product_data: {
+              name: productName,
+              description: "Personalized custom song delivered to your inbox.",
+            },
+          },
+        },
+      ],
+      payment_intent_data: {
+        setup_future_usage: "off_session",
+        description: "RibbonSong personalized song",
+        metadata: { orderId, kind: "base_order" },
+      },
       metadata: { orderId, kind: "base_order" },
-      description: "RibbonSong personalized song",
+      return_url: finalReturnUrl,
     });
 
     const { error: updateError } = await supabase
       .from("orders")
       .update({
-        stripe_payment_intent_id: paymentIntent.id,
+        stripe_checkout_session_id: session.id,
+        stripe_payment_intent_id:
+          typeof session.payment_intent === "string" ? session.payment_intent : null,
         stripe_customer_id: customerId,
         stripe_env: env,
         payment_status: "checkout_started",
@@ -98,19 +138,27 @@ serve(async (req) => {
       .eq("id", orderId);
 
     if (updateError) {
-      console.error("orders.update failed:", updateError);
-      return json({ error: "Could not update order checkout state" }, 500);
+      console.error("[create-checkout] orders.update failed:", updateError);
+      return json({ error: "order_update_failed", detail: updateError.message }, 500);
     }
 
+    console.log(
+      `[create-checkout] ok order=${orderId} session=${session.id} amount=${amountCents} ${currency}`,
+    );
+
     return json({
-      clientSecret: paymentIntent.client_secret,
-      paymentIntentId: paymentIntent.id,
-      amount: price.amount,
-      currency: price.currency,
+      ok: true,
+      clientSecret: session.client_secret,
+      sessionId: session.id,
+      amount: amountCents,
+      currency,
     });
   } catch (e: any) {
-    console.error("create-checkout error:", e);
-    return json({ error: e.message || "Internal error" }, 500);
+    console.error("[create-checkout] error:", e?.message || e, e?.raw || "");
+    return json(
+      { error: "stripe_error", message: e?.message || "Internal error" },
+      500,
+    );
   }
 });
 
@@ -120,7 +168,6 @@ serve(async (req) => {
  * generation immediately. No Stripe involvement.
  */
 async function handleFreeSongRedemption(orderId: string, code: string, req: Request) {
-  // Auth required
   const authHeader = req.headers.get("Authorization") ?? "";
   const token = authHeader.replace(/^Bearer\s+/i, "");
   if (!token) return json({ error: "Login required" }, 401);
@@ -150,7 +197,6 @@ async function handleFreeSongRedemption(orderId: string, code: string, req: Requ
     return json({ error: "Code does not belong to you" }, 403);
   }
 
-  // Atomic decrement
   const { data: updated, error: decErr } = await supabase
     .from("reaction_reward_codes")
     .update({
@@ -168,8 +214,6 @@ async function handleFreeSongRedemption(orderId: string, code: string, req: Requ
     return json({ error: "Code already fully used or race lost" }, 400);
   }
 
-  // Mark order as free + paid + ready for brief gen
-  // Schedule delivery for next morning ~9am UTC (simple heuristic)
   const tomorrow = new Date();
   tomorrow.setUTCDate(tomorrow.getUTCDate() + 1);
   tomorrow.setUTCHours(9, 0, 0, 0);
@@ -182,7 +226,7 @@ async function handleFreeSongRedemption(orderId: string, code: string, req: Requ
       amount_paid_cents: 0,
       source_kind: "free_reward",
       source_reward_code_id: reward.id,
-      status: "upsells_complete", // skip upsells, go straight to brief
+      status: "upsells_complete",
       delivery_tier: "express_48h",
       scheduled_delivery_at: tomorrow.toISOString(),
     })
