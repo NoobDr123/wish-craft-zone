@@ -455,7 +455,7 @@ function DashboardPanel() {
         <h2 className="font-display text-xl font-semibold mb-4">Upsell take rates</h2>
         <div className="grid grid-cols-1 gap-4 md:grid-cols-3">
           <UpsellCard label="Extra verse" count={data.upsellCounts.extra_verse} total={data.paidCount} priceCents={1999} />
-          <UpsellCard label="Rush delivery" count={data.upsellCounts.rush_delivery} total={data.paidCount} priceCents={5900} />
+          <UpsellCard label="Rush delivery (24h or 48h)" count={data.upsellCounts.rush_delivery} total={data.paidCount} priceCents={2999} />
           <UpsellCard label="Unlimited edits" count={data.upsellCounts.unlimited_edits} total={data.paidCount} priceCents={3299} />
         </div>
       </div>
@@ -1090,16 +1090,27 @@ function UpsellsPanel() {
 
   if (!data) return <div className="text-muted-foreground">Loading…</div>;
 
-  const types = ["extra_verse", "rush_delivery", "unlimited_edits"];
+  // Order matches the live funnel: Upsell 1 → Upsell 2 (+ 48h downsell) → Upsell 3.
+  const types = ["extra_verse", "rush_delivery", "delivery_48h", "unlimited_edits"];
   const labels: Record<string, string> = {
-    extra_verse: "Extra verse ($19.99)",
-    rush_delivery: "Rush delivery ($59.00)",
-    unlimited_edits: "Unlimited edits ($32.99)",
+    extra_verse: "Upsell 1 — Extra verse ($19.99)",
+    rush_delivery: "Upsell 2 — Rush delivery 24h ($29.99)",
+    delivery_48h: "Upsell 2 downsell — Delivery 48h ($19.99)",
+    unlimited_edits: "Upsell 3 — Unlimited edits ($32.99)",
   };
-  const prices: Record<string, number> = { extra_verse: 1999, rush_delivery: 5900, unlimited_edits: 3299 };
-  const orderField: Record<string, string> = {
+  const prices: Record<string, number> = {
+    extra_verse: 1999,
+    rush_delivery: 2999,
+    delivery_48h: 1999,
+    unlimited_edits: 3299,
+  };
+  // Maps a tracked upsell to the order column we use to confirm it was actually
+  // charged. delivery_48h has no dedicated column (it sets is_rush=true just
+  // like rush_delivery), so we skip the "confirmed in orders" line for it.
+  const orderField: Record<string, string | null> = {
     extra_verse: "has_3rd_verse",
     rush_delivery: "is_rush",
+    delivery_48h: null,
     unlimited_edits: "has_unlimited_edits",
   };
 
@@ -1120,7 +1131,12 @@ function UpsellsPanel() {
           const views = data.events.filter((e) => e.event_type === "upsell_view" && e.upsell_type === t).length;
           const accepts = data.events.filter((e) => e.event_type === "upsell_accept" && e.upsell_type === t).length;
           const declines = data.events.filter((e) => e.event_type === "upsell_decline" && e.upsell_type === t).length;
-          const taken = paidOrders.filter((o) => o[orderField[t] as keyof typeof o]).length;
+          const field = orderField[t];
+          // For upsells with a dedicated order flag, count actual paid orders.
+          // For delivery_48h (no flag), fall back to tracked accept events.
+          const taken = field
+            ? paidOrders.filter((o) => o[field as keyof typeof o]).length
+            : accepts;
           const revenue = taken * prices[t];
 
           return (
@@ -1151,8 +1167,16 @@ function UpsellsPanel() {
                 </div>
               </div>
               <div className="mt-4 text-sm text-muted-foreground">
-                Confirmed in orders: <span className="font-semibold text-foreground">{taken}</span> of {paidOrders.length} paid orders
-                <span className="ml-2">({fmtPct(taken, paidOrders.length)})</span>
+                {field ? (
+                  <>
+                    Confirmed in orders: <span className="font-semibold text-foreground">{taken}</span> of {paidOrders.length} paid orders
+                    <span className="ml-2">({fmtPct(taken, paidOrders.length)})</span>
+                  </>
+                ) : (
+                  <>
+                    Counted from accept events (no dedicated order flag — sets <code className="rounded bg-muted px-1">is_rush</code> like the 24h rush).
+                  </>
+                )}
               </div>
             </div>
           );
