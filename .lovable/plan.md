@@ -1,54 +1,49 @@
-I found the important signal: the backend payment function is successfully creating live sessions for the latest order, but most recent order rows are still showing placeholder emails and many have `payment_status = checkout_started` with no saved `stripe_checkout_session_id`. That points to a broken handoff between quiz state, order row creation, embedded checkout mounting, and order updates — not just a Stripe account/customer problem.
+I found the main issue: the app currently has a nested TanStack route conflict. `src/routes/checkout.tsx` acts as a parent route for `/checkout/return`, so when Stripe sends users to `/checkout/return?payment_intent_id=...`, the server-rendered page can still show the checkout screen instead of the return-confirmation screen. That explains why customers remain on the return URL and do not advance to `/upsell-1` reliably.
 
-Plan to fix it from first principles:
+Plan to fix fast:
 
-1. Make checkout creation server-authoritative
-   - Replace the current two-step browser flow (`insert order from browser` → `create Stripe session`) with one backend-controlled flow.
-   - The checkout page will send the complete quiz/contact payload to a backend function.
-   - The backend function will create or update the order row, create the embedded checkout session, and persist the session id in one trusted path.
-   - This avoids browser row-security issues, localStorage hydration races, and placeholder email orders.
+1. Make `/checkout/return` an independent top-level route
+   - Rename the return route file from `checkout.return.tsx` to the flat escaped path convention for a literal slash: `checkout[.]return.tsx`.
+   - Keep its `createFileRoute("/checkout/return")` definition.
+   - This prevents it from being nested under `/checkout`, so the return page renders by itself instead of being swallowed by the checkout page.
 
-2. Stop gating the payment iframe on fragile local state
-   - The checkout page currently waits for `orderId && ready` before mounting Stripe.
-   - I will change the flow so the user’s email/name fields are the source of truth and the payment session is requested only after they are valid.
-   - If no valid order exists, the backend will create it from the full quiz payload instead of relying on a previously persisted `orderId`.
+2. Add a belt-and-suspenders redirect guard inside `/checkout`
+   - At the very top of the checkout route component, detect if `window.location.pathname === "/checkout/return"`.
+   - If so, immediately render the same return-page component or hard-redirect into the standalone return route logic instead of rendering payment checkout.
+   - This protects current/stale bundles and any edge case where the nested route still resolves through the checkout component.
 
-3. Fix quiz-to-checkout data transfer
-   - Keep buyer email/name from the quiz delivery step and checkout form synchronized.
-   - Ensure `buyer_email`, `buyer_name`, `recipient_name`, relationship, song preferences, and all story answers are included in the backend checkout request.
-   - Prevent placeholder `pending+...@ribbonsong.com` from being used once a real email is available.
+3. Make the return page route buyers to upsells even if local state is missing
+   - Keep calling `confirm-payment` using the `payment_intent_id` from the URL.
+   - On paid confirmation, persist `orderId`, `checkoutSessionId`, buyer email if available, then hard-redirect to `/upsell-1` unless the order is already marked complete.
+   - Preserve the polling fallback, but make the timeout path less dangerous: only send to upsells when we have an order ID; otherwise show a clear support message instead of looping on checkout.
 
-4. Fix session persistence and retry behavior
-   - Ensure every successful checkout session creation saves:
-     - `stripe_checkout_session_id`
-     - `stripe_customer_id`
-     - `stripe_env`
-     - `payment_status = checkout_started`
-   - If the order update fails after Stripe creates the session, return a clear error and log it, instead of leaving the user staring at a dead checkout.
-   - Add an idempotency-friendly retry path so refreshing checkout does not create duplicate broken orders.
+4. Ensure upsell pages do not depend only on localStorage
+   - Let upsell pages use the `checkoutSessionId`/PaymentIntent proof from store as they do now.
+   - If the user lands on upsells with missing local store but the order was just confirmed, the return page will have written the needed state before redirecting.
 
-5. Fix checkout return confirmation for embedded sessions
-   - The return page currently only calls the payment confirmation fallback when it has a payment intent id, but embedded checkout returns a `session_id`.
-   - I will update it to call the confirmation fallback with `sessionId` too, so paid embedded sessions reliably move to upsells even if the webhook is delayed.
+5. Verify all payment entry points
+   - Card form: `confirmCardPayment` success -> `/checkout/return?payment_intent_id=...` -> confirm -> `/upsell-1`.
+   - Apple Pay / Google Pay / Link: Express confirm success -> same return URL -> confirm -> `/upsell-1`.
+   - Promo amount changes: still remount payment Elements with the discounted amount.
 
-6. Add targeted diagnostics visible in logs
-   - Add structured logs for:
-     - missing quiz payload
-     - invalid email/name
-     - order create/update success/failure
-     - session create success/failure
-     - session id persistence success/failure
-   - This will make future checkout failures easy to identify instead of guessing.
+Technical details:
 
-7. Verify end-to-end
-   - Run build/type checks.
-   - Deploy the changed payment backend functions.
-   - Test the backend function directly.
-   - Check recent database rows to confirm new orders store real email/name and a real checkout session id.
-   - Confirm the frontend path remains inline embedded checkout on the site, not a Stripe redirect link.
+```text
+Before:
+/checkout
+  └─ /return  (nested child route generated from checkout.return.tsx)
 
-Technical notes:
-- Keep Stripe Embedded Checkout (`ui_mode: "embedded"`) and `return_url`; no redirect-based checkout.
-- Keep `verify_jwt = false` for payment-related backend functions so anonymous buyers and preflight requests work.
-- Use the existing payment gateway utility (`createStripeClient`) rather than direct Stripe secret keys.
-- Avoid editing generated backend client/type files.
+Problem:
+Direct visit to /checkout/return can SSR/render checkout parent UI, so return confirmation code may not take control.
+
+After:
+/checkout         payment page only
+/checkout/return  standalone confirmation/redirect page
+```
+
+Files to change after approval:
+- `src/routes/checkout.return.tsx` -> rename to `src/routes/checkout[.]return.tsx`
+- `src/routes/checkout.tsx`
+- Possibly small export cleanup in the return route so the checkout guard can reuse the return component if needed
+
+No database migration is needed.
