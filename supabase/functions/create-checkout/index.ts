@@ -70,6 +70,19 @@ serve(async (req) => {
   try {
     const stripe = createStripeClient(env);
 
+    const sanitizedPatch = sanitizeCheckoutQuizPatch(quizPatch);
+    if (sanitizedPatch) {
+      const { error: syncErr } = await supabase
+        .from("orders")
+        .update(sanitizedPatch)
+        .eq("id", orderId)
+        .neq("payment_status", "paid");
+      if (syncErr) {
+        console.error("[create-checkout] quiz patch sync failed:", syncErr);
+        return json({ error: "order_sync_failed", detail: syncErr.message }, 500);
+      }
+    }
+
     const { data: existingOrder, error: orderErr } = await supabase
       .from("orders")
       .select(
