@@ -31,7 +31,12 @@ serve(async (req) => {
 
   try {
     switch (event.type) {
+      case "checkout.session.completed":
+      case "checkout.session.async_payment_succeeded":
+        await handleCheckoutSessionCompleted(event.data.object, env);
+        break;
       case "payment_intent.succeeded":
+        // Fallback: still handle PI succeeded so legacy/upsell PIs work.
         await handlePaymentSucceeded(event.data.object, env);
         break;
       case "payment_intent.payment_failed":
@@ -40,11 +45,6 @@ serve(async (req) => {
           event.data.object.id,
           event.data.object.last_payment_error?.message,
         );
-        break;
-      // checkout.session.completed kept for backwards compatibility with any
-      // in-flight orders created with the old flow. Safe to ignore otherwise.
-      case "checkout.session.completed":
-        console.log("Legacy checkout.session.completed ignored:", event.data.object.id);
         break;
       default:
         console.log("Unhandled event:", event.type);
