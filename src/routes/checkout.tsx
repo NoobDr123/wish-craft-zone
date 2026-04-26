@@ -248,18 +248,19 @@ function CheckoutPage() {
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [hydrated, q.recipient_name, q.reward_code, orderId]);
 
-  // Persist buyer email/name to the order as they type (debounced).
+  // Persist buyer email/name and the latest quiz payload to the order as they type (debounced).
   useEffect(() => {
     if (!orderId || !ready) return;
     const t = setTimeout(async () => {
       const trimmedEmail = email.trim().toLowerCase();
+      const trimmedName = name.trim();
       q.set("buyer_email", trimmedEmail);
-      q.set("buyer_name", name);
+      q.set("buyer_name", trimmedName);
       await supabase
         .from("orders")
-        .update({ buyer_email: trimmedEmail, buyer_name: name })
+        .update(buildOrderPatchForQuiz({ buyerEmail: trimmedEmail, buyerName: trimmedName }))
         .eq("id", orderId);
-    }, 600);
+    }, 300);
     return () => clearTimeout(t);
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [email, name, ready, orderId]);
