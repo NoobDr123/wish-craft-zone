@@ -158,7 +158,13 @@ serve(async (req) => {
     }
 
     if (order.payment_status === "paid") {
-      return json({ error: "order_already_paid" }, 400);
+      console.log(`[create-payment-intent] already paid order=${orderId}`);
+      return json({
+        ok: true,
+        alreadyPaid: true,
+        orderId,
+        paymentIntentId: order.stripe_payment_intent_id,
+      });
     }
 
     const amountCents = order.amount_cents ?? 4999;
