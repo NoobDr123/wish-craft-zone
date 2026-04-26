@@ -35,45 +35,6 @@ function Upsell1() {
       orderId: q.orderId,
       buyerEmail: q.buyer_email || undefined,
     });
-
-    // Fire Meta Pixel Purchase on upsell-1 view (per buyer request).
-    // Deduped per order via localStorage so refreshes / back-navigation
-    // never double-count. Uses the main order's amount_paid_cents as the
-    // purchase value so reporting matches the actual sale.
-    if (!q.orderId) return;
-    const key = `rs_px_upsell1_${q.orderId}`;
-    if (typeof window === "undefined" || localStorage.getItem(key)) return;
-    let cancelled = false;
-    void (async () => {
-      try {
-        const { data: order } = await supabase
-          .from("orders")
-          .select("amount_paid_cents, amount_cents, currency")
-          .eq("id", q.orderId!)
-          .maybeSingle();
-        if (cancelled) return;
-        const cents = order?.amount_paid_cents || order?.amount_cents || 0;
-        const { pixelTrack } = await import("@/lib/metaPixel");
-        pixelTrack(
-          "Purchase",
-          {
-            value: Number((cents / 100).toFixed(2)),
-            currency: (order?.currency || "USD").toUpperCase(),
-            content_type: "product",
-            content_name: "RibbonSong Personalized Song",
-            content_ids: [q.orderId],
-            order_id: q.orderId,
-          },
-          { eventID: q.orderId },
-        );
-        localStorage.setItem(key, "1");
-      } catch {
-        /* never block the funnel on pixel errors */
-      }
-    })();
-    return () => {
-      cancelled = true;
-    };
   }, [q.orderId, q.buyer_email]);
 
   const accept = async () => {
