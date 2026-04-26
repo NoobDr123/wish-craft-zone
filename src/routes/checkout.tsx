@@ -70,12 +70,9 @@ function CheckoutPage() {
     setOrderId(q.orderId || null);
   }, [hydrated, q.buyer_email, q.buyer_name, q.orderId]);
 
-  useEffect(() => {
-    if (!hydrated) return;
-    if (!q.recipient_name && !q.orderId) {
-      setError("Checkout session not found. Please finish the quiz first.");
-    }
-  }, [hydrated, q.recipient_name, q.orderId]);
+  // Note: we no longer block with "Checkout session not found" — the order
+  // is created on-the-fly by `ensureOrderForQuiz` / `create-payment-intent`
+  // even when the local quiz store is empty (e.g. returning buyer).
 
   // Track checkout page view once hydrated
   useEffect(() => {
