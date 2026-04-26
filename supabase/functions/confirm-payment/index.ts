@@ -170,8 +170,11 @@ serve(async (req) => {
             if (error) console.error("issue_reward_code_for_order failed:", error);
           });
 
-        // Send confirmation email if not already sent.
-        if (!existing.confirmation_email_sent_at) {
+        // Send confirmation email NOW only for T3ST orders (which skip the
+        // upsell pages entirely). For normal orders, mark-upsells-complete
+        // sends it after upsell decisions are settled — so the email reflects
+        // the real add-ons + total paid.
+        if (isT3st && !existing.confirmation_email_sent_at) {
           sendOrderConfirmation(orderId).catch((e) =>
             console.error("sendOrderConfirmation failed:", e),
           );
