@@ -275,9 +275,7 @@ function ScratchPage() {
   const expired = stage === "claim" && countdown === 0;
 
   const warmCheckout = () => {
-    void prefetchCheckout().catch((error) => {
-      console.error("[scratch] checkout prefetch failed before navigation:", error);
-    });
+    try { preloadStripe(); } catch { /* ignore */ }
   };
 
   return (
