@@ -53,7 +53,7 @@ serve(async (req) => {
     return json({ error: "invalid_json" }, 400);
   }
 
-  const { orderId, environment, rewardCode, returnUrl } = parsedBody;
+  const { orderId, environment, rewardCode, returnUrl, quizPatch } = parsedBody;
   if (!orderId || typeof orderId !== "string") {
     return json({ error: "missing_order_id" }, 400);
   }
