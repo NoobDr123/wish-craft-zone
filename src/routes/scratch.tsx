@@ -440,17 +440,24 @@ function ScratchPage() {
           </div>
 
           {/* CTA */}
-          <Link
-            to="/checkout"
+          <button
+            type="button"
+            onClick={startCheckout}
             onMouseEnter={() => prefetchCheckout()}
-            onTouchStart={() => prefetchCheckout()}
             onFocus={() => prefetchCheckout()}
-            className="mt-6 flex w-full items-center justify-center gap-2 rounded-full bg-primary px-8 py-5 text-base font-bold text-primary-foreground shadow-glow transition-all hover:bg-primary-hover active:scale-[0.99]"
+            disabled={checkoutStarting}
+            className="mt-6 flex w-full items-center justify-center gap-2 rounded-full bg-primary px-8 py-5 text-base font-bold text-primary-foreground shadow-glow transition-all hover:bg-primary-hover active:scale-[0.99] disabled:cursor-wait disabled:opacity-70"
           >
             <Gift className="h-5 w-5" />
-            {copy.ctaLabel}
-            <ArrowRight className="h-5 w-5" />
-          </Link>
+            {checkoutStarting ? "Starting secure checkout…" : copy.ctaLabel}
+            {!checkoutStarting && <ArrowRight className="h-5 w-5" />}
+          </button>
+
+          {checkoutError && (
+            <p className="mt-3 text-center text-sm font-medium text-destructive">
+              {checkoutError}
+            </p>
+          )}
 
           <p className="mt-4 flex items-center justify-center gap-1.5 text-center text-xs text-muted-foreground">
             <AlertTriangle className="h-3.5 w-3.5" />
