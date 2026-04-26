@@ -220,7 +220,9 @@ serve(async (req) => {
         amount: amountCents,
         currency,
         customer: customerId,
-        automatic_payment_methods: { enabled: true },
+        // Card only on the inline form. Apple Pay / Google Pay / Link are
+        // surfaced separately through the ExpressCheckoutElement above.
+        payment_method_types: ["card"],
         setup_future_usage: "off_session",
         description: order.recipient_name
           ? `RibbonSong personalized song for ${order.recipient_name}`
