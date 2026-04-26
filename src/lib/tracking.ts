@@ -66,6 +66,7 @@ export async function ensureSession(): Promise<void> {
       user_agent: navigator.userAgent.slice(0, 500),
       referrer: document.referrer?.slice(0, 500) || null,
       landing_path: window.location.pathname,
+      host: window.location.host?.slice(0, 200) || null,
       utm_source: utm.utm_source ?? null,
       utm_medium: utm.utm_medium ?? null,
       utm_campaign: utm.utm_campaign ?? null,
