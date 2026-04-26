@@ -53,7 +53,7 @@ serve(async (req) => {
     return json({ error: "invalid_json" }, 400);
   }
 
-  const { orderId, environment, rewardCode, returnUrl, quizPatch } = parsedBody;
+  const { orderId, environment, rewardCode, returnUrl, quizPatch, quizSnapshot, userId } = parsedBody;
   if (!orderId || typeof orderId !== "string") {
     return json({ error: "missing_order_id" }, 400);
   }
@@ -70,20 +70,8 @@ serve(async (req) => {
   try {
     const stripe = createStripeClient(env);
 
-    const sanitizedPatch = sanitizeCheckoutQuizPatch(quizPatch);
-    if (sanitizedPatch) {
-      const { error: syncErr } = await supabase
-        .from("orders")
-        .update(sanitizedPatch)
-        .eq("id", orderId)
-        .neq("payment_status", "paid");
-      if (syncErr) {
-        console.error("[create-checkout] quiz patch sync failed:", syncErr);
-        return json({ error: "order_sync_failed", detail: syncErr.message }, 500);
-      }
-    }
-
-    const { data: existingOrder, error: orderErr } = await supabase
+    // Look up existing order first
+    let { data: existingOrder, error: orderErr } = await supabase
       .from("orders")
       .select(
         "id, buyer_email, buyer_name, recipient_name, amount_cents, currency, stripe_customer_id, stripe_env, stripe_checkout_session_id, payment_status",
@@ -95,9 +83,75 @@ serve(async (req) => {
       console.error("[create-checkout] order lookup failed:", orderErr);
       return json({ error: "order_lookup_failed", detail: orderErr.message }, 500);
     }
+
+    // If the order does NOT exist, create it from the snapshot the client sent.
+    // This makes the backend authoritative — no more relying on browser-side
+    // inserts that can silently fail due to RLS or hydration races.
     if (!existingOrder) {
-      return json({ error: "order_not_found" }, 404);
+      const snapshot = sanitizeCheckoutQuizPatch(quizSnapshot) || sanitizeCheckoutQuizPatch(quizPatch);
+      if (!snapshot || !snapshot.recipient_name) {
+        console.error("[create-checkout] no order and insufficient snapshot to create one");
+        return json({ error: "order_not_found", detail: "no_snapshot" }, 404);
+      }
+      const buyerEmail = (snapshot.buyer_email as string | undefined) || `pending+${orderId}@ribbonsong.com`;
+      const insertRow: Record<string, unknown> = {
+        id: orderId,
+        user_id: typeof userId === "string" ? userId : null,
+        ...snapshot,
+        buyer_email: buyerEmail,
+        amount_cents: 4999,
+        currency: "USD",
+        status: "pending_payment",
+        payment_status: "pending",
+      };
+      const { data: inserted, error: insErr } = await supabase
+        .from("orders")
+        .insert(insertRow)
+        .select(
+          "id, buyer_email, buyer_name, recipient_name, amount_cents, currency, stripe_customer_id, stripe_env, stripe_checkout_session_id, payment_status",
+        )
+        .maybeSingle();
+      if (insErr || !inserted) {
+        console.error("[create-checkout] order insert failed:", insErr);
+        return json({ error: "order_create_failed", detail: insErr?.message }, 500);
+      }
+      existingOrder = inserted;
+      console.log(`[create-checkout] created new order=${orderId}`);
+    } else {
+      // Order exists — sync any updated quiz/contact details (sanitized).
+      const sanitizedPatch = sanitizeCheckoutQuizPatch(quizPatch) || sanitizeCheckoutQuizPatch(quizSnapshot);
+      if (sanitizedPatch) {
+        // Don't overwrite a real buyer_email with a placeholder.
+        if (
+          existingOrder.buyer_email &&
+          !existingOrder.buyer_email.startsWith("pending+") &&
+          typeof sanitizedPatch.buyer_email === "string" &&
+          (sanitizedPatch.buyer_email as string).startsWith("pending+")
+        ) {
+          delete sanitizedPatch.buyer_email;
+        }
+        const { error: syncErr } = await supabase
+          .from("orders")
+          .update(sanitizedPatch)
+          .eq("id", orderId)
+          .neq("payment_status", "paid");
+        if (syncErr) {
+          console.error("[create-checkout] quiz patch sync failed:", syncErr);
+          // Non-fatal — keep going. The session can still be created.
+        } else {
+          // Refresh local view of the order so the customer/email below is current.
+          const { data: refreshed } = await supabase
+            .from("orders")
+            .select(
+              "id, buyer_email, buyer_name, recipient_name, amount_cents, currency, stripe_customer_id, stripe_env, stripe_checkout_session_id, payment_status",
+            )
+            .eq("id", orderId)
+            .maybeSingle();
+          if (refreshed) existingOrder = refreshed;
+        }
+      }
     }
+
     if (existingOrder.payment_status === "paid") {
       return json({ error: "order_already_paid" }, 400);
     }
