@@ -245,7 +245,7 @@ function PaymentForm({ amount, currency, email, name, returnUrl, paymentIntentId
       layout: {
         type: "accordion",
         defaultCollapsed: false,
-        radios: false,
+        radios: "never",
         spacedAccordionItems: false,
       },
       defaultValues: { billingDetails },
