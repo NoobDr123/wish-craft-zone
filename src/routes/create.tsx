@@ -83,6 +83,7 @@ const emailRe = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
 type QuizSnapshot = ReturnType<typeof useQuizStore.getState>;
 
 type Step = {
+  key: string;
   chapter: string;
   title: string;
   subtitle?: string;
@@ -90,6 +91,8 @@ type Step = {
   isValid: (q: QuizSnapshot) => boolean;
   render: () => React.ReactNode;
   nextLabel?: string;
+  /** Snapshot of the user's answer(s) for this step, for analytics payload. */
+  answer: (q: QuizSnapshot) => Record<string, unknown>;
 };
 
 function CreatePage() {
