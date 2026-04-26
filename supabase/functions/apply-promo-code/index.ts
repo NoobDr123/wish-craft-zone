@@ -140,17 +140,13 @@ serve(async (req) => {
       updatePayload.is_rush = true;
       updatePayload.priority = "priority";
     } else {
-      // Set the new base amount on the order itself. Checkout will read this
-      // when it (re)creates the Stripe Checkout Session at the new amount.
+      // Set the new base amount on the order. The next call to
+      // create-payment-intent will see the existing PI and update its
+      // amount in place (or create a fresh one if needed).
       updatePayload.amount_cents = finalAmount;
-      // Force a fresh Checkout Session next time so the embedded UI
-      // shows the new total. The current session was created at the old
-      // amount and Stripe sessions are immutable.
-      updatePayload.stripe_checkout_session_id = null;
-      updatePayload.stripe_payment_intent_id = null;
 
-      // Best-effort: also patch any existing PI for legacy in-flight orders
-      // that still use the old PaymentIntent flow.
+      // Best-effort: patch the existing PI now so the currently-mounted
+      // Elements instance reflects the new total even before it re-fetches.
       if (order.stripe_payment_intent_id) {
         try {
           const stripe = createStripeClient(env);
@@ -158,7 +154,10 @@ serve(async (req) => {
             amount: finalAmount,
           });
         } catch (e) {
-          console.warn("legacy stripe PI update failed (non-fatal):", e);
+          console.warn("stripe PI amount update failed (non-fatal):", e);
+          // If we couldn't update it (e.g. PI was already confirmed), force
+          // a fresh PI on the next create-payment-intent call.
+          updatePayload.stripe_payment_intent_id = null;
         }
       }
     }
