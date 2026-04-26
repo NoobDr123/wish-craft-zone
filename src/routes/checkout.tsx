@@ -371,23 +371,23 @@ function CheckoutPage() {
         </div>
       </header>
 
-      <main className="mx-auto max-w-2xl px-5 py-10">
+      <main className="mx-auto max-w-2xl px-4 py-8 sm:px-5 sm:py-10">
         <section className="text-center">
-          <h1 className="text-balance font-display text-4xl font-bold leading-[1.05] text-foreground md:text-5xl">
+          <h1 className="text-balance font-display text-[28px] font-bold leading-[1.1] text-foreground sm:text-4xl md:text-5xl">
             Almost There! Complete Your Order
           </h1>
-          <p className="mx-auto mt-5 max-w-xl text-balance text-base leading-relaxed text-muted-foreground md:text-lg">
+          <p className="mx-auto mt-4 max-w-xl text-balance text-[15px] leading-relaxed text-muted-foreground sm:mt-5 sm:text-base md:text-lg">
             You're just one click away from creating a beautiful, personalized
             song for{" "}
             <span className="font-semibold text-primary">{recipient}</span>.
           </p>
-          <div className="mt-6 inline-flex items-center gap-2 rounded-full bg-primary px-5 py-2.5 text-sm font-semibold text-primary-foreground shadow-soft">
+          <div className="mt-5 inline-flex items-center gap-2 rounded-full bg-primary px-4 py-2 text-[13px] font-semibold text-primary-foreground shadow-soft sm:mt-6 sm:px-5 sm:py-2.5 sm:text-sm">
             Expected delivery: <span className="font-bold">{deliveryDate}</span>
           </div>
         </section>
 
         {/* Order summary — always visible */}
-        <section className="mt-8 rounded-3xl border border-peach/70 bg-card p-6 shadow-soft md:p-7">
+        <section className="mt-6 rounded-3xl border border-peach/70 bg-card p-5 shadow-soft sm:mt-8 sm:p-6 md:p-7">
           <h2 className="flex items-center gap-2 font-display text-2xl font-bold text-foreground">
             <Music2 className="h-5 w-5 text-primary" /> Your Custom Song
           </h2>
