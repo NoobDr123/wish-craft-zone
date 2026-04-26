@@ -71,17 +71,19 @@ serve(async (req) => {
       description: "RibbonSong personalized song",
     });
 
-    supabase
+    const { error: updateError } = await supabase
       .from("orders")
       .update({
         stripe_payment_intent_id: paymentIntent.id,
         stripe_customer_id: customerId,
         payment_status: "checkout_started",
       })
-      .eq("id", orderId)
-      .then(({ error }) => {
-        if (error) console.error("orders.update (non-blocking) failed:", error);
-      });
+      .eq("id", orderId);
+
+    if (updateError) {
+      console.error("orders.update failed:", updateError);
+      return json({ error: "Could not update order checkout state" }, 500);
+    }
 
     return json({
       clientSecret: paymentIntent.client_secret,
