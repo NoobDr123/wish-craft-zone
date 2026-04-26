@@ -1,5 +1,5 @@
 import { createFileRoute, useNavigate } from "@tanstack/react-router";
-import { useEffect } from "react";
+import { useEffect, useState } from "react";
 import { Logo } from "@/components/Logo";
 import { useQuizStore } from "@/stores/quizStore";
 import { ArrowRight, ShieldCheck, Star } from "lucide-react";
@@ -41,10 +41,18 @@ const TESTIMONIALS = [
 function AlmostTherePage() {
   const navigate = useNavigate();
   const q = useQuizStore();
+  const [hydrated, setHydrated] = useState(() => useQuizStore.persist.hasHydrated());
 
   useEffect(() => {
+    const unsubscribe = useQuizStore.persist.onFinishHydration(() => setHydrated(true));
+    if (useQuizStore.persist.hasHydrated()) setHydrated(true);
+    return unsubscribe;
+  }, []);
+
+  useEffect(() => {
+    if (!hydrated) return;
     if (!q.recipient_name) navigate({ to: "/create" });
-  }, [q.recipient_name, navigate]);
+  }, [hydrated, q.recipient_name, navigate]);
 
   return (
     <div className="min-h-screen bg-background">
@@ -121,7 +129,7 @@ function AlmostTherePage() {
 
         {/* CTA */}
         <button
-          onClick={() => navigate({ to: "/scratch" })}
+          onClick={() => navigate({ to: "/checkout" })}
           className="mt-8 flex w-full items-center justify-center gap-3 rounded-2xl bg-primary px-8 py-5 text-lg font-semibold text-primary-foreground shadow-glow transition-all hover:bg-primary-hover active:scale-[0.99]"
         >
           Continue to checkout <ArrowRight className="h-5 w-5" />
