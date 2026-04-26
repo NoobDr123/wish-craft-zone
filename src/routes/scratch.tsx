@@ -285,12 +285,9 @@ function ScratchPage() {
     if (checkoutStarting) return;
     setCheckoutError(null);
     setCheckoutStarting(true);
-    const checkout = await prefetchCheckout();
-    if (!checkout) {
-      setCheckoutError("Checkout is still starting. Please tap again in a moment.");
-      setCheckoutStarting(false);
-      return;
-    }
+    void prefetchCheckout().catch((error) => {
+      console.error("[scratch] checkout prefetch failed before navigation:", error);
+    });
     navigate({ to: "/checkout" });
   };
 
