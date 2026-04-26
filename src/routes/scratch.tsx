@@ -1,4 +1,4 @@
-import { createFileRoute, useNavigate, Link } from "@tanstack/react-router";
+import { createFileRoute, Link } from "@tanstack/react-router";
 import { useEffect, useMemo, useRef, useState } from "react";
 import confetti from "canvas-confetti";
 import { Logo } from "@/components/Logo";
@@ -20,7 +20,6 @@ const REVEAL_THRESHOLD = 0.4; // 40% scratched off → auto reveal
 const COUNTDOWN_SECONDS = 10 * 60; // 10:00
 
 function ScratchPage() {
-  const navigate = useNavigate();
   const q = useQuizStore();
   const canvasRef = useRef<HTMLCanvasElement | null>(null);
   const [revealed, setRevealed] = useState(false);
@@ -30,8 +29,6 @@ function ScratchPage() {
   const lastPosRef = useRef<{ x: number; y: number } | null>(null);
   const initRef = useRef(false);
   const [countdown, setCountdown] = useState(COUNTDOWN_SECONDS);
-  const [checkoutStarting, setCheckoutStarting] = useState(false);
-  const [checkoutError, setCheckoutError] = useState<string | null>(null);
   const [hydrated, setHydrated] = useState(() => useQuizStore.persist.hasHydrated());
 
   const recipientName = (q.recipient_name || "").trim();
@@ -79,11 +76,6 @@ function ScratchPage() {
     if (useQuizStore.persist.hasHydrated()) setHydrated(true);
     return unsubscribe;
   }, []);
-
-  useEffect(() => {
-    if (!hydrated) return;
-    if (!q.recipient_name) navigate({ to: "/create" });
-  }, [hydrated, q.recipient_name, navigate]);
 
   // Countdown urgency timer (only on claim screen)
   useEffect(() => {
