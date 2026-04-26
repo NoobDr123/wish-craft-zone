@@ -214,15 +214,18 @@ serve(async (req) => {
       }
     }
 
-    // Create a fresh PI if we don't have a usable one
+    // Create a fresh PI if we don't have a usable one. We use
+    // automatic_payment_methods (no redirects) so the same PI can be confirmed
+    // by the inline card form *or* the ExpressCheckoutElement (Apple Pay /
+    // Google Pay / Link). Both surfaces will see the latest `amount` — which
+    // is critical for promo codes (otherwise wallets show the pre-discount
+    // total).
     if (!pi) {
       pi = await stripe.paymentIntents.create({
         amount: amountCents,
         currency,
         customer: customerId,
-        // Card only on the inline form. Apple Pay / Google Pay / Link are
-        // surfaced separately through the ExpressCheckoutElement above.
-        payment_method_types: ["card"],
+        automatic_payment_methods: { enabled: true, allow_redirects: "never" },
         setup_future_usage: "off_session",
         description: order.recipient_name
           ? `RibbonSong personalized song for ${order.recipient_name}`
