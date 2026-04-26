@@ -27,18 +27,45 @@ serve(async (req) => {
   if (req.method === "OPTIONS") return new Response(null, { headers: corsHeaders });
 
   try {
-    const { paymentIntentId, environment } = await req.json();
-    if (!paymentIntentId || typeof paymentIntentId !== "string") {
-      return json({ error: "Missing paymentIntentId" }, 400);
-    }
-    const env = (environment || "sandbox") as StripeEnv;
+    const body = await req.json();
+    const { paymentIntentId, sessionId, environment } = body || {};
+    const env = (environment === "live" ? "live" : "sandbox") as StripeEnv;
     const stripe = createStripeClient(env);
 
-    // Expand `latest_charge` so we can read billing email/name as a fallback
-    // when the buyer never typed those into the form (Apple Pay quick path).
-    const pi = await stripe.paymentIntents.retrieve(paymentIntentId, {
-      expand: ["latest_charge"],
-    });
+    // Resolve to a PaymentIntent — accept either a PI id directly OR a
+    // Checkout Session id (the new embedded-checkout flow returns this).
+    let pi: any = null;
+    let resolvedSessionId: string | null = sessionId || null;
+
+    if (paymentIntentId && typeof paymentIntentId === "string") {
+      pi = await stripe.paymentIntents.retrieve(paymentIntentId, {
+        expand: ["latest_charge"],
+      });
+    } else if (sessionId && typeof sessionId === "string") {
+      const session = await stripe.checkout.sessions.retrieve(sessionId, {
+        expand: ["payment_intent", "payment_intent.latest_charge"],
+      });
+      resolvedSessionId = session.id;
+      const piRef = session.payment_intent;
+      if (typeof piRef === "string") {
+        pi = await stripe.paymentIntents.retrieve(piRef, {
+          expand: ["latest_charge"],
+        });
+      } else if (piRef && typeof piRef === "object") {
+        pi = piRef;
+      }
+      // Pull orderId from session metadata if PI lacks it
+      if (pi && !pi.metadata?.orderId && session.metadata?.orderId) {
+        pi.metadata = { ...(pi.metadata || {}), orderId: session.metadata.orderId, kind: "base_order" };
+      }
+    } else {
+      return json({ error: "Missing paymentIntentId or sessionId" }, 400);
+    }
+
+    if (!pi) {
+      return json({ error: "Could not resolve payment intent" }, 400);
+    }
+
     const orderId = pi.metadata?.orderId;
     const kind = pi.metadata?.kind;
     const upsellType = pi.metadata?.upsellType;
@@ -48,7 +75,6 @@ serve(async (req) => {
     }
 
     if (pi.status !== "succeeded") {
-      // Not paid yet — let the client keep polling.
       return json({
         ok: false,
         paid: false,
