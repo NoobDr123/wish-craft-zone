@@ -3,6 +3,9 @@ project_id = "tytxdnftsnspejnyfbmg"
 [functions.create-checkout]
 verify_jwt = false
 
+[functions.create-payment-intent]
+verify_jwt = false
+
 [functions.charge-upsell]
 verify_jwt = false
 
