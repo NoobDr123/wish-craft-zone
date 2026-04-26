@@ -109,6 +109,10 @@ export async function ensureOrderForQuiz(): Promise<string | null> {
     user_id: userId,
     ...patch,
     buyer_email: buyerEmail,
+    amount_cents: 4999,
+    currency: "USD",
+    status: "pending_payment",
+    payment_status: "pending",
   });
 
   if (insertError) {
