@@ -127,9 +127,13 @@ async function handleCheckoutSessionCompleted(session: any, env: StripeEnv) {
     },
   });
 
-  sendOrderConfirmation(orderId).catch((e) =>
-    console.error("sendOrderConfirmation failed:", e),
-  );
+  // Only send the confirmation email NOW if T3ST (skips upsells). Otherwise
+  // mark-upsells-complete sends it after add-ons are settled.
+  if (isT3st) {
+    sendOrderConfirmation(orderId).catch((e) =>
+      console.error("sendOrderConfirmation failed:", e),
+    );
+  }
 
   supabase
     .rpc("issue_reward_code_for_order", { _order_id: orderId })
