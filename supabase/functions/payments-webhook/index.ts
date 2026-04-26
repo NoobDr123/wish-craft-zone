@@ -31,7 +31,12 @@ serve(async (req) => {
 
   try {
     switch (event.type) {
+      case "checkout.session.completed":
+      case "checkout.session.async_payment_succeeded":
+        await handleCheckoutSessionCompleted(event.data.object, env);
+        break;
       case "payment_intent.succeeded":
+        // Fallback: still handle PI succeeded so legacy/upsell PIs work.
         await handlePaymentSucceeded(event.data.object, env);
         break;
       case "payment_intent.payment_failed":
@@ -40,11 +45,6 @@ serve(async (req) => {
           event.data.object.id,
           event.data.object.last_payment_error?.message,
         );
-        break;
-      // checkout.session.completed kept for backwards compatibility with any
-      // in-flight orders created with the old flow. Safe to ignore otherwise.
-      case "checkout.session.completed":
-        console.log("Legacy checkout.session.completed ignored:", event.data.object.id);
         break;
       default:
         console.log("Unhandled event:", event.type);
@@ -57,6 +57,86 @@ serve(async (req) => {
 
   return ok();
 });
+
+/**
+ * Handle Stripe Checkout Session completion (the new base-order flow).
+ * Idempotent: if the order is already paid, this is a no-op.
+ */
+async function handleCheckoutSessionCompleted(session: any, env: StripeEnv) {
+  const orderId = session.metadata?.orderId;
+  if (!orderId) {
+    console.log("checkout.session.completed with no orderId metadata:", session.id);
+    return;
+  }
+  if (session.payment_status && session.payment_status !== "paid") {
+    console.log(
+      `checkout.session.completed but payment_status=${session.payment_status}, skipping:`,
+      session.id,
+    );
+    return;
+  }
+
+  const { data: existingOrder } = await supabase
+    .from("orders")
+    .select("id, payment_status, promo_code_id")
+    .eq("id", orderId)
+    .maybeSingle();
+
+  if (!existingOrder) {
+    console.warn(`checkout.session.completed: order ${orderId} not found`);
+    return;
+  }
+  if (existingOrder.payment_status === "paid") {
+    console.log(`checkout.session.completed: order ${orderId} already paid, skipping`);
+    return;
+  }
+
+  let isT3st = false;
+  if (existingOrder.promo_code_id) {
+    const { data: promo } = await supabase
+      .from("promo_codes")
+      .select("code")
+      .eq("id", existingOrder.promo_code_id)
+      .maybeSingle();
+    isT3st = (promo?.code || "").toUpperCase() === "T3ST";
+  }
+
+  await supabase
+    .from("orders")
+    .update({
+      stripe_customer_id: session.customer ?? undefined,
+      stripe_payment_intent_id:
+        typeof session.payment_intent === "string" ? session.payment_intent : undefined,
+      stripe_checkout_session_id: session.id,
+      stripe_env: env,
+      payment_status: "paid",
+      amount_paid_cents: session.amount_total ?? 0,
+      status: isT3st ? "upsells_complete" : "awaiting_upsells",
+    })
+    .eq("id", orderId);
+
+  await supabase.from("job_events").insert({
+    order_id: orderId,
+    event_type: "base_payment_succeeded",
+    payload: {
+      sessionId: session.id,
+      paymentIntentId: session.payment_intent,
+      amount: session.amount_total,
+      t3st: isT3st,
+      source: "checkout.session.completed",
+    },
+  });
+
+  sendOrderConfirmation(orderId).catch((e) =>
+    console.error("sendOrderConfirmation failed:", e),
+  );
+
+  supabase
+    .rpc("issue_reward_code_for_order", { _order_id: orderId })
+    .then(({ error }) => {
+      if (error) console.error("issue_reward_code_for_order failed:", error);
+    });
+}
 
 async function handlePaymentSucceeded(pi: any, env: StripeEnv) {
   const orderId = pi.metadata?.orderId;

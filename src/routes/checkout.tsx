@@ -2,15 +2,11 @@ import { createFileRoute, useNavigate, Link } from "@tanstack/react-router";
 import { lazy, Suspense, useEffect, useRef, useState } from "react";
 import { Logo } from "@/components/Logo";
 import { PaymentTestModeBanner } from "@/components/PaymentTestModeBanner";
-import { CustomPaymentForm } from "@/components/CustomPaymentForm";
+import { StripeEmbeddedCheckout } from "@/components/StripeEmbeddedCheckout";
 import { ReviewSurveyModal } from "@/components/ReviewSurveyModal";
-import { useQuizStore } from "@/stores/quizStore";
+import { useQuizStore, journeyStageOf, tenseOf } from "@/stores/quizStore";
 import { supabase } from "@/integrations/supabase/client";
-import {
-  prefetchCheckout,
-  getPrefetchedCheckout,
-  type PrefetchedCheckout,
-} from "@/lib/checkoutPrefetch";
+import { stripeEnvironment } from "@/lib/stripe";
 import {
   ArrowLeft,
   CheckCircle2,
@@ -23,22 +19,11 @@ import {
 // critical path. Mounted only when scrolled into view.
 const SamplesSection = lazy(() => import("@/components/CheckoutSamples"));
 
-interface SampleSong {
-  id: string;
-  title: string;
-  for_text: string | null;
-  quote: string | null;
-  audio_url: string | null;
-  recipient_name: string;
-}
-
 export const Route = createFileRoute("/checkout")({
   component: CheckoutPage,
   head: () => ({
     meta: [{ title: "Almost There · RibbonSong" }],
   }),
-  // Samples are no longer fetched in the SSR loader — they were blocking the
-  // critical path. They now load lazily after the payment form is ready.
 });
 
 const emailRe = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
@@ -55,9 +40,9 @@ function CheckoutPage() {
   const [hydrated, setHydrated] = useState(() => useQuizStore.persist.hasHydrated());
   const [email, setEmail] = useState(q.buyer_email || "");
   const [name, setName] = useState(q.buyer_name || "");
-  const [clientSecret, setClientSecret] = useState<string | null>(null);
-  const [paymentIntentId, setPaymentIntentId] = useState<string | null>(null);
   const [orderId, setOrderId] = useState<string | null>(q.orderId || null);
+  const [creatingOrder, setCreatingOrder] = useState(false);
+  const [amountVersion, setAmountVersion] = useState(0);
   const [error, setError] = useState<string | null>(null);
   const [reviewOpen, setReviewOpen] = useState(false);
 

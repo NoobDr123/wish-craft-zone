@@ -134,25 +134,32 @@ serve(async (req) => {
 
     if (finalAmount === 0) {
       // Free order — short-circuit the whole payment flow.
-      // Also mark it as rush + priority so process-kie-callback schedules
-      // delivery immediately (instead of the default +24h) — useful for
-      // 100% test/promo codes where we want instant end-to-end.
       updatePayload.payment_status = "paid";
       updatePayload.amount_paid_cents = 0;
       updatePayload.status = "upsells_complete"; // jumps straight to brief generation via trigger
       updatePayload.is_rush = true;
       updatePayload.priority = "priority";
-    } else if (order.stripe_payment_intent_id) {
-      // Partial discount — update the existing PaymentIntent so the user is
-      // charged the discounted amount when they confirm.
-      try {
-        const stripe = createStripeClient(env);
-        await stripe.paymentIntents.update(order.stripe_payment_intent_id, {
-          amount: finalAmount,
-        });
-      } catch (e) {
-        console.error("stripe PI update failed:", e);
-        return json({ ok: false, error: "internal_error" }, 500);
+    } else {
+      // Set the new base amount on the order itself. Checkout will read this
+      // when it (re)creates the Stripe Checkout Session at the new amount.
+      updatePayload.amount_cents = finalAmount;
+      // Force a fresh Checkout Session next time so the embedded UI
+      // shows the new total. The current session was created at the old
+      // amount and Stripe sessions are immutable.
+      updatePayload.stripe_checkout_session_id = null;
+      updatePayload.stripe_payment_intent_id = null;
+
+      // Best-effort: also patch any existing PI for legacy in-flight orders
+      // that still use the old PaymentIntent flow.
+      if (order.stripe_payment_intent_id) {
+        try {
+          const stripe = createStripeClient(env);
+          await stripe.paymentIntents.update(order.stripe_payment_intent_id, {
+            amount: finalAmount,
+          });
+        } catch (e) {
+          console.warn("legacy stripe PI update failed (non-fatal):", e);
+        }
       }
     }
 

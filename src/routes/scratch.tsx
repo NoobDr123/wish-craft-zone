@@ -3,7 +3,7 @@ import { useEffect, useMemo, useRef, useState } from "react";
 import confetti from "canvas-confetti";
 import { Logo } from "@/components/Logo";
 import { journeyStageOf, useQuizStore } from "@/stores/quizStore";
-import { prefetchCheckout } from "@/lib/checkoutPrefetch";
+import { preloadStripe } from "@/lib/stripe";
 import { ArrowLeft, ArrowRight, Gift, Timer, AlertTriangle, Flame, Heart, Sparkles } from "lucide-react";
 
 export const Route = createFileRoute("/scratch")({
@@ -191,9 +191,10 @@ function ScratchPage() {
       }
     }
     fireConfetti();
-    // High-intent moment: warm Stripe.js + create the order/PaymentIntent in
-    // the background so /checkout can mount the form instantly on arrival.
-    prefetchCheckout();
+    // High-intent moment: just warm Stripe.js so /checkout mounts faster.
+    // The actual session is created by /checkout itself once it has full
+    // order context — keeping that authoritative avoids race conditions.
+    try { preloadStripe(); } catch { /* ignore — page surfaces errors */ }
     // Auto-advance to claim screen after a short delay
     setTimeout(() => setStage("claim"), 1400);
   };
@@ -274,9 +275,7 @@ function ScratchPage() {
   const expired = stage === "claim" && countdown === 0;
 
   const warmCheckout = () => {
-    void prefetchCheckout().catch((error) => {
-      console.error("[scratch] checkout prefetch failed before navigation:", error);
-    });
+    try { preloadStripe(); } catch { /* ignore */ }
   };
 
   return (
