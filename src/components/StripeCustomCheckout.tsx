@@ -241,22 +241,29 @@ function PaymentForm({ amount, currency, email, name, returnUrl, paymentIntentId
   const elements = useElements();
   const [submitting, setSubmitting] = useState(false);
   const [error, setError] = useState<string | null>(null);
-  const [country, setCountry] = useState<string>(() => {
-    if (typeof navigator !== "undefined") {
-      const lang = navigator.language || "en-US";
-      const region = lang.split("-")[1]?.toUpperCase();
-      if (region && COUNTRIES.some((c) => c.code === region)) return region;
-    }
-    return "US";
-  });
+  // US is the primary market — always default to US regardless of browser locale.
+  const [country, setCountry] = useState<string>("US");
+  const [postalCode, setPostalCode] = useState<string>("");
+
+  // Countries where Stripe / card networks expect a postal code with the billing address.
+  const postalRequired = useMemo(
+    () => ["US", "CA", "GB", "AU", "DE", "FR", "IT", "ES", "NL", "IE", "PL", "PT", "CZ", "MX", "BR", "JP", "NZ", "BE", "AT", "CH", "SE", "NO", "DK", "FI"].includes(country),
+    [country],
+  );
+
+  const postalLabel = country === "US" ? "ZIP code" : "Postal code";
+  const postalPlaceholder = country === "US" ? "90210" : "Postal code";
 
   const billingDetails = useMemo(
     () => ({
       name: name?.trim() || undefined,
       email: email?.trim() || undefined,
-      address: { country },
+      address: {
+        country,
+        postal_code: postalCode.trim() || undefined,
+      },
     }),
-    [name, email, country],
+    [name, email, country, postalCode],
   );
 
   const cardNumberOptions: StripeCardNumberElementOptions = useMemo(
