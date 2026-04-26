@@ -502,28 +502,27 @@ function CheckoutPage() {
             )}
           </div>
 
-          {/* Inline payment form — mounted as soon as the PaymentIntent is ready */}
+          {/* Embedded Stripe Checkout — mounts inline once we have an orderId */}
           <div className="mt-6 border-t border-peach/70">
-            {clientSecret && paymentIntentId ? (
-              <CustomPaymentForm
-                key={paymentIntentId}
-                clientSecret={clientSecret}
-                paymentIntentId={paymentIntentId}
-                email={email.trim().toLowerCase()}
-                amountLabel={
-                  promoApplied
-                    ? `$${(promoApplied.final_amount_cents / 100).toFixed(2)}`
-                    : "$49.99"
-                }
-                amountCents={promoApplied?.final_amount_cents ?? 4999}
-                promoVersion={promoApplied ? 1 : 0}
-                returnUrl={`${window.location.origin}/checkout/return?payment_intent_id=${paymentIntentId}`}
-                onError={(msg) => setError(msg)}
-                disabled={!ready}
-                disabledReason="Enter your email and name above to continue"
+            {orderId && ready ? (
+              <StripeEmbeddedCheckout
+                orderId={orderId}
+                amountVersion={amountVersion}
+                returnUrl={`${window.location.origin}/checkout/return?session_id={CHECKOUT_SESSION_ID}`}
+                onError={(msg: string) => setError(msg)}
               />
             ) : (
               <div className="space-y-4 p-4 md:p-6">
+                {!ready && orderId && (
+                  <p className="text-center text-sm text-muted-foreground">
+                    Enter your email and name above to load the payment form.
+                  </p>
+                )}
+                {creatingOrder && (
+                  <p className="text-center text-sm text-muted-foreground">
+                    Preparing your secure checkout…
+                  </p>
+                )}
                 {/* Skeleton matching the real form footprint to avoid layout shift */}
                 <div className="h-12 animate-pulse rounded-2xl bg-foreground/10" />
                 <div className="flex gap-2">
