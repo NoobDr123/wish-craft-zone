@@ -319,10 +319,12 @@ function CreatePage() {
 
     // 4. Q5 — qualities
     {
+      key: "qualities",
       chapter: "Their soul",
       title: c5.question,
       subtitle: c5.helper,
       isValid: (s) => s.qualities.trim().length >= 1,
+      answer: (s) => ({ length: s.qualities.length }),
       render: () => (
         <Question label={c5.sublabel}>
           <TextArea
@@ -338,10 +340,12 @@ function CreatePage() {
 
     // 5. Q6 — one memory
     {
+      key: "shared_memory",
       chapter: "Their soul",
       title: c6.question,
       subtitle: c6.helper,
       isValid: (s) => s.shared_memory.trim().length >= 1,
+      answer: (s) => ({ length: s.shared_memory.length }),
       render: () => (
         <Question label={c6.sublabel}>
           <TextArea
@@ -357,10 +361,12 @@ function CreatePage() {
 
     // 6. Q7 — theme (filtered by stage)
     {
+      key: "core_message",
       chapter: "The message",
       title: "What's the heart of this song?",
       subtitle: "Pick the one that says what you most want them to feel when they hear it.",
       isValid: (s) => !!s.message && themes.some((t) => t.value === s.message),
+      answer: (s) => ({ message: s.message }),
       render: () => (
         <Question label="Choose what fits">
           <ListSelect
@@ -377,10 +383,12 @@ function CreatePage() {
 
     // 7. Q8 — letter
     {
+      key: "personal_words",
       chapter: "The message",
       title: c8.question,
       subtitle: c8.helper,
       isValid: (s) => s.personal_words.trim().length >= 1,
+      answer: (s) => ({ length: s.personal_words.length }),
       render: () => (
         <Question label={c8.sublabel}>
           <TextArea
@@ -400,10 +408,12 @@ function CreatePage() {
 
     // 8. Sound — genre + tempo + voice
     {
+      key: "sound",
       chapter: "Their sound",
       title: "How should it sound?",
       subtitle: "Pick what feels right. We'll shape everything to fit.",
       isValid: (s) => !!s.genre && !!s.tempo && !!s.voice,
+      answer: (s) => ({ genre: s.genre, tempo: s.tempo, voice: s.voice }),
       render: () => (
         <div className="space-y-7">
           <Question label="Genre">
@@ -436,11 +446,13 @@ function CreatePage() {
 
     // 9. Buyer name + email
     {
+      key: "delivery",
       chapter: "Delivery",
       title: "Where should we send it?",
       subtitle: "We'll email you when it is ready, usually within 5 days.",
       isValid: (s) =>
         s.buyer_name.trim().length > 1 && emailRe.test(s.buyer_email),
+      answer: (s) => ({ has_buyer_name: !!s.buyer_name, has_buyer_email: !!s.buyer_email }),
       nextLabel: "Review my order",
       render: () => (
         <div className="space-y-6">
