@@ -287,9 +287,12 @@ function CheckoutPage() {
     try {
       // Make sure latest email/name are saved before we mark order paid
       const trimmedEmail = email.trim().toLowerCase();
+      const trimmedName = name.trim();
+      q.set("buyer_email", trimmedEmail);
+      q.set("buyer_name", trimmedName);
       await supabase
         .from("orders")
-        .update({ buyer_email: trimmedEmail, buyer_name: name })
+        .update(buildOrderPatchForQuiz({ buyerEmail: trimmedEmail, buyerName: trimmedName }))
         .eq("id", orderId);
 
       const { stripeEnvironment } = await import("@/lib/stripe");
