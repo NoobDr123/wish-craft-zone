@@ -529,6 +529,7 @@ function CheckoutPage() {
                 amountVersion={amountVersion}
                 returnUrl={`${window.location.origin}/checkout/return?session_id={CHECKOUT_SESSION_ID}`}
                 quizPatch={quizPatch}
+                quizSnapshot={quizPatch}
                 onError={(msg: string) => setError(msg)}
               />
             ) : (
