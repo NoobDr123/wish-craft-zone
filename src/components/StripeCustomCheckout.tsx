@@ -212,6 +212,7 @@ export function StripeCustomCheckout(props: Props) {
       >
         <PaymentForm
           orderId={orderId}
+          clientSecret={session.clientSecret}
           amount={session.amount}
           currency={session.currency}
           email={email}
@@ -226,6 +227,7 @@ export function StripeCustomCheckout(props: Props) {
 
 interface FormProps {
   orderId: string;
+  clientSecret: string;
   amount: number;
   currency: string;
   email: string;
@@ -277,7 +279,7 @@ const ELEMENT_BASE_STYLE = {
   },
 } as const;
 
-function PaymentForm({ amount, currency, email, name, returnUrl, paymentIntentId }: FormProps) {
+function PaymentForm({ amount, currency, email, name, returnUrl, paymentIntentId, clientSecret }: FormProps) {
   const stripe = useStripe();
   const elements = useElements();
   const [submitting, setSubmitting] = useState(false);
@@ -352,7 +354,7 @@ function PaymentForm({ amount, currency, email, name, returnUrl, paymentIntentId
     // is stuck on /checkout and never reaches the upsell funnel.
     const { error: confirmError, paymentIntent } = await stripe.confirmPayment({
       elements,
-      clientSecret: undefined as unknown as string,
+      clientSecret,
       confirmParams: {
         return_url: returnUrlWithPi,
         payment_method_data: { billing_details: billingDetails },
@@ -364,13 +366,10 @@ function PaymentForm({ amount, currency, email, name, returnUrl, paymentIntentId
       setError(confirmError.message || "Payment was not completed.");
       return;
     }
-    // Success path (no redirect needed). Navigate to the return URL — the
-    // /checkout/return page will confirm the PI server-side and forward to
-    // /upsell-1.
-    if (
-      paymentIntent &&
-      (paymentIntent.status === "succeeded" || paymentIntent.status === "processing")
-    ) {
+    // If Stripe didn't throw or redirect for a required action, always hand off
+    // to our return page. It confirms/polls server-side and then sends buyers
+    // into the upsell flow on every wallet/browser combination.
+    if (!paymentIntent || paymentIntent.status !== "requires_payment_method") {
       window.location.assign(returnUrlWithPi);
     }
   }
@@ -403,22 +402,14 @@ function PaymentForm({ amount, currency, email, name, returnUrl, paymentIntentId
     // We confirm directly with the individual card element — no PaymentElement
     // submit step needed. Stripe collects number/exp/cvc from the mounted
     // Elements via the cardNumber reference.
-    const { error: confirmError } = await stripe.confirmCardPayment(
-      // The PI client secret is held by Elements; we pass it via the parent
-      // <Elements clientSecret> option, but confirmCardPayment still needs it
-      // explicitly. We grab it off elements' internal state via the parent.
-      // The wrapping <Elements> received the clientSecret as an option, so we
-      // re-read it from the data attribute on the form's hidden input below.
-      (document.getElementById("rs-pi-secret") as HTMLInputElement)?.value || "",
-      {
+    const { error: confirmError } = await stripe.confirmCardPayment(clientSecret, {
         payment_method: {
           card: cardNumber,
           billing_details: billingDetails,
         },
         receipt_email: billingDetails.email,
         return_url: returnUrlWithPi,
-      },
-    );
+      });
 
     if (confirmError) {
       setSubmitting(false);
@@ -433,15 +424,6 @@ function PaymentForm({ amount, currency, email, name, returnUrl, paymentIntentId
 
   return (
     <form onSubmit={handleCardSubmit} className="space-y-5">
-      {/* Hidden input carries the PI client secret so confirmCardPayment can
-          read it without prop-drilling — we already have it on the parent. */}
-      <input
-        type="hidden"
-        id="rs-pi-secret"
-        value={(elements as unknown as { _commonOptions?: { clientSecret?: string } } | null)
-          ?._commonOptions?.clientSecret || ""}
-      />
-
       {/* Wallets — Apple Pay / Google Pay / Link only. */}
       <div>
         <ExpressCheckoutElement
