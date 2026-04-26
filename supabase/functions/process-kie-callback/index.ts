@@ -92,18 +92,18 @@ serve(async (req) => {
     const chosen = validVariants[0];
 
     // Compute scheduled delivery based on tier (under-promise / over-deliver):
-    //   standard    => 24h after song is ready (promised 5 days on landing)
-    //   express_48h => 12h (promised 48h)
-    //   rush_24h    => 7h  (promised 24h)
+    //   standard    promised 5 days  → actually delivered ~3 days  (72h)
+    //   express_48h promised 48 hours → actually delivered ~24 hours (24h)
+    //   rush_24h    promised 24 hours → actually delivered ~12 hours (12h)
     // (Gift delivery_date branching removed for now — will revisit later.)
     const now = new Date();
     const tierDelayHours: Record<string, number> = {
-      standard: 24,
-      express_48h: 12,
-      rush_24h: 7,
+      standard: 72,
+      express_48h: 24,
+      rush_24h: 12,
     };
     const tier = (order.delivery_tier as string) || (order.is_rush ? "rush_24h" : "standard");
-    const delayHours = tierDelayHours[tier] ?? 24;
+    const delayHours = tierDelayHours[tier] ?? 72;
     const scheduled = new Date(now.getTime() + delayHours * 60 * 60 * 1000);
 
     const slug = order.share_page_slug ?? finalOrderId;
