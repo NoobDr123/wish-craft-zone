@@ -366,12 +366,17 @@ function PaymentForm({ amount, currency, email, name, returnUrl, paymentIntentId
       setError(confirmError.message || "Payment was not completed.");
       return;
     }
-    // If Stripe didn't throw or redirect for a required action, always hand off
-    // to our return page. It confirms/polls server-side and then sends buyers
-    // into the upsell flow on every wallet/browser combination.
-    if (!paymentIntent || paymentIntent.status !== "requires_payment_method") {
-      window.location.assign(returnUrlWithPi);
+    // Stripe doesn't auto-redirect (allow_redirects=never). Whether the PI
+    // is null (rare) or succeeded inline, hand off to the return page so it
+    // can confirm server-side and route into the upsell flow. Only skip the
+    // redirect if the PI is in a state that means the user still needs to
+    // act (e.g. requires_payment_method after a wallet decline).
+    if (paymentIntent && paymentIntent.status === "requires_payment_method") {
+      setSubmitting(false);
+      setError("Payment was not completed. Please try again.");
+      return;
     }
+    window.location.assign(returnUrlWithPi);
   }
 
   async function handleCardSubmit(e: React.FormEvent) {
