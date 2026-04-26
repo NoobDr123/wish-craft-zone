@@ -1,4 +1,4 @@
-import { createFileRoute, useNavigate, Link } from "@tanstack/react-router";
+import { createFileRoute, Link } from "@tanstack/react-router";
 import { useEffect, useMemo, useRef, useState } from "react";
 import confetti from "canvas-confetti";
 import { Logo } from "@/components/Logo";
@@ -20,7 +20,6 @@ const REVEAL_THRESHOLD = 0.4; // 40% scratched off → auto reveal
 const COUNTDOWN_SECONDS = 10 * 60; // 10:00
 
 function ScratchPage() {
-  const navigate = useNavigate();
   const q = useQuizStore();
   const canvasRef = useRef<HTMLCanvasElement | null>(null);
   const [revealed, setRevealed] = useState(false);
@@ -30,8 +29,6 @@ function ScratchPage() {
   const lastPosRef = useRef<{ x: number; y: number } | null>(null);
   const initRef = useRef(false);
   const [countdown, setCountdown] = useState(COUNTDOWN_SECONDS);
-  const [checkoutStarting, setCheckoutStarting] = useState(false);
-  const [checkoutError, setCheckoutError] = useState<string | null>(null);
   const [hydrated, setHydrated] = useState(() => useQuizStore.persist.hasHydrated());
 
   const recipientName = (q.recipient_name || "").trim();
@@ -79,11 +76,6 @@ function ScratchPage() {
     if (useQuizStore.persist.hasHydrated()) setHydrated(true);
     return unsubscribe;
   }, []);
-
-  useEffect(() => {
-    if (!hydrated) return;
-    if (!q.recipient_name) navigate({ to: "/create" });
-  }, [hydrated, q.recipient_name, navigate]);
 
   // Countdown urgency timer (only on claim screen)
   useEffect(() => {
@@ -281,14 +273,10 @@ function ScratchPage() {
   const secs = (countdown % 60).toString().padStart(2, "0");
   const expired = stage === "claim" && countdown === 0;
 
-  const startCheckout = async () => {
-    if (checkoutStarting) return;
-    setCheckoutError(null);
-    setCheckoutStarting(true);
+  const warmCheckout = () => {
     void prefetchCheckout().catch((error) => {
       console.error("[scratch] checkout prefetch failed before navigation:", error);
     });
-    navigate({ to: "/checkout" });
   };
 
   return (
@@ -437,24 +425,18 @@ function ScratchPage() {
           </div>
 
           {/* CTA */}
-          <button
-            type="button"
-            onClick={startCheckout}
-            onMouseEnter={() => prefetchCheckout()}
-            onFocus={() => prefetchCheckout()}
-            disabled={checkoutStarting}
+          <a
+            href="/checkout"
+            onPointerDown={warmCheckout}
+            onClick={warmCheckout}
+            onMouseEnter={warmCheckout}
+            onFocus={warmCheckout}
             className="mt-6 flex w-full items-center justify-center gap-2 rounded-full bg-primary px-8 py-5 text-base font-bold text-primary-foreground shadow-glow transition-all hover:bg-primary-hover active:scale-[0.99] disabled:cursor-wait disabled:opacity-70"
           >
             <Gift className="h-5 w-5" />
-            {checkoutStarting ? "Starting secure checkout…" : copy.ctaLabel}
-            {!checkoutStarting && <ArrowRight className="h-5 w-5" />}
-          </button>
-
-          {checkoutError && (
-            <p className="mt-3 text-center text-sm font-medium text-destructive">
-              {checkoutError}
-            </p>
-          )}
+            {copy.ctaLabel}
+            <ArrowRight className="h-5 w-5" />
+          </a>
 
           <p className="mt-4 flex items-center justify-center gap-1.5 text-center text-xs text-muted-foreground">
             <AlertTriangle className="h-3.5 w-3.5" />
