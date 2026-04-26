@@ -38,6 +38,23 @@ import { WebhookDebugPanel } from "@/components/admin/WebhookDebugPanel";
 import { supabase } from "@/integrations/supabase/client";
 import { useRealtimeRefresh } from "@/hooks/useRealtimeRefresh";
 
+// Hosts that count as "real" production traffic for admin analytics.
+// Sessions from preview/lovable.app domains are excluded so the admin
+// panel only shows quiz responses captured on the live site.
+const ALLOWED_HOSTS = ["ribbonsong.com", "www.ribbonsong.com"];
+
+/** Fetch session_ids for sessions originating from allowed (production) hosts. */
+async function fetchAllowedSessionIds(sinceIso?: string): Promise<Set<string>> {
+  let q = supabase
+    .from("page_sessions")
+    .select("session_id")
+    .in("host", ALLOWED_HOSTS)
+    .limit(50000);
+  if (sinceIso) q = q.gte("created_at", sinceIso);
+  const { data } = await q;
+  return new Set((data ?? []).map((r) => r.session_id));
+}
+
 export const Route = createFileRoute("/admin")({
   component: AdminRoute,
   head: () => ({
