@@ -321,7 +321,9 @@ function PaymentForm({ amount, currency, email, name, returnUrl, paymentIntentId
 
   return (
     <form onSubmit={handleCardSubmit} className="space-y-6">
-      {/* Wallets — Apple Pay / Google Pay / Link */}
+      {/* Wallets — Apple Pay / Google Pay / Link only.
+          Explicitly disable Amazon Pay, PayPal, Klarna, etc. so the merchant
+          account's default wallet set doesn't leak through. */}
       <div>
         <ExpressCheckoutElement
           onConfirm={() => void handleExpressConfirm()}
@@ -329,7 +331,15 @@ function PaymentForm({ amount, currency, email, name, returnUrl, paymentIntentId
             buttonHeight: 52,
             buttonTheme: { applePay: "black", googlePay: "black" },
             layout: { maxColumns: 1, maxRows: 0 },
-            paymentMethods: { applePay: "always", googlePay: "always", link: "auto" },
+            paymentMethods: {
+              applePay: "always",
+              googlePay: "always",
+              link: "auto",
+              amazonPay: "never",
+              paypal: "never",
+              klarna: "never",
+            },
+            paymentMethodOrder: ["apple_pay", "google_pay", "link"],
           }}
         />
       </div>
