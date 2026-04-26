@@ -325,6 +325,18 @@ function PaymentForm({ amount, currency, email, name, returnUrl, paymentIntentId
     setError(null);
     setSubmitting(true);
 
+    if (postalRequired && !postalCode.trim()) {
+      setSubmitting(false);
+      setError(`Please enter your ${postalLabel.toLowerCase()}.`);
+      return;
+    }
+    // Basic US ZIP validation (5 digits or ZIP+4).
+    if (country === "US" && !/^\d{5}(-\d{4})?$/.test(postalCode.trim())) {
+      setSubmitting(false);
+      setError("Please enter a valid US ZIP code (e.g. 90210).");
+      return;
+    }
+
     const cardNumber = elements.getElement(CardNumberElement);
     if (!cardNumber) {
       setSubmitting(false);
