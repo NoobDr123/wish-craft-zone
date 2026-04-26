@@ -73,8 +73,15 @@ function ScratchPage() {
   }, [journey, firstName, relationship]);
 
   useEffect(() => {
+    const unsubscribe = useQuizStore.persist.onFinishHydration(() => setHydrated(true));
+    if (useQuizStore.persist.hasHydrated()) setHydrated(true);
+    return unsubscribe;
+  }, []);
+
+  useEffect(() => {
+    if (!hydrated) return;
     if (!q.recipient_name) navigate({ to: "/create" });
-  }, [q.recipient_name, navigate]);
+  }, [hydrated, q.recipient_name, navigate]);
 
   // Countdown urgency timer (only on claim screen)
   useEffect(() => {
