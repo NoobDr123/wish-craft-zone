@@ -196,12 +196,13 @@ async function handlePaymentSucceeded(pi: any, env: StripeEnv) {
       },
     });
 
-    // Fire-and-forget: send the order confirmation email with all details.
-    // Done here (vs. on the client) so it sends even if the buyer closes the
-    // tab right after payment.
-    sendOrderConfirmation(orderId).catch((e) =>
-      console.error("sendOrderConfirmation failed:", e),
-    );
+    // Only send the confirmation email NOW if T3ST (skips upsells). Otherwise
+    // mark-upsells-complete sends it after add-ons are settled.
+    if (isT3st) {
+      sendOrderConfirmation(orderId).catch((e) =>
+        console.error("sendOrderConfirmation failed:", e),
+      );
+    }
 
     // Issue the unique reaction-reward promo code (locked until they upload
     // a reaction video). Idempotent — safe to call on retries.
