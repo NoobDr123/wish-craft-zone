@@ -346,17 +346,32 @@ function PaymentForm({ amount, currency, email, name, returnUrl, paymentIntentId
       setError(submitError.message || "Could not start payment.");
       return;
     }
-    const { error: confirmError } = await stripe.confirmPayment({
+    // Because the PI was created with `allow_redirects: "never"`, Stripe will
+    // NOT auto-navigate to the return_url after Apple Pay / Google Pay / Link
+    // succeeds. We have to drive the redirect ourselves — otherwise the buyer
+    // is stuck on /checkout and never reaches the upsell funnel.
+    const { error: confirmError, paymentIntent } = await stripe.confirmPayment({
       elements,
       clientSecret: undefined as unknown as string,
       confirmParams: {
         return_url: returnUrlWithPi,
         payment_method_data: { billing_details: billingDetails },
       },
+      redirect: "if_required",
     });
     if (confirmError) {
       setSubmitting(false);
       setError(confirmError.message || "Payment was not completed.");
+      return;
+    }
+    // Success path (no redirect needed). Navigate to the return URL — the
+    // /checkout/return page will confirm the PI server-side and forward to
+    // /upsell-1.
+    if (
+      paymentIntent &&
+      (paymentIntent.status === "succeeded" || paymentIntent.status === "processing")
+    ) {
+      window.location.assign(returnUrlWithPi);
     }
   }
 
