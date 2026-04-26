@@ -83,6 +83,7 @@ const emailRe = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
 type QuizSnapshot = ReturnType<typeof useQuizStore.getState>;
 
 type Step = {
+  key: string;
   chapter: string;
   title: string;
   subtitle?: string;
@@ -90,6 +91,8 @@ type Step = {
   isValid: (q: QuizSnapshot) => boolean;
   render: () => React.ReactNode;
   nextLabel?: string;
+  /** Snapshot of the user's answer(s) for this step, for analytics payload. */
+  answer: (q: QuizSnapshot) => Record<string, unknown>;
 };
 
 function CreatePage() {
@@ -155,12 +158,16 @@ function CreatePage() {
     void track({ type: "quiz_start", stepIndex: 0 });
   }, []);
 
-  // Track question_view whenever step index changes
+  // Track question_view whenever step index changes.
+  // We read the step key/answer via a ref so the effect doesn't depend on `steps`
+  // (which is recreated each render).
+  const stepRef = useRef<{ key?: string; answer?: Record<string, unknown> }>({});
   useEffect(() => {
     stepEnteredAt.current = Date.now();
     void track({
       type: "question_view",
       stepIndex: index,
+      stepKey: stepRef.current.key,
       buyerEmail: q.buyer_email || undefined,
     });
   }, [index, q.buyer_email]);
@@ -186,6 +193,7 @@ function CreatePage() {
   const steps: Step[] = [
     // 1. Relationship + (Other reveal) + first name
     {
+      key: "who_they_are",
       chapter: "Who they are",
       title: "Who is this song for?",
       subtitle: "Pick whoever fits closest. We'll use their name in the song.",
@@ -193,6 +201,11 @@ function CreatePage() {
         !!s.relationship &&
         s.recipient_name.trim().length > 1 &&
         (s.relationship !== "Other" || s.relationship_other.trim().length > 1),
+      answer: (s) => ({
+        relationship: s.relationship,
+        relationship_other: s.relationship_other || undefined,
+        recipient_name: s.recipient_name,
+      }),
       render: () => (
         <div className="space-y-7">
           <Question label="They are my…">
@@ -239,10 +252,12 @@ function CreatePage() {
 
     // 2. Journey stage (rich radio with sub-copy)
     {
+      key: "journey_stage",
       chapter: "Their fight",
       title: `Where is ${name} in their journey?`,
       subtitle: "Pick what's closest right now. This shapes the tone of the whole song.",
       isValid: (s) => !!s.stage,
+      answer: (s) => ({ stage: s.stage }),
       render: () => (
         <Question label="Choose what fits best today">
           <div className="space-y-2.5">
@@ -286,10 +301,12 @@ function CreatePage() {
 
     // 3. Q4 — fighting for / holding onto / lived for
     {
+      key: "fighting_for",
       chapter: "Their fight",
       title: c4.question,
       subtitle: c4.helper,
       isValid: (s) => s.fighting_for.trim().length >= 1,
+      answer: (s) => ({ length: s.fighting_for.length }),
       render: () => (
         <Question label={c4.sublabel}>
           <TextArea
@@ -306,10 +323,12 @@ function CreatePage() {
 
     // 4. Q5 — qualities
     {
+      key: "qualities",
       chapter: "Their soul",
       title: c5.question,
       subtitle: c5.helper,
       isValid: (s) => s.qualities.trim().length >= 1,
+      answer: (s) => ({ length: s.qualities.length }),
       render: () => (
         <Question label={c5.sublabel}>
           <TextArea
@@ -325,10 +344,12 @@ function CreatePage() {
 
     // 5. Q6 — one memory
     {
+      key: "shared_memory",
       chapter: "Their soul",
       title: c6.question,
       subtitle: c6.helper,
       isValid: (s) => s.shared_memory.trim().length >= 1,
+      answer: (s) => ({ length: s.shared_memory.length }),
       render: () => (
         <Question label={c6.sublabel}>
           <TextArea
@@ -344,10 +365,12 @@ function CreatePage() {
 
     // 6. Q7 — theme (filtered by stage)
     {
+      key: "core_message",
       chapter: "The message",
       title: "What's the heart of this song?",
       subtitle: "Pick the one that says what you most want them to feel when they hear it.",
       isValid: (s) => !!s.message && themes.some((t) => t.value === s.message),
+      answer: (s) => ({ message: s.message }),
       render: () => (
         <Question label="Choose what fits">
           <ListSelect
@@ -364,10 +387,12 @@ function CreatePage() {
 
     // 7. Q8 — letter
     {
+      key: "personal_words",
       chapter: "The message",
       title: c8.question,
       subtitle: c8.helper,
       isValid: (s) => s.personal_words.trim().length >= 1,
+      answer: (s) => ({ length: s.personal_words.length }),
       render: () => (
         <Question label={c8.sublabel}>
           <TextArea
@@ -387,10 +412,12 @@ function CreatePage() {
 
     // 8. Sound — genre + tempo + voice
     {
+      key: "sound",
       chapter: "Their sound",
       title: "How should it sound?",
       subtitle: "Pick what feels right. We'll shape everything to fit.",
       isValid: (s) => !!s.genre && !!s.tempo && !!s.voice,
+      answer: (s) => ({ genre: s.genre, tempo: s.tempo, voice: s.voice }),
       render: () => (
         <div className="space-y-7">
           <Question label="Genre">
@@ -423,11 +450,13 @@ function CreatePage() {
 
     // 9. Buyer name + email
     {
+      key: "delivery",
       chapter: "Delivery",
       title: "Where should we send it?",
       subtitle: "We'll email you when it is ready, usually within 5 days.",
       isValid: (s) =>
         s.buyer_name.trim().length > 1 && emailRe.test(s.buyer_email),
+      answer: (s) => ({ has_buyer_name: !!s.buyer_name, has_buyer_email: !!s.buyer_email }),
       nextLabel: "Review my order",
       render: () => (
         <div className="space-y-6">
@@ -458,12 +487,17 @@ function CreatePage() {
   const step = steps[safeIndex];
   const valid = step.isValid(q);
 
+  // Keep stepRef in sync so the question_view effect can include step metadata.
+  stepRef.current = { key: step.key, answer: step.answer(q) };
+
   const next = () => {
     const elapsed = Date.now() - stepEnteredAt.current;
     void track({
       type: "question_answer",
       stepIndex: safeIndex,
+      stepKey: step.key,
       timeOnStepMs: elapsed,
+      payload: step.answer(q),
       buyerEmail: q.buyer_email || undefined,
     });
     if (safeIndex < total - 1) setIndex(safeIndex + 1);
@@ -474,13 +508,36 @@ function CreatePage() {
       void track({
         type: "quiz_complete",
         stepIndex: total,
+        stepKey: step.key,
         timeOnStepMs: totalTime ?? undefined,
+        payload: {
+          relationship: q.relationship,
+          stage: q.stage,
+          message: q.message,
+          genre: q.genre,
+          tempo: q.tempo,
+          voice: q.voice,
+          fighting_for_len: q.fighting_for.length,
+          qualities_len: q.qualities.length,
+          shared_memory_len: q.shared_memory.length,
+          personal_words_len: q.personal_words.length,
+        },
         buyerEmail: q.buyer_email || undefined,
       });
       navigate({ to: "/almost-there" });
     }
   };
-  const back = () => setIndex(Math.max(0, safeIndex - 1));
+  const back = () => {
+    const elapsed = Date.now() - stepEnteredAt.current;
+    void track({
+      type: "question_back",
+      stepIndex: safeIndex,
+      stepKey: step.key,
+      timeOnStepMs: elapsed,
+      buyerEmail: q.buyer_email || undefined,
+    });
+    setIndex(Math.max(0, safeIndex - 1));
+  };
 
   return (
     <>
