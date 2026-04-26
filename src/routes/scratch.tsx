@@ -30,6 +30,7 @@ function ScratchPage() {
   const lastPosRef = useRef<{ x: number; y: number } | null>(null);
   const initRef = useRef(false);
   const [countdown, setCountdown] = useState(COUNTDOWN_SECONDS);
+  const [hydrated, setHydrated] = useState(() => useQuizStore.persist.hasHydrated());
 
   const recipientName = (q.recipient_name || "").trim();
   const firstName = recipientName.split(/\s+/)[0] || "";
