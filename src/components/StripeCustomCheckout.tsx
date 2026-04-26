@@ -161,13 +161,40 @@ export function StripeCustomCheckout(props: Props) {
           clientSecret: session.clientSecret,
           appearance: {
             theme: "stripe",
+            labels: "above",
             variables: {
-              colorPrimary: "#d97706",
-              colorBackground: "#ffffff",
-              colorText: "#1f2937",
-              colorDanger: "#dc2626",
-              fontFamily: "system-ui, -apple-system, sans-serif",
-              borderRadius: "12px",
+              colorPrimary: "#8D6FAF",
+              colorBackground: "#FBF6EC",
+              colorText: "#1F1B16",
+              colorTextPlaceholder: "#8A8175",
+              colorTextSecondary: "#5A5148",
+              colorDanger: "#B23A3A",
+              fontFamily: '"Instrument Sans", system-ui, -apple-system, sans-serif',
+              fontSizeBase: "16px",
+              spacingUnit: "5px",
+              borderRadius: "14px",
+            },
+            rules: {
+              ".Label": {
+                fontSize: "15px",
+                fontWeight: "500",
+                color: "#1F1B16",
+                marginBottom: "8px",
+              },
+              ".Input": {
+                backgroundColor: "#FBF6EC",
+                border: "1px solid #E5D9C8",
+                boxShadow: "none",
+                padding: "14px 16px",
+              },
+              ".Input:focus": {
+                border: "1px solid #8D6FAF",
+                boxShadow: "0 0 0 3px rgba(141, 111, 175, 0.15)",
+              },
+              ".Tab, .Block": {
+                backgroundColor: "#FBF6EC",
+                border: "1px solid #E5D9C8",
+              },
             },
           },
         }}
