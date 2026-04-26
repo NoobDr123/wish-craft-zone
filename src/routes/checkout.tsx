@@ -371,23 +371,23 @@ function CheckoutPage() {
         </div>
       </header>
 
-      <main className="mx-auto max-w-2xl px-5 py-10">
+      <main className="mx-auto max-w-2xl px-4 py-8 sm:px-5 sm:py-10">
         <section className="text-center">
-          <h1 className="text-balance font-display text-4xl font-bold leading-[1.05] text-foreground md:text-5xl">
+          <h1 className="text-balance font-display text-[28px] font-bold leading-[1.1] text-foreground sm:text-4xl md:text-5xl">
             Almost There! Complete Your Order
           </h1>
-          <p className="mx-auto mt-5 max-w-xl text-balance text-base leading-relaxed text-muted-foreground md:text-lg">
+          <p className="mx-auto mt-4 max-w-xl text-balance text-[15px] leading-relaxed text-muted-foreground sm:mt-5 sm:text-base md:text-lg">
             You're just one click away from creating a beautiful, personalized
             song for{" "}
             <span className="font-semibold text-primary">{recipient}</span>.
           </p>
-          <div className="mt-6 inline-flex items-center gap-2 rounded-full bg-primary px-5 py-2.5 text-sm font-semibold text-primary-foreground shadow-soft">
+          <div className="mt-5 inline-flex items-center gap-2 rounded-full bg-primary px-4 py-2 text-[13px] font-semibold text-primary-foreground shadow-soft sm:mt-6 sm:px-5 sm:py-2.5 sm:text-sm">
             Expected delivery: <span className="font-bold">{deliveryDate}</span>
           </div>
         </section>
 
         {/* Order summary — always visible */}
-        <section className="mt-8 rounded-3xl border border-peach/70 bg-card p-6 shadow-soft md:p-7">
+        <section className="mt-6 rounded-3xl border border-peach/70 bg-card p-5 shadow-soft sm:mt-8 sm:p-6 md:p-7">
           <h2 className="flex items-center gap-2 font-display text-2xl font-bold text-foreground">
             <Music2 className="h-5 w-5 text-primary" /> Your Custom Song
           </h2>
@@ -427,7 +427,7 @@ function CheckoutPage() {
           </div>
 
           {/* Promo code input */}
-          <div className="mt-5 rounded-2xl border border-dashed border-primary/30 bg-primary/5 p-4">
+          <div className="mt-5 rounded-2xl border border-dashed border-primary/30 bg-primary/5 p-3 sm:p-4">
             {promoApplied ? (
               <div className="flex items-center justify-between gap-3 text-sm">
                 <div>
@@ -440,14 +440,14 @@ function CheckoutPage() {
                       : `You saved $${(promoApplied.discount_cents / 100).toFixed(2)}.`}
                   </p>
                 </div>
-                <CheckCircle2 className="h-5 w-5 text-success" />
+                <CheckCircle2 className="h-5 w-5 shrink-0 text-success" />
               </div>
             ) : (
               <>
-                <label className="mb-2 block text-xs font-semibold uppercase tracking-wider text-muted-foreground">
+                <label className="mb-2 block text-[11px] font-semibold uppercase tracking-wider text-muted-foreground">
                   Have a promo code?
                 </label>
-                <div className="flex gap-2">
+                <div className="flex items-stretch gap-2">
                   <input
                     type="text"
                     value={promoCode}
@@ -456,7 +456,7 @@ function CheckoutPage() {
                       setPromoError(null);
                     }}
                     placeholder="Enter code"
-                    className="flex-1 rounded-xl border-2 border-peach bg-background px-3 py-2.5 text-sm uppercase tracking-wider text-foreground placeholder:normal-case placeholder:tracking-normal placeholder:text-muted-foreground/60 focus:border-primary focus:outline-none focus:ring-2 focus:ring-primary/30"
+                    className="min-w-0 flex-1 rounded-xl border-2 border-peach bg-background px-3 py-2.5 text-sm uppercase tracking-wider text-foreground placeholder:normal-case placeholder:tracking-normal placeholder:text-muted-foreground/60 focus:border-primary focus:outline-none focus:ring-2 focus:ring-primary/30"
                     maxLength={32}
                     disabled={promoApplying}
                   />
@@ -464,7 +464,7 @@ function CheckoutPage() {
                     type="button"
                     onClick={handleApplyPromo}
                     disabled={promoApplying || !promoCode.trim()}
-                    className="shrink-0 rounded-xl bg-primary px-4 py-2.5 text-sm font-semibold text-primary-foreground transition-colors hover:bg-primary/90 disabled:cursor-not-allowed disabled:opacity-50"
+                    className="shrink-0 rounded-xl bg-primary px-3 py-2.5 text-sm font-semibold text-primary-foreground transition-colors hover:bg-primary/90 disabled:cursor-not-allowed disabled:opacity-50 sm:px-4"
                   >
                     {promoApplying ? "Applying…" : "Apply"}
                   </button>
