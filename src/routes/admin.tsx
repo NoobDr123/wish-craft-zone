@@ -1131,7 +1131,12 @@ function UpsellsPanel() {
           const views = data.events.filter((e) => e.event_type === "upsell_view" && e.upsell_type === t).length;
           const accepts = data.events.filter((e) => e.event_type === "upsell_accept" && e.upsell_type === t).length;
           const declines = data.events.filter((e) => e.event_type === "upsell_decline" && e.upsell_type === t).length;
-          const taken = paidOrders.filter((o) => o[orderField[t] as keyof typeof o]).length;
+          const field = orderField[t];
+          // For upsells with a dedicated order flag, count actual paid orders.
+          // For delivery_48h (no flag), fall back to tracked accept events.
+          const taken = field
+            ? paidOrders.filter((o) => o[field as keyof typeof o]).length
+            : accepts;
           const revenue = taken * prices[t];
 
           return (
@@ -1162,8 +1167,16 @@ function UpsellsPanel() {
                 </div>
               </div>
               <div className="mt-4 text-sm text-muted-foreground">
-                Confirmed in orders: <span className="font-semibold text-foreground">{taken}</span> of {paidOrders.length} paid orders
-                <span className="ml-2">({fmtPct(taken, paidOrders.length)})</span>
+                {field ? (
+                  <>
+                    Confirmed in orders: <span className="font-semibold text-foreground">{taken}</span> of {paidOrders.length} paid orders
+                    <span className="ml-2">({fmtPct(taken, paidOrders.length)})</span>
+                  </>
+                ) : (
+                  <>
+                    Counted from accept events (no dedicated order flag — sets <code className="rounded bg-muted px-1">is_rush</code> like the 24h rush).
+                  </>
+                )}
               </div>
             </div>
           );
