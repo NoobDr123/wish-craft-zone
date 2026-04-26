@@ -1,12 +1,18 @@
 import { useCallback, useEffect, useMemo, useRef, useState } from "react";
 import {
+  CardCvcElement,
+  CardExpiryElement,
+  CardNumberElement,
   Elements,
   ExpressCheckoutElement,
-  PaymentElement,
   useElements,
   useStripe,
 } from "@stripe/react-stripe-js";
-import type { StripePaymentElementOptions } from "@stripe/stripe-js";
+import type {
+  StripeCardCvcElementOptions,
+  StripeCardExpiryElementOptions,
+  StripeCardNumberElementOptions,
+} from "@stripe/stripe-js";
 import { Loader2, Lock, ShieldCheck } from "lucide-react";
 import { getStripe, stripeEnvironment } from "@/lib/stripe";
 import { supabase } from "@/integrations/supabase/client";
@@ -33,22 +39,12 @@ interface SessionState {
   currency: string;
 }
 
-function formatPrice(amount: number, currency: string) {
-  try {
-    return new Intl.NumberFormat("en-US", {
-      style: "currency",
-      currency: currency.toUpperCase(),
-      minimumFractionDigits: 2,
-    }).format(amount / 100);
-  } catch {
-    return `$${(amount / 100).toFixed(2)}`;
-  }
-}
-
 /**
- * Custom on-page checkout: Apple Pay / Google Pay / Link buttons up top
- * (Express Checkout Element), then a card form (Payment Element), then a
- * branded "Pay $X" button. PCI scope stays SAQ A — Stripe iframes the inputs.
+ * Fully custom on-page checkout:
+ *   • ExpressCheckoutElement at the top → Apple Pay / Google Pay / Link only.
+ *   • Hand-coded card form below using individual Stripe Elements primitives
+ *     (CardNumber / CardExpiry / CardCvc) so we control every label, wrapper,
+ *     and country dropdown ourselves. PCI scope stays SAQ A.
  */
 export function StripeCustomCheckout(props: Props) {
   const { orderId, amountVersion, email, name, quizPatch, quizSnapshot, onError } = props;
@@ -115,10 +111,6 @@ export function StripeCustomCheckout(props: Props) {
     return (
       <div className="space-y-4 p-4 md:p-6">
         <div className="h-12 animate-pulse rounded-2xl bg-foreground/10" />
-        <div className="flex gap-2">
-          <div className="h-12 flex-1 animate-pulse rounded-2xl bg-foreground/10" />
-          <div className="h-12 flex-1 animate-pulse rounded-2xl bg-foreground/10" />
-        </div>
         <div className="my-2 flex items-center gap-3">
           <div className="h-px flex-1 bg-border" />
           <span className="text-xs font-medium uppercase tracking-wider text-muted-foreground/60">
@@ -126,7 +118,9 @@ export function StripeCustomCheckout(props: Props) {
           </span>
           <div className="h-px flex-1 bg-border" />
         </div>
-        <div className="h-32 animate-pulse rounded-xl bg-foreground/5" />
+        <div className="h-16 animate-pulse rounded-2xl bg-foreground/5" />
+        <div className="h-16 animate-pulse rounded-2xl bg-foreground/5" />
+        <div className="h-16 animate-pulse rounded-2xl bg-foreground/5" />
         <div className="h-14 animate-pulse rounded-2xl bg-primary/30" />
       </div>
     );
@@ -161,40 +155,16 @@ export function StripeCustomCheckout(props: Props) {
           clientSecret: session.clientSecret,
           appearance: {
             theme: "stripe",
-            labels: "above",
             variables: {
               colorPrimary: "#8D6FAF",
               colorBackground: "#FBF6EC",
               colorText: "#1F1B16",
-              colorTextPlaceholder: "#8A8175",
-              colorTextSecondary: "#5A5148",
+              colorTextPlaceholder: "#A89E8F",
               colorDanger: "#B23A3A",
               fontFamily: '"Instrument Sans", system-ui, -apple-system, sans-serif',
               fontSizeBase: "16px",
               spacingUnit: "5px",
               borderRadius: "14px",
-            },
-            rules: {
-              ".Label": {
-                fontSize: "15px",
-                fontWeight: "500",
-                color: "#1F1B16",
-                marginBottom: "8px",
-              },
-              ".Input": {
-                backgroundColor: "#FBF6EC",
-                border: "1px solid #E5D9C8",
-                boxShadow: "none",
-                padding: "14px 16px",
-              },
-              ".Input:focus": {
-                border: "1px solid #8D6FAF",
-                boxShadow: "0 0 0 3px rgba(141, 111, 175, 0.15)",
-              },
-              ".Tab, .Block": {
-                backgroundColor: "#FBF6EC",
-                border: "1px solid #E5D9C8",
-              },
             },
           },
         }}
@@ -223,37 +193,87 @@ interface FormProps {
   paymentIntentId: string;
 }
 
+// Country list — short, common-first. Full ISO codes accepted by Stripe.
+const COUNTRIES: Array<{ code: string; label: string }> = [
+  { code: "US", label: "United States" },
+  { code: "PL", label: "Poland" },
+  { code: "GB", label: "United Kingdom" },
+  { code: "CA", label: "Canada" },
+  { code: "AU", label: "Australia" },
+  { code: "DE", label: "Germany" },
+  { code: "FR", label: "France" },
+  { code: "IT", label: "Italy" },
+  { code: "ES", label: "Spain" },
+  { code: "NL", label: "Netherlands" },
+  { code: "IE", label: "Ireland" },
+  { code: "SE", label: "Sweden" },
+  { code: "NO", label: "Norway" },
+  { code: "DK", label: "Denmark" },
+  { code: "FI", label: "Finland" },
+  { code: "BE", label: "Belgium" },
+  { code: "AT", label: "Austria" },
+  { code: "CH", label: "Switzerland" },
+  { code: "PT", label: "Portugal" },
+  { code: "CZ", label: "Czechia" },
+  { code: "MX", label: "Mexico" },
+  { code: "BR", label: "Brazil" },
+  { code: "JP", label: "Japan" },
+  { code: "NZ", label: "New Zealand" },
+];
+
+const ELEMENT_BASE_STYLE = {
+  base: {
+    fontFamily: '"Instrument Sans", system-ui, -apple-system, sans-serif',
+    fontSize: "16px",
+    color: "#1F1B16",
+    fontSmoothing: "antialiased",
+    "::placeholder": { color: "#A89E8F" },
+    iconColor: "#5A5148",
+  },
+  invalid: {
+    color: "#B23A3A",
+    iconColor: "#B23A3A",
+  },
+} as const;
+
 function PaymentForm({ amount, currency, email, name, returnUrl, paymentIntentId }: FormProps) {
   const stripe = useStripe();
   const elements = useElements();
   const [submitting, setSubmitting] = useState(false);
   const [error, setError] = useState<string | null>(null);
+  const [country, setCountry] = useState<string>(() => {
+    if (typeof navigator !== "undefined") {
+      const lang = navigator.language || "en-US";
+      const region = lang.split("-")[1]?.toUpperCase();
+      if (region && COUNTRIES.some((c) => c.code === region)) return region;
+    }
+    return "US";
+  });
 
   const billingDetails = useMemo(
     () => ({
       name: name?.trim() || undefined,
       email: email?.trim() || undefined,
+      address: { country },
     }),
-    [name, email],
+    [name, email, country],
   );
 
-  const paymentElementOptions: StripePaymentElementOptions = useMemo(
+  const cardNumberOptions: StripeCardNumberElementOptions = useMemo(
     () => ({
-      // Accordion (radio) layout with all methods expanded — matches the
-      // reference design where card fields (number / expiry / CVC / country)
-      // sit on individual labeled rows with no extra wrapper.
-      layout: {
-        type: "accordion",
-        defaultCollapsed: false,
-        radios: "never",
-        spacedAccordionItems: false,
-      },
-      defaultValues: { billingDetails },
-      // We collect email/name above the Stripe iframe ourselves.
-      fields: { billingDetails: { email: "never", name: "never" } },
-      wallets: { applePay: "never", googlePay: "never", link: "never" },
+      style: ELEMENT_BASE_STYLE,
+      placeholder: "1234 1234 1234 1234",
+      showIcon: true,
     }),
-    [billingDetails],
+    [],
+  );
+  const cardExpiryOptions: StripeCardExpiryElementOptions = useMemo(
+    () => ({ style: ELEMENT_BASE_STYLE, placeholder: "MM / YY" }),
+    [],
+  );
+  const cardCvcOptions: StripeCardCvcElementOptions = useMemo(
+    () => ({ style: ELEMENT_BASE_STYLE, placeholder: "CVC" }),
+    [],
   );
 
   // Build the return_url with our PI id appended so the return page can
@@ -280,7 +300,7 @@ function PaymentForm({ amount, currency, email, name, returnUrl, paymentIntentId
     }
     const { error: confirmError } = await stripe.confirmPayment({
       elements,
-      clientSecret: undefined as unknown as string, // not needed when elements is present
+      clientSecret: undefined as unknown as string,
       confirmParams: {
         return_url: returnUrlWithPi,
         payment_method_data: { billing_details: billingDetails },
@@ -290,7 +310,6 @@ function PaymentForm({ amount, currency, email, name, returnUrl, paymentIntentId
       setSubmitting(false);
       setError(confirmError.message || "Payment was not completed.");
     }
-    // On success Stripe redirects to return_url.
   }
 
   async function handleCardSubmit(e: React.FormEvent) {
@@ -298,32 +317,57 @@ function PaymentForm({ amount, currency, email, name, returnUrl, paymentIntentId
     if (!stripe || !elements) return;
     setError(null);
     setSubmitting(true);
-    const { error: submitError } = await elements.submit();
-    if (submitError) {
+
+    const cardNumber = elements.getElement(CardNumberElement);
+    if (!cardNumber) {
       setSubmitting(false);
-      setError(submitError.message || "Please check your card details.");
+      setError("Card form not ready. Please refresh and try again.");
       return;
     }
-    const { error: confirmError } = await stripe.confirmPayment({
-      elements,
-      confirmParams: {
-        return_url: returnUrlWithPi,
-        payment_method_data: { billing_details: billingDetails },
+
+    // We confirm directly with the individual card element — no PaymentElement
+    // submit step needed. Stripe collects number/exp/cvc from the mounted
+    // Elements via the cardNumber reference.
+    const { error: confirmError } = await stripe.confirmCardPayment(
+      // The PI client secret is held by Elements; we pass it via the parent
+      // <Elements clientSecret> option, but confirmCardPayment still needs it
+      // explicitly. We grab it off elements' internal state via the parent.
+      // The wrapping <Elements> received the clientSecret as an option, so we
+      // re-read it from the data attribute on the form's hidden input below.
+      (document.getElementById("rs-pi-secret") as HTMLInputElement)?.value || "",
+      {
+        payment_method: {
+          card: cardNumber,
+          billing_details: billingDetails,
+        },
         receipt_email: billingDetails.email,
+        return_url: returnUrlWithPi,
       },
-    });
+    );
+
     if (confirmError) {
       setSubmitting(false);
       setError(confirmError.message || "Payment was declined. Please try a different card.");
+      return;
     }
-    // Success → Stripe redirects.
+
+    // Success → navigate to the return URL ourselves (no automatic redirect
+    // when using confirmCardPayment without next_action).
+    window.location.assign(returnUrlWithPi);
   }
 
   return (
-    <form onSubmit={handleCardSubmit} className="space-y-6">
-      {/* Wallets — Apple Pay / Google Pay / Link only.
-          Explicitly disable Amazon Pay, PayPal, Klarna, etc. so the merchant
-          account's default wallet set doesn't leak through. */}
+    <form onSubmit={handleCardSubmit} className="space-y-5">
+      {/* Hidden input carries the PI client secret so confirmCardPayment can
+          read it without prop-drilling — we already have it on the parent. */}
+      <input
+        type="hidden"
+        id="rs-pi-secret"
+        value={(elements as unknown as { _commonOptions?: { clientSecret?: string } } | null)
+          ?._commonOptions?.clientSecret || ""}
+      />
+
+      {/* Wallets — Apple Pay / Google Pay / Link only. */}
       <div>
         <ExpressCheckoutElement
           onConfirm={() => void handleExpressConfirm()}
@@ -352,15 +396,69 @@ function PaymentForm({ amount, currency, email, name, returnUrl, paymentIntentId
         <div className="h-px flex-1 bg-foreground/15" />
       </div>
 
-      {/* Card form — labels render above each field via Elements appearance config */}
-      <div>
-        <PaymentElement options={paymentElementOptions} />
+      {/* Card number */}
+      <div className="space-y-2">
+        <label className="block text-[15px] font-semibold text-foreground">Card number</label>
+        <div className="rounded-2xl border border-[#E5D9C8] bg-[#FBF6EC] px-4 py-[14px] transition-colors focus-within:border-primary focus-within:ring-[3px] focus-within:ring-primary/15">
+          <CardNumberElement options={cardNumberOptions} />
+        </div>
       </div>
 
+      {/* Expiry */}
+      <div className="space-y-2">
+        <label className="block text-[15px] font-semibold text-foreground">Expiration date</label>
+        <div className="rounded-2xl border border-[#E5D9C8] bg-[#FBF6EC] px-4 py-[14px] transition-colors focus-within:border-primary focus-within:ring-[3px] focus-within:ring-primary/15">
+          <CardExpiryElement options={cardExpiryOptions} />
+        </div>
+      </div>
+
+      {/* CVC */}
+      <div className="space-y-2">
+        <label className="block text-[15px] font-semibold text-foreground">Security code</label>
+        <div className="rounded-2xl border border-[#E5D9C8] bg-[#FBF6EC] px-4 py-[14px] transition-colors focus-within:border-primary focus-within:ring-[3px] focus-within:ring-primary/15">
+          <CardCvcElement options={cardCvcOptions} />
+        </div>
+      </div>
+
+      {/* Country */}
+      <div className="space-y-2">
+        <label className="block text-[15px] font-semibold text-foreground">Country</label>
+        <div className="relative">
+          <select
+            value={country}
+            onChange={(e) => setCountry(e.target.value)}
+            className="w-full appearance-none rounded-2xl border border-[#E5D9C8] bg-[#FBF6EC] px-4 py-[14px] pr-10 text-[16px] text-foreground transition-colors focus:border-primary focus:outline-none focus:ring-[3px] focus:ring-primary/15"
+          >
+            {COUNTRIES.map((c) => (
+              <option key={c.code} value={c.code}>
+                {c.label}
+              </option>
+            ))}
+          </select>
+          <svg
+            aria-hidden="true"
+            className="pointer-events-none absolute right-4 top-1/2 h-4 w-4 -translate-y-1/2 text-foreground/60"
+            viewBox="0 0 20 20"
+            fill="none"
+          >
+            <path
+              d="M5 7.5l5 5 5-5"
+              stroke="currentColor"
+              strokeWidth="1.75"
+              strokeLinecap="round"
+              strokeLinejoin="round"
+            />
+          </svg>
+        </div>
+      </div>
+
+      <p className="text-[12.5px] leading-snug text-muted-foreground">
+        By providing your card information, you authorize RibbonSong to charge your card for this
+        order in accordance with our terms.
+      </p>
+
       {error && (
-        <p className="rounded-xl bg-destructive/10 px-4 py-3 text-sm text-destructive">
-          {error}
-        </p>
+        <p className="rounded-xl bg-destructive/10 px-4 py-3 text-sm text-destructive">{error}</p>
       )}
 
       <button
