@@ -545,6 +545,7 @@ function FunnelPanel() {
   const load = async (signal?: { active: boolean }) => {
     setLoading(true);
     const start = rangeStart(range);
+    const allowed = await fetchAllowedSessionIds(start?.toISOString());
     let q = supabase
       .from("quiz_events")
       .select("session_id, event_type, step_index, time_on_step_ms, created_at")
@@ -553,7 +554,8 @@ function FunnelPanel() {
     if (start) q = q.gte("created_at", start.toISOString());
     const { data: events } = await q;
     if (signal && !signal.active) return;
-    const evts = events ?? [];
+    // Filter to only events from production-host sessions (ribbonsong.com).
+    const evts = (events ?? []).filter((e) => allowed.has(e.session_id));
 
     const sessionsByType: Record<string, Set<string>> = {};
     const totalByType: Record<string, number> = {};
