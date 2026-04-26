@@ -65,6 +65,13 @@ function CheckoutPage() {
 
   useEffect(() => {
     if (!hydrated) return;
+    setEmail(q.buyer_email || "");
+    setName(q.buyer_name || "");
+    setOrderId(q.orderId || null);
+  }, [hydrated, q.buyer_email, q.buyer_name, q.orderId]);
+
+  useEffect(() => {
+    if (!hydrated) return;
     if (!q.recipient_name && !q.orderId) {
       setError("Checkout session not found. Please finish the quiz first.");
     }
