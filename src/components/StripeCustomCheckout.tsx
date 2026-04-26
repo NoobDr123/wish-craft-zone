@@ -366,7 +366,7 @@ function PaymentForm({ amount, currency, email, name, returnUrl, paymentIntentId
         ) : (
           <>
             <Lock className="h-4 w-4" />
-            Complete My Order · {formatPrice(amount, currency)}
+            Complete My Order
           </>
         )}
       </button>
