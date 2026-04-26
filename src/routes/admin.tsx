@@ -38,6 +38,23 @@ import { WebhookDebugPanel } from "@/components/admin/WebhookDebugPanel";
 import { supabase } from "@/integrations/supabase/client";
 import { useRealtimeRefresh } from "@/hooks/useRealtimeRefresh";
 
+// Hosts that count as "real" production traffic for admin analytics.
+// Sessions from preview/lovable.app domains are excluded so the admin
+// panel only shows quiz responses captured on the live site.
+const ALLOWED_HOSTS = ["ribbonsong.com", "www.ribbonsong.com"];
+
+/** Fetch session_ids for sessions originating from allowed (production) hosts. */
+async function fetchAllowedSessionIds(sinceIso?: string): Promise<Set<string>> {
+  let q = supabase
+    .from("page_sessions")
+    .select("session_id")
+    .in("host", ALLOWED_HOSTS)
+    .limit(50000);
+  if (sinceIso) q = q.gte("created_at", sinceIso);
+  const { data } = await q;
+  return new Set((data ?? []).map((r) => r.session_id));
+}
+
 export const Route = createFileRoute("/admin")({
   component: AdminRoute,
   head: () => ({
@@ -528,6 +545,7 @@ function FunnelPanel() {
   const load = async (signal?: { active: boolean }) => {
     setLoading(true);
     const start = rangeStart(range);
+    const allowed = await fetchAllowedSessionIds(start?.toISOString());
     let q = supabase
       .from("quiz_events")
       .select("session_id, event_type, step_index, time_on_step_ms, created_at")
@@ -536,7 +554,8 @@ function FunnelPanel() {
     if (start) q = q.gte("created_at", start.toISOString());
     const { data: events } = await q;
     if (signal && !signal.active) return;
-    const evts = events ?? [];
+    // Filter to only events from production-host sessions (ribbonsong.com).
+    const evts = (events ?? []).filter((e) => allowed.has(e.session_id));
 
     const sessionsByType: Record<string, Set<string>> = {};
     const totalByType: Record<string, number> = {};
@@ -1038,6 +1057,7 @@ function UpsellsPanel() {
 
   const load = async (signal?: { active: boolean }) => {
     const start = rangeStart(range);
+    const allowed = await fetchAllowedSessionIds(start?.toISOString());
     let eq = supabase
       .from("quiz_events")
       .select("event_type, upsell_type, amount_cents, created_at, session_id")
@@ -1054,7 +1074,9 @@ function UpsellsPanel() {
     if (start) oq = oq.gte("created_at", start.toISOString());
     const [{ data: events }, { data: orders }] = await Promise.all([eq, oq]);
     if (signal && !signal.active) return;
-    setData({ events: events ?? [], orders: orders ?? [] });
+    // Filter quiz events to production-host sessions only.
+    const filteredEvents = (events ?? []).filter((e) => allowed.has(e.session_id));
+    setData({ events: filteredEvents, orders: orders ?? [] });
   };
 
   useEffect(() => {

@@ -541,6 +541,7 @@ export type Database = {
           buyer_email: string | null
           created_at: string
           first_seen_at: string
+          host: string | null
           id: string
           landing_path: string | null
           last_seen_at: string
@@ -557,6 +558,7 @@ export type Database = {
           buyer_email?: string | null
           created_at?: string
           first_seen_at?: string
+          host?: string | null
           id?: string
           landing_path?: string | null
           last_seen_at?: string
@@ -573,6 +575,7 @@ export type Database = {
           buyer_email?: string | null
           created_at?: string
           first_seen_at?: string
+          host?: string | null
           id?: string
           landing_path?: string | null
           last_seen_at?: string
