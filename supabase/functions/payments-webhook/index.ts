@@ -127,9 +127,13 @@ async function handleCheckoutSessionCompleted(session: any, env: StripeEnv) {
     },
   });
 
-  sendOrderConfirmation(orderId).catch((e) =>
-    console.error("sendOrderConfirmation failed:", e),
-  );
+  // Only send the confirmation email NOW if T3ST (skips upsells). Otherwise
+  // mark-upsells-complete sends it after add-ons are settled.
+  if (isT3st) {
+    sendOrderConfirmation(orderId).catch((e) =>
+      console.error("sendOrderConfirmation failed:", e),
+    );
+  }
 
   supabase
     .rpc("issue_reward_code_for_order", { _order_id: orderId })
@@ -192,12 +196,13 @@ async function handlePaymentSucceeded(pi: any, env: StripeEnv) {
       },
     });
 
-    // Fire-and-forget: send the order confirmation email with all details.
-    // Done here (vs. on the client) so it sends even if the buyer closes the
-    // tab right after payment.
-    sendOrderConfirmation(orderId).catch((e) =>
-      console.error("sendOrderConfirmation failed:", e),
-    );
+    // Only send the confirmation email NOW if T3ST (skips upsells). Otherwise
+    // mark-upsells-complete sends it after add-ons are settled.
+    if (isT3st) {
+      sendOrderConfirmation(orderId).catch((e) =>
+        console.error("sendOrderConfirmation failed:", e),
+      );
+    }
 
     // Issue the unique reaction-reward promo code (locked until they upload
     // a reaction video). Idempotent — safe to call on retries.
@@ -236,6 +241,18 @@ async function handlePaymentSucceeded(pi: any, env: StripeEnv) {
       .single();
 
     const productConfig = (order?.product_config as Record<string, boolean>) || {};
+
+    // Idempotency: charge-upsell already optimistically applied this upsell
+    // (flag + product_config + amount_paid_cents). Don't double-apply.
+    if (productConfig[upsellType]) {
+      await supabase.from("job_events").insert({
+        order_id: orderId,
+        event_type: "upsell_webhook_skipped_already_applied",
+        payload: { upsellType, paymentIntentId: pi.id },
+      });
+      return;
+    }
+
     productConfig[upsellType] = true;
 
     const updates: Record<string, unknown> = {
@@ -257,7 +274,7 @@ async function handlePaymentSucceeded(pi: any, env: StripeEnv) {
     await supabase.from("job_events").insert({
       order_id: orderId,
       event_type: "upsell_charged",
-      payload: { upsellType, paymentIntentId: pi.id, amount: pi.amount_received },
+      payload: { upsellType, paymentIntentId: pi.id, amount: pi.amount_received, source: "webhook" },
     });
   }
 }

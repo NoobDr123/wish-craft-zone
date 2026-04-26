@@ -54,7 +54,7 @@ serve(async (req) => {
     const { data: order, error } = await supabase
       .from("orders")
       .select(
-        "user_id, buyer_email, status, stripe_customer_id, stripe_payment_method_id, stripe_checkout_session_id, stripe_payment_intent_id, product_config, delivery_tier, promo_code_id",
+        "user_id, buyer_email, status, stripe_customer_id, stripe_payment_method_id, stripe_checkout_session_id, stripe_payment_intent_id, product_config, delivery_tier, promo_code_id, amount_paid_cents",
       )
       .eq("id", orderId)
       .single();
@@ -124,7 +124,13 @@ serve(async (req) => {
       // but we also update optimistically so the next page sees it immediately.
       if (pi.status === "succeeded") {
         productConfig[upsellType] = true;
-        const updates: Record<string, unknown> = { product_config: productConfig };
+        const chargedAmount = pi.amount_received ?? pi.amount ?? chargeAmount;
+        const updates: Record<string, unknown> = {
+          product_config: productConfig,
+          // Increment optimistically so /processing + the order-confirmation
+          // email show the real total even if the Stripe webhook is delayed.
+          amount_paid_cents: (order.amount_paid_cents ?? 0) + chargedAmount,
+        };
         if (upsell.flagColumn) updates[upsell.flagColumn] = true;
 
         // Upgrade delivery_tier only if the new tier outranks the current one.
@@ -135,6 +141,18 @@ serve(async (req) => {
         }
 
         await supabase.from("orders").update(updates).eq("id", orderId);
+
+        // Log success so admins / debug tooling can see the upsell landed.
+        await supabase.from("job_events").insert({
+          order_id: orderId,
+          event_type: "upsell_charged",
+          payload: {
+            upsellType,
+            paymentIntentId: pi.id,
+            amount: chargedAmount,
+            source: "charge-upsell",
+          },
+        });
 
         return json({ success: true });
       }
