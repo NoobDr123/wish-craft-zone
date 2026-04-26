@@ -297,10 +297,12 @@ function CreatePage() {
 
     // 3. Q4 — fighting for / holding onto / lived for
     {
+      key: "fighting_for",
       chapter: "Their fight",
       title: c4.question,
       subtitle: c4.helper,
       isValid: (s) => s.fighting_for.trim().length >= 1,
+      answer: (s) => ({ length: s.fighting_for.length }),
       render: () => (
         <Question label={c4.sublabel}>
           <TextArea
