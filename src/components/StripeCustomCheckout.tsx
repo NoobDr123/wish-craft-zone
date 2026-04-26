@@ -121,6 +121,12 @@ export function StripeCustomCheckout(props: Props) {
           return;
         }
 
+        if ((data as { alreadyPaid?: boolean } | null)?.alreadyPaid) {
+          console.log("[checkout] order already paid — redirecting to upsell flow");
+          window.location.replace("/upsell-1");
+          return;
+        }
+
         if (!data?.clientSecret) {
           const msg = (data as { error?: string })?.error || "Checkout could not be initialized.";
           console.error("[checkout] no clientSecret:", data);
