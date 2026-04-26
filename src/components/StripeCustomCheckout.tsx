@@ -320,30 +320,30 @@ function PaymentForm({ amount, currency, email, name, returnUrl, paymentIntentId
   }
 
   return (
-    <form onSubmit={handleCardSubmit} className="space-y-5">
+    <form onSubmit={handleCardSubmit} className="space-y-6">
       {/* Wallets — Apple Pay / Google Pay / Link */}
       <div>
         <ExpressCheckoutElement
           onConfirm={() => void handleExpressConfirm()}
           options={{
-            buttonHeight: 48,
+            buttonHeight: 52,
             buttonTheme: { applePay: "black", googlePay: "black" },
-            layout: { maxColumns: 2, maxRows: 1 },
+            layout: { maxColumns: 1, maxRows: 0 },
             paymentMethods: { applePay: "always", googlePay: "always", link: "auto" },
           }}
         />
       </div>
 
       <div className="flex items-center gap-3">
-        <div className="h-px flex-1 bg-border" />
-        <span className="text-xs font-medium uppercase tracking-wider text-muted-foreground/70">
+        <div className="h-px flex-1 bg-foreground/15" />
+        <span className="text-[11px] font-semibold uppercase tracking-[0.18em] text-foreground/60">
           Or pay with card
         </span>
-        <div className="h-px flex-1 bg-border" />
+        <div className="h-px flex-1 bg-foreground/15" />
       </div>
 
-      {/* Card form */}
-      <div className="rounded-2xl border border-border bg-background p-4">
+      {/* Card form — labels render above each field via Elements appearance config */}
+      <div>
         <PaymentElement options={paymentElementOptions} />
       </div>
 
@@ -356,7 +356,7 @@ function PaymentForm({ amount, currency, email, name, returnUrl, paymentIntentId
       <button
         type="submit"
         disabled={!stripe || !elements || submitting}
-        className="flex w-full items-center justify-center gap-2 rounded-2xl bg-primary px-6 py-4 text-base font-bold text-primary-foreground shadow-soft transition-all hover:brightness-95 active:scale-[0.99] disabled:cursor-not-allowed disabled:opacity-60"
+        className="flex w-full items-center justify-center gap-2 rounded-2xl bg-[#3F6B4A] px-6 py-5 text-base font-bold text-white shadow-soft transition-all hover:brightness-95 active:scale-[0.99] disabled:cursor-not-allowed disabled:opacity-60"
       >
         {submitting ? (
           <>
@@ -366,7 +366,7 @@ function PaymentForm({ amount, currency, email, name, returnUrl, paymentIntentId
         ) : (
           <>
             <Lock className="h-4 w-4" />
-            Pay {formatPrice(amount, currency)}
+            Complete My Order · {formatPrice(amount, currency)}
           </>
         )}
       </button>
