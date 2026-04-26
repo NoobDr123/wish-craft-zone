@@ -6,7 +6,7 @@ import { StripeEmbeddedCheckout } from "@/components/StripeEmbeddedCheckout";
 import { ReviewSurveyModal } from "@/components/ReviewSurveyModal";
 import { useQuizStore, journeyStageOf, tenseOf } from "@/stores/quizStore";
 import { supabase } from "@/integrations/supabase/client";
-import { stripeEnvironment } from "@/lib/stripe";
+import { ensureOrderForQuiz } from "@/lib/checkoutPrefetch";
 import {
   ArrowLeft,
   CheckCircle2,
@@ -65,7 +65,7 @@ function CheckoutPage() {
 
   useEffect(() => {
     if (!hydrated) return;
-    if (!q.recipient_name && !q.orderId && !getPrefetchedCheckout()) {
+    if (!q.recipient_name && !q.orderId) {
       setError("Checkout session not found. Please finish the quiz first.");
     }
   }, [hydrated, q.recipient_name, q.orderId]);
@@ -206,37 +206,36 @@ function CheckoutPage() {
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [hydrated, q.reward_code]);
 
-  // Single-shot kick: use the prefetched checkout from /scratch if it exists,
-  // otherwise prefetchCheckout() runs the full flow now. Either way the form
-  // mounts as soon as the clientSecret resolves.
+  // Ensure an order row exists so the embedded checkout can request a session.
+  // The actual Stripe Checkout Session is created by <StripeEmbeddedCheckout>
+  // via fetchClientSecret(), so we only need an orderId here.
   const startedRef = useRef(false);
   useEffect(() => {
     if (!hydrated) return;
     if (q.reward_code) return; // free path handles it
     if (startedRef.current) return;
-
-    const cached = getPrefetchedCheckout();
-    if (!q.recipient_name && !q.orderId && !cached) return;
+    if (orderId) return;
+    if (!q.recipient_name && !q.orderId) return;
     startedRef.current = true;
 
-    const apply = (pf: PrefetchedCheckout | null) => {
-      if (!pf) {
-        setError("Could not start payment. Please go back and try again.");
-        return;
-      }
-      q.set("orderId", pf.orderId);
-      setOrderId(pf.orderId);
-      setClientSecret(pf.clientSecret);
-      setPaymentIntentId(pf.paymentIntentId);
-    };
-
-    if (cached) {
-      apply(cached);
-    } else {
-      prefetchCheckout().then(apply);
-    }
+    setCreatingOrder(true);
+    void ensureOrderForQuiz()
+      .then((id) => {
+        if (!id) {
+          setError("Could not start payment. Please go back and try again.");
+          startedRef.current = false;
+          return;
+        }
+        setOrderId(id);
+      })
+      .catch((e) => {
+        console.error("[checkout] ensureOrderForQuiz failed:", e);
+        setError("Could not start payment. Please try again.");
+        startedRef.current = false;
+      })
+      .finally(() => setCreatingOrder(false));
     // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [hydrated, q.recipient_name, q.reward_code]);
+  }, [hydrated, q.recipient_name, q.reward_code, orderId]);
 
   // Persist buyer email/name to the order as they type (debounced).
   useEffect(() => {
@@ -310,6 +309,8 @@ function CheckoutPage() {
         final_amount_cents: data.final_amount_cents,
         free: data.free,
       });
+      // Force the embedded checkout to re-fetch a session with the new amount.
+      setAmountVersion((v) => v + 1);
 
       if (data.free) {
         // Skip Stripe entirely — order is already marked paid + queued
@@ -501,28 +502,27 @@ function CheckoutPage() {
             )}
           </div>
 
-          {/* Inline payment form — mounted as soon as the PaymentIntent is ready */}
+          {/* Embedded Stripe Checkout — mounts inline once we have an orderId */}
           <div className="mt-6 border-t border-peach/70">
-            {clientSecret && paymentIntentId ? (
-              <CustomPaymentForm
-                key={paymentIntentId}
-                clientSecret={clientSecret}
-                paymentIntentId={paymentIntentId}
-                email={email.trim().toLowerCase()}
-                amountLabel={
-                  promoApplied
-                    ? `$${(promoApplied.final_amount_cents / 100).toFixed(2)}`
-                    : "$49.99"
-                }
-                amountCents={promoApplied?.final_amount_cents ?? 4999}
-                promoVersion={promoApplied ? 1 : 0}
-                returnUrl={`${window.location.origin}/checkout/return?payment_intent_id=${paymentIntentId}`}
-                onError={(msg) => setError(msg)}
-                disabled={!ready}
-                disabledReason="Enter your email and name above to continue"
+            {orderId && ready ? (
+              <StripeEmbeddedCheckout
+                orderId={orderId}
+                amountVersion={amountVersion}
+                returnUrl={`${window.location.origin}/checkout/return?session_id={CHECKOUT_SESSION_ID}`}
+                onError={(msg: string) => setError(msg)}
               />
             ) : (
               <div className="space-y-4 p-4 md:p-6">
+                {!ready && orderId && (
+                  <p className="text-center text-sm text-muted-foreground">
+                    Enter your email and name above to load the payment form.
+                  </p>
+                )}
+                {creatingOrder && (
+                  <p className="text-center text-sm text-muted-foreground">
+                    Preparing your secure checkout…
+                  </p>
+                )}
                 {/* Skeleton matching the real form footprint to avoid layout shift */}
                 <div className="h-12 animate-pulse rounded-2xl bg-foreground/10" />
                 <div className="flex gap-2">
