@@ -1,44 +1,25 @@
 import { supabase } from "@/integrations/supabase/client";
-import { useQuizStore, journeyStageOf, tenseOf } from "@/stores/quizStore";
+import { useQuizStore, journeyStageOf, tenseOf, type QuizState } from "@/stores/quizStore";
 
-/**
- * Ensure an `orders` row exists for the current quiz state and return its
- * orderId. Idempotent: if the quiz store already has an orderId, returns it
- * without inserting.
- *
- * NOTE: This NO LONGER creates a Stripe PaymentIntent or Checkout Session.
- * The embedded Stripe Checkout component now creates the session on demand
- * once it has the orderId. This avoids the fragile prefetch-then-hydrate
- * race that previously broke checkout.
- */
-export async function ensureOrderForQuiz(): Promise<string | null> {
+function resolveRelationship(q: QuizState) {
+  return q.relationship === "Other" && q.relationship_other.trim()
+    ? q.relationship_other.trim()
+    : (q.relationship ?? null);
+}
+
+export function buildOrderPatchForQuiz(
+  overrides: { buyerEmail?: string; buyerName?: string } = {},
+) {
   const q = useQuizStore.getState();
-  if (q.orderId) return q.orderId;
-  if (!q.recipient_name) return null;
-
   const journey = journeyStageOf(q.stage);
   const tense = tenseOf(q.stage);
-  const relationshipResolved =
-    q.relationship === "Other" && q.relationship_other.trim()
-      ? q.relationship_other.trim()
-      : (q.relationship ?? null);
+  const relationshipResolved = resolveRelationship(q);
+  const buyerEmail = (overrides.buyerEmail ?? q.buyer_email ?? "").trim().toLowerCase();
+  const buyerName = (overrides.buyerName ?? q.buyer_name ?? "").trim();
 
-  const { data: authData } = await supabase.auth.getUser();
-  const userId = authData.user?.id ?? null;
-
-  const orderId =
-    typeof crypto !== "undefined" && "randomUUID" in crypto
-      ? crypto.randomUUID()
-      : `${Date.now()}-${Math.random().toString(36).slice(2)}`;
-
-  const realEmail = (q.buyer_email || "").trim().toLowerCase();
-  const buyerEmail = realEmail || `pending+${orderId}@ribbonsong.com`;
-
-  const { error: insertError } = await supabase.from("orders").insert({
-    id: orderId,
-    user_id: userId,
+  return {
     buyer_email: buyerEmail,
-    buyer_name: q.buyer_name || null,
+    buyer_name: buyerName || null,
     recipient_name: q.recipient_name,
     relationship: relationshipResolved,
     genre: q.genre ?? null,
@@ -49,10 +30,6 @@ export async function ensureOrderForQuiz(): Promise<string | null> {
     recipient_email: q.recipient_email || null,
     delivery_date: q.delivery_date || null,
     personal_note: q.personal_note || null,
-    amount_cents: 4999,
-    currency: "USD",
-    status: "pending_payment",
-    payment_status: "pending",
     priority: journey === "hospice" ? "hospice" : "standard",
     quiz_payload: {
       q1_relationship: q.relationship,
@@ -90,6 +67,52 @@ export async function ensureOrderForQuiz(): Promise<string | null> {
       journey_stage: journey,
       tense,
     },
+  };
+}
+
+/**
+ * Ensure an `orders` row exists for the current quiz state and return its
+ * orderId. Idempotent: if the quiz store already has an orderId, returns it
+ * after a best-effort sync of the latest quiz/contact details.
+ *
+ * NOTE: This NO LONGER creates a Stripe PaymentIntent or Checkout Session.
+ * The embedded Stripe Checkout component now creates the session on demand
+ * once it has the orderId. This avoids the fragile prefetch-then-hydrate
+ * race that previously broke checkout.
+ */
+export async function ensureOrderForQuiz(): Promise<string | null> {
+  const q = useQuizStore.getState();
+  if (!q.recipient_name) return null;
+
+  const patch = buildOrderPatchForQuiz();
+
+  if (q.orderId) {
+    // Anonymous browser updates may be blocked by row security, so this is
+    // best-effort only. The create-checkout function also syncs this patch
+    // with service permissions immediately before creating the payment session.
+    await supabase.from("orders").update(patch).eq("id", q.orderId);
+    return q.orderId;
+  }
+
+  const { data: authData } = await supabase.auth.getUser();
+  const userId = authData.user?.id ?? null;
+
+  const orderId =
+    typeof crypto !== "undefined" && "randomUUID" in crypto
+      ? crypto.randomUUID()
+      : `${Date.now()}-${Math.random().toString(36).slice(2)}`;
+
+  const buyerEmail = patch.buyer_email || `pending+${orderId}@ribbonsong.com`;
+
+  const { error: insertError } = await supabase.from("orders").insert({
+    id: orderId,
+    user_id: userId,
+    ...patch,
+    buyer_email: buyerEmail,
+    amount_cents: 4999,
+    currency: "USD",
+    status: "pending_payment",
+    payment_status: "pending",
   });
 
   if (insertError) {

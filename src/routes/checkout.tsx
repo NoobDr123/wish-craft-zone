@@ -6,7 +6,7 @@ import { StripeEmbeddedCheckout } from "@/components/StripeEmbeddedCheckout";
 import { ReviewSurveyModal } from "@/components/ReviewSurveyModal";
 import { useQuizStore, journeyStageOf, tenseOf } from "@/stores/quizStore";
 import { supabase } from "@/integrations/supabase/client";
-import { ensureOrderForQuiz } from "@/lib/checkoutPrefetch";
+import { buildOrderPatchForQuiz, ensureOrderForQuiz } from "@/lib/checkoutPrefetch";
 import {
   ArrowLeft,
   CheckCircle2,
@@ -65,6 +65,13 @@ function CheckoutPage() {
 
   useEffect(() => {
     if (!hydrated) return;
+    setEmail(q.buyer_email || "");
+    setName(q.buyer_name || "");
+    setOrderId(q.orderId || null);
+  }, [hydrated, q.buyer_email, q.buyer_name, q.orderId]);
+
+  useEffect(() => {
+    if (!hydrated) return;
     if (!q.recipient_name && !q.orderId) {
       setError("Checkout session not found. Please finish the quiz first.");
     }
@@ -95,6 +102,10 @@ function CheckoutPage() {
     setDeliveryDate(formatDeliveryDate());
   }, []);
   const recipient = q.recipient_name || "your loved one";
+
+  const quizPatch = hydrated
+    ? buildOrderPatchForQuiz({ buyerEmail: email, buyerName: name })
+    : undefined;
 
   // Free-song redemption short-circuit: if the user arrived with a valid
   // reward code (set on /create), insert a $0 order and route directly to
@@ -237,18 +248,19 @@ function CheckoutPage() {
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [hydrated, q.recipient_name, q.reward_code, orderId]);
 
-  // Persist buyer email/name to the order as they type (debounced).
+  // Persist buyer email/name and the latest quiz payload to the order as they type (debounced).
   useEffect(() => {
     if (!orderId || !ready) return;
     const t = setTimeout(async () => {
       const trimmedEmail = email.trim().toLowerCase();
+      const trimmedName = name.trim();
       q.set("buyer_email", trimmedEmail);
-      q.set("buyer_name", name);
+      q.set("buyer_name", trimmedName);
       await supabase
         .from("orders")
-        .update({ buyer_email: trimmedEmail, buyer_name: name })
+        .update(buildOrderPatchForQuiz({ buyerEmail: trimmedEmail, buyerName: trimmedName }))
         .eq("id", orderId);
-    }, 600);
+    }, 300);
     return () => clearTimeout(t);
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [email, name, ready, orderId]);
@@ -275,9 +287,12 @@ function CheckoutPage() {
     try {
       // Make sure latest email/name are saved before we mark order paid
       const trimmedEmail = email.trim().toLowerCase();
+      const trimmedName = name.trim();
+      q.set("buyer_email", trimmedEmail);
+      q.set("buyer_name", trimmedName);
       await supabase
         .from("orders")
-        .update({ buyer_email: trimmedEmail, buyer_name: name })
+        .update(buildOrderPatchForQuiz({ buyerEmail: trimmedEmail, buyerName: trimmedName }))
         .eq("id", orderId);
 
       const { stripeEnvironment } = await import("@/lib/stripe");
@@ -509,6 +524,7 @@ function CheckoutPage() {
                 orderId={orderId}
                 amountVersion={amountVersion}
                 returnUrl={`${window.location.origin}/checkout/return?session_id={CHECKOUT_SESSION_ID}`}
+                quizPatch={quizPatch}
                 onError={(msg: string) => setError(msg)}
               />
             ) : (

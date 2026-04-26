@@ -1,4 +1,4 @@
-import { useCallback } from "react";
+import { useCallback, useEffect, useRef } from "react";
 import { EmbeddedCheckoutProvider, EmbeddedCheckout } from "@stripe/react-stripe-js";
 import { getStripe, stripeEnvironment } from "@/lib/stripe";
 import { supabase } from "@/integrations/supabase/client";
@@ -8,14 +8,26 @@ interface Props {
   /** Bumped whenever the order amount changes (promo applied) so we re-mount with a new session. */
   amountVersion: number;
   returnUrl: string;
+  quizPatch?: Record<string, unknown>;
   onError?: (msg: string) => void;
 }
 
-export function StripeEmbeddedCheckout({ orderId, amountVersion, returnUrl, onError }: Props) {
+export function StripeEmbeddedCheckout({ orderId, amountVersion, returnUrl, quizPatch, onError }: Props) {
+  const latestQuizPatchRef = useRef(quizPatch);
+
+  useEffect(() => {
+    latestQuizPatchRef.current = quizPatch;
+  }, [quizPatch]);
+
   const fetchClientSecret = useCallback(async (): Promise<string> => {
     console.log("[checkout] requesting embedded session", { orderId, amountVersion });
     const { data, error } = await supabase.functions.invoke("create-checkout", {
-      body: { orderId, environment: stripeEnvironment, returnUrl },
+      body: {
+        orderId,
+        environment: stripeEnvironment,
+        returnUrl,
+        quizPatch: latestQuizPatchRef.current,
+      },
     });
     if (error) {
       console.error("[checkout] create-checkout invoke error:", error);
