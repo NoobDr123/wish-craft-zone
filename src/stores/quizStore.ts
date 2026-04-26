@@ -1,8 +1,10 @@
 import { create } from "zustand";
 import { persist, createJSONStorage } from "zustand/middleware";
 
-// Quiz answers are persisted in localStorage for 24 hours, then auto-cleared.
-const QUIZ_TTL_MS = 24 * 60 * 60 * 1000;
+// Quiz answers are persisted in localStorage for 6 hours, then auto-cleared.
+// Completed orders are saved permanently in the database (orders.quiz_payload),
+// so the admin panel still shows the full history regardless of this TTL.
+const QUIZ_TTL_MS = 6 * 60 * 60 * 1000;
 const QUIZ_TIMESTAMP_KEY = "ribbonsong-quiz-v3-savedAt";
 
 const ttlStorage = {
