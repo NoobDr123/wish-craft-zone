@@ -425,8 +425,9 @@ function ScratchPage() {
           </div>
 
           {/* CTA */}
-          <Link
-            to="/checkout"
+          <a
+            href="/checkout"
+            onPointerDown={warmCheckout}
             onClick={warmCheckout}
             onMouseEnter={warmCheckout}
             onFocus={warmCheckout}
@@ -435,7 +436,7 @@ function ScratchPage() {
             <Gift className="h-5 w-5" />
             {copy.ctaLabel}
             <ArrowRight className="h-5 w-5" />
-          </Link>
+          </a>
 
           <p className="mt-4 flex items-center justify-center gap-1.5 text-center text-xs text-muted-foreground">
             <AlertTriangle className="h-3.5 w-3.5" />
