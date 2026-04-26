@@ -87,12 +87,37 @@ export async function requireUser(req: Request): Promise<{ id: string; email: st
 }
 
 /**
- * Convenience: if the request is NOT internal, returns a 401 Response.
- * Returns null if authorized (caller proceeds normally).
+ * Returns true if the request is from an authenticated user with the `admin`
+ * role in `public.user_roles`. Lets the admin panel call internal pipeline
+ * functions (generate-brief, submit-to-kie, deliver-song, ...) directly from
+ * the browser using the admin's session JWT.
+ */
+export async function isAdminRequest(req: Request): Promise<boolean> {
+  const user = await requireUser(req);
+  if (!user) return false;
+  try {
+    const admin = createClient(
+      Deno.env.get("SUPABASE_URL")!,
+      Deno.env.get("SUPABASE_SERVICE_ROLE_KEY")!,
+    );
+    const { data, error } = await admin.rpc("has_role", {
+      _user_id: user.id,
+      _role: "admin",
+    });
+    if (error) return false;
+    return data === true;
+  } catch {
+    return false;
+  }
+}
+
+/**
+ * Convenience: if the request is NOT internal (and NOT an authenticated admin),
+ * returns a 401 Response. Returns null if authorized (caller proceeds normally).
  */
 export async function guardInternal(req: Request, corsHeaders: Record<string, string>): Promise<Response | null> {
-  const ok = await isInternalRequest(req);
-  if (ok) return null;
+  if (await isInternalRequest(req)) return null;
+  if (await isAdminRequest(req)) return null;
   return new Response(JSON.stringify({ error: "Unauthorized" }), {
     status: 401,
     headers: { ...corsHeaders, "Content-Type": "application/json" },
