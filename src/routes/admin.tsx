@@ -1284,6 +1284,9 @@ function OrdersPanel() {
                     <Button size="sm" variant="outline" disabled={busy === `${o.id}:deliver`} onClick={() => callFn("deliver-song", { orderId: o.id }, "deliver", o.id)}>
                       Deliver now
                     </Button>
+                    <Button size="sm" variant="default" disabled={busy === `${o.id}:force`} onClick={() => callFn("deliver-song", { orderId: o.id, force: true }, "force", o.id)}>
+                      Force deliver (skip schedule)
+                    </Button>
                   </div>
                 </td>
               </tr>
