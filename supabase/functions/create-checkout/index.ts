@@ -50,6 +50,22 @@ serve(async (req) => {
       .maybeSingle();
 
     let customerId = existingOrder?.stripe_env === env ? existingOrder?.stripe_customer_id ?? null : null;
+    if (customerId) {
+      // Verify the cached customer still exists in this Stripe environment.
+      // It may have been deleted, or the connection may have been swapped to
+      // a different underlying account, leaving us with a stale ID.
+      try {
+        const existing = await stripe.customers.retrieve(customerId);
+        if ((existing as any).deleted) customerId = null;
+      } catch (err: any) {
+        if (err?.code === "resource_missing") {
+          console.warn(`[create-checkout] stale customer ${customerId}, recreating`);
+          customerId = null;
+        } else {
+          throw err;
+        }
+      }
+    }
     if (!customerId) {
       const customer = await stripe.customers.create({
         email:
