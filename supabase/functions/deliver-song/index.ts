@@ -28,7 +28,7 @@ serve(async (req) => {
   if (unauthorized) return unauthorized;
 
   try {
-    const { orderId } = await req.json();
+    const { orderId, force } = await req.json();
     if (!orderId) return json({ error: "Missing orderId" }, 400);
 
     const { data: order } = await supabase
@@ -43,8 +43,13 @@ serve(async (req) => {
       return json({ error: `Order not ready (status=${order.status})` }, 400);
     }
 
-    // Honor scheduled_delivery_at — if still in future, requeue silently
-    if (order.scheduled_delivery_at && new Date(order.scheduled_delivery_at) > new Date()) {
+    // Honor scheduled_delivery_at — if still in future, requeue silently.
+    // Admin can bypass by passing force: true.
+    if (
+      !force &&
+      order.scheduled_delivery_at &&
+      new Date(order.scheduled_delivery_at) > new Date()
+    ) {
       return json({ ok: true, skipped: "not_yet_due" });
     }
 
