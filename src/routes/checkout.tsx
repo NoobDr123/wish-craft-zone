@@ -103,6 +103,10 @@ function CheckoutPage() {
   }, []);
   const recipient = q.recipient_name || "your loved one";
 
+  const quizPatch = hydrated
+    ? buildOrderPatchForQuiz({ buyerEmail: email, buyerName: name })
+    : undefined;
+
   // Free-song redemption short-circuit: if the user arrived with a valid
   // reward code (set on /create), insert a $0 order and route directly to
   // /processing — no Stripe involvement.
