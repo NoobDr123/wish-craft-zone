@@ -75,10 +75,11 @@ export function buildOrderPatchForQuiz(
  * orderId. Idempotent: if the quiz store already has an orderId, returns it
  * after a best-effort sync of the latest quiz/contact details.
  *
- * NOTE: This NO LONGER creates a Stripe PaymentIntent or Checkout Session.
- * The embedded Stripe Checkout component now creates the session on demand
- * once it has the orderId. This avoids the fragile prefetch-then-hydrate
- * race that previously broke checkout.
+ * NOTE: This NO LONGER creates Stripe payment state. The custom on-page
+ * Stripe Elements component creates the PaymentIntent on demand once it has
+ * an orderId. If the anonymous client insert is blocked, we still return a
+ * generated orderId; create-payment-intent can create the order from the
+ * quiz snapshot with service permissions.
  */
 export async function ensureOrderForQuiz(): Promise<string | null> {
   const q = useQuizStore.getState();
@@ -117,7 +118,8 @@ export async function ensureOrderForQuiz(): Promise<string | null> {
 
   if (insertError) {
     console.error("[ensureOrderForQuiz] order insert failed:", insertError);
-    return null;
+    q.set("orderId", orderId);
+    return orderId;
   }
 
   q.set("orderId", orderId);
