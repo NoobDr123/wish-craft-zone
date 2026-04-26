@@ -1,7 +1,9 @@
-import { Outlet, Link, createRootRoute, HeadContent, Scripts } from "@tanstack/react-router";
+import { Outlet, Link, createRootRoute, HeadContent, Scripts, useRouterState } from "@tanstack/react-router";
+import { useEffect, useRef } from "react";
 
 import appCss from "../styles.css?url";
 import { StaleBundleGuard } from "@/components/StaleBundleGuard";
+import { pixelTrack } from "@/lib/metaPixel";
 
 function NotFoundComponent() {
   return (
