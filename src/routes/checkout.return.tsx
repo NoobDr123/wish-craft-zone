@@ -1,4 +1,4 @@
-import { createFileRoute, useNavigate } from "@tanstack/react-router";
+import { createFileRoute } from "@tanstack/react-router";
 import { useEffect, useState } from "react";
 import { CheckCircle2 } from "lucide-react";
 import { Logo } from "@/components/Logo";
@@ -21,7 +21,6 @@ export const Route = createFileRoute("/checkout/return")({
 });
 
 function CheckoutReturnPage() {
-  const navigate = useNavigate();
   const search = Route.useSearch();
   const q = useQuizStore();
   const [status, setStatus] = useState<"checking" | "ready" | "error">("checking");
@@ -84,7 +83,7 @@ function CheckoutReturnPage() {
           }
           setStatus("ready");
           const next = result.skipUpsells ? "/processing" : "/upsell-1";
-          setTimeout(() => navigate({ to: next }), 400);
+          setTimeout(() => window.location.replace(next), 250);
           return true;
         }
       } catch (e) {
@@ -146,7 +145,7 @@ function CheckoutReturnPage() {
         // jump straight to /processing where the song is being generated.
         const skipUpsells = order.status === "upsells_complete";
         const nextRoute = skipUpsells ? "/processing" : "/upsell-1";
-        setTimeout(() => navigate({ to: nextRoute }), 800);
+        setTimeout(() => window.location.replace(nextRoute), 250);
         return;
       }
 
@@ -163,7 +162,7 @@ function CheckoutReturnPage() {
           if (paymentIntentId) q.set("checkoutSessionId", paymentIntentId);
         }
         setStatus("ready");
-        setTimeout(() => navigate({ to: "/upsell-1" }), 600);
+        setTimeout(() => window.location.replace("/upsell-1"), 250);
         return;
       }
 
@@ -174,7 +173,7 @@ function CheckoutReturnPage() {
     return () => {
       cancelled = true;
     };
-  }, [paymentIntentId, sessionId, navigate, q]);
+  }, [paymentIntentId, sessionId, q]);
 
   return (
     <div className="min-h-screen bg-gradient-warm">
