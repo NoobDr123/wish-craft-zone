@@ -231,7 +231,7 @@ function CheckoutPage() {
     if (startedRef.current) return;
 
     const cached = getPrefetchedCheckout();
-    if (!q.recipient_name && !cached) return;
+    if (!q.recipient_name && !q.orderId && !cached) return;
     startedRef.current = true;
 
     const apply = (pf: PrefetchedCheckout | null) => {
