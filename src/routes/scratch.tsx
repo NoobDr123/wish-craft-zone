@@ -30,6 +30,8 @@ function ScratchPage() {
   const lastPosRef = useRef<{ x: number; y: number } | null>(null);
   const initRef = useRef(false);
   const [countdown, setCountdown] = useState(COUNTDOWN_SECONDS);
+  const [checkoutStarting, setCheckoutStarting] = useState(false);
+  const [checkoutError, setCheckoutError] = useState<string | null>(null);
   const [hydrated, setHydrated] = useState(() => useQuizStore.persist.hasHydrated());
 
   const recipientName = (q.recipient_name || "").trim();
