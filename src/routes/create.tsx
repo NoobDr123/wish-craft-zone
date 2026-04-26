@@ -248,10 +248,12 @@ function CreatePage() {
 
     // 2. Journey stage (rich radio with sub-copy)
     {
+      key: "journey_stage",
       chapter: "Their fight",
       title: `Where is ${name} in their journey?`,
       subtitle: "Pick what's closest right now. This shapes the tone of the whole song.",
       isValid: (s) => !!s.stage,
+      answer: (s) => ({ stage: s.stage }),
       render: () => (
         <Question label="Choose what fits best today">
           <div className="space-y-2.5">
