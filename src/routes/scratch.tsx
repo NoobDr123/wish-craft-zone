@@ -425,8 +425,8 @@ function ScratchPage() {
           </div>
 
           {/* CTA */}
-          <button
-            onClick={() => navigate({ to: "/checkout" })}
+          <Link
+            to="/checkout"
             onMouseEnter={() => prefetchCheckout()}
             onTouchStart={() => prefetchCheckout()}
             onFocus={() => prefetchCheckout()}
@@ -435,7 +435,7 @@ function ScratchPage() {
             <Gift className="h-5 w-5" />
             {copy.ctaLabel}
             <ArrowRight className="h-5 w-5" />
-          </button>
+          </Link>
 
           <p className="mt-4 flex items-center justify-center gap-1.5 text-center text-xs text-muted-foreground">
             <AlertTriangle className="h-3.5 w-3.5" />
