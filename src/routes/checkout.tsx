@@ -206,37 +206,36 @@ function CheckoutPage() {
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [hydrated, q.reward_code]);
 
-  // Single-shot kick: use the prefetched checkout from /scratch if it exists,
-  // otherwise prefetchCheckout() runs the full flow now. Either way the form
-  // mounts as soon as the clientSecret resolves.
+  // Ensure an order row exists so the embedded checkout can request a session.
+  // The actual Stripe Checkout Session is created by <StripeEmbeddedCheckout>
+  // via fetchClientSecret(), so we only need an orderId here.
   const startedRef = useRef(false);
   useEffect(() => {
     if (!hydrated) return;
     if (q.reward_code) return; // free path handles it
     if (startedRef.current) return;
-
-    const cached = getPrefetchedCheckout();
-    if (!q.recipient_name && !q.orderId && !cached) return;
+    if (orderId) return;
+    if (!q.recipient_name && !q.orderId) return;
     startedRef.current = true;
 
-    const apply = (pf: PrefetchedCheckout | null) => {
-      if (!pf) {
-        setError("Could not start payment. Please go back and try again.");
-        return;
-      }
-      q.set("orderId", pf.orderId);
-      setOrderId(pf.orderId);
-      setClientSecret(pf.clientSecret);
-      setPaymentIntentId(pf.paymentIntentId);
-    };
-
-    if (cached) {
-      apply(cached);
-    } else {
-      prefetchCheckout().then(apply);
-    }
+    setCreatingOrder(true);
+    void ensureOrderForQuiz()
+      .then((id) => {
+        if (!id) {
+          setError("Could not start payment. Please go back and try again.");
+          startedRef.current = false;
+          return;
+        }
+        setOrderId(id);
+      })
+      .catch((e) => {
+        console.error("[checkout] ensureOrderForQuiz failed:", e);
+        setError("Could not start payment. Please try again.");
+        startedRef.current = false;
+      })
+      .finally(() => setCreatingOrder(false));
     // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [hydrated, q.recipient_name, q.reward_code]);
+  }, [hydrated, q.recipient_name, q.reward_code, orderId]);
 
   // Persist buyer email/name to the order as they type (debounced).
   useEffect(() => {
