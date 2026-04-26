@@ -7,6 +7,42 @@ const supabase = createClient(
   Deno.env.get("SUPABASE_SERVICE_ROLE_KEY")!,
 );
 
+const checkoutQuizPatchFields = new Set([
+  "buyer_email",
+  "buyer_name",
+  "recipient_name",
+  "relationship",
+  "genre",
+  "tempo",
+  "voice",
+  "song_title_idea",
+  "is_gift",
+  "recipient_email",
+  "delivery_date",
+  "personal_note",
+  "priority",
+  "quiz_payload",
+]);
+
+function sanitizeCheckoutQuizPatch(input: unknown) {
+  if (!input || typeof input !== "object" || Array.isArray(input)) return null;
+  const out: Record<string, unknown> = {};
+  for (const [key, value] of Object.entries(input as Record<string, unknown>)) {
+    if (!checkoutQuizPatchFields.has(key)) continue;
+    if (key === "buyer_email") {
+      const email = typeof value === "string" ? value.trim().toLowerCase() : "";
+      if (/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email)) out.buyer_email = email;
+      continue;
+    }
+    if (key === "buyer_name") {
+      out.buyer_name = typeof value === "string" && value.trim() ? value.trim() : null;
+      continue;
+    }
+    out[key] = value;
+  }
+  return Object.keys(out).length ? out : null;
+}
+
 serve(async (req) => {
   if (req.method === "OPTIONS") return new Response(null, { headers: corsHeaders });
 
