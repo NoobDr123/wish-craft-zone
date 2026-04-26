@@ -487,12 +487,17 @@ function CreatePage() {
   const step = steps[safeIndex];
   const valid = step.isValid(q);
 
+  // Keep stepRef in sync so the question_view effect can include step metadata.
+  stepRef.current = { key: step.key, answer: step.answer(q) };
+
   const next = () => {
     const elapsed = Date.now() - stepEnteredAt.current;
     void track({
       type: "question_answer",
       stepIndex: safeIndex,
+      stepKey: step.key,
       timeOnStepMs: elapsed,
+      payload: step.answer(q),
       buyerEmail: q.buyer_email || undefined,
     });
     if (safeIndex < total - 1) setIndex(safeIndex + 1);
@@ -503,13 +508,36 @@ function CreatePage() {
       void track({
         type: "quiz_complete",
         stepIndex: total,
+        stepKey: step.key,
         timeOnStepMs: totalTime ?? undefined,
+        payload: {
+          relationship: q.relationship,
+          stage: q.stage,
+          message: q.message,
+          genre: q.genre,
+          tempo: q.tempo,
+          voice: q.voice,
+          fighting_for_len: q.fighting_for.length,
+          qualities_len: q.qualities.length,
+          shared_memory_len: q.shared_memory.length,
+          personal_words_len: q.personal_words.length,
+        },
         buyerEmail: q.buyer_email || undefined,
       });
       navigate({ to: "/almost-there" });
     }
   };
-  const back = () => setIndex(Math.max(0, safeIndex - 1));
+  const back = () => {
+    const elapsed = Date.now() - stepEnteredAt.current;
+    void track({
+      type: "question_back",
+      stepIndex: safeIndex,
+      stepKey: step.key,
+      timeOnStepMs: elapsed,
+      buyerEmail: q.buyer_email || undefined,
+    });
+    setIndex(Math.max(0, safeIndex - 1));
+  };
 
   return (
     <>
