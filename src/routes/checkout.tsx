@@ -2,7 +2,7 @@ import { createFileRoute, useNavigate, Link } from "@tanstack/react-router";
 import { lazy, Suspense, useEffect, useRef, useState } from "react";
 import { Logo } from "@/components/Logo";
 import { PaymentTestModeBanner } from "@/components/PaymentTestModeBanner";
-import { StripeEmbeddedCheckout } from "@/components/StripeEmbeddedCheckout";
+import { StripeCustomCheckout } from "@/components/StripeCustomCheckout";
 import { ReviewSurveyModal } from "@/components/ReviewSurveyModal";
 import { useQuizStore, journeyStageOf, tenseOf } from "@/stores/quizStore";
 import { supabase } from "@/integrations/supabase/client";
@@ -517,23 +517,29 @@ function CheckoutPage() {
             )}
           </div>
 
-          {/* Embedded Stripe Checkout — mounts inline once we have an orderId.
-              Stripe Embedded Checkout collects email itself, so we don't gate
-              on the local email/name fields. The fields above stay as a
-              convenience to pre-fill and to attach the order to the buyer's
-              identity in our DB. */}
+          {/* Custom on-page payment: Apple/Google Pay/Link buttons up top,
+              card form below, branded "Pay" button. We collect email/name
+              ourselves above, so we wait for them to be valid before mounting
+              the form (Stripe needs them for billing details + receipts). */}
           <div className="mt-6 border-t border-peach/70">
-            {orderId ? (
-              <StripeEmbeddedCheckout
+            {orderId && ready ? (
+              <StripeCustomCheckout
                 orderId={orderId}
                 amountVersion={amountVersion}
-                returnUrl={`${window.location.origin}/checkout/return?session_id={CHECKOUT_SESSION_ID}`}
+                returnUrl={`${window.location.origin}/checkout/return`}
+                email={email}
+                name={name}
                 quizPatch={quizPatch}
                 quizSnapshot={quizPatch}
                 onError={(msg: string) => setError(msg)}
               />
             ) : (
               <div className="space-y-4 p-4 md:p-6">
+                {!ready && orderId && (
+                  <p className="text-center text-sm text-muted-foreground">
+                    Enter your email and name above to load payment options.
+                  </p>
+                )}
                 {creatingOrder && (
                   <p className="text-center text-sm text-muted-foreground">
                     Preparing your secure checkout…
