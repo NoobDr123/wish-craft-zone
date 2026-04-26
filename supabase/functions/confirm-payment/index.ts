@@ -139,6 +139,7 @@ serve(async (req) => {
           // T3ST: skip upsell pages — go straight to brief generation.
           status: isT3st ? "upsells_complete" : "awaiting_upsells",
         };
+        if (resolvedSessionId) updates.stripe_checkout_session_id = resolvedSessionId;
         if (placeholder && realEmail) updates.buyer_email = realEmail.toLowerCase();
         if (placeholder && realName) updates.buyer_name = realName;
 
