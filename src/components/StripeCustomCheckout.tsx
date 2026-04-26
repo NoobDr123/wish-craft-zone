@@ -187,8 +187,10 @@ export function StripeCustomCheckout(props: Props) {
   return (
     <div className="p-4 md:p-6">
       <Elements
-        // Re-key whenever the PI changes so Stripe Elements re-mounts cleanly.
-        key={session.paymentIntentId}
+        // Re-key whenever the PI *or amount* changes so Stripe Elements
+        // (incl. the Apple Pay / Google Pay sheet) re-mounts cleanly with the
+        // new total — otherwise wallets keep showing the pre-promo amount.
+        key={`${session.paymentIntentId}-${session.amount}`}
         stripe={getStripe()}
         options={{
           clientSecret: session.clientSecret,
