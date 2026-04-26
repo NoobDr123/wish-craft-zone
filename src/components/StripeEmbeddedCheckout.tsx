@@ -32,7 +32,7 @@ export function StripeEmbeddedCheckout({ orderId, amountVersion, returnUrl, quiz
     }
     return data.clientSecret as string;
     // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [orderId, amountVersion, returnUrl]);
+  }, [orderId, amountVersion, returnUrl, quizPatch]);
 
   return (
     <div className="p-4 md:p-6">
