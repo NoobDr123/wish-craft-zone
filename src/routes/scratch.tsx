@@ -30,6 +30,8 @@ function ScratchPage() {
   const lastPosRef = useRef<{ x: number; y: number } | null>(null);
   const initRef = useRef(false);
   const [countdown, setCountdown] = useState(COUNTDOWN_SECONDS);
+  const [checkoutStarting, setCheckoutStarting] = useState(false);
+  const [checkoutError, setCheckoutError] = useState<string | null>(null);
   const [hydrated, setHydrated] = useState(() => useQuizStore.persist.hasHydrated());
 
   const recipientName = (q.recipient_name || "").trim();
@@ -279,6 +281,19 @@ function ScratchPage() {
   const secs = (countdown % 60).toString().padStart(2, "0");
   const expired = stage === "claim" && countdown === 0;
 
+  const startCheckout = async () => {
+    if (checkoutStarting) return;
+    setCheckoutError(null);
+    setCheckoutStarting(true);
+    const checkout = await prefetchCheckout();
+    if (!checkout) {
+      setCheckoutError("Checkout is still starting. Please tap again in a moment.");
+      setCheckoutStarting(false);
+      return;
+    }
+    navigate({ to: "/checkout" });
+  };
+
   return (
     <div className="min-h-screen bg-gradient-warm">
       <header className="border-b border-peach/60 bg-background/60 backdrop-blur">
@@ -425,17 +440,24 @@ function ScratchPage() {
           </div>
 
           {/* CTA */}
-          <Link
-            to="/checkout"
+          <button
+            type="button"
+            onClick={startCheckout}
             onMouseEnter={() => prefetchCheckout()}
-            onTouchStart={() => prefetchCheckout()}
             onFocus={() => prefetchCheckout()}
-            className="mt-6 flex w-full items-center justify-center gap-2 rounded-full bg-primary px-8 py-5 text-base font-bold text-primary-foreground shadow-glow transition-all hover:bg-primary-hover active:scale-[0.99]"
+            disabled={checkoutStarting}
+            className="mt-6 flex w-full items-center justify-center gap-2 rounded-full bg-primary px-8 py-5 text-base font-bold text-primary-foreground shadow-glow transition-all hover:bg-primary-hover active:scale-[0.99] disabled:cursor-wait disabled:opacity-70"
           >
             <Gift className="h-5 w-5" />
-            {copy.ctaLabel}
-            <ArrowRight className="h-5 w-5" />
-          </Link>
+            {checkoutStarting ? "Starting secure checkout…" : copy.ctaLabel}
+            {!checkoutStarting && <ArrowRight className="h-5 w-5" />}
+          </button>
+
+          {checkoutError && (
+            <p className="mt-3 text-center text-sm font-medium text-destructive">
+              {checkoutError}
+            </p>
+          )}
 
           <p className="mt-4 flex items-center justify-center gap-1.5 text-center text-xs text-muted-foreground">
             <AlertTriangle className="h-3.5 w-3.5" />
