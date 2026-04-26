@@ -105,6 +105,20 @@ function RootShell({ children }: { children: React.ReactNode }) {
 }
 
 function RootComponent() {
+  // Fire Meta Pixel `PageView` on every SPA route change.
+  // The initial PageView is fired by the inline script in <head>; this hook
+  // covers all subsequent client-side navigations so funnel pages (quiz steps,
+  // checkout, upsells, thank-you) are tracked individually in Meta Ads.
+  const pathname = useRouterState({ select: (s) => s.location.pathname });
+  const firstRender = useRef(true);
+  useEffect(() => {
+    if (firstRender.current) {
+      firstRender.current = false;
+      return;
+    }
+    pixelTrack("PageView");
+  }, [pathname]);
+
   return (
     <>
       <StaleBundleGuard />
