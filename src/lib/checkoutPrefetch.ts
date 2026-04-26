@@ -30,10 +30,6 @@ export function buildOrderPatchForQuiz(
     recipient_email: q.recipient_email || null,
     delivery_date: q.delivery_date || null,
     personal_note: q.personal_note || null,
-    amount_cents: 4999,
-    currency: "USD",
-    status: "pending_payment",
-    payment_status: "pending",
     priority: journey === "hospice" ? "hospice" : "standard",
     quiz_payload: {
       q1_relationship: q.relationship,
