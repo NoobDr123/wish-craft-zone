@@ -158,12 +158,16 @@ function CreatePage() {
     void track({ type: "quiz_start", stepIndex: 0 });
   }, []);
 
-  // Track question_view whenever step index changes
+  // Track question_view whenever step index changes.
+  // We read the step key/answer via a ref so the effect doesn't depend on `steps`
+  // (which is recreated each render).
+  const stepRef = useRef<{ key?: string; answer?: Record<string, unknown> }>({});
   useEffect(() => {
     stepEnteredAt.current = Date.now();
     void track({
       type: "question_view",
       stepIndex: index,
+      stepKey: stepRef.current.key,
       buyerEmail: q.buyer_email || undefined,
     });
   }, [index, q.buyer_email]);
