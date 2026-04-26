@@ -53,6 +53,8 @@ serve(async (req) => {
 
     // Already past this stage? No-op (idempotent).
     if (order.status !== "awaiting_upsells" && order.status !== "paid") {
+      // Still try to send confirmation email if it hasn't gone out yet.
+      void sendOrderConfirmationIfNeeded(orderId);
       return json({ ok: true, alreadyAdvanced: true });
     }
 
@@ -64,12 +66,48 @@ serve(async (req) => {
 
     if (error) return json({ error: error.message }, 500);
 
+    // Now that all upsell decisions are settled, send the confirmation email
+    // with the FINAL order details (add-ons, delivery speed, total paid).
+    void sendOrderConfirmationIfNeeded(orderId);
+
     return json({ ok: true });
   } catch (e: any) {
     console.error("mark-upsells-complete error:", e);
     return json({ error: e.message || "Internal error" }, 500);
   }
 });
+
+async function sendOrderConfirmationIfNeeded(orderId: string) {
+  try {
+    const { data: order } = await supabase
+      .from("orders")
+      .select("confirmation_email_sent_at, buyer_email")
+      .eq("id", orderId)
+      .maybeSingle();
+    if (!order || order.confirmation_email_sent_at || !order.buyer_email) return;
+
+    const supabaseUrl = Deno.env.get("SUPABASE_URL")!;
+    const serviceKey = Deno.env.get("SUPABASE_SERVICE_ROLE_KEY")!;
+    await fetch(`${supabaseUrl}/functions/v1/send-app-email`, {
+      method: "POST",
+      headers: {
+        "Content-Type": "application/json",
+        Authorization: `Bearer ${serviceKey}`,
+      },
+      body: JSON.stringify({
+        template: "order_confirmation",
+        to: order.buyer_email,
+        data: { orderId },
+      }),
+    });
+    await supabase
+      .from("orders")
+      .update({ confirmation_email_sent_at: new Date().toISOString() })
+      .eq("id", orderId);
+  } catch (e) {
+    console.error("sendOrderConfirmationIfNeeded failed:", e);
+  }
+}
 
 function json(body: unknown, status = 200) {
   return new Response(JSON.stringify(body), {
