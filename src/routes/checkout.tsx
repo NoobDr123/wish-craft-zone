@@ -226,14 +226,17 @@ function CheckoutPage() {
   // mounts as soon as the clientSecret resolves.
   const startedRef = useRef(false);
   useEffect(() => {
-    if (!q.recipient_name) return;
+    if (!hydrated) return;
     if (q.reward_code) return; // free path handles it
     if (startedRef.current) return;
+
+    const cached = getPrefetchedCheckout();
+    if (!q.recipient_name && !cached) return;
     startedRef.current = true;
 
     const apply = (pf: PrefetchedCheckout | null) => {
       if (!pf) {
-        setError("Could not start payment. Please try again.");
+        setError("Could not start payment. Please go back and try again.");
         return;
       }
       q.set("orderId", pf.orderId);
@@ -242,14 +245,13 @@ function CheckoutPage() {
       setPaymentIntentId(pf.paymentIntentId);
     };
 
-    const cached = getPrefetchedCheckout();
     if (cached) {
       apply(cached);
     } else {
       prefetchCheckout().then(apply);
     }
     // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [q.recipient_name, q.reward_code]);
+  }, [hydrated, q.recipient_name, q.reward_code]);
 
   // Persist buyer email/name to the order as they type (debounced).
   useEffect(() => {
