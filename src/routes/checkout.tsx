@@ -65,7 +65,7 @@ function CheckoutPage() {
 
   useEffect(() => {
     if (!hydrated) return;
-    if (!q.recipient_name && !q.orderId && !getPrefetchedCheckout()) {
+    if (!q.recipient_name && !q.orderId) {
       setError("Checkout session not found. Please finish the quiz first.");
     }
   }, [hydrated, q.recipient_name, q.orderId]);
