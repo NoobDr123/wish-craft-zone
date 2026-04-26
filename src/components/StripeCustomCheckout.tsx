@@ -239,7 +239,15 @@ function PaymentForm({ amount, currency, email, name, returnUrl, paymentIntentId
 
   const paymentElementOptions: StripePaymentElementOptions = useMemo(
     () => ({
-      layout: { type: "tabs", defaultCollapsed: false },
+      // Accordion (radio) layout with all methods expanded — matches the
+      // reference design where card fields (number / expiry / CVC / country)
+      // sit on individual labeled rows with no extra wrapper.
+      layout: {
+        type: "accordion",
+        defaultCollapsed: false,
+        radios: false,
+        spacedAccordionItems: false,
+      },
       defaultValues: { billingDetails },
       // We collect email/name above the Stripe iframe ourselves.
       fields: { billingDetails: { email: "never", name: "never" } },
