@@ -13,10 +13,21 @@ interface Props {
 }
 
 export function StripeEmbeddedCheckout({ orderId, amountVersion, returnUrl, quizPatch, onError }: Props) {
+  const latestQuizPatchRef = useRef(quizPatch);
+
+  useEffect(() => {
+    latestQuizPatchRef.current = quizPatch;
+  }, [quizPatch]);
+
   const fetchClientSecret = useCallback(async (): Promise<string> => {
     console.log("[checkout] requesting embedded session", { orderId, amountVersion });
     const { data, error } = await supabase.functions.invoke("create-checkout", {
-      body: { orderId, environment: stripeEnvironment, returnUrl, quizPatch },
+      body: {
+        orderId,
+        environment: stripeEnvironment,
+        returnUrl,
+        quizPatch: latestQuizPatchRef.current,
+      },
     });
     if (error) {
       console.error("[checkout] create-checkout invoke error:", error);
@@ -32,7 +43,7 @@ export function StripeEmbeddedCheckout({ orderId, amountVersion, returnUrl, quiz
     }
     return data.clientSecret as string;
     // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [orderId, amountVersion, returnUrl, quizPatch]);
+  }, [orderId, amountVersion, returnUrl]);
 
   return (
     <div className="p-4 md:p-6">
