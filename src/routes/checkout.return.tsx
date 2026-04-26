@@ -53,12 +53,18 @@ function CheckoutReturnPage() {
     // Server-side fallback: ask Stripe directly whether the PI succeeded and
     // mark the order paid. The webhook is supposed to do this, but Apple/Google
     // Pay flows can race the redirect and webhooks aren't always reliable.
+    // Embedded checkout returns a session_id, so support that path too.
     const callConfirm = async (): Promise<boolean> => {
-      if (!paymentIntentId || confirmCalled) return false;
+      if (!paymentIntentId && !sessionId) return false;
+      if (confirmCalled) return false;
       confirmCalled = true;
       try {
         const { data, error } = await supabase.functions.invoke("confirm-payment", {
-          body: { paymentIntentId, environment: stripeEnvironment },
+          body: {
+            paymentIntentId: paymentIntentId || undefined,
+            sessionId: sessionId || undefined,
+            environment: stripeEnvironment,
+          },
         });
         if (error) {
           console.warn("confirm-payment error (will keep polling):", error.message);
@@ -70,6 +76,7 @@ function CheckoutReturnPage() {
           // Server confirmed the payment — route immediately, don't wait for poll.
           q.set("orderId", result.orderId);
           if (paymentIntentId) q.set("checkoutSessionId", paymentIntentId);
+          else if (sessionId) q.set("checkoutSessionId", sessionId);
           if (paymentIntentId) {
             autoLogin(paymentIntentId).catch((e) =>
               console.error("autoLogin failed (non-fatal):", e),

@@ -9,24 +9,41 @@ interface Props {
   amountVersion: number;
   returnUrl: string;
   quizPatch?: Record<string, unknown>;
+  /** Full snapshot used by the backend to create the order if it doesn't exist yet. */
+  quizSnapshot?: Record<string, unknown>;
   onError?: (msg: string) => void;
 }
 
-export function StripeEmbeddedCheckout({ orderId, amountVersion, returnUrl, quizPatch, onError }: Props) {
+export function StripeEmbeddedCheckout({
+  orderId,
+  amountVersion,
+  returnUrl,
+  quizPatch,
+  quizSnapshot,
+  onError,
+}: Props) {
   const latestQuizPatchRef = useRef(quizPatch);
+  const latestSnapshotRef = useRef(quizSnapshot);
 
   useEffect(() => {
     latestQuizPatchRef.current = quizPatch;
   }, [quizPatch]);
+  useEffect(() => {
+    latestSnapshotRef.current = quizSnapshot;
+  }, [quizSnapshot]);
 
   const fetchClientSecret = useCallback(async (): Promise<string> => {
     console.log("[checkout] requesting embedded session", { orderId, amountVersion });
+    const { data: authData } = await supabase.auth.getUser();
+    const userId = authData.user?.id ?? null;
     const { data, error } = await supabase.functions.invoke("create-checkout", {
       body: {
         orderId,
         environment: stripeEnvironment,
         returnUrl,
         quizPatch: latestQuizPatchRef.current,
+        quizSnapshot: latestSnapshotRef.current,
+        userId,
       },
     });
     if (error) {
@@ -41,6 +58,7 @@ export function StripeEmbeddedCheckout({ orderId, amountVersion, returnUrl, quiz
       onError?.(msg);
       throw new Error(msg);
     }
+    console.log("[checkout] session ready", { sessionId: data.sessionId });
     return data.clientSecret as string;
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [orderId, amountVersion, returnUrl]);
