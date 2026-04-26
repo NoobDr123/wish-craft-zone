@@ -41,10 +41,18 @@ const TESTIMONIALS = [
 function AlmostTherePage() {
   const navigate = useNavigate();
   const q = useQuizStore();
+  const [hydrated, setHydrated] = useState(() => useQuizStore.persist.hasHydrated());
 
   useEffect(() => {
+    const unsubscribe = useQuizStore.persist.onFinishHydration(() => setHydrated(true));
+    if (useQuizStore.persist.hasHydrated()) setHydrated(true);
+    return unsubscribe;
+  }, []);
+
+  useEffect(() => {
+    if (!hydrated) return;
     if (!q.recipient_name) navigate({ to: "/create" });
-  }, [q.recipient_name, navigate]);
+  }, [hydrated, q.recipient_name, navigate]);
 
   return (
     <div className="min-h-screen bg-background">
