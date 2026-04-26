@@ -189,6 +189,7 @@ function CreatePage() {
   const steps: Step[] = [
     // 1. Relationship + (Other reveal) + first name
     {
+      key: "who_they_are",
       chapter: "Who they are",
       title: "Who is this song for?",
       subtitle: "Pick whoever fits closest. We'll use their name in the song.",
@@ -196,6 +197,11 @@ function CreatePage() {
         !!s.relationship &&
         s.recipient_name.trim().length > 1 &&
         (s.relationship !== "Other" || s.relationship_other.trim().length > 1),
+      answer: (s) => ({
+        relationship: s.relationship,
+        relationship_other: s.relationship_other || undefined,
+        recipient_name: s.recipient_name,
+      }),
       render: () => (
         <div className="space-y-7">
           <Question label="They are my…">
