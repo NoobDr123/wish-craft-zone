@@ -281,6 +281,19 @@ function ScratchPage() {
   const secs = (countdown % 60).toString().padStart(2, "0");
   const expired = stage === "claim" && countdown === 0;
 
+  const startCheckout = async () => {
+    if (checkoutStarting) return;
+    setCheckoutError(null);
+    setCheckoutStarting(true);
+    const checkout = await prefetchCheckout();
+    if (!checkout) {
+      setCheckoutError("Checkout is still starting. Please tap again in a moment.");
+      setCheckoutStarting(false);
+      return;
+    }
+    navigate({ to: "/checkout" });
+  };
+
   return (
     <div className="min-h-screen bg-gradient-warm">
       <header className="border-b border-peach/60 bg-background/60 backdrop-blur">
