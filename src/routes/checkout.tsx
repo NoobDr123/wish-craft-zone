@@ -35,6 +35,18 @@ function formatDeliveryDate() {
 }
 
 function CheckoutPage() {
+  // CRITICAL: When the user lands on /checkout/return (a child route of
+  // /checkout), TanStack Router renders this parent component too. Without
+  // this guard, the checkout payment UI would mount on top of the return
+  // page and the buyer would never get redirected to the upsell flow.
+  // Render the child route via <Outlet /> instead and bail out of all the
+  // checkout logic below.
+  const matches = useMatches();
+  const isOnReturn = matches.some((m) => m.routeId === "/checkout/return");
+  if (isOnReturn) {
+    return <Outlet />;
+  }
+
   const navigate = useNavigate();
   const q = useQuizStore();
   const [hydrated, setHydrated] = useState(() => useQuizStore.persist.hasHydrated());
