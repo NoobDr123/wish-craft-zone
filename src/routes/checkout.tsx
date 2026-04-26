@@ -86,7 +86,7 @@ function CheckoutPage() {
   // is created on-the-fly by `ensureOrderForQuiz` / `create-payment-intent`
   // even when the local quiz store is empty (e.g. returning buyer).
 
-  // Track checkout page view once hydrated
+  // Track checkout page view once hydrated + fire Meta Pixel InitiateCheckout
   useEffect(() => {
     if (!hydrated) return;
     void import("@/lib/tracking").then(({ track, attachSessionIdentity }) => {
@@ -97,6 +97,12 @@ function CheckoutPage() {
       if (q.buyer_email) {
         void attachSessionIdentity({ buyerEmail: q.buyer_email });
       }
+    });
+    void import("@/lib/metaPixel").then(({ pixelTrack }) => {
+      pixelTrack("InitiateCheckout", {
+        content_category: "personalized_song",
+        currency: "USD",
+      });
     });
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [hydrated]);
