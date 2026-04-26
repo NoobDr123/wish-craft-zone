@@ -6,7 +6,7 @@ import { StripeEmbeddedCheckout } from "@/components/StripeEmbeddedCheckout";
 import { ReviewSurveyModal } from "@/components/ReviewSurveyModal";
 import { useQuizStore, journeyStageOf, tenseOf } from "@/stores/quizStore";
 import { supabase } from "@/integrations/supabase/client";
-import { ensureOrderForQuiz } from "@/lib/checkoutPrefetch";
+import { buildOrderPatchForQuiz, ensureOrderForQuiz } from "@/lib/checkoutPrefetch";
 import {
   ArrowLeft,
   CheckCircle2,
