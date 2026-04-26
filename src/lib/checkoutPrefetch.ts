@@ -56,10 +56,8 @@ export function prefetchCheckout(): Promise<PrefetchedCheckout | null> {
   inflight = (async () => {
     try {
       const q = useQuizStore.getState();
-      if (!q.recipient_name) return null;
-
-      const { data: authData } = await supabase.auth.getUser();
-      const userId = authData.user?.id ?? null;
+      const existingOrderId = q.orderId;
+      if (!q.recipient_name && !existingOrderId) return null;
 
       const journey = journeyStageOf(q.stage);
       const tense = tenseOf(q.stage);
@@ -68,16 +66,21 @@ export function prefetchCheckout(): Promise<PrefetchedCheckout | null> {
           ? q.relationship_other.trim()
           : (q.relationship ?? null);
 
-      const newOrderId =
-        typeof crypto !== "undefined" && "randomUUID" in crypto
-          ? crypto.randomUUID()
-          : `${Date.now()}-${Math.random().toString(36).slice(2)}`;
+      let orderId = existingOrderId;
+      if (!orderId) {
+        const { data: authData } = await supabase.auth.getUser();
+        const userId = authData.user?.id ?? null;
 
-      const placeholderEmail = `pending+${newOrderId}@ribbonsong.com`;
+        orderId =
+          typeof crypto !== "undefined" && "randomUUID" in crypto
+            ? crypto.randomUUID()
+            : `${Date.now()}-${Math.random().toString(36).slice(2)}`;
 
-      const { error: insertError } = await supabase.from("orders").insert({
-        id: newOrderId,
-        user_id: userId,
+        const placeholderEmail = `pending+${orderId}@ribbonsong.com`;
+
+        const { error: insertError } = await supabase.from("orders").insert({
+          id: orderId,
+          user_id: userId,
         buyer_email: placeholderEmail,
         buyer_name: null,
         recipient_name: q.recipient_name,
@@ -131,18 +134,19 @@ export function prefetchCheckout(): Promise<PrefetchedCheckout | null> {
           journey_stage: journey,
           tense,
         },
-      });
+        });
 
-      if (insertError) {
-        console.error("[prefetchCheckout] order insert failed:", insertError);
-        return null;
+        if (insertError) {
+          console.error("[prefetchCheckout] order insert failed:", insertError);
+          return null;
+        }
+
+        q.set("orderId", orderId);
       }
-
-      q.set("orderId", newOrderId);
 
       const { data, error: fnError } = await supabase.functions.invoke(
         "create-checkout",
-        { body: { orderId: newOrderId, environment: stripeEnvironment } },
+        { body: { orderId, environment: stripeEnvironment } },
       );
 
       if (fnError || !data?.clientSecret) {
@@ -151,7 +155,7 @@ export function prefetchCheckout(): Promise<PrefetchedCheckout | null> {
       }
 
       cached = {
-        orderId: newOrderId,
+        orderId,
         clientSecret: data.clientSecret,
         paymentIntentId: data.paymentIntentId,
         createdAt: Date.now(),
