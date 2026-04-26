@@ -85,6 +85,28 @@ export function StripeCustomCheckout(props: Props) {
           const status = (error as { context?: { status?: number } })?.context?.status;
           const msg = error.message || "Could not start checkout.";
           lastErrorMsg = msg;
+          // The order has already been paid (e.g. buyer hit Back after a
+          // successful Apple Pay / card payment, or refreshed checkout).
+          // Don't show a scary error — just send them into the upsell flow.
+          // We have to read the response body manually because supabase-js
+          // surfaces non-2xx as `error` and hides the JSON body.
+          let alreadyPaid = false;
+          try {
+            const ctx = (error as { context?: Response })?.context;
+            if (ctx && typeof (ctx as Response).clone === "function") {
+              const body = await (ctx as Response).clone().json().catch(() => null);
+              if (body && (body as { error?: string }).error === "order_already_paid") {
+                alreadyPaid = true;
+              }
+            }
+          } catch {
+            // ignore — fall through to normal error handling
+          }
+          if (alreadyPaid || /order_already_paid/i.test(msg)) {
+            console.log("[checkout] order already paid — redirecting to upsell flow");
+            window.location.replace("/upsell-1");
+            return;
+          }
           // 503 / 504 / network = transient — retry. 4xx = real error, fail fast.
           const transient = !status || status === 503 || status === 504 || status === 408 || status === 502 || /service is temporarily unavailable|runtime_error|failed to fetch|network/i.test(msg);
           if (transient && attempt < MAX_ATTEMPTS - 1) {
