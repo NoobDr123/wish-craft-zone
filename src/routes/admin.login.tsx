@@ -4,9 +4,10 @@
 
 import { createFileRoute } from "@tanstack/react-router";
 import { useState, type FormEvent } from "react";
-import { ArrowLeft, Lock, CheckCircle2, Loader2, ShieldCheck } from "lucide-react";
+import { ArrowLeft, Lock, CheckCircle2, Loader2, ShieldCheck, Chrome } from "lucide-react";
 import { Logo } from "@/components/Logo";
 import { supabase } from "@/integrations/supabase/client";
+import { lovable } from "@/integrations/lovable";
 
 
 export const Route = createFileRoute("/admin/login")({
@@ -29,6 +30,7 @@ function AdminLoginRoute() {
 function AdminLoginPage() {
   const [email, setEmail] = useState("");
   const [submitting, setSubmitting] = useState(false);
+  const [googleSubmitting, setGoogleSubmitting] = useState(false);
   const [sent, setSent] = useState(false);
   const [error, setError] = useState<string | null>(null);
 
@@ -62,6 +64,16 @@ function AdminLoginPage() {
       return;
     }
     setSent(true);
+  };
+
+  const handleGoogleSignIn = async () => {
+    setError(null);
+    setGoogleSubmitting(true);
+    const { error: err } = await lovable.auth.signInWithOAuth("google", {
+      redirect_uri: `${window.location.origin}/auth/callback?redirect=/admin`,
+    });
+    setGoogleSubmitting(false);
+    if (err) setError(err.message);
   };
 
   return (
@@ -129,6 +141,31 @@ function AdminLoginPage() {
               </div>
 
               <form onSubmit={handleSubmit} className="mt-6 space-y-4">
+                <button
+                  type="button"
+                  onClick={handleGoogleSignIn}
+                  disabled={googleSubmitting || submitting}
+                  className="flex w-full items-center justify-center gap-2 rounded-2xl border border-primary/25 bg-background px-6 py-4 text-base font-bold text-foreground shadow-soft transition-all hover:bg-accent/40 active:scale-[0.99] disabled:cursor-not-allowed disabled:opacity-60"
+                >
+                  {googleSubmitting ? (
+                    <>
+                      <Loader2 className="h-4 w-4 animate-spin" />
+                      Opening Google…
+                    </>
+                  ) : (
+                    <>
+                      <Chrome className="h-4 w-4" />
+                      Continue with Google
+                    </>
+                  )}
+                </button>
+
+                <div className="flex items-center gap-3 text-xs font-semibold uppercase tracking-[0.16em] text-muted-foreground">
+                  <span className="h-px flex-1 bg-border" />
+                  or email link
+                  <span className="h-px flex-1 bg-border" />
+                </div>
+
                 <div>
                   <label className="text-sm font-semibold text-foreground">
                     Staff email address
