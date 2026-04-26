@@ -45,11 +45,11 @@ serve(async (req) => {
 
     const { data: existingOrder } = await supabase
       .from("orders")
-      .select("buyer_email, stripe_customer_id")
+      .select("buyer_email, stripe_customer_id, stripe_env")
       .eq("id", orderId)
       .maybeSingle();
 
-    let customerId = existingOrder?.stripe_customer_id ?? null;
+    let customerId = existingOrder?.stripe_env === env ? existingOrder?.stripe_customer_id ?? null : null;
     if (!customerId) {
       const customer = await stripe.customers.create({
         email:
@@ -71,17 +71,20 @@ serve(async (req) => {
       description: "RibbonSong personalized song",
     });
 
-    supabase
+    const { error: updateError } = await supabase
       .from("orders")
       .update({
         stripe_payment_intent_id: paymentIntent.id,
         stripe_customer_id: customerId,
+        stripe_env: env,
         payment_status: "checkout_started",
       })
-      .eq("id", orderId)
-      .then(({ error }) => {
-        if (error) console.error("orders.update (non-blocking) failed:", error);
-      });
+      .eq("id", orderId);
+
+    if (updateError) {
+      console.error("orders.update failed:", updateError);
+      return json({ error: "Could not update order checkout state" }, 500);
+    }
 
     return json({
       clientSecret: paymentIntent.client_secret,
