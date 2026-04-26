@@ -57,48 +57,87 @@ export function StripeCustomCheckout(props: Props) {
     const myToken = ++fetchTokenRef.current;
     setLoading(true);
     setFetchError(null);
-    try {
-      const { data: authData } = await supabase.auth.getUser();
-      const userId = authData.user?.id ?? null;
-      console.log("[checkout] requesting payment intent", { orderId, amountVersion });
-      const { data, error } = await supabase.functions.invoke("create-payment-intent", {
-        body: {
+
+    const { data: authData } = await supabase.auth.getUser();
+    const userId = authData.user?.id ?? null;
+
+    // Retry with exponential backoff on transient errors (503 / network blips).
+    // Edge Runtime occasionally returns SUPABASE_EDGE_RUNTIME_ERROR on cold
+    // boots — the next call almost always succeeds.
+    const MAX_ATTEMPTS = 4;
+    const BACKOFFS_MS = [400, 900, 1800];
+    let lastErrorMsg = "Could not start checkout. Please try again.";
+
+    for (let attempt = 0; attempt < MAX_ATTEMPTS; attempt++) {
+      if (myToken !== fetchTokenRef.current) return; // superseded
+      try {
+        console.log("[checkout] requesting payment intent", {
           orderId,
-          environment: stripeEnvironment,
-          quizPatch,
-          quizSnapshot,
-          userId,
-        },
-      });
-      if (myToken !== fetchTokenRef.current) return; // stale
-      if (error) {
-        console.error("[checkout] create-payment-intent invoke error:", error);
-        const msg = error.message || "Could not start checkout. Please try again.";
+          amountVersion,
+          attempt: attempt + 1,
+        });
+        const { data, error } = await supabase.functions.invoke("create-payment-intent", {
+          body: { orderId, environment: stripeEnvironment, quizPatch, quizSnapshot, userId },
+        });
+        if (myToken !== fetchTokenRef.current) return;
+
+        if (error) {
+          const status = (error as { context?: { status?: number } })?.context?.status;
+          const msg = error.message || "Could not start checkout.";
+          lastErrorMsg = msg;
+          // 503 / 504 / network = transient — retry. 4xx = real error, fail fast.
+          const transient = !status || status === 503 || status === 504 || status === 408 || status === 502 || /service is temporarily unavailable|runtime_error|failed to fetch|network/i.test(msg);
+          if (transient && attempt < MAX_ATTEMPTS - 1) {
+            console.warn(`[checkout] transient error (status=${status}), retrying in ${BACKOFFS_MS[attempt]}ms`);
+            await new Promise((r) => setTimeout(r, BACKOFFS_MS[attempt]));
+            continue;
+          }
+          console.error("[checkout] create-payment-intent invoke error:", error);
+          setFetchError(msg);
+          onError?.(msg);
+          setLoading(false);
+          return;
+        }
+
+        if (!data?.clientSecret) {
+          const msg = (data as { error?: string })?.error || "Checkout could not be initialized.";
+          console.error("[checkout] no clientSecret:", data);
+          setFetchError(msg);
+          onError?.(msg);
+          setLoading(false);
+          return;
+        }
+
+        console.log("[checkout] PI ready", { paymentIntentId: data.paymentIntentId });
+        setSession({
+          clientSecret: data.clientSecret as string,
+          paymentIntentId: data.paymentIntentId as string,
+          amount: data.amount as number,
+          currency: data.currency as string,
+        });
+        setLoading(false);
+        return;
+      } catch (e: unknown) {
+        const msg = e instanceof Error ? e.message : "Network error preparing checkout.";
+        lastErrorMsg = msg;
+        if (attempt < MAX_ATTEMPTS - 1) {
+          console.warn(`[checkout] threw "${msg}", retrying in ${BACKOFFS_MS[attempt]}ms`);
+          await new Promise((r) => setTimeout(r, BACKOFFS_MS[attempt]));
+          continue;
+        }
+        console.error("[checkout] fetch threw after retries:", e);
         setFetchError(msg);
         onError?.(msg);
+        setLoading(false);
         return;
       }
-      if (!data?.clientSecret) {
-        const msg = (data as any)?.error || "Checkout could not be initialized.";
-        console.error("[checkout] no clientSecret:", data);
-        setFetchError(msg);
-        onError?.(msg);
-        return;
-      }
-      console.log("[checkout] PI ready", { paymentIntentId: data.paymentIntentId });
-      setSession({
-        clientSecret: data.clientSecret as string,
-        paymentIntentId: data.paymentIntentId as string,
-        amount: data.amount as number,
-        currency: data.currency as string,
-      });
-    } catch (e: any) {
-      const msg = e?.message || "Network error preparing checkout.";
-      console.error("[checkout] fetch threw:", e);
-      setFetchError(msg);
-      onError?.(msg);
-    } finally {
-      if (myToken === fetchTokenRef.current) setLoading(false);
+    }
+
+    // Defensive: fell through the loop without resolving.
+    if (myToken === fetchTokenRef.current) {
+      setFetchError(lastErrorMsg);
+      onError?.(lastErrorMsg);
+      setLoading(false);
     }
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [orderId, amountVersion]);
