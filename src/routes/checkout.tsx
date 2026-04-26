@@ -517,9 +517,13 @@ function CheckoutPage() {
             )}
           </div>
 
-          {/* Embedded Stripe Checkout — mounts inline once we have an orderId */}
+          {/* Embedded Stripe Checkout — mounts inline once we have an orderId.
+              Stripe Embedded Checkout collects email itself, so we don't gate
+              on the local email/name fields. The fields above stay as a
+              convenience to pre-fill and to attach the order to the buyer's
+              identity in our DB. */}
           <div className="mt-6 border-t border-peach/70">
-            {orderId && ready ? (
+            {orderId ? (
               <StripeEmbeddedCheckout
                 orderId={orderId}
                 amountVersion={amountVersion}
@@ -529,11 +533,6 @@ function CheckoutPage() {
               />
             ) : (
               <div className="space-y-4 p-4 md:p-6">
-                {!ready && orderId && (
-                  <p className="text-center text-sm text-muted-foreground">
-                    Enter your email and name above to load the payment form.
-                  </p>
-                )}
                 {creatingOrder && (
                   <p className="text-center text-sm text-muted-foreground">
                     Preparing your secure checkout…
