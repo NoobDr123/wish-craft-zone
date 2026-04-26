@@ -236,6 +236,18 @@ async function handlePaymentSucceeded(pi: any, env: StripeEnv) {
       .single();
 
     const productConfig = (order?.product_config as Record<string, boolean>) || {};
+
+    // Idempotency: charge-upsell already optimistically applied this upsell
+    // (flag + product_config + amount_paid_cents). Don't double-apply.
+    if (productConfig[upsellType]) {
+      await supabase.from("job_events").insert({
+        order_id: orderId,
+        event_type: "upsell_webhook_skipped_already_applied",
+        payload: { upsellType, paymentIntentId: pi.id },
+      });
+      return;
+    }
+
     productConfig[upsellType] = true;
 
     const updates: Record<string, unknown> = {
@@ -257,7 +269,7 @@ async function handlePaymentSucceeded(pi: any, env: StripeEnv) {
     await supabase.from("job_events").insert({
       order_id: orderId,
       event_type: "upsell_charged",
-      payload: { upsellType, paymentIntentId: pi.id, amount: pi.amount_received },
+      payload: { upsellType, paymentIntentId: pi.id, amount: pi.amount_received, source: "webhook" },
     });
   }
 }
