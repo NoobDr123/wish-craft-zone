@@ -1,5 +1,5 @@
 import { createFileRoute, useNavigate } from "@tanstack/react-router";
-import { useEffect } from "react";
+import { useEffect, useState } from "react";
 import { Logo } from "@/components/Logo";
 import { useQuizStore } from "@/stores/quizStore";
 import { ArrowRight, ShieldCheck, Star } from "lucide-react";
