@@ -309,6 +309,8 @@ function CheckoutPage() {
         final_amount_cents: data.final_amount_cents,
         free: data.free,
       });
+      // Force the embedded checkout to re-fetch a session with the new amount.
+      setAmountVersion((v) => v + 1);
 
       if (data.free) {
         // Skip Stripe entirely — order is already marked paid + queued
