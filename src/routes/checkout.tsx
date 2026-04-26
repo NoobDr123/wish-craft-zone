@@ -80,8 +80,10 @@ function CheckoutPage() {
 
   useEffect(() => {
     if (!hydrated) return;
-    if (!q.recipient_name) navigate({ to: "/create" });
-  }, [hydrated, q.recipient_name, navigate]);
+    if (!q.recipient_name && !q.orderId && !getPrefetchedCheckout()) {
+      setError("Checkout session not found. Please finish the quiz first.");
+    }
+  }, [hydrated, q.recipient_name, q.orderId]);
 
   // Track checkout page view once hydrated
   useEffect(() => {
