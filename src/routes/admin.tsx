@@ -1164,6 +1164,7 @@ function UpsellsPanel() {
 
   const load = async (signal?: { active: boolean }) => {
     const start = rangeStart(range);
+    const end = rangeEnd(range);
     const allowed = await fetchAllowedSessionIds(start?.toISOString());
     let eq = supabase
       .from("quiz_events")
@@ -1172,6 +1173,7 @@ function UpsellsPanel() {
       .order("created_at", { ascending: false })
       .limit(5000);
     if (start) eq = eq.gte("created_at", start.toISOString());
+    if (end) eq = eq.lt("created_at", end.toISOString());
     let oq = supabase
       .from("orders")
       .select("has_3rd_verse, is_rush, has_unlimited_edits, payment_status, created_at")
@@ -1179,6 +1181,7 @@ function UpsellsPanel() {
       .order("created_at", { ascending: false })
       .limit(2000);
     if (start) oq = oq.gte("created_at", start.toISOString());
+    if (end) oq = oq.lt("created_at", end.toISOString());
     const [{ data: events }, { data: orders }] = await Promise.all([eq, oq]);
     if (signal && !signal.active) return;
     // Filter quiz events to production-host sessions only.
