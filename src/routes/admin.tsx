@@ -1468,7 +1468,9 @@ function EmailsPanel() {
       .order("created_at", { ascending: false })
       .limit(2000);
     const start = rangeStart(range);
+    const end = rangeEnd(range);
     if (start) q = q.gte("created_at", start.toISOString());
+    if (end) q = q.lt("created_at", end.toISOString());
     const { data } = await q;
     const { data: sup } = await supabase
       .from("suppressed_emails")
