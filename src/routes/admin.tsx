@@ -515,7 +515,7 @@ function DashboardPanel() {
       <div className="mb-6 flex items-center justify-between">
         <div>
           <h1 className="font-display text-3xl font-semibold">Dashboard</h1>
-          <p className="text-sm text-muted-foreground">Revenue, sales, upsells, payments at a glance.</p>
+          <p className="text-sm text-muted-foreground">Revenue, sales, upsells, payments at a glance. All times in Eastern Time (EST/EDT).</p>
         </div>
         <RangeSelector value={range} onChange={setRange} />
       </div>
