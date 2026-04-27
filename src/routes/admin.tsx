@@ -441,6 +441,7 @@ function DashboardPanel() {
   const load = async (signal?: { active: boolean }) => {
     setLoading(true);
     const start = rangeStart(range);
+    const end = rangeEnd(range);
     let q = supabase
       .from("orders")
       .select("id, amount_paid_cents, amount_cents, payment_status, status, has_3rd_verse, is_rush, has_unlimited_edits, created_at")
@@ -448,6 +449,7 @@ function DashboardPanel() {
       .order("created_at", { ascending: false })
       .limit(2000);
     if (start) q = q.gte("created_at", start.toISOString());
+    if (end) q = q.lt("created_at", end.toISOString());
     const { data: rows } = await q;
     if (signal && !signal.active) return;
     const orders = rows ?? [];
@@ -459,7 +461,7 @@ function DashboardPanel() {
 
     const byDay: Record<string, { cents: number; orders: number }> = {};
     for (const o of paid) {
-      const d = new Date(o.created_at).toISOString().slice(0, 10);
+      const d = estDateKey(o.created_at);
       if (!byDay[d]) byDay[d] = { cents: 0, orders: 0 };
       byDay[d].cents += o.amount_paid_cents ?? 0;
       byDay[d].orders += 1;
