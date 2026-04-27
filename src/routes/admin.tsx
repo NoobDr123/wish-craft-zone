@@ -431,27 +431,77 @@ interface DashboardData {
   aovCents: number;
   upsellCounts: { extra_verse: number; rush_delivery: number; unlimited_edits: number };
   dailySales: { date: string; cents: number; orders: number }[];
+  // Funnel/conversion (within selected range, production hosts only)
+  uniqueVisitors: number;
+  quizStarts: number;
+  quizCompletes: number;
+  quizCompletionPct: number;
+  conversionPct: number; // paid / uniqueVisitors
+  // Lifetime customer metrics (all-time, ignores range)
+  lifetimeCustomerCount: number;
+  lifetimeRevenueCents: number;
+  lifetimeLtvCents: number;
+  lifetimeRepeatPct: number;
+  // Recent orders (paid only, latest 10 in range)
+  recentOrders: Array<{
+    id: string;
+    created_at: string;
+    buyer_email: string;
+    buyer_name: string | null;
+    amount_paid_cents: number;
+    payment_status: string;
+    status: string;
+  }>;
 }
 
 function DashboardPanel() {
   const [range, setRange] = useState<Range>("7d");
   const [data, setData] = useState<DashboardData | null>(null);
   const [loading, setLoading] = useState(true);
+  const [liveVisitors, setLiveVisitors] = useState<number>(0);
 
   const load = async (signal?: { active: boolean }) => {
     setLoading(true);
     const start = rangeStart(range);
     const end = rangeEnd(range);
-    let q = supabase
+
+    // ---- Orders in range
+    let ordersQ = supabase
       .from("orders")
-      .select("id, amount_paid_cents, amount_cents, payment_status, status, has_3rd_verse, is_rush, has_unlimited_edits, created_at")
+      .select("id, buyer_email, buyer_name, customer_name, amount_paid_cents, amount_cents, payment_status, status, has_3rd_verse, is_rush, has_unlimited_edits, created_at")
       .not("buyer_email", "like", "pending+%@ribbonsong.com")
       .order("created_at", { ascending: false })
       .limit(2000);
-    if (start) q = q.gte("created_at", start.toISOString());
-    if (end) q = q.lt("created_at", end.toISOString());
-    const { data: rows } = await q;
+    if (start) ordersQ = ordersQ.gte("created_at", start.toISOString());
+    if (end) ordersQ = ordersQ.lt("created_at", end.toISOString());
+
+    // ---- Quiz events in range (for conversion + completion rate)
+    let quizQ = supabase
+      .from("quiz_events")
+      .select("session_id, event_type, created_at")
+      .in("event_type", ["lander_view", "quiz_start", "quiz_complete"])
+      .order("created_at", { ascending: false })
+      .limit(10000);
+    if (start) quizQ = quizQ.gte("created_at", start.toISOString());
+    if (end) quizQ = quizQ.lt("created_at", end.toISOString());
+
+    // ---- Lifetime customer rollup (all-time, paid orders only)
+    const lifetimeQ = supabase
+      .from("orders")
+      .select("buyer_email, amount_paid_cents, payment_status")
+      .not("buyer_email", "like", "pending+%@ribbonsong.com")
+      .in("payment_status", ["paid", "succeeded"])
+      .limit(20000);
+
+    const allowedSessions = await fetchAllowedSessionIds(start?.toISOString());
+
+    const [{ data: rows }, { data: quizEvents }, { data: lifetimeRows }] = await Promise.all([
+      ordersQ,
+      quizQ,
+      lifetimeQ,
+    ]);
     if (signal && !signal.active) return;
+
     const orders = rows ?? [];
     const paid = orders.filter((o) => o.payment_status === "paid" || o.payment_status === "succeeded");
     const failed = orders.filter((o) => o.payment_status === "failed");
@@ -459,6 +509,7 @@ function DashboardPanel() {
     const revenueCents = paid.reduce((s, o) => s + (o.amount_paid_cents ?? 0), 0);
     const aovCents = paid.length > 0 ? Math.round(revenueCents / paid.length) : 0;
 
+    // Daily sales grouped by EST date
     const byDay: Record<string, { cents: number; orders: number }> = {};
     for (const o of paid) {
       const d = estDateKey(o.created_at);
@@ -469,6 +520,47 @@ function DashboardPanel() {
     const dailySales = Object.entries(byDay)
       .map(([date, v]) => ({ date, cents: v.cents, orders: v.orders }))
       .sort((a, b) => a.date.localeCompare(b.date));
+
+    // Funnel from quiz events (production sessions only)
+    const evts = (quizEvents ?? []).filter((e) => allowedSessions.has(e.session_id));
+    const landers = new Set<string>();
+    const starts = new Set<string>();
+    const completes = new Set<string>();
+    for (const e of evts) {
+      if (e.event_type === "lander_view") landers.add(e.session_id);
+      if (e.event_type === "quiz_start") starts.add(e.session_id);
+      if (e.event_type === "quiz_complete") completes.add(e.session_id);
+    }
+    const uniqueVisitors = landers.size;
+    const quizStarts = starts.size;
+    const quizCompletes = completes.size;
+    const quizCompletionPct = quizStarts > 0 ? (quizCompletes / quizStarts) * 100 : 0;
+    const conversionPct = uniqueVisitors > 0 ? (paid.length / uniqueVisitors) * 100 : 0;
+
+    // Lifetime customer/LTV (all-time)
+    const ltvByEmail: Record<string, { cents: number; orders: number }> = {};
+    for (const o of lifetimeRows ?? []) {
+      const email = (o.buyer_email ?? "").toLowerCase();
+      if (!email) continue;
+      if (!ltvByEmail[email]) ltvByEmail[email] = { cents: 0, orders: 0 };
+      ltvByEmail[email].cents += o.amount_paid_cents ?? 0;
+      ltvByEmail[email].orders += 1;
+    }
+    const lifetimeCustomerCount = Object.keys(ltvByEmail).length;
+    const lifetimeRevenueCents = Object.values(ltvByEmail).reduce((s, v) => s + v.cents, 0);
+    const lifetimeLtvCents = lifetimeCustomerCount > 0 ? Math.round(lifetimeRevenueCents / lifetimeCustomerCount) : 0;
+    const repeatBuyers = Object.values(ltvByEmail).filter((v) => v.orders > 1).length;
+    const lifetimeRepeatPct = lifetimeCustomerCount > 0 ? (repeatBuyers / lifetimeCustomerCount) * 100 : 0;
+
+    const recentOrders = paid.slice(0, 10).map((o) => ({
+      id: o.id,
+      created_at: o.created_at,
+      buyer_email: o.buyer_email,
+      buyer_name: o.buyer_name ?? o.customer_name ?? null,
+      amount_paid_cents: o.amount_paid_cents ?? 0,
+      payment_status: o.payment_status,
+      status: o.status,
+    }));
 
     setData({
       revenueCents,
@@ -483,8 +575,31 @@ function DashboardPanel() {
         unlimited_edits: paid.filter((o) => o.has_unlimited_edits).length,
       },
       dailySales,
+      uniqueVisitors,
+      quizStarts,
+      quizCompletes,
+      quizCompletionPct,
+      conversionPct,
+      lifetimeCustomerCount,
+      lifetimeRevenueCents,
+      lifetimeLtvCents,
+      lifetimeRepeatPct,
+      recentOrders,
     });
     setLoading(false);
+  };
+
+  // Live visitors: distinct sessions on a production host active in the last 5 min.
+  const loadLive = async () => {
+    const fiveMinAgo = new Date(Date.now() - 5 * 60 * 1000).toISOString();
+    const { data: rows } = await supabase
+      .from("page_sessions")
+      .select("session_id")
+      .in("host", ALLOWED_HOSTS)
+      .gte("last_seen_at", fiveMinAgo)
+      .limit(2000);
+    const unique = new Set((rows ?? []).map((r) => r.session_id));
+    setLiveVisitors(unique.size);
   };
 
   useEffect(() => {
@@ -494,7 +609,15 @@ function DashboardPanel() {
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [range]);
 
+  // Refresh "live" count every 20s.
+  useEffect(() => {
+    loadLive();
+    const t = setInterval(loadLive, 20_000);
+    return () => clearInterval(t);
+  }, []);
+
   useRealtimeRefresh("orders", () => load());
+  useRealtimeRefresh("quiz_events", () => load(), { debounceMs: 2000 });
 
   if (loading || !data) {
     return (
@@ -512,26 +635,73 @@ function DashboardPanel() {
 
   return (
     <>
-      <div className="mb-6 flex items-center justify-between">
+      <div className="mb-6 flex items-center justify-between gap-4 flex-wrap">
         <div>
           <h1 className="font-display text-3xl font-semibold">Dashboard</h1>
-          <p className="text-sm text-muted-foreground">Revenue, sales, upsells, payments at a glance. All times in Eastern Time (EST/EDT).</p>
+          <p className="text-sm text-muted-foreground">Revenue, conversion, customers, and live activity. All times in Eastern Time (EST/EDT).</p>
         </div>
         <RangeSelector value={range} onChange={setRange} />
       </div>
 
-      {/* Top KPI row */}
+      {/* Live + headline KPIs */}
       <div className="grid grid-cols-2 gap-4 md:grid-cols-4">
+        <div className="rounded-2xl border border-emerald-500/30 bg-emerald-500/5 p-5">
+          <div className="flex items-center gap-2 text-xs uppercase tracking-wider text-emerald-700">
+            <span className="relative flex h-2 w-2">
+              <span className="absolute inline-flex h-full w-full animate-ping rounded-full bg-emerald-500 opacity-75"></span>
+              <span className="relative inline-flex h-2 w-2 rounded-full bg-emerald-500"></span>
+            </span>
+            Live on site
+          </div>
+          <div className="mt-2 font-display text-3xl font-semibold text-emerald-700">{liveVisitors}</div>
+          <div className="mt-1 text-xs text-muted-foreground">active in the last 5 min</div>
+        </div>
         <StatCard label="Revenue" value={fmtMoney(data.revenueCents)} sub={`${data.paidCount} paid orders`} tone="success" />
-        <StatCard label="AOV" value={fmtMoney(data.aovCents)} sub={`avg order value`} />
+        <StatCard label="AOV" value={fmtMoney(data.aovCents)} sub="avg order value" />
         <StatCard label="Orders" value={data.orderCount} sub={`${data.paidCount} paid · ${data.pendingCount} pending`} />
-        <StatCard label="Failed payments" value={data.failedCount} tone={data.failedCount > 0 ? "danger" : "muted"} />
+      </div>
+
+      {/* Conversion + funnel rates */}
+      <div className="mt-4 grid grid-cols-2 gap-4 md:grid-cols-4">
+        <StatCard
+          label="Visitors"
+          value={data.uniqueVisitors}
+          sub="unique landers (prod)"
+        />
+        <StatCard
+          label="Conversion rate"
+          value={data.uniqueVisitors > 0 ? `${data.conversionPct.toFixed(2)}%` : "—"}
+          sub={`${data.paidCount} paid / ${data.uniqueVisitors} visitors`}
+          tone={data.conversionPct > 0 ? "success" : "muted"}
+        />
+        <StatCard
+          label="Quiz completion"
+          value={data.quizStarts > 0 ? `${data.quizCompletionPct.toFixed(1)}%` : "—"}
+          sub={`${data.quizCompletes} of ${data.quizStarts} starts`}
+        />
+        <StatCard
+          label="Failed payments"
+          value={data.failedCount}
+          tone={data.failedCount > 0 ? "danger" : "muted"}
+        />
+      </div>
+
+      {/* Lifetime customer / LTV */}
+      <div className="mt-8">
+        <h2 className="font-display text-xl font-semibold mb-1">Customers (all-time)</h2>
+        <p className="text-sm text-muted-foreground mb-4">Lifetime value across every paying customer, regardless of the date range above.</p>
+        <div className="grid grid-cols-2 gap-4 md:grid-cols-4">
+          <StatCard label="Customers" value={data.lifetimeCustomerCount} sub="unique paying emails" />
+          <StatCard label="Lifetime revenue" value={fmtMoney(data.lifetimeRevenueCents)} tone="success" />
+          <StatCard label="LTV" value={fmtMoney(data.lifetimeLtvCents)} sub="avg revenue per customer" />
+          <StatCard label="Repeat buyers" value={`${data.lifetimeRepeatPct.toFixed(1)}%`} sub="ordered more than once" />
+        </div>
       </div>
 
       {/* Daily sales chart */}
       <div className="mt-8 rounded-2xl border border-border bg-card p-6">
         <h2 className="font-display text-xl font-semibold">Daily sales</h2>
-        <p className="text-sm text-muted-foreground">Revenue per day in the selected range.</p>
+        <p className="text-sm text-muted-foreground">Revenue per day in the selected range (EST).</p>
         {data.dailySales.length === 0 ? (
           <p className="mt-8 text-center text-muted-foreground">No sales in this range.</p>
         ) : (
@@ -552,6 +722,57 @@ function DashboardPanel() {
               </div>
             ))}
           </div>
+        )}
+      </div>
+
+      {/* Recent orders */}
+      <div className="mt-8 rounded-2xl border border-border bg-card overflow-hidden">
+        <div className="px-6 py-4 border-b border-border flex items-center justify-between">
+          <div>
+            <h2 className="font-display text-xl font-semibold">Recent paid orders</h2>
+            <p className="text-sm text-muted-foreground">Latest sales in the selected range.</p>
+          </div>
+          <Badge variant="outline" className="text-[10px]">{data.recentOrders.length} shown</Badge>
+        </div>
+        {data.recentOrders.length === 0 ? (
+          <p className="px-6 py-8 text-center text-muted-foreground">No paid orders in this range.</p>
+        ) : (
+          <table className="w-full text-sm">
+            <thead className="bg-muted/30 text-left">
+              <tr>
+                <th className="p-3">When (EST)</th>
+                <th className="p-3">Customer</th>
+                <th className="p-3">Email</th>
+                <th className="p-3">Status</th>
+                <th className="p-3 text-right">Amount</th>
+              </tr>
+            </thead>
+            <tbody>
+              {data.recentOrders.map((o) => (
+                <tr key={o.id} className="border-t border-border/40">
+                  <td className="p-3 text-muted-foreground whitespace-nowrap">
+                    {new Intl.DateTimeFormat("en-US", {
+                      timeZone: ADMIN_TZ,
+                      month: "short",
+                      day: "numeric",
+                      hour: "numeric",
+                      minute: "2-digit",
+                    }).format(new Date(o.created_at))}
+                  </td>
+                  <td className="p-3 font-medium">{o.buyer_name ?? "—"}</td>
+                  <td className="p-3 text-muted-foreground">{o.buyer_email}</td>
+                  <td className="p-3">
+                    <Badge variant="outline" className="text-[10px] capitalize">
+                      {o.status.replace(/_/g, " ")}
+                    </Badge>
+                  </td>
+                  <td className="p-3 text-right font-medium text-emerald-600">
+                    {fmtMoney(o.amount_paid_cents)}
+                  </td>
+                </tr>
+              ))}
+            </tbody>
+          </table>
         )}
       </div>
 
