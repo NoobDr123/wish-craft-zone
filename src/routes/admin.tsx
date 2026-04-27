@@ -234,21 +234,121 @@ function StaffPage() {
    Shared helpers
    ===================================================================== */
 
-type Range = "24h" | "7d" | "30d" | "all";
-const RANGES: Range[] = ["24h", "7d", "30d", "all"];
+// All admin date math is anchored to America/New_York (Eastern Time).
+// "Today" and "Yesterday" mean the EST/EDT calendar day, not rolling 24h.
+const ADMIN_TZ = "America/New_York";
+
+type Range = "today" | "yesterday" | "24h" | "7d" | "30d" | "90d" | "mtd" | "ytd" | "all";
+const RANGES: Range[] = ["today", "yesterday", "24h", "7d", "30d", "90d", "mtd", "ytd", "all"];
+
+const RANGE_LABELS: Record<Range, string> = {
+  today: "Today",
+  yesterday: "Yesterday",
+  "24h": "Last 24h",
+  "7d": "7 days",
+  "30d": "30 days",
+  "90d": "90 days",
+  mtd: "Month to date",
+  ytd: "Year to date",
+  all: "All time",
+};
+
+/** Get the Y/M/D parts for `now` as observed in the admin (EST) timezone. */
+function estParts(now: Date = new Date()) {
+  const fmt = new Intl.DateTimeFormat("en-US", {
+    timeZone: ADMIN_TZ,
+    year: "numeric",
+    month: "2-digit",
+    day: "2-digit",
+    hour: "2-digit",
+    minute: "2-digit",
+    second: "2-digit",
+    hour12: false,
+  });
+  const parts = Object.fromEntries(fmt.formatToParts(now).map((p) => [p.type, p.value]));
+  return {
+    year: Number(parts.year),
+    month: Number(parts.month),
+    day: Number(parts.day),
+  };
+}
+
+/** Returns the UTC instant corresponding to midnight EST on the given EST y/m/d (offset days back). */
+function estMidnightUtc(daysBackFromToday: number = 0): Date {
+  const { year, month, day } = estParts();
+  // Anchor at noon UTC of that EST day so DST shifts can't bump us a day.
+  const anchor = new Date(Date.UTC(year, month - 1, day - daysBackFromToday, 12, 0, 0));
+  // Compute EST offset for that anchor and subtract to land on EST midnight.
+  const fmt = new Intl.DateTimeFormat("en-US", {
+    timeZone: ADMIN_TZ,
+    hour: "2-digit",
+    hour12: false,
+  });
+  const estHour = Number(
+    fmt.formatToParts(anchor).find((p) => p.type === "hour")?.value ?? "12",
+  );
+  const offsetHours = 12 - estHour; // hours to subtract from anchor to get EST midnight in UTC
+  return new Date(anchor.getTime() - offsetHours * 60 * 60 * 1000);
+}
 
 function rangeStart(r: Range): Date | null {
   if (r === "all") return null;
-  const d = new Date();
-  if (r === "24h") d.setHours(d.getHours() - 24);
-  if (r === "7d") d.setDate(d.getDate() - 7);
-  if (r === "30d") d.setDate(d.getDate() - 30);
-  return d;
+  if (r === "24h") {
+    const d = new Date();
+    d.setHours(d.getHours() - 24);
+    return d;
+  }
+  if (r === "today") return estMidnightUtc(0);
+  if (r === "yesterday") return estMidnightUtc(1);
+  if (r === "7d") return estMidnightUtc(6);
+  if (r === "30d") return estMidnightUtc(29);
+  if (r === "90d") return estMidnightUtc(89);
+  if (r === "mtd") {
+    const { year, month } = estParts();
+    return estMidnightUtcFor(year, month, 1);
+  }
+  if (r === "ytd") {
+    const { year } = estParts();
+    return estMidnightUtcFor(year, 1, 1);
+  }
+  return null;
+}
+
+/** Like estMidnightUtc but for an arbitrary EST y/m/d. */
+function estMidnightUtcFor(year: number, month: number, day: number): Date {
+  const anchor = new Date(Date.UTC(year, month - 1, day, 12, 0, 0));
+  const fmt = new Intl.DateTimeFormat("en-US", {
+    timeZone: ADMIN_TZ,
+    hour: "2-digit",
+    hour12: false,
+  });
+  const estHour = Number(
+    fmt.formatToParts(anchor).find((p) => p.type === "hour")?.value ?? "12",
+  );
+  const offsetHours = 12 - estHour;
+  return new Date(anchor.getTime() - offsetHours * 60 * 60 * 1000);
+}
+
+/** Optional end-of-range cap (used only for "yesterday" — needs an upper bound). */
+function rangeEnd(r: Range): Date | null {
+  if (r === "yesterday") return estMidnightUtc(0);
+  return null;
+}
+
+/** Format a UTC ISO timestamp as a YYYY-MM-DD string in EST. Used for daily grouping. */
+function estDateKey(iso: string): string {
+  const fmt = new Intl.DateTimeFormat("en-CA", {
+    timeZone: ADMIN_TZ,
+    year: "numeric",
+    month: "2-digit",
+    day: "2-digit",
+  });
+  return fmt.format(new Date(iso));
 }
 
 function RangeSelector({ value, onChange }: { value: Range; onChange: (r: Range) => void }) {
   return (
-    <div className="flex gap-2">
+    <div className="flex flex-wrap gap-2">
       {RANGES.map((r) => (
         <button
           key={r}
@@ -259,9 +359,12 @@ function RangeSelector({ value, onChange }: { value: Range; onChange: (r: Range)
               : "border-border bg-card hover:border-primary/40"
           }`}
         >
-          {r === "24h" ? "Last 24h" : r === "7d" ? "7 days" : r === "30d" ? "30 days" : "All time"}
+          {RANGE_LABELS[r]}
         </button>
       ))}
+      <span className="ml-2 self-center text-[10px] uppercase tracking-wider text-muted-foreground">
+        EST
+      </span>
     </div>
   );
 }
@@ -338,6 +441,7 @@ function DashboardPanel() {
   const load = async (signal?: { active: boolean }) => {
     setLoading(true);
     const start = rangeStart(range);
+    const end = rangeEnd(range);
     let q = supabase
       .from("orders")
       .select("id, amount_paid_cents, amount_cents, payment_status, status, has_3rd_verse, is_rush, has_unlimited_edits, created_at")
@@ -345,6 +449,7 @@ function DashboardPanel() {
       .order("created_at", { ascending: false })
       .limit(2000);
     if (start) q = q.gte("created_at", start.toISOString());
+    if (end) q = q.lt("created_at", end.toISOString());
     const { data: rows } = await q;
     if (signal && !signal.active) return;
     const orders = rows ?? [];
@@ -356,7 +461,7 @@ function DashboardPanel() {
 
     const byDay: Record<string, { cents: number; orders: number }> = {};
     for (const o of paid) {
-      const d = new Date(o.created_at).toISOString().slice(0, 10);
+      const d = estDateKey(o.created_at);
       if (!byDay[d]) byDay[d] = { cents: 0, orders: 0 };
       byDay[d].cents += o.amount_paid_cents ?? 0;
       byDay[d].orders += 1;
@@ -410,7 +515,7 @@ function DashboardPanel() {
       <div className="mb-6 flex items-center justify-between">
         <div>
           <h1 className="font-display text-3xl font-semibold">Dashboard</h1>
-          <p className="text-sm text-muted-foreground">Revenue, sales, upsells, payments at a glance.</p>
+          <p className="text-sm text-muted-foreground">Revenue, sales, upsells, payments at a glance. All times in Eastern Time (EST/EDT).</p>
         </div>
         <RangeSelector value={range} onChange={setRange} />
       </div>
@@ -545,6 +650,7 @@ function FunnelPanel() {
   const load = async (signal?: { active: boolean }) => {
     setLoading(true);
     const start = rangeStart(range);
+    const end = rangeEnd(range);
     const allowed = await fetchAllowedSessionIds(start?.toISOString());
     let q = supabase
       .from("quiz_events")
@@ -552,6 +658,7 @@ function FunnelPanel() {
       .order("created_at", { ascending: false })
       .limit(10000);
     if (start) q = q.gte("created_at", start.toISOString());
+    if (end) q = q.lt("created_at", end.toISOString());
     const { data: events } = await q;
     if (signal && !signal.active) return;
     // Filter to only events from production-host sessions (ribbonsong.com).
@@ -1057,6 +1164,7 @@ function UpsellsPanel() {
 
   const load = async (signal?: { active: boolean }) => {
     const start = rangeStart(range);
+    const end = rangeEnd(range);
     const allowed = await fetchAllowedSessionIds(start?.toISOString());
     let eq = supabase
       .from("quiz_events")
@@ -1065,6 +1173,7 @@ function UpsellsPanel() {
       .order("created_at", { ascending: false })
       .limit(5000);
     if (start) eq = eq.gte("created_at", start.toISOString());
+    if (end) eq = eq.lt("created_at", end.toISOString());
     let oq = supabase
       .from("orders")
       .select("has_3rd_verse, is_rush, has_unlimited_edits, payment_status, created_at")
@@ -1072,6 +1181,7 @@ function UpsellsPanel() {
       .order("created_at", { ascending: false })
       .limit(2000);
     if (start) oq = oq.gte("created_at", start.toISOString());
+    if (end) oq = oq.lt("created_at", end.toISOString());
     const [{ data: events }, { data: orders }] = await Promise.all([eq, oq]);
     if (signal && !signal.active) return;
     // Filter quiz events to production-host sessions only.
@@ -1358,7 +1468,9 @@ function EmailsPanel() {
       .order("created_at", { ascending: false })
       .limit(2000);
     const start = rangeStart(range);
+    const end = rangeEnd(range);
     if (start) q = q.gte("created_at", start.toISOString());
+    if (end) q = q.lt("created_at", end.toISOString());
     const { data } = await q;
     const { data: sup } = await supabase
       .from("suppressed_emails")
