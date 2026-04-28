@@ -490,7 +490,26 @@ function PaymentForm({ amount, currency, email, name, returnUrl, paymentIntentId
       <div className="space-y-2">
         <label className="block text-[15px] font-semibold text-foreground">Card number</label>
         <div className="rounded-2xl border border-[#E5D9C8] bg-[#FBF6EC] px-4 py-[14px] transition-colors focus-within:border-primary focus-within:ring-[3px] focus-within:ring-primary/15">
-          <CardNumberElement options={cardNumberOptions} />
+          <CardNumberElement
+            options={cardNumberOptions}
+            onFocus={() => {
+              // Fire once per session — signal "started entering card".
+              try {
+                if (typeof window !== "undefined" && !sessionStorage.getItem("rs_card_started")) {
+                  sessionStorage.setItem("rs_card_started", "1");
+                  void import("@/lib/tracking").then(({ track }) => {
+                    void track({
+                      type: "checkout_card_started",
+                      buyerEmail: email || undefined,
+                      amountCents: amount,
+                    });
+                  });
+                }
+              } catch {
+                /* noop */
+              }
+            }}
+          />
         </div>
       </div>
 
