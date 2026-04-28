@@ -14,6 +14,169 @@ export type Database = {
   }
   public: {
     Tables: {
+      ad_campaigns: {
+        Row: {
+          aspect_ratio: string
+          background_image_url: string | null
+          created_at: string
+          created_by: string | null
+          duration_seconds: number
+          id: string
+          music_track_id: string | null
+          name: string
+          notes: string | null
+          overlays: Json
+          updated_at: string
+        }
+        Insert: {
+          aspect_ratio?: string
+          background_image_url?: string | null
+          created_at?: string
+          created_by?: string | null
+          duration_seconds?: number
+          id?: string
+          music_track_id?: string | null
+          name: string
+          notes?: string | null
+          overlays?: Json
+          updated_at?: string
+        }
+        Update: {
+          aspect_ratio?: string
+          background_image_url?: string | null
+          created_at?: string
+          created_by?: string | null
+          duration_seconds?: number
+          id?: string
+          music_track_id?: string | null
+          name?: string
+          notes?: string | null
+          overlays?: Json
+          updated_at?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "ad_campaigns_music_track_id_fkey"
+            columns: ["music_track_id"]
+            isOneToOne: false
+            referencedRelation: "ad_music_tracks"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      ad_music_tracks: {
+        Row: {
+          audio_url: string | null
+          cover_image_url: string | null
+          created_at: string
+          created_by: string | null
+          duration_seconds: number | null
+          genre: string | null
+          id: string
+          kie_error: string | null
+          kie_status: string
+          kie_task_id: string | null
+          lyrics: string | null
+          mood: string | null
+          prompt: string
+          title: string
+          updated_at: string
+        }
+        Insert: {
+          audio_url?: string | null
+          cover_image_url?: string | null
+          created_at?: string
+          created_by?: string | null
+          duration_seconds?: number | null
+          genre?: string | null
+          id?: string
+          kie_error?: string | null
+          kie_status?: string
+          kie_task_id?: string | null
+          lyrics?: string | null
+          mood?: string | null
+          prompt: string
+          title: string
+          updated_at?: string
+        }
+        Update: {
+          audio_url?: string | null
+          cover_image_url?: string | null
+          created_at?: string
+          created_by?: string | null
+          duration_seconds?: number | null
+          genre?: string | null
+          id?: string
+          kie_error?: string | null
+          kie_status?: string
+          kie_task_id?: string | null
+          lyrics?: string | null
+          mood?: string | null
+          prompt?: string
+          title?: string
+          updated_at?: string
+        }
+        Relationships: []
+      }
+      ad_renders: {
+        Row: {
+          aspect_ratio: string
+          campaign_id: string
+          cost_cents: number | null
+          created_at: string
+          created_by: string | null
+          duration_ms: number | null
+          error_message: string | null
+          id: string
+          lambda_bucket_name: string | null
+          lambda_render_id: string | null
+          output_url: string | null
+          progress: number | null
+          status: string
+          updated_at: string
+        }
+        Insert: {
+          aspect_ratio: string
+          campaign_id: string
+          cost_cents?: number | null
+          created_at?: string
+          created_by?: string | null
+          duration_ms?: number | null
+          error_message?: string | null
+          id?: string
+          lambda_bucket_name?: string | null
+          lambda_render_id?: string | null
+          output_url?: string | null
+          progress?: number | null
+          status?: string
+          updated_at?: string
+        }
+        Update: {
+          aspect_ratio?: string
+          campaign_id?: string
+          cost_cents?: number | null
+          created_at?: string
+          created_by?: string | null
+          duration_ms?: number | null
+          error_message?: string | null
+          id?: string
+          lambda_bucket_name?: string | null
+          lambda_render_id?: string | null
+          output_url?: string | null
+          progress?: number | null
+          status?: string
+          updated_at?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "ad_renders_campaign_id_fkey"
+            columns: ["campaign_id"]
+            isOneToOne: false
+            referencedRelation: "ad_campaigns"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       email_send_log: {
         Row: {
           created_at: string
