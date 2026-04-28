@@ -426,14 +426,14 @@ function CheckoutPage() {
             </span>
             <p className="flex items-baseline gap-2">
               {/* Reference price is always $99 — promo codes discount from
-                  the already-reduced $49.99 (50% OFF), not from $99. */}
+                  the already-reduced $29.99, not from $99. */}
               <span className="text-base font-medium text-muted-foreground line-through">
                 $99
               </span>
               <span className="font-display text-3xl font-bold text-primary">
                 {promoApplied
                   ? `$${(promoApplied.final_amount_cents / 100).toFixed(2)}`
-                  : "$49.99"}
+                  : "$29.99"}
               </span>
               <span className="text-sm font-semibold text-muted-foreground">
                 USD
@@ -635,7 +635,7 @@ function CheckoutFooter() {
             <Link to="/terms" className="underline hover:text-foreground">Terms of Service</Link>{" "}
             and{" "}
             <Link to="/privacy" className="underline hover:text-foreground">Privacy Policy</Link>.
-            Your card will be charged <span className="font-semibold text-foreground">$49.99 USD</span>{" "}
+            Your card will be charged <span className="font-semibold text-foreground">$29.99 USD</span>{" "}
             today as a one-time payment to RibbonSong. No subscription, no recurring charges.
           </p>
           <p>
