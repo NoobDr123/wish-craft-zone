@@ -439,8 +439,11 @@ interface DashboardData {
   uniqueVisitors: number;
   quizStarts: number;
   quizCompletes: number;
+  checkoutViews: number;
+  cardStarted: number;
   quizCompletionPct: number;
   conversionPct: number; // paid / uniqueVisitors
+  checkoutToPaidPct: number; // paid / cardStarted
   // Lifetime customer metrics (all-time, ignores range)
   lifetimeCustomerCount: number;
   lifetimeRevenueCents: number;
@@ -463,6 +466,7 @@ function DashboardPanel() {
   const [data, setData] = useState<DashboardData | null>(null);
   const [loading, setLoading] = useState(true);
   const [liveVisitors, setLiveVisitors] = useState<number>(0);
+  const [liveCardEntering, setLiveCardEntering] = useState<number>(0);
 
   const load = async (signal?: { active: boolean }) => {
     setLoading(true);
@@ -483,9 +487,9 @@ function DashboardPanel() {
     let quizQ = supabase
       .from("quiz_events")
       .select("session_id, event_type, created_at")
-      .in("event_type", ["lander_view", "quiz_start", "quiz_complete"])
+      .in("event_type", ["lander_view", "quiz_start", "quiz_complete", "checkout_view", "checkout_card_started"])
       .order("created_at", { ascending: false })
-      .limit(10000);
+      .limit(20000);
     if (start) quizQ = quizQ.gte("created_at", start.toISOString());
     if (end) quizQ = quizQ.lt("created_at", end.toISOString());
 
@@ -530,16 +534,21 @@ function DashboardPanel() {
     const landers = new Set<string>();
     const starts = new Set<string>();
     const completes = new Set<string>();
+    const checkoutViews = new Set<string>();
+    const cardStarteds = new Set<string>();
     for (const e of evts) {
       if (e.event_type === "lander_view") landers.add(e.session_id);
       if (e.event_type === "quiz_start") starts.add(e.session_id);
       if (e.event_type === "quiz_complete") completes.add(e.session_id);
+      if (e.event_type === "checkout_view") checkoutViews.add(e.session_id);
+      if (e.event_type === "checkout_card_started") cardStarteds.add(e.session_id);
     }
     const uniqueVisitors = landers.size;
     const quizStarts = starts.size;
     const quizCompletes = completes.size;
     const quizCompletionPct = quizStarts > 0 ? (quizCompletes / quizStarts) * 100 : 0;
     const conversionPct = uniqueVisitors > 0 ? (paid.length / uniqueVisitors) * 100 : 0;
+    const checkoutToPaidPct = cardStarteds.size > 0 ? (paid.length / cardStarteds.size) * 100 : 0;
 
     // Lifetime customer/LTV (all-time)
     const ltvByEmail: Record<string, { cents: number; orders: number }> = {};
@@ -582,8 +591,11 @@ function DashboardPanel() {
       uniqueVisitors,
       quizStarts,
       quizCompletes,
+      checkoutViews: checkoutViews.size,
+      cardStarted: cardStarteds.size,
       quizCompletionPct,
       conversionPct,
+      checkoutToPaidPct,
       lifetimeCustomerCount,
       lifetimeRevenueCents,
       lifetimeLtvCents,
