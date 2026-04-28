@@ -608,14 +608,24 @@ function DashboardPanel() {
   // Live visitors: distinct sessions on a production host active in the last 5 min.
   const loadLive = async () => {
     const fiveMinAgo = new Date(Date.now() - 5 * 60 * 1000).toISOString();
-    const { data: rows } = await supabase
-      .from("page_sessions")
-      .select("session_id")
-      .in("host", ALLOWED_HOSTS)
-      .gte("last_seen_at", fiveMinAgo)
-      .limit(2000);
+    const [{ data: rows }, { data: cardEvts }] = await Promise.all([
+      supabase
+        .from("page_sessions")
+        .select("session_id")
+        .in("host", ALLOWED_HOSTS)
+        .gte("last_seen_at", fiveMinAgo)
+        .limit(2000),
+      supabase
+        .from("quiz_events")
+        .select("session_id")
+        .eq("event_type", "checkout_card_started")
+        .gte("created_at", fiveMinAgo)
+        .limit(500),
+    ]);
     const unique = new Set((rows ?? []).map((r) => r.session_id));
     setLiveVisitors(unique.size);
+    const liveCards = new Set((cardEvts ?? []).map((r) => r.session_id));
+    setLiveCardEntering(liveCards.size);
   };
 
   useEffect(() => {
@@ -672,9 +682,19 @@ function DashboardPanel() {
           <div className="mt-2 font-display text-3xl font-semibold text-emerald-700">{liveVisitors}</div>
           <div className="mt-1 text-xs text-muted-foreground">active in the last 5 min</div>
         </div>
+        <div className="rounded-2xl border border-amber-500/30 bg-amber-500/5 p-5">
+          <div className="flex items-center gap-2 text-xs uppercase tracking-wider text-amber-700">
+            <span className="relative flex h-2 w-2">
+              <span className={`absolute inline-flex h-full w-full rounded-full bg-amber-500 opacity-75 ${liveCardEntering > 0 ? "animate-ping" : ""}`}></span>
+              <span className="relative inline-flex h-2 w-2 rounded-full bg-amber-500"></span>
+            </span>
+            Entering card now
+          </div>
+          <div className="mt-2 font-display text-3xl font-semibold text-amber-700">{liveCardEntering}</div>
+          <div className="mt-1 text-xs text-muted-foreground">started typing card in last 5 min</div>
+        </div>
         <StatCard label="Revenue" value={fmtMoney(data.revenueCents)} sub={`${data.paidCount} paid orders`} tone="success" />
         <StatCard label="AOV" value={fmtMoney(data.aovCents)} sub="avg order value" />
-        <StatCard label="Orders" value={data.orderCount} sub={`${data.paidCount} paid · ${data.pendingCount} pending`} />
       </div>
 
       {/* Conversion + funnel rates */}
@@ -685,11 +705,27 @@ function DashboardPanel() {
           sub="unique landers (prod)"
         />
         <StatCard
+          label="Reached checkout"
+          value={data.checkoutViews}
+          sub={`${data.cardStarted} started entering card`}
+        />
+        <StatCard
           label="Conversion rate"
           value={data.uniqueVisitors > 0 ? `${data.conversionPct.toFixed(2)}%` : "—"}
           sub={`${data.paidCount} paid / ${data.uniqueVisitors} visitors`}
           tone={data.conversionPct > 0 ? "success" : "muted"}
         />
+        <StatCard
+          label="Card → paid"
+          value={data.cardStarted > 0 ? `${data.checkoutToPaidPct.toFixed(1)}%` : "—"}
+          sub={`${data.paidCount} paid / ${data.cardStarted} entered card`}
+          tone={data.checkoutToPaidPct > 0 ? "success" : "muted"}
+        />
+      </div>
+
+      {/* Quiz + failure rates */}
+      <div className="mt-4 grid grid-cols-2 gap-4 md:grid-cols-4">
+        <StatCard label="Orders" value={data.orderCount} sub={`${data.paidCount} paid · ${data.pendingCount} pending`} />
         <StatCard
           label="Quiz completion"
           value={data.quizStarts > 0 ? `${data.quizCompletionPct.toFixed(1)}%` : "—"}
@@ -699,6 +735,12 @@ function DashboardPanel() {
           label="Failed payments"
           value={data.failedCount}
           tone={data.failedCount > 0 ? "danger" : "muted"}
+        />
+        <StatCard
+          label="Abandoned at card"
+          value={Math.max(0, data.cardStarted - data.paidCount)}
+          sub="started card, never paid"
+          tone={data.cardStarted - data.paidCount > 0 ? "danger" : "muted"}
         />
       </div>
 
