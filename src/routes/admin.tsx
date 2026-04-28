@@ -8,7 +8,7 @@
 //   3. TOTP 2FA, re-prompted every 12 hours
 
 import { createFileRoute, Link, Outlet, useLocation, useNavigate } from "@tanstack/react-router";
-import { useEffect, useMemo, useState } from "react";
+import { useEffect, useMemo, useState, type ReactNode } from "react";
 import {
   LayoutDashboard,
   TrendingUp,
