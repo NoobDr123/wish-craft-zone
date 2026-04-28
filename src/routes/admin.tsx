@@ -2404,3 +2404,516 @@ function SupportPanel() {
     </>
   );
 }
+
+/* ---------- Customer Explorer (back door) ---------- */
+// Searchable explorer over EVERY order — paid, unpaid, abandoned. Click a row
+// to open a side drawer with the full quiz responses, brief, payment details,
+// job events timeline, related emails, sessions, reactions, refunds, revisions.
+
+interface ExplorerOrderRow {
+  id: string;
+  buyer_email: string;
+  buyer_name: string | null;
+  recipient_name: string;
+  relationship: string | null;
+  status: string;
+  payment_status: string;
+  amount_cents: number;
+  amount_paid_cents: number;
+  delivery_tier: string;
+  is_gift: boolean;
+  flagged_for_review: boolean;
+  created_at: string;
+  delivered_at: string | null;
+  user_id: string | null;
+}
+
+function CustomerExplorerPanel() {
+  const [rows, setRows] = useState<ExplorerOrderRow[]>([]);
+  const [search, setSearch] = useState("");
+  const [filter, setFilter] = useState<"all" | "paid" | "unpaid" | "abandoned" | "delivered" | "flagged">("all");
+  const [loading, setLoading] = useState(true);
+  const [selectedId, setSelectedId] = useState<string | null>(null);
+
+  const load = async () => {
+    setLoading(true);
+    let q = supabase
+      .from("orders")
+      .select("id, buyer_email, buyer_name, recipient_name, relationship, status, payment_status, amount_cents, amount_paid_cents, delivery_tier, is_gift, flagged_for_review, created_at, delivered_at, user_id")
+      .order("created_at", { ascending: false })
+      .limit(500);
+
+    if (filter === "paid") q = q.eq("payment_status", "paid");
+    if (filter === "unpaid") q = q.neq("payment_status", "paid");
+    if (filter === "abandoned") q = q.eq("payment_status", "pending").eq("status", "pending_payment");
+    if (filter === "delivered") q = q.eq("status", "delivered");
+    if (filter === "flagged") q = q.eq("flagged_for_review", true);
+
+    const { data } = await q;
+    setRows((data ?? []) as ExplorerOrderRow[]);
+    setLoading(false);
+  };
+
+  useEffect(() => { load(); /* eslint-disable-next-line */ }, [filter]);
+  useRealtimeRefresh("orders", () => load(), { debounceMs: 1500 });
+
+  const filtered = rows.filter((r) => {
+    if (!search.trim()) return true;
+    const s = search.toLowerCase();
+    return (
+      r.buyer_email?.toLowerCase().includes(s) ||
+      r.buyer_name?.toLowerCase().includes(s) ||
+      r.recipient_name?.toLowerCase().includes(s) ||
+      r.id.toLowerCase().includes(s)
+    );
+  });
+
+  const stats = {
+    total: filtered.length,
+    paid: filtered.filter((r) => r.payment_status === "paid").length,
+    revenue: filtered.reduce((s, r) => s + (r.amount_paid_cents ?? 0), 0),
+  };
+
+  return (
+    <>
+      <div className="mb-6 flex items-center justify-between">
+        <div>
+          <h1 className="font-display text-3xl font-semibold">Customer explorer</h1>
+          <p className="text-sm text-muted-foreground mt-1">
+            Search every order — paid, unpaid, abandoned — and inspect the full quiz, brief, payment, and timeline.
+          </p>
+        </div>
+      </div>
+
+      <div className="mb-4 flex flex-wrap items-center gap-2">
+        <div className="relative flex-1 min-w-[260px] max-w-md">
+          <Search className="absolute left-3 top-1/2 h-4 w-4 -translate-y-1/2 text-muted-foreground" />
+          <input
+            value={search}
+            onChange={(e) => setSearch(e.target.value)}
+            placeholder="Search by email, name, recipient, or order ID…"
+            className="w-full rounded-full border border-border bg-card pl-10 pr-4 py-2 text-sm outline-none focus:border-primary"
+          />
+        </div>
+        <div className="flex gap-2">
+          {(["all", "paid", "unpaid", "abandoned", "delivered", "flagged"] as const).map((f) => (
+            <button
+              key={f}
+              onClick={() => setFilter(f)}
+              className={`rounded-full border px-3 py-1.5 text-xs capitalize ${
+                filter === f
+                  ? "border-primary bg-primary text-primary-foreground"
+                  : "border-border bg-card hover:bg-peach/40"
+              }`}
+            >
+              {f}
+            </button>
+          ))}
+        </div>
+      </div>
+
+      <div className="mb-3 flex gap-3 text-xs text-muted-foreground">
+        <span>{stats.total} orders</span>
+        <span>·</span>
+        <span>{stats.paid} paid</span>
+        <span>·</span>
+        <span>{fmtMoney(stats.revenue)} revenue</span>
+      </div>
+
+      <div className="overflow-x-auto rounded-2xl border border-border bg-card">
+        <table className="w-full text-sm">
+          <thead className="border-b border-border bg-muted/30 text-left text-xs uppercase tracking-wide text-muted-foreground">
+            <tr>
+              <th className="p-3">Buyer</th>
+              <th className="p-3">For</th>
+              <th className="p-3">Status</th>
+              <th className="p-3">Pay</th>
+              <th className="p-3">Tier</th>
+              <th className="p-3">Amount</th>
+              <th className="p-3">Created</th>
+            </tr>
+          </thead>
+          <tbody>
+            {loading && (
+              <tr><td colSpan={7} className="p-8 text-center text-muted-foreground">Loading…</td></tr>
+            )}
+            {!loading && filtered.length === 0 && (
+              <tr><td colSpan={7} className="p-8 text-center text-muted-foreground">No matching orders.</td></tr>
+            )}
+            {filtered.map((r) => (
+              <tr
+                key={r.id}
+                onClick={() => setSelectedId(r.id)}
+                className="border-b border-border/40 cursor-pointer hover:bg-peach/30 transition"
+              >
+                <td className="p-3">
+                  <div className="font-medium">{r.buyer_name || "—"}</div>
+                  <div className="text-xs text-muted-foreground">{r.buyer_email}</div>
+                </td>
+                <td className="p-3">
+                  <div>{r.recipient_name}</div>
+                  <div className="text-xs text-muted-foreground">{r.relationship || "—"}{r.is_gift ? " · gift" : ""}</div>
+                </td>
+                <td className="p-3"><Badge variant="outline" className="text-xs">{r.status}</Badge></td>
+                <td className="p-3">
+                  <Badge
+                    variant={r.payment_status === "paid" ? "default" : r.payment_status === "failed" ? "destructive" : "outline"}
+                    className="text-xs"
+                  >
+                    {r.payment_status}
+                  </Badge>
+                  {r.flagged_for_review && <Badge variant="destructive" className="ml-1 text-[10px]">flag</Badge>}
+                </td>
+                <td className="p-3 text-xs">{r.delivery_tier}</td>
+                <td className="p-3 text-xs">
+                  {fmtMoney(r.amount_paid_cents || r.amount_cents)}
+                </td>
+                <td className="p-3 text-xs whitespace-nowrap">{new Date(r.created_at).toLocaleString()}</td>
+              </tr>
+            ))}
+          </tbody>
+        </table>
+      </div>
+
+      {selectedId && (
+        <CustomerDetailDrawer orderId={selectedId} onClose={() => setSelectedId(null)} />
+      )}
+    </>
+  );
+}
+
+function CustomerDetailDrawer({ orderId, onClose }: { orderId: string; onClose: () => void }) {
+  const [order, setOrder] = useState<any | null>(null);
+  const [events, setEvents] = useState<any[]>([]);
+  const [emails, setEmails] = useState<any[]>([]);
+  const [otherOrders, setOtherOrders] = useState<any[]>([]);
+  const [refunds, setRefunds] = useState<any[]>([]);
+  const [revisions, setRevisions] = useState<any[]>([]);
+  const [reactions, setReactions] = useState<any[]>([]);
+  const [sessions, setSessions] = useState<any[]>([]);
+  const [loading, setLoading] = useState(true);
+
+  useEffect(() => {
+    let active = true;
+    (async () => {
+      setLoading(true);
+      const { data: ord } = await supabase.from("orders").select("*").eq("id", orderId).maybeSingle();
+      if (!active) return;
+      setOrder(ord);
+
+      const email = ord?.buyer_email ?? null;
+
+      const [evRes, emRes, otherRes, refRes, revRes, reactRes, sessRes] = await Promise.all([
+        supabase.from("job_events").select("id, event_type, payload, created_at").eq("order_id", orderId).order("created_at", { ascending: false }).limit(200),
+        email ? supabase.from("email_send_log").select("id, template_name, status, created_at, error_message").eq("recipient_email", email).order("created_at", { ascending: false }).limit(50) : Promise.resolve({ data: [] }),
+        email ? supabase.from("orders").select("id, recipient_name, status, payment_status, amount_paid_cents, created_at").eq("buyer_email", email).neq("id", orderId).order("created_at", { ascending: false }).limit(20) : Promise.resolve({ data: [] }),
+        supabase.from("refund_requests").select("id, request_type, reason, status, amount_cents, created_at").eq("order_id", orderId).order("created_at", { ascending: false }),
+        supabase.from("revision_requests").select("id, notes, status, is_free, created_at").eq("order_id", orderId).order("created_at", { ascending: false }),
+        supabase.from("reaction_videos").select("id, status, is_public, caption, created_at").eq("order_id", orderId).order("created_at", { ascending: false }),
+        email ? supabase.from("page_sessions").select("session_id, host, landing_path, referrer, utm_source, utm_medium, utm_campaign, first_seen_at, last_seen_at").eq("buyer_email", email).order("last_seen_at", { ascending: false }).limit(20) : Promise.resolve({ data: [] }),
+      ]);
+
+      if (!active) return;
+      setEvents(evRes.data ?? []);
+      setEmails((emRes as any).data ?? []);
+      setOtherOrders((otherRes as any).data ?? []);
+      setRefunds(refRes.data ?? []);
+      setRevisions(revRes.data ?? []);
+      setReactions(reactRes.data ?? []);
+      setSessions((sessRes as any).data ?? []);
+      setLoading(false);
+    })();
+    return () => { active = false; };
+  }, [orderId]);
+
+  const quiz = (order?.quiz_payload ?? {}) as Record<string, any>;
+  const brief = order?.brief as any;
+
+  return (
+    <div className="fixed inset-0 z-50 flex">
+      <div className="flex-1 bg-black/40 backdrop-blur-sm" onClick={onClose} />
+      <aside className="w-full max-w-2xl bg-background border-l border-border overflow-y-auto shadow-2xl">
+        <div className="sticky top-0 z-10 bg-background/95 backdrop-blur border-b border-border px-6 py-4 flex items-start justify-between">
+          <div>
+            <div className="text-xs text-muted-foreground">Order</div>
+            <div className="font-mono text-xs">{orderId}</div>
+            {order && (
+              <div className="mt-1 font-display text-lg font-semibold">
+                {order.recipient_name} <span className="text-muted-foreground font-normal text-sm">for {order.buyer_name || order.buyer_email}</span>
+              </div>
+            )}
+          </div>
+          <button
+            onClick={onClose}
+            className="rounded-full p-2 hover:bg-muted"
+            aria-label="Close"
+          >
+            <X className="h-5 w-5" />
+          </button>
+        </div>
+
+        {loading && <div className="p-6 text-sm text-muted-foreground">Loading…</div>}
+
+        {order && !loading && (
+          <div className="p-6 space-y-6">
+            {/* Top status */}
+            <div className="grid grid-cols-2 gap-3 text-sm">
+              <DetailField label="Status" value={<Badge variant="outline">{order.status}</Badge>} />
+              <DetailField label="Payment" value={
+                <Badge variant={order.payment_status === "paid" ? "default" : order.payment_status === "failed" ? "destructive" : "outline"}>
+                  {order.payment_status}
+                </Badge>
+              } />
+              <DetailField label="Amount paid" value={fmtMoney(order.amount_paid_cents || 0)} />
+              <DetailField label="Order amount" value={fmtMoney(order.amount_cents || 0)} />
+              <DetailField label="Tier" value={order.delivery_tier} />
+              <DetailField label="Priority" value={order.priority} />
+              <DetailField label="Source" value={order.source_kind} />
+              <DetailField label="Currency" value={order.currency} />
+              <DetailField label="Created" value={new Date(order.created_at).toLocaleString()} />
+              <DetailField label="Delivered" value={order.delivered_at ? new Date(order.delivered_at).toLocaleString() : "—"} />
+              <DetailField label="Scheduled delivery" value={order.scheduled_delivery_at ? new Date(order.scheduled_delivery_at).toLocaleString() : "—"} />
+              <DetailField label="Confirmation email" value={order.confirmation_email_sent_at ? new Date(order.confirmation_email_sent_at).toLocaleString() : "—"} />
+            </div>
+
+            {order.flagged_for_review && (
+              <div className="rounded-lg border border-destructive/40 bg-destructive/10 p-3 text-sm">
+                <div className="font-medium text-destructive">Flagged for review</div>
+                <div className="text-muted-foreground mt-1">{order.flag_reason || "(no reason)"}</div>
+              </div>
+            )}
+
+            {/* Contact */}
+            <Section title="Contact">
+              <DetailField label="Buyer name" value={order.buyer_name || "—"} />
+              <DetailField label="Buyer email" value={order.buyer_email} />
+              <DetailField label="Recipient" value={order.recipient_name} />
+              <DetailField label="Relationship" value={order.relationship || "—"} />
+              <DetailField label="Is gift" value={order.is_gift ? "Yes" : "No"} />
+              <DetailField label="Recipient email" value={order.recipient_email || "—"} />
+              <DetailField label="Delivery date" value={order.delivery_date || "—"} />
+              <DetailField label="Has account" value={order.user_id ? "Yes" : "No"} />
+            </Section>
+
+            {/* Song spec */}
+            <Section title="Song spec">
+              <DetailField label="Genre" value={order.genre || "—"} />
+              <DetailField label="Tempo" value={order.tempo || "—"} />
+              <DetailField label="Voice" value={order.voice || "—"} />
+              <DetailField label="Title idea" value={order.song_title_idea || "—"} />
+              <DetailField label="3rd verse" value={order.has_3rd_verse ? "Yes" : "No"} />
+              <DetailField label="Rush" value={order.is_rush ? "Yes" : "No"} />
+              <DetailField label="Unlimited edits" value={order.has_unlimited_edits ? "Yes" : "No"} />
+            </Section>
+
+            {/* Personal note */}
+            {order.personal_note && (
+              <Section title="Personal note">
+                <p className="col-span-2 text-sm whitespace-pre-wrap leading-relaxed bg-muted/40 rounded-lg p-3">{order.personal_note}</p>
+              </Section>
+            )}
+
+            {/* Quiz */}
+            {Object.keys(quiz).length > 0 && (
+              <div>
+                <h3 className="font-display text-sm font-semibold uppercase tracking-wider text-muted-foreground mb-2">Quiz responses</h3>
+                <div className="rounded-lg border border-border bg-card divide-y divide-border/60">
+                  {Object.entries(quiz).map(([k, v]) => (
+                    <div key={k} className="px-3 py-2 grid grid-cols-3 gap-3 text-sm">
+                      <div className="text-xs text-muted-foreground font-mono">{k}</div>
+                      <div className="col-span-2 whitespace-pre-wrap break-words">
+                        {v == null ? "—" : typeof v === "object" ? JSON.stringify(v, null, 2) : String(v)}
+                      </div>
+                    </div>
+                  ))}
+                </div>
+              </div>
+            )}
+
+            {/* Brief */}
+            {brief && (
+              <div>
+                <h3 className="font-display text-sm font-semibold uppercase tracking-wider text-muted-foreground mb-2">AI brief</h3>
+                <pre className="rounded-lg border border-border bg-muted/40 p-3 text-xs overflow-x-auto whitespace-pre-wrap">{JSON.stringify(brief, null, 2)}</pre>
+                {order.brief_score && (
+                  <pre className="mt-2 rounded-lg border border-border bg-muted/40 p-3 text-xs overflow-x-auto whitespace-pre-wrap">Score: {JSON.stringify(order.brief_score, null, 2)}</pre>
+                )}
+              </div>
+            )}
+
+            {/* Payment / Stripe */}
+            <Section title="Payment / Stripe">
+              <DetailField label="Stripe env" value={order.stripe_env || "—"} />
+              <DetailField label="PaymentIntent" value={<span className="font-mono text-xs break-all">{order.stripe_payment_intent_id || "—"}</span>} />
+              <DetailField label="Customer" value={<span className="font-mono text-xs break-all">{order.stripe_customer_id || "—"}</span>} />
+              <DetailField label="Payment method" value={<span className="font-mono text-xs break-all">{order.stripe_payment_method_id || "—"}</span>} />
+              <DetailField label="Checkout session" value={<span className="font-mono text-xs break-all">{order.stripe_checkout_session_id || "—"}</span>} />
+              <DetailField label="Promo / discount" value={order.discount_cents ? `${fmtMoney(order.discount_cents)} off` : "—"} />
+            </Section>
+
+            {/* Other orders for this email */}
+            {otherOrders.length > 0 && (
+              <div>
+                <h3 className="font-display text-sm font-semibold uppercase tracking-wider text-muted-foreground mb-2">
+                  Other orders from {order.buyer_email} ({otherOrders.length})
+                </h3>
+                <div className="rounded-lg border border-border bg-card divide-y divide-border/60">
+                  {otherOrders.map((o) => (
+                    <div key={o.id} className="px-3 py-2 flex items-center justify-between text-sm">
+                      <div>
+                        <div className="font-medium">{o.recipient_name}</div>
+                        <div className="text-xs text-muted-foreground">{new Date(o.created_at).toLocaleString()}</div>
+                      </div>
+                      <div className="flex items-center gap-2 text-xs">
+                        <Badge variant="outline">{o.status}</Badge>
+                        <Badge variant={o.payment_status === "paid" ? "default" : "outline"}>{o.payment_status}</Badge>
+                        <span>{fmtMoney(o.amount_paid_cents || 0)}</span>
+                      </div>
+                    </div>
+                  ))}
+                </div>
+              </div>
+            )}
+
+            {/* Sessions */}
+            {sessions.length > 0 && (
+              <div>
+                <h3 className="font-display text-sm font-semibold uppercase tracking-wider text-muted-foreground mb-2">Sessions ({sessions.length})</h3>
+                <div className="rounded-lg border border-border bg-card divide-y divide-border/60">
+                  {sessions.map((s) => (
+                    <div key={s.session_id} className="px-3 py-2 text-xs">
+                      <div className="flex items-center justify-between">
+                        <span className="font-mono">{s.session_id.slice(0, 12)}…</span>
+                        <span className="text-muted-foreground">{new Date(s.last_seen_at).toLocaleString()}</span>
+                      </div>
+                      <div className="text-muted-foreground mt-0.5">
+                        {s.host || "—"} · {s.landing_path || "/"}{s.utm_source ? ` · ${s.utm_source}/${s.utm_medium || ""}/${s.utm_campaign || ""}` : ""}
+                      </div>
+                      {s.referrer && <div className="text-muted-foreground truncate">ref: {s.referrer}</div>}
+                    </div>
+                  ))}
+                </div>
+              </div>
+            )}
+
+            {/* Emails */}
+            {emails.length > 0 && (
+              <div>
+                <h3 className="font-display text-sm font-semibold uppercase tracking-wider text-muted-foreground mb-2">Emails ({emails.length})</h3>
+                <div className="rounded-lg border border-border bg-card divide-y divide-border/60">
+                  {emails.map((e) => (
+                    <div key={e.id} className="px-3 py-2 flex items-center justify-between text-xs">
+                      <div>
+                        <div className="font-medium">{e.template_name}</div>
+                        {e.error_message && <div className="text-destructive truncate max-w-xs">{e.error_message}</div>}
+                      </div>
+                      <div className="flex items-center gap-2">
+                        <Badge variant={e.status === "sent" ? "default" : e.status === "bounced" || e.status === "failed" ? "destructive" : "outline"}>{e.status}</Badge>
+                        <span className="text-muted-foreground">{new Date(e.created_at).toLocaleString()}</span>
+                      </div>
+                    </div>
+                  ))}
+                </div>
+              </div>
+            )}
+
+            {/* Refunds / revisions / reactions */}
+            {(refunds.length > 0 || revisions.length > 0 || reactions.length > 0) && (
+              <div className="grid gap-3">
+                {refunds.length > 0 && (
+                  <div>
+                    <h3 className="font-display text-sm font-semibold uppercase tracking-wider text-muted-foreground mb-2">Refund requests</h3>
+                    {refunds.map((r) => (
+                      <div key={r.id} className="rounded-lg border border-border bg-card p-3 text-sm mb-2">
+                        <div className="flex items-center justify-between">
+                          <Badge variant="outline">{r.request_type}</Badge>
+                          <Badge variant="outline">{r.status}</Badge>
+                        </div>
+                        <p className="mt-2 text-xs text-muted-foreground whitespace-pre-wrap">{r.reason}</p>
+                      </div>
+                    ))}
+                  </div>
+                )}
+                {revisions.length > 0 && (
+                  <div>
+                    <h3 className="font-display text-sm font-semibold uppercase tracking-wider text-muted-foreground mb-2">Revision requests</h3>
+                    {revisions.map((r) => (
+                      <div key={r.id} className="rounded-lg border border-border bg-card p-3 text-sm mb-2">
+                        <div className="flex items-center justify-between">
+                          <Badge variant="outline">{r.status}</Badge>
+                          <span className="text-xs text-muted-foreground">{r.is_free ? "free" : "paid"}</span>
+                        </div>
+                        <p className="mt-2 text-xs text-muted-foreground whitespace-pre-wrap">{r.notes}</p>
+                      </div>
+                    ))}
+                  </div>
+                )}
+                {reactions.length > 0 && (
+                  <div>
+                    <h3 className="font-display text-sm font-semibold uppercase tracking-wider text-muted-foreground mb-2">Reactions</h3>
+                    {reactions.map((r) => (
+                      <div key={r.id} className="rounded-lg border border-border bg-card p-3 text-sm mb-2">
+                        <div className="flex items-center justify-between">
+                          <Badge variant="outline">{r.status}</Badge>
+                          <span className="text-xs text-muted-foreground">{r.is_public ? "public" : "private"}</span>
+                        </div>
+                        {r.caption && <p className="mt-2 text-xs text-muted-foreground">{r.caption}</p>}
+                      </div>
+                    ))}
+                  </div>
+                )}
+              </div>
+            )}
+
+            {/* Timeline */}
+            <div>
+              <h3 className="font-display text-sm font-semibold uppercase tracking-wider text-muted-foreground mb-2">
+                Timeline ({events.length})
+              </h3>
+              <div className="rounded-lg border border-border bg-card divide-y divide-border/60">
+                {events.length === 0 && (
+                  <div className="p-3 text-xs text-muted-foreground">No events yet.</div>
+                )}
+                {events.map((e) => (
+                  <details key={e.id} className="group">
+                    <summary className="px-3 py-2 cursor-pointer hover:bg-muted/40 flex items-center justify-between text-sm list-none">
+                      <span className="font-medium">{e.event_type}</span>
+                      <span className="text-xs text-muted-foreground">{new Date(e.created_at).toLocaleString()}</span>
+                    </summary>
+                    {e.payload && (
+                      <pre className="px-3 pb-2 text-[11px] overflow-x-auto whitespace-pre-wrap text-muted-foreground">{JSON.stringify(e.payload, null, 2)}</pre>
+                    )}
+                  </details>
+                ))}
+              </div>
+            </div>
+
+            {/* Raw JSON */}
+            <details>
+              <summary className="cursor-pointer text-xs text-muted-foreground hover:text-foreground">View raw order JSON</summary>
+              <pre className="mt-2 rounded-lg border border-border bg-muted/40 p-3 text-[11px] overflow-x-auto whitespace-pre-wrap">{JSON.stringify(order, null, 2)}</pre>
+            </details>
+          </div>
+        )}
+      </aside>
+    </div>
+  );
+}
+
+function Section({ title, children }: { title: string; children: React.ReactNode }) {
+  return (
+    <div>
+      <h3 className="font-display text-sm font-semibold uppercase tracking-wider text-muted-foreground mb-2">{title}</h3>
+      <div className="grid grid-cols-2 gap-3 text-sm">{children}</div>
+    </div>
+  );
+}
+
+function DetailField({ label, value }: { label: string; value: React.ReactNode }) {
+  return (
+    <div>
+      <div className="text-xs text-muted-foreground">{label}</div>
+      <div className="mt-0.5 break-words">{value}</div>
+    </div>
+  );
+}
