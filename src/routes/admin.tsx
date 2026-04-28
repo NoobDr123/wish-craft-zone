@@ -22,7 +22,8 @@ import {
   Pencil,
   Inbox,
   Activity,
-
+  Search,
+  X,
   LogOut,
   ChevronDown,
   ChevronRight,
