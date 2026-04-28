@@ -60,7 +60,7 @@ serve(async (req) => {
       return json({ ok: false, error: "order_already_paid" }, 400);
     }
 
-    const baseAmount = order.amount_cents ?? 4999;
+    const baseAmount = order.amount_cents ?? 2999;
 
     // Atomic redeem via DB function (handles race conditions + max_uses)
     const { data: result, error: redeemErr } = await supabase.rpc(

@@ -109,7 +109,7 @@ serve(async (req) => {
         user_id: typeof userId === "string" ? userId : null,
         ...snap,
         buyer_email: buyerEmail,
-        amount_cents: 4999,
+        amount_cents: 2999,
         currency: "USD",
         status: "pending_payment",
         payment_status: "pending",
@@ -167,7 +167,7 @@ serve(async (req) => {
       });
     }
 
-    const amountCents = order.amount_cents ?? 4999;
+    const amountCents = order.amount_cents ?? 2999;
     const currency = (order.currency || "USD").toLowerCase();
 
     // Resolve / create customer
