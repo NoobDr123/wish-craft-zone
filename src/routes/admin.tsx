@@ -217,6 +217,7 @@ function StaffPage() {
           {tab === "dashboard" && <DashboardPanel />}
           {tab === "funnel" && <FunnelPanel />}
           {tab === "crm" && <CrmPanel />}
+          {tab === "customers" && <CustomerExplorerPanel />}
           {tab === "orders" && <OrdersPanel />}
           {tab === "upsells" && <UpsellsPanel />}
           {tab === "emails" && <EmailsPanel />}
