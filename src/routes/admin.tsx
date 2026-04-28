@@ -77,6 +77,7 @@ type Tab =
   | "dashboard"
   | "funnel"
   | "crm"
+  | "customers"
   | "orders"
   | "upsells"
   | "emails"
@@ -91,6 +92,7 @@ const NAV: Array<{ key: Tab; label: string; icon: any; group: string }> = [
   { key: "dashboard", label: "Dashboard", icon: LayoutDashboard, group: "Overview" },
   { key: "funnel", label: "Funnel", icon: TrendingUp, group: "Overview" },
   { key: "crm", label: "CRM", icon: Users, group: "Overview" },
+  { key: "customers", label: "Customer explorer", icon: Search, group: "Overview" },
   { key: "orders", label: "Orders", icon: ShoppingBag, group: "Operations" },
   { key: "upsells", label: "Upsells", icon: Sparkles, group: "Operations" },
   { key: "emails", label: "Emails", icon: Mail, group: "Operations" },
