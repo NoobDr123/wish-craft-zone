@@ -2900,7 +2900,7 @@ function CustomerDetailDrawer({ orderId, onClose }: { orderId: string; onClose: 
   );
 }
 
-function Section({ title, children }: { title: string; children: React.ReactNode }) {
+function Section({ title, children }: { title: string; children: ReactNode }) {
   return (
     <div>
       <h3 className="font-display text-sm font-semibold uppercase tracking-wider text-muted-foreground mb-2">{title}</h3>
@@ -2909,7 +2909,7 @@ function Section({ title, children }: { title: string; children: React.ReactNode
   );
 }
 
-function DetailField({ label, value }: { label: string; value: React.ReactNode }) {
+function DetailField({ label, value }: { label: string; value: ReactNode }) {
   return (
     <div>
       <div className="text-xs text-muted-foreground">{label}</div>
