@@ -106,7 +106,7 @@ function TermsPage() {
 
           <h2>5. Pricing, Payment, and Upsells</h2>
           <p>
-            Our base price for a personalized song is $49.99 USD. All prices
+            Our base price for a personalized song is $29.99 USD. All prices
             are subject to change without notice. We may offer optional
             upgrades, add-ons, or faster delivery tiers during or after the
             checkout process. You will only be charged for optional upgrades if
