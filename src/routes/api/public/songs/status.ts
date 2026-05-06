@@ -61,16 +61,22 @@ export const Route = createFileRoute("/api/public/songs/status")({
         const selected =
           variants.find((v) => v?.id === order.selected_variant_id) ?? variants[0] ?? null;
 
+        const shareSlug = order.share_page_slug;
+        const songPageUrl = shareSlug
+          ? `https://ribbonsong.com/listen/${shareSlug}`
+          : null;
+
         return json(200, {
           orderId: order.id,
           status: order.status,
           progress: PROGRESS[order.status as string] ?? 0,
           dogName: order.dog_name,
           songUrl: selected?.audio_url ?? null,
+          songPageUrl,
           coverImageUrl: selected?.image_url ?? null,
           lyrics: (order.brief as any)?.lyrics ?? null,
           title: (order.brief as any)?.title ?? null,
-          shareSlug: order.share_page_slug,
+          shareSlug,
           deliveredAt: order.delivered_at,
           estimatedDelivery: order.scheduled_delivery_at,
           kieTaskId: order.kie_task_id,
