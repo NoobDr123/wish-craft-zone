@@ -1,29 +1,32 @@
-const BREED_ICONS: Record<string, string> = {
-  "Labrador Retriever": "🦮",
-  "Golden Retriever": "🐕",
-  "German Shepherd": "🐕‍🦺",
-  "French Bulldog": "🐶",
-  "Bulldog": "🐶",
-  "Poodle": "🐩",
-  "Goldendoodle / Labradoodle": "🐩",
-  "Beagle": "🐕",
-  "Rottweiler": "🐕",
-  "Yorkshire Terrier": "🐶",
-  "Dachshund": "🌭",
-  "Boxer": "🥊",
-  "Australian Shepherd": "🐕",
-  "Border Collie": "🐕",
-  "Pomeranian": "🦊",
-  "Cavalier King Charles Spaniel": "🐶",
-  "Chihuahua": "🐶",
-  "Pit Bull / Staffordshire Terrier": "🐕",
-  "Husky": "🐺",
-  "Shih Tzu": "🐶",
-  "Bernese Mountain Dog": "🐕‍🦺",
-  "Cocker Spaniel": "🐕",
-  "Mixed breed (proudly)": "💖",
-  "Rescue, breed unknown": "🏡",
-  "Other": "🐾",
+import breedSprite from "@/assets/breeds-sprite.png";
+
+// 5x5 grid order matches the generated sprite
+const BREED_GRID: Record<string, [number, number]> = {
+  "Labrador Retriever": [0, 0],
+  "Golden Retriever": [1, 0],
+  "German Shepherd": [2, 0],
+  "French Bulldog": [3, 0],
+  "Bulldog": [4, 0],
+  "Poodle": [0, 1],
+  "Goldendoodle / Labradoodle": [1, 1],
+  "Beagle": [2, 1],
+  "Rottweiler": [3, 1],
+  "Yorkshire Terrier": [4, 1],
+  "Dachshund": [0, 2],
+  "Boxer": [1, 2],
+  "Australian Shepherd": [2, 2],
+  "Border Collie": [3, 2],
+  "Pomeranian": [4, 2],
+  "Cavalier King Charles Spaniel": [0, 3],
+  "Chihuahua": [1, 3],
+  "Pit Bull / Staffordshire Terrier": [2, 3],
+  "Husky": [3, 3],
+  "Shih Tzu": [4, 3],
+  "Bernese Mountain Dog": [0, 4],
+  "Cocker Spaniel": [1, 4],
+  "Mixed breed (proudly)": [2, 4],
+  "Rescue, breed unknown": [3, 4],
+  "Other": [4, 4],
 };
 
 interface BreedSelectProps<T extends string> {
@@ -41,7 +44,7 @@ export function BreedSelect<T extends string>({
     <div className="grid grid-cols-2 gap-3 sm:grid-cols-3 md:grid-cols-4">
       {options.map((opt) => {
         const active = value === opt;
-        const icon = BREED_ICONS[opt] ?? "🐾";
+        const [col, row] = BREED_GRID[opt] ?? BREED_GRID["Other"];
         return (
           <button
             key={opt}
@@ -53,14 +56,18 @@ export function BreedSelect<T extends string>({
                 : "border-border hover:-translate-y-0.5 hover:border-primary/50 hover:bg-peach/30"
             }`}
           >
-            <div className="flex aspect-square w-full items-center justify-center rounded-xl bg-peach/20">
-              <span
-                className="text-5xl transition-transform duration-300 group-hover:scale-110 sm:text-6xl"
+            <div className="aspect-square w-full overflow-hidden rounded-xl bg-peach/20">
+              <div
                 role="img"
                 aria-label={opt}
-              >
-                {icon}
-              </span>
+                className="h-full w-full transition-transform duration-300 group-hover:scale-[1.04]"
+                style={{
+                  backgroundImage: `url(${breedSprite})`,
+                  backgroundSize: "500% 500%",
+                  backgroundPosition: `${col * 25}% ${row * 25}%`,
+                  backgroundRepeat: "no-repeat",
+                }}
+              />
             </div>
             <span
               className={`mt-2.5 block text-[13px] font-medium leading-tight ${
