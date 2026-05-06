@@ -74,20 +74,20 @@ export const Route = createFileRoute("/")({
   },
   head: () => ({
     meta: [
-      { title: "PawprintSong — A song for the dog you'll always miss" },
+      { title: "PawprintSong — A song that brings her back into the room" },
       {
         name: "description",
         content:
-          "Tender, custom tribute songs honoring beloved dogs. Written from your memories. Recorded in studio. Delivered in five days.",
+          "When the house goes quiet, give yourself a song that holds her. Original. Custom. Written from your memories. Delivered in five days.",
       },
       {
         property: "og:title",
-        content: "PawprintSong — A song for the dog you'll always miss",
+        content: "PawprintSong — A song that brings her back into the room",
       },
       {
         property: "og:description",
         content:
-          "Personalized tribute songs for the dog who was your whole world.",
+          "Original songs for the dogs we've loved and lost. Written from your memories. Hers forever.",
       },
       { property: "og:image", content: heroImg },
       { name: "twitter:image", content: heroImg },
@@ -1147,14 +1147,11 @@ function LandingPage() {
           <div className="mb-10 max-w-[720px] md:mb-14">
             <Eyebrow>Who it's for</Eyebrow>
             <h2 className="mb-3.5 font-display text-[clamp(28px,7vw,48px)] font-medium leading-[1.1] tracking-[-0.022em] text-[#1F1B16]">
-              Wherever they are in the fight,{" "}
-              <em className="italic text-[#8D6FAF]">meet them there.</em>
+              No two dogs were the same.{" "}
+              <em className="italic text-[#8D6FAF]">Her song shouldn't be either.</em>
             </h2>
             <p className="max-w-[560px] text-[16px] leading-[1.55] text-[#5A5148] md:text-[17px]">
-              Cancer doesn't touch two families the same way. A PawPrint Song is
-              shaped to honor exactly where your person is right now. Newly
-              diagnosed, mid treatment, celebrating remission, or held in
-              loving memory.
+              Whether she was a goofy lab who loved the world, a senior shepherd who watched over you for fifteen years, or a rescue mutt nobody understood but you — her song is shaped to fit her. By breed, by quirk, by the specific way she loved you.
             </p>
           </div>
 
@@ -1200,11 +1197,11 @@ function LandingPage() {
       <section id="stories" className="bg-[#ECE2D0] px-0 py-[64px] md:py-[100px]">
         <div className="mx-auto max-w-[1200px] px-5 sm:px-6">
           <div className="mx-auto mb-10 max-w-[720px] text-center md:mb-14">
-            <Eyebrow center>Real families</Eyebrow>
+            <Eyebrow center>Real owners</Eyebrow>
             <h2 className="mb-3.5 font-display text-[clamp(28px,7vw,48px)] font-medium leading-[1.1] tracking-[-0.022em] text-[#1F1B16]">
-              <em className="italic text-[#8D6FAF]">2,400+</em> songs delivered.
+              <em className="italic text-[#8D6FAF]">1,200+</em> dogs honored.
               <br />
-              Each one held something a card couldn't.
+              Each song held something a frame couldn't.
             </h2>
           </div>
 
@@ -1373,13 +1370,12 @@ function LandingPage() {
         <div className="mx-auto max-w-[820px] px-5 text-center sm:px-6">
           <h2 className="mb-6 font-display text-[clamp(28px,7vw,52px)] font-medium italic leading-[1.1] tracking-[-0.02em] text-[#F6F0E6]">
             <span className="not-italic text-[#E5D9EF]">&ldquo;</span>
-            They listened on repeat the night before they passed.
+            I play her song on the days the house feels too empty.
             <span className="not-italic text-[#E5D9EF]">&rdquo;</span>
           </h2>
           <p className="mx-auto mb-8 max-w-[560px] text-[16px] leading-[1.6] text-[rgba(246,240,230,0.75)] md:text-[17px]">
-            You're not late. You're not too early. There's no perfect time to
-            give someone a song that says everything you couldn't. There's just
-            now.
+            There's no right time to give yourself this. There's just now — and
+            her, still in the music, whenever you need her.
           </p>
           <PrimaryBtn large>Make Her Song 🐾</PrimaryBtn>
           <div className="mt-6 text-[13px] text-[rgba(246,240,230,0.55)]">
