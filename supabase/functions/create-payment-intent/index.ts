@@ -103,7 +103,7 @@ serve(async (req) => {
       if (!snap || !snap.dog_name) {
         return json({ error: "order_not_found", detail: "no_snapshot" }, 404);
       }
-      const buyerEmail = (snap.buyer_email as string | undefined) || `pending+${orderId}@ribbonsong.com`;
+      const buyerEmail = (snap.buyer_email as string | undefined) || `pending+${orderId}@getpawprintsong.com`;
       const insertRow: Record<string, unknown> = {
         id: orderId,
         user_id: typeof userId === "string" ? userId : null,

@@ -66,7 +66,7 @@ const FAQS = [
   },
   {
     q: "What if I don't love it?",
-    a: "We'll keep working with you until you do. If a revision doesn't get you there, reach out to hello@ribbonsong.com and we'll regenerate the song or refund you — your call.",
+    a: "We'll keep working with you until you do. If a revision doesn't get you there, reach out to hello@getpawprintsong.com and we'll regenerate the song or refund you — your call.",
   },
   {
     q: "How does the \"Re-Found\" reaction reward work?",
@@ -86,7 +86,7 @@ const FAQS = [
   },
   {
     q: "Do you offer refunds?",
-    a: "Yes. If you're not happy after a revision, we'll refund you. Reach out within 30 days of delivery at hello@ribbonsong.com.",
+    a: "Yes. If you're not happy after a revision, we'll refund you. Reach out within 30 days of delivery at hello@getpawprintsong.com.",
   },
 ];
 
@@ -130,7 +130,7 @@ function ContactPage() {
       toast.success("Message sent — we'll reply by email shortly.");
     } catch (err: any) {
       console.error("contact submit failed", err);
-      toast.error(err?.message ?? "Couldn't send. Try emailing hello@ribbonsong.com instead.");
+      toast.error(err?.message ?? "Couldn't send. Try emailing hello@getpawprintsong.com instead.");
     } finally {
       setSubmitting(false);
     }
@@ -171,8 +171,8 @@ function ContactPage() {
                 Got it — your message is in our inbox. We'll reply to{" "}
                 <span className="font-semibold">{email}</span> within a few hours. If anything
                 urgent, you can also email us directly at{" "}
-                <a className="underline" href="mailto:hello@ribbonsong.com">
-                  hello@ribbonsong.com
+                <a className="underline" href="mailto:hello@getpawprintsong.com">
+                  hello@getpawprintsong.com
                 </a>
                 .
               </div>
@@ -261,10 +261,10 @@ function ContactPage() {
                 Fastest way to reach us.
               </p>
               <a
-                href="mailto:hello@ribbonsong.com"
+                href="mailto:hello@getpawprintsong.com"
                 className="mt-3 inline-block text-[15px] font-medium text-[#8D6FAF] hover:underline"
               >
-                hello@ribbonsong.com
+                hello@getpawprintsong.com
               </a>
             </div>
 

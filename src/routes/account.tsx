@@ -170,10 +170,10 @@ function AccountPage() {
               <p className="text-sm text-[rgba(31,27,22,0.65)]">
                 Need anything else? Email us at{" "}
                 <a
-                  href="mailto:hello@ribbonsong.com"
+                  href="mailto:hello@getpawprintsong.com"
                   className="font-medium text-[#8D6FAF] underline-offset-4 hover:underline"
                 >
-                  hello@ribbonsong.com
+                  hello@getpawprintsong.com
                 </a>
               </p>
             </section>

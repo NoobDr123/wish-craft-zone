@@ -93,7 +93,7 @@ serve(async (req) => {
         console.error("[create-checkout] no order and insufficient snapshot to create one");
         return json({ error: "order_not_found", detail: "no_snapshot" }, 404);
       }
-      const buyerEmail = (snapshot.buyer_email as string | undefined) || `pending+${orderId}@ribbonsong.com`;
+      const buyerEmail = (snapshot.buyer_email as string | undefined) || `pending+${orderId}@getpawprintsong.com`;
       const insertRow: Record<string, unknown> = {
         id: orderId,
         user_id: typeof userId === "string" ? userId : null,
@@ -200,7 +200,7 @@ serve(async (req) => {
     const finalReturnUrl =
       typeof returnUrl === "string" && returnUrl.length > 0
         ? returnUrl
-        : "https://ribbonsong.com/checkout/return?session_id={CHECKOUT_SESSION_ID}";
+        : "https://getpawprintsong.com/checkout/return?session_id={CHECKOUT_SESSION_ID}";
 
     const session = await stripe.checkout.sessions.create({
       mode: "payment",

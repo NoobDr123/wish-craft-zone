@@ -2,7 +2,7 @@
 
 Two endpoints. Both auth with the same bearer token.
 
-**Base URL:** `https://ribbonsong.com`
+**Base URL:** `https://getpawprintsong.com`
 **Auth header (every request):** `Authorization: Bearer <MANUS_API_KEY>`
 
 ---
@@ -54,7 +54,7 @@ Two endpoints. Both auth with the same bearer token.
 ### Example
 
 ```bash
-curl -X POST https://ribbonsong.com/api/public/songs/generate \
+curl -X POST https://getpawprintsong.com/api/public/songs/generate \
   -H "Authorization: Bearer $MANUS_API_KEY" \
   -H "Content-Type: application/json" \
   -d '{
@@ -114,7 +114,7 @@ curl -X POST https://ribbonsong.com/api/public/songs/generate \
 | `delivered` | 100 |
 | `failed` | 0 |
 
-When `status === "delivered"`, `songUrl` (raw audio file), `songPageUrl` (public listening page on ribbonsong.com), `coverImageUrl`, `lyrics`, `title`, and `shareSlug` are populated. Use `songPageUrl` if you want to send the customer a shareable link; use `songUrl` if you need the raw mp3.
+When `status === "delivered"`, `songUrl` (raw audio file), `songPageUrl` (public listening page on getpawprintsong.com), `coverImageUrl`, `lyrics`, `title`, and `shareSlug` are populated. Use `songPageUrl` if you want to send the customer a shareable link; use `songUrl` if you need the raw mp3.
 
 ### Polling guidance
 

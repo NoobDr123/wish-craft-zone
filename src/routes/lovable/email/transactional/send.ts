@@ -253,7 +253,7 @@ export const Route = createFileRoute("/lovable/email/transactional/send")({
 
         // 4. Render React Email template to HTML and plain text.
         // Inject a public unsubscribe URL so templates can render a footer link.
-        const unsubscribeUrl = `${import.meta.env.VITE_PUBLIC_SITE_URL || 'https://ribbonsong.com'}/email/unsubscribe?token=${unsubscribeToken}`
+        const unsubscribeUrl = `${import.meta.env.VITE_PUBLIC_SITE_URL || 'https://getpawprintsong.com'}/email/unsubscribe?token=${unsubscribeToken}`
         const renderData = { ...templateData, unsubscribe_url: unsubscribeUrl }
         const element = React.createElement(template.component, renderData)
         const html = await render(element)

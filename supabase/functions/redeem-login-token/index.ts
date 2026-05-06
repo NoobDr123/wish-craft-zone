@@ -75,7 +75,7 @@ serve(async (req) => {
     const email = order.buyer_email.trim().toLowerCase();
     const safeRedirect = sanitizeRedirect(redirectTo);
     const baseUrl =
-      Deno.env.get("PUBLIC_SITE_URL") ?? "https://ribbonsong.com";
+      Deno.env.get("PUBLIC_SITE_URL") ?? "https://getpawprintsong.com";
 
     // 4) Create or find the auth user.
     //

@@ -158,7 +158,7 @@ function supportNotification(d: Record<string, any>) {
   const subjectLine = escape(d.subject ?? "New support message");
   const body = escape(d.body ?? "").replace(/\n/g, "<br/>");
   const orderId = d.order_id_text ? escape(String(d.order_id_text)) : "";
-  const inboxUrl = String(d.inbox_url ?? "https://ribbonsong.com/admin");
+  const inboxUrl = String(d.inbox_url ?? "https://getpawprintsong.com/admin");
 
   const subject = `[Support] ${d.subject ?? "New message"} — ${d.sender_name ?? ""}`;
 
@@ -242,8 +242,8 @@ function reactionApproved(d: Record<string, any>) {
   const freeSongs = Number(d.free_songs ?? 2);
   const refundCents = Number(d.refund_amount_cents ?? 0);
   const refundDollars = (refundCents / 100).toFixed(2);
-  const portalUrl = String(d.portal_url ?? "https://ribbonsong.com/dashboard");
-  const createUrl = String(d.create_url ?? `https://ribbonsong.com/create?reward=${code}`);
+  const portalUrl = String(d.portal_url ?? "https://getpawprintsong.com/dashboard");
+  const createUrl = String(d.create_url ?? `https://getpawprintsong.com/create?reward=${code}`);
 
   const subject = `Your reaction was approved — refund + ${freeSongs} free songs 🎁`;
   const heading = buyer
@@ -291,7 +291,7 @@ function reactionApproved(d: Record<string, any>) {
 function reactionRejected(d: Record<string, any>) {
   const recipient = escape(d.recipient_name ?? "your dog");
   const reason = escape(d.reason ?? "");
-  const portalUrl = String(d.portal_url ?? "https://ribbonsong.com/dashboard");
+  const portalUrl = String(d.portal_url ?? "https://getpawprintsong.com/dashboard");
 
   const subject = `About your reaction video`;
   const html = `<!doctype html>
@@ -335,7 +335,7 @@ function orderConfirmation(d: Record<string, any>) {
       : "";
   const recipient = escape(d.recipient_name ?? "your dog");
   const orderRef = escape(d.order_ref ?? "");
-  const dashboardUrl = String(d.dashboard_url ?? "https://ribbonsong.com/login");
+  const dashboardUrl = String(d.dashboard_url ?? "https://getpawprintsong.com/login");
 
   const speed = d.delivery_speed ?? "standard";
   const speedLabel =

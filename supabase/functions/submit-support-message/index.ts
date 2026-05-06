@@ -10,8 +10,8 @@ const supabase = createClient(
   Deno.env.get("SUPABASE_SERVICE_ROLE_KEY")!,
 );
 
-const SUPPORT_INBOX = "hello@ribbonsong.com";
-const ADMIN_INBOX_URL = "https://ribbonsong.com/admin";
+const SUPPORT_INBOX = "hello@getpawprintsong.com";
+const ADMIN_INBOX_URL = "https://getpawprintsong.com/admin";
 
 const corsHeaders = {
   "Access-Control-Allow-Origin": "*",

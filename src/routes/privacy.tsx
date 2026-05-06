@@ -33,7 +33,7 @@ function PrivacyPage() {
             This Privacy Policy explains how PawPrint Song
             (&ldquo;PawPrint Song&rdquo;, &ldquo;we&rdquo;, &ldquo;us&rdquo;)
             collects, uses, shares, and protects your personal information when
-            you use ribbonsong.com and our song-creation service (the
+            you use getpawprintsong.com and our song-creation service (the
             &ldquo;Service&rdquo;). By using the Service you agree to this
             Policy and our <Link to="/terms">Terms of Service</Link>.
           </p>
@@ -153,7 +153,7 @@ function PrivacyPage() {
             correct, delete, or port your personal information, to opt out of
             certain processing, and to withdraw consent. To exercise any of
             these rights email us at{" "}
-            <a href="mailto:hello@ribbonsong.com">hello@ribbonsong.com</a>. We
+            <a href="mailto:hello@getpawprintsong.com">hello@getpawprintsong.com</a>. We
             will not discriminate against you for exercising these rights.
           </p>
 
@@ -191,7 +191,7 @@ function PrivacyPage() {
           <h2>13. Contact</h2>
           <p>
             For privacy questions or to exercise your rights, email us at{" "}
-            <a href="mailto:hello@ribbonsong.com">hello@ribbonsong.com</a>.
+            <a href="mailto:hello@getpawprintsong.com">hello@getpawprintsong.com</a>.
           </p>
         </div>
       </main>

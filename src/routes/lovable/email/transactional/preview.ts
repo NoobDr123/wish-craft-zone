@@ -53,7 +53,7 @@ export const Route = createFileRoute("/lovable/email/transactional/preview")({
           try {
             const previewData = {
               ...entry.previewData,
-              unsubscribe_url: 'https://ribbonsong.com/email/unsubscribe?token=preview-token',
+              unsubscribe_url: 'https://getpawprintsong.com/email/unsubscribe?token=preview-token',
             }
             const html = await render(
               React.createElement(entry.component, previewData)
