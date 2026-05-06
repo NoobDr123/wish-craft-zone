@@ -1,11 +1,12 @@
 import { create } from "zustand";
 import { persist, createJSONStorage } from "zustand/middleware";
 
-// Quiz answers are persisted in localStorage for 6 hours, then auto-cleared.
+// Quiz answers persist in localStorage for 6 hours, then auto-clear.
 // Completed orders are saved permanently in the database (orders.quiz_payload),
-// so the admin panel still shows the full history regardless of this TTL.
+// so the admin panel still shows full history regardless of this TTL.
 const QUIZ_TTL_MS = 6 * 60 * 60 * 1000;
-const QUIZ_TIMESTAMP_KEY = "ribbonsong-quiz-v3-savedAt";
+const QUIZ_TIMESTAMP_KEY = "pawprintsong-quiz-v1-savedAt";
+const QUIZ_KEY = "pawprintsong-quiz-v1";
 
 const ttlStorage = {
   getItem: (name: string): string | null => {
@@ -20,6 +21,9 @@ const ttlStorage = {
           return null;
         }
       }
+      // Wipe any leftover cancer-era quiz state.
+      window.localStorage.removeItem("ribbonsong-quiz-v3");
+      window.localStorage.removeItem("ribbonsong-quiz-v3-savedAt");
       return window.localStorage.getItem(name);
     } catch {
       return null;
@@ -45,115 +49,77 @@ const ttlStorage = {
   },
 };
 
-export type RelationshipKey =
-  | "Husband"
-  | "Wife"
-  | "Mother"
-  | "Father"
-  | "Son"
-  | "Daughter"
-  | "Sibling"
-  | "Grandparent"
-  | "Friend"
+// Breeds list comes from the funnel spec (`pawprintsong-funnel-copy.md`, Step 1).
+export type DogBreedKey =
+  | "Labrador Retriever"
+  | "Golden Retriever"
+  | "German Shepherd"
+  | "French Bulldog"
+  | "Bulldog"
+  | "Poodle"
+  | "Goldendoodle / Labradoodle"
+  | "Beagle"
+  | "Rottweiler"
+  | "Yorkshire Terrier"
+  | "Dachshund"
+  | "Boxer"
+  | "Australian Shepherd"
+  | "Border Collie"
+  | "Pomeranian"
+  | "Cavalier King Charles Spaniel"
+  | "Chihuahua"
+  | "Pit Bull / Staffordshire Terrier"
+  | "Husky"
+  | "Shih Tzu"
+  | "Bernese Mountain Dog"
+  | "Cocker Spaniel"
+  | "Mixed breed (proudly)"
+  | "Rescue, breed unknown"
   | "Other";
 
-export type StageKey =
-  | "Just diagnosed"
-  | "In treatment"
-  | "Between treatments"
-  | "In remission / survivor"
-  | "In hospice / final chapter"
-  | "In loving memory";
+export type DogGenderKey = "she" | "he";
 
-// Kept for back-compat with existing code paths; not surfaced in new quiz UI.
-export type CancerTypeKey =
-  | "Breast"
-  | "Lung"
-  | "Colon / Colorectal"
-  | "Prostate"
-  | "Blood (Leukemia / Lymphoma)"
-  | "Brain"
-  | "Pancreatic"
-  | "Ovarian"
-  | "Childhood cancer"
-  | "Another type"
-  | "Prefer not to say";
-
-export type ToneKey =
-  | "Comforting & gentle"
-  | "Uplifting & hopeful"
-  | "Strong & defiant"
-  | "Joyful & celebratory"
-  | "Reverent & prayerful"
-  | "Bittersweet & honoring";
-
-// New theme set — superset across journey stages. Filtered by stage in UI.
-export type CoreMessage =
-  | "You are not alone"
-  | "I'm so proud of your strength"
-  | "Keep fighting, we're with you"
-  | "Thank you for everything"
-  | "It's okay to rest now"
-  | "Your love lives on in us"
-  | "We will carry you through this"
-  | "You shaped who I am"
-  | "I will remember you every day";
-
+// Genres from spec Step 6.
 export type GenreKey =
-  | "Acoustic Folk"
-  | "Pop"
+  | "Acoustic"
   | "Country"
-  | "R&B / Soul"
-  | "Gospel / Worship"
-  | "Cinematic / Orchestral"
-  | "Hip-Hop / Rap"
-  | "Rock / Indie";
+  | "Folk"
+  | "Lullaby"
+  | "Cinematic"
+  | "Instrumental only";
 
-export type TempoKey = "Slow & Tender" | "Mid-tempo" | "Upbeat & Triumphant";
-export type VoiceKey = "Female Voice" | "Male Voice" | "Duet" | "No Preference";
-
-export type JourneyStage = "active" | "hospice" | "memory";
-export type Tense = "present" | "present_fading" | "past";
+export type VoiceKey = "Female Voice" | "Male Voice";
 
 export interface QuizState {
-  // Step 1 — Who is this for
-  relationship?: RelationshipKey;
-  relationship_other: string;
-  recipient_name: string;
+  // Step 1 — basics
+  dog_name: string;
   pronunciation: string;
-  age_range: string;
+  dog_gender?: DogGenderKey;
+  dog_breed?: DogBreedKey;
+  dog_breed_other: string;
 
-  // Step 2 — Their journey
-  stage?: StageKey;
-  cancer_type?: CancerTypeKey;
+  // Step 2 — photo
+  dog_photo_url: string;
 
-  // Step 3-6 — Story (free text)
-  fighting_for: string; // q4 — fighting for / holding onto / lived for
-  qualities: string; // q5 — qualities you love / loved
-  shared_memory: string; // q6 — one memory
+  // Step 3 — personality
+  dog_personality: string;
 
-  // Legacy free-text fields (kept for back-compat with edge fn; unused in new UI)
-  signature_strength: string;
-  hardest_moment: string;
-  what_helps_most: string;
-  inside_joke: string;
-  little_things: string;
-  faith_or_beliefs: string;
+  // Step 4 — memory
+  dog_memory: string;
 
-  // Step 7-8 — The message
-  message?: CoreMessage; // q7 theme
-  personal_words: string; // q8 letter
-  hope_for_them: string;
+  // Step 5 — letter to her
+  letter_to_dog: string;
 
-  // Step 9 — Sound
+  // Step 6 — sound
   genre?: GenreKey;
-  tempo?: TempoKey;
   voice?: VoiceKey;
   song_title_idea: string;
 
-  // Step 10-11 — Delivery
+  // Step 7 — contact
   buyer_name: string;
   buyer_email: string;
+
+  // Gift / scheduling (kept for back-compat with existing checkout/email code)
   is_gift: boolean;
   recipient_email: string;
   delivery_date: string;
@@ -174,21 +140,13 @@ export interface QuizState {
 }
 
 const initial = {
-  recipient_name: "",
-  relationship_other: "",
+  dog_name: "",
   pronunciation: "",
-  age_range: "",
-  fighting_for: "",
-  signature_strength: "",
-  hardest_moment: "",
-  what_helps_most: "",
-  qualities: "",
-  inside_joke: "",
-  shared_memory: "",
-  little_things: "",
-  faith_or_beliefs: "",
-  personal_words: "",
-  hope_for_them: "",
+  dog_breed_other: "",
+  dog_photo_url: "",
+  dog_personality: "",
+  dog_memory: "",
+  letter_to_dog: "",
   song_title_idea: "",
   buyer_name: "",
   buyer_email: "",
@@ -208,21 +166,23 @@ export const useQuizStore = create<QuizState>()(
       set: (key, value) => set({ [key]: value } as Partial<QuizState>),
       reset: () => set({ ...initial, orderId: undefined, reward_code: undefined }),
     }),
-    { name: "ribbonsong-quiz-v3", storage: createJSONStorage(() => ttlStorage) },
+    { name: QUIZ_KEY, storage: createJSONStorage(() => ttlStorage) },
   ),
 );
 
-// -------- Helpers --------
-
-export function journeyStageOf(stage?: StageKey): JourneyStage {
-  if (stage === "In loving memory") return "memory";
-  if (stage === "In hospice / final chapter") return "hospice";
-  return "active";
+// Convenience: resolve the displayable breed string (handles "Other").
+export function resolveBreed(q: Pick<QuizState, "dog_breed" | "dog_breed_other">): string | null {
+  if (q.dog_breed === "Other" && q.dog_breed_other.trim()) {
+    return q.dog_breed_other.trim();
+  }
+  return q.dog_breed ?? null;
 }
 
-export function tenseOf(stage?: StageKey): Tense {
-  const j = journeyStageOf(stage);
-  if (j === "memory") return "past";
-  if (j === "hospice") return "present_fading";
-  return "present";
+// Pronoun helpers driven by selected gender. Defaults to "she" per spec
+// (Daisy is the canonical example dog).
+export function pronouns(gender?: DogGenderKey) {
+  if (gender === "he") {
+    return { sub: "he", obj: "him", poss: "his", possPron: "his" } as const;
+  }
+  return { sub: "she", obj: "her", poss: "her", possPron: "hers" } as const;
 }

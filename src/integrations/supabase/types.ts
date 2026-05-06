@@ -272,6 +272,13 @@ export type Database = {
           brief_score: Json | null
           cover_image_url: string | null
           created_at: string
+          dog_breed: string | null
+          dog_breed_other: string | null
+          dog_gender: string | null
+          dog_memory: string | null
+          dog_name: string
+          dog_personality: string | null
+          dog_photo_url: string | null
           flag_reason: string | null
           for_text: string | null
           genre: string
@@ -280,17 +287,14 @@ export type Database = {
           kie_callback_received_at: string | null
           kie_submitted_at: string | null
           kie_task_id: string | null
+          letter_to_dog: string | null
           lyrics: string | null
           published: boolean
           quote: string | null
-          recipient_name: string
-          relationship: string | null
           sort_order: number
-          stage: string | null
           status: string
           story_prompt: string
           synced_lyrics: Json | null
-          tempo: string
           testimonial_slug: string | null
           title: string
           updated_at: string
@@ -303,6 +307,13 @@ export type Database = {
           brief_score?: Json | null
           cover_image_url?: string | null
           created_at?: string
+          dog_breed?: string | null
+          dog_breed_other?: string | null
+          dog_gender?: string | null
+          dog_memory?: string | null
+          dog_name: string
+          dog_personality?: string | null
+          dog_photo_url?: string | null
           flag_reason?: string | null
           for_text?: string | null
           genre?: string
@@ -311,17 +322,14 @@ export type Database = {
           kie_callback_received_at?: string | null
           kie_submitted_at?: string | null
           kie_task_id?: string | null
+          letter_to_dog?: string | null
           lyrics?: string | null
           published?: boolean
           quote?: string | null
-          recipient_name: string
-          relationship?: string | null
           sort_order?: number
-          stage?: string | null
           status?: string
           story_prompt: string
           synced_lyrics?: Json | null
-          tempo?: string
           testimonial_slug?: string | null
           title: string
           updated_at?: string
@@ -334,6 +342,13 @@ export type Database = {
           brief_score?: Json | null
           cover_image_url?: string | null
           created_at?: string
+          dog_breed?: string | null
+          dog_breed_other?: string | null
+          dog_gender?: string | null
+          dog_memory?: string | null
+          dog_name?: string
+          dog_personality?: string | null
+          dog_photo_url?: string | null
           flag_reason?: string | null
           for_text?: string | null
           genre?: string
@@ -342,17 +357,14 @@ export type Database = {
           kie_callback_received_at?: string | null
           kie_submitted_at?: string | null
           kie_task_id?: string | null
+          letter_to_dog?: string | null
           lyrics?: string | null
           published?: boolean
           quote?: string | null
-          recipient_name?: string
-          relationship?: string | null
           sort_order?: number
-          stage?: string | null
           status?: string
           story_prompt?: string
           synced_lyrics?: Json | null
-          tempo?: string
           testimonial_slug?: string | null
           title?: string
           updated_at?: string
@@ -491,6 +503,13 @@ export type Database = {
           delivery_date: string | null
           delivery_tier: string
           discount_cents: number
+          dog_breed: string | null
+          dog_breed_other: string | null
+          dog_gender: string | null
+          dog_memory: string | null
+          dog_name: string
+          dog_personality: string | null
+          dog_photo_url: string | null
           flag_reason: string | null
           flagged_for_review: boolean
           genre: string | null
@@ -504,6 +523,7 @@ export type Database = {
           kie_callback_received_at: string | null
           kie_submitted_at: string | null
           kie_task_id: string | null
+          letter_to_dog: string | null
           parent_order_id: string | null
           payment_status: string
           personal_note: string | null
@@ -512,10 +532,7 @@ export type Database = {
           promo_code_id: string | null
           quiz_payload: Json | null
           recipient_email: string | null
-          recipient_name: string
-          recipient_relationship: string | null
           regeneration_used_at: string | null
-          relationship: string | null
           revision_count: number
           revision_notes: string | null
           scheduled_delivery_at: string | null
@@ -533,7 +550,6 @@ export type Database = {
           stripe_fulfillment_synced_at: string | null
           stripe_payment_intent_id: string | null
           stripe_payment_method_id: string | null
-          tempo: string | null
           updated_at: string
           user_id: string | null
           voice: string | null
@@ -556,6 +572,13 @@ export type Database = {
           delivery_date?: string | null
           delivery_tier?: string
           discount_cents?: number
+          dog_breed?: string | null
+          dog_breed_other?: string | null
+          dog_gender?: string | null
+          dog_memory?: string | null
+          dog_name: string
+          dog_personality?: string | null
+          dog_photo_url?: string | null
           flag_reason?: string | null
           flagged_for_review?: boolean
           genre?: string | null
@@ -569,6 +592,7 @@ export type Database = {
           kie_callback_received_at?: string | null
           kie_submitted_at?: string | null
           kie_task_id?: string | null
+          letter_to_dog?: string | null
           parent_order_id?: string | null
           payment_status?: string
           personal_note?: string | null
@@ -577,10 +601,7 @@ export type Database = {
           promo_code_id?: string | null
           quiz_payload?: Json | null
           recipient_email?: string | null
-          recipient_name: string
-          recipient_relationship?: string | null
           regeneration_used_at?: string | null
-          relationship?: string | null
           revision_count?: number
           revision_notes?: string | null
           scheduled_delivery_at?: string | null
@@ -598,7 +619,6 @@ export type Database = {
           stripe_fulfillment_synced_at?: string | null
           stripe_payment_intent_id?: string | null
           stripe_payment_method_id?: string | null
-          tempo?: string | null
           updated_at?: string
           user_id?: string | null
           voice?: string | null
@@ -621,6 +641,13 @@ export type Database = {
           delivery_date?: string | null
           delivery_tier?: string
           discount_cents?: number
+          dog_breed?: string | null
+          dog_breed_other?: string | null
+          dog_gender?: string | null
+          dog_memory?: string | null
+          dog_name?: string
+          dog_personality?: string | null
+          dog_photo_url?: string | null
           flag_reason?: string | null
           flagged_for_review?: boolean
           genre?: string | null
@@ -634,6 +661,7 @@ export type Database = {
           kie_callback_received_at?: string | null
           kie_submitted_at?: string | null
           kie_task_id?: string | null
+          letter_to_dog?: string | null
           parent_order_id?: string | null
           payment_status?: string
           personal_note?: string | null
@@ -642,10 +670,7 @@ export type Database = {
           promo_code_id?: string | null
           quiz_payload?: Json | null
           recipient_email?: string | null
-          recipient_name?: string
-          recipient_relationship?: string | null
           regeneration_used_at?: string | null
-          relationship?: string | null
           revision_count?: number
           revision_notes?: string | null
           scheduled_delivery_at?: string | null
@@ -663,7 +688,6 @@ export type Database = {
           stripe_fulfillment_synced_at?: string | null
           stripe_payment_intent_id?: string | null
           stripe_payment_method_id?: string | null
-          tempo?: string | null
           updated_at?: string
           user_id?: string | null
           voice?: string | null
@@ -903,17 +927,18 @@ export type Database = {
           audio_url: string | null
           cover_image_url: string | null
           created_at: string | null
+          dog_breed: string | null
+          dog_gender: string | null
+          dog_name: string | null
+          dog_photo_url: string | null
           for_text: string | null
           genre: string | null
           genre_label: string | null
           id: string
           lyrics: string | null
           quote: string | null
-          recipient_name: string | null
-          relationship: string | null
           sort_order: number | null
           synced_lyrics: Json | null
-          tempo: string | null
           testimonial_slug: string | null
           title: string | null
           updated_at: string | null
@@ -923,17 +948,18 @@ export type Database = {
           audio_url?: string | null
           cover_image_url?: string | null
           created_at?: string | null
+          dog_breed?: string | null
+          dog_gender?: string | null
+          dog_name?: string | null
+          dog_photo_url?: string | null
           for_text?: string | null
           genre?: string | null
           genre_label?: string | null
           id: string
           lyrics?: string | null
           quote?: string | null
-          recipient_name?: string | null
-          relationship?: string | null
           sort_order?: number | null
           synced_lyrics?: Json | null
-          tempo?: string | null
           testimonial_slug?: string | null
           title?: string | null
           updated_at?: string | null
@@ -943,17 +969,18 @@ export type Database = {
           audio_url?: string | null
           cover_image_url?: string | null
           created_at?: string | null
+          dog_breed?: string | null
+          dog_gender?: string | null
+          dog_name?: string | null
+          dog_photo_url?: string | null
           for_text?: string | null
           genre?: string | null
           genre_label?: string | null
           id?: string
           lyrics?: string | null
           quote?: string | null
-          recipient_name?: string | null
-          relationship?: string | null
           sort_order?: number | null
           synced_lyrics?: Json | null
-          tempo?: string | null
           testimonial_slug?: string | null
           title?: string | null
           updated_at?: string | null
@@ -966,39 +993,42 @@ export type Database = {
           audio_variants: Json | null
           brief: Json | null
           delivered_at: string | null
+          dog_breed: string | null
+          dog_gender: string | null
+          dog_name: string | null
           genre: string | null
           id: string
-          recipient_name: string | null
           selected_variant_id: string | null
           share_page_slug: string | null
           song_title_idea: string | null
-          tempo: string | null
           voice: string | null
         }
         Insert: {
           audio_variants?: Json | null
           brief?: Json | null
           delivered_at?: string | null
+          dog_breed?: string | null
+          dog_gender?: string | null
+          dog_name?: string | null
           genre?: string | null
           id: string
-          recipient_name?: string | null
           selected_variant_id?: string | null
           share_page_slug?: string | null
           song_title_idea?: string | null
-          tempo?: string | null
           voice?: string | null
         }
         Update: {
           audio_variants?: Json | null
           brief?: Json | null
           delivered_at?: string | null
+          dog_breed?: string | null
+          dog_gender?: string | null
+          dog_name?: string | null
           genre?: string | null
           id?: string
-          recipient_name?: string | null
           selected_variant_id?: string | null
           share_page_slug?: string | null
           song_title_idea?: string | null
-          tempo?: string | null
           voice?: string | null
         }
         Relationships: []
@@ -1508,12 +1538,13 @@ export type Database = {
         Returns: {
           audio_variants: Json
           brief: Json
+          dog_breed: string
+          dog_gender: string
+          dog_name: string
           genre: string
           id: string
-          recipient_name: string
           selected_variant_id: string
           share_page_slug: string
-          tempo: string
         }[]
       }
       has_role: {
