@@ -62,7 +62,7 @@ serve(async (req) => {
 
     const { data: order } = await supabase
       .from("orders")
-      .select("buyer_email, buyer_name, recipient_name")
+      .select("buyer_email, buyer_name, dog_name")
       .eq("id", reaction.order_id)
       .single();
 
@@ -75,7 +75,7 @@ serve(async (req) => {
     if (order?.buyer_email) {
       fireEmail(order.buyer_email, "reaction-rejected", {
         buyer_name: order.buyer_name,
-        recipient_name: order.recipient_name,
+        recipient_name: order.dog_name,
         reason,
         portal_url: `https://ribbonsong.com/portal/${reaction.order_id}`,
       }).catch((e) => console.error("email send failed:", e));

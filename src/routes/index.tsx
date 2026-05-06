@@ -3,7 +3,7 @@ import { useEffect, useRef, useState } from "react";
 import rachelPhoto from "@/assets/rachel-mother-real.jpg";
 
 const RACHEL_SONG_URL =
-  "https://tempfile.aiquickdraw.com/r/87ddf1c43b994c3c9e593b383ec8de16.mp3";
+  "https://tempfile.aiquickdraw.com/r/d4899ca946ec497dbd5e86027fb1b52f.mp3";
 const HERO_SAMPLE_ID = "7c2985a2-8ab5-4920-a0bb-347dcf619019";
 import { SiteHeader } from "@/components/SiteHeader";
 import { SiteFooter } from "@/components/SiteFooter";
@@ -74,20 +74,20 @@ export const Route = createFileRoute("/")({
   },
   head: () => ({
     meta: [
-      { title: "PawPrint Song — Give them a song when words run out" },
+      { title: "PawprintSong — A song for the dog you'll always miss" },
       {
         name: "description",
         content:
-          "When cancer takes the words away, give them a song. Written with care. Produced in studio. Delivered to your inbox in five days.",
+          "Tender, custom tribute songs honoring beloved dogs. Written from your memories. Recorded in studio. Delivered in five days.",
       },
       {
         property: "og:title",
-        content: "PawPrint Song — Give them a song when words run out",
+        content: "PawprintSong — A song for the dog you'll always miss",
       },
       {
         property: "og:description",
         content:
-          "Personalized songs for cancer fighters, survivors, and those we've loved and lost.",
+          "Personalized tribute songs for the dog who was your whole world.",
       },
       { property: "og:image", content: heroImg },
       { name: "twitter:image", content: heroImg },

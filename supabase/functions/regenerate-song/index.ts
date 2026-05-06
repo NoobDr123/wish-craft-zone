@@ -54,7 +54,6 @@ serve(async (req) => {
       return json({ error: "Order has no brief to regenerate" }, 400);
     }
 
-    // Build a refined brief via Claude, reusing the same writer model.
     const newBrief = await rewriteBrief(order, changeNotes.trim());
 
     await supabase
@@ -77,7 +76,6 @@ serve(async (req) => {
       payload: { changeNotes: changeNotes.slice(0, 500) },
     });
 
-    // Kick off Suno submission immediately
     fetch(`${Deno.env.get("SUPABASE_URL")!}/functions/v1/submit-to-kie`, {
       method: "POST",
       headers: {
@@ -94,25 +92,32 @@ serve(async (req) => {
   }
 });
 
+function pronounsFor(gender?: string) {
+  if (gender === "he") return { sub: "he", obj: "him", poss: "his" };
+  return { sub: "she", obj: "her", poss: "her" };
+}
+
 async function rewriteBrief(order: any, changeNotes: string) {
   const oldBrief = order.brief;
   const q = order.quiz_payload || {};
+  const p = pronounsFor(order.dog_gender);
+  const dogName = order.dog_name ?? "the dog";
+  const breed = order.dog_breed === "Other" ? order.dog_breed_other : order.dog_breed;
 
-  const system = `You are PawPrint Song's senior songwriter. The customer received a song and wants changes. Your job is to rewrite the lyrics + style based on their feedback while keeping everything that made the original good. Return JSON only.`;
+  const system = `You are PawprintSong's senior songwriter. The customer received a tribute song for their beloved dog and wants changes. Rewrite while keeping what made the original good. Past tense for who the dog was, present tense for enduring love. Return JSON only.`;
 
-  const userPrompt = `The customer received this song and wants it regenerated with the following changes.
+  const userPrompt = `The customer received this dog tribute song and wants it regenerated with the following changes.
 
-ORIGINAL BRIEF (their answers)
-- Recipient: ${order.recipient_name}
-- Relationship: ${order.relationship ?? q.q1_relationship ?? "Loved one"}
-- Genre: ${order.genre}
-- Tempo: ${order.tempo}
-- Voice: ${order.voice}
-- Stage: ${q.q3_journey ?? q.stage ?? ""}
-- Their story: ${q.q4_fighting_for ?? q.fighting_for ?? ""} | ${q.q5_qualities ?? q.qualities ?? ""} | ${q.q6_shared_memory ?? q.shared_memory ?? ""}
-- Theme: ${q.q7_theme ?? q.message ?? ""}
+DOG (their answers)
+- Name: ${dogName}
+- Breed: ${breed ?? ""}
+- Pronouns: ${p.sub}/${p.obj}/${p.poss}
+- Personality: ${order.dog_personality ?? q.dog_personality ?? ""}
+- Memory: ${order.dog_memory ?? q.dog_memory ?? ""}
+- Letter: ${order.letter_to_dog ?? q.letter_to_dog ?? ""}
+- Genre / Voice: ${order.genre} / ${order.voice}
 
-PREVIOUS LYRICS (what they got)
+PREVIOUS LYRICS
 Title: ${oldBrief.title}
 Style: ${oldBrief.style_prompt}
 Lyrics:
@@ -121,7 +126,7 @@ ${oldBrief.lyrics}
 CUSTOMER'S CHANGE REQUEST
 ${changeNotes}
 
-Rewrite the song to honor their feedback. Keep specific personal details. Output JSON:
+Rewrite to honor their feedback. Keep ${dogName}'s name, keep specific personal details. Output JSON:
 {
   "title": "...",
   "style_prompt": "...",
@@ -138,7 +143,6 @@ Rewrite the song to honor their feedback. Keep specific personal details. Output
     messages: [{ role: "user", content: userPrompt }],
   });
 
-  // Strip ```json fences if present
   const cleaned = raw.replace(/^```(?:json)?\s*/i, "").replace(/\s*```$/i, "").trim();
   try {
     return JSON.parse(cleaned);

@@ -22,8 +22,8 @@ const supabase = createClient(
 const checkoutQuizPatchFields = new Set([
   "buyer_email",
   "buyer_name",
-  "recipient_name",
-  "relationship",
+  "dog_name",
+  "dog_breed",
   "genre",
   "tempo",
   "voice",
@@ -87,7 +87,7 @@ serve(async (req) => {
     let { data: order, error: orderErr } = await supabase
       .from("orders")
       .select(
-        "id, buyer_email, buyer_name, recipient_name, amount_cents, currency, stripe_customer_id, stripe_env, stripe_payment_intent_id, payment_status",
+        "id, buyer_email, buyer_name, dog_name, amount_cents, currency, stripe_customer_id, stripe_env, stripe_payment_intent_id, payment_status",
       )
       .eq("id", orderId)
       .maybeSingle();
@@ -100,7 +100,7 @@ serve(async (req) => {
     // Create order from snapshot if missing
     if (!order) {
       const snap = sanitizePatch(quizSnapshot) || sanitizePatch(quizPatch);
-      if (!snap || !snap.recipient_name) {
+      if (!snap || !snap.dog_name) {
         return json({ error: "order_not_found", detail: "no_snapshot" }, 404);
       }
       const buyerEmail = (snap.buyer_email as string | undefined) || `pending+${orderId}@ribbonsong.com`;
@@ -118,7 +118,7 @@ serve(async (req) => {
         .from("orders")
         .insert(insertRow)
         .select(
-          "id, buyer_email, buyer_name, recipient_name, amount_cents, currency, stripe_customer_id, stripe_env, stripe_payment_intent_id, payment_status",
+          "id, buyer_email, buyer_name, dog_name, amount_cents, currency, stripe_customer_id, stripe_env, stripe_payment_intent_id, payment_status",
         )
         .maybeSingle();
       if (insErr || !inserted) {
@@ -148,7 +148,7 @@ serve(async (req) => {
           const { data: refreshed } = await supabase
             .from("orders")
             .select(
-              "id, buyer_email, buyer_name, recipient_name, amount_cents, currency, stripe_customer_id, stripe_env, stripe_payment_intent_id, payment_status",
+              "id, buyer_email, buyer_name, dog_name, amount_cents, currency, stripe_customer_id, stripe_env, stripe_payment_intent_id, payment_status",
             )
             .eq("id", orderId)
             .maybeSingle();
@@ -233,8 +233,8 @@ serve(async (req) => {
         customer: customerId,
         automatic_payment_methods: { enabled: true, allow_redirects: "never" },
         setup_future_usage: "off_session",
-        description: order.recipient_name
-          ? `PawPrint Song personalized song for ${order.recipient_name}`
+        description: order.dog_name
+          ? `PawPrint Song personalized song for ${order.dog_name}`
           : "PawPrint Song personalized song",
         metadata: { orderId, kind: "base_order" },
       });
