@@ -790,7 +790,7 @@ function LandingPage() {
                   <video
                     src="/rachel-mother-real.mp4"
                     poster={rachelPhoto}
-                    className="h-full w-full object-contain bg-[#7A4A2E]"
+                    className="h-full w-full object-contain bg-[#1F1A17]"
                     autoPlay
                     loop
                     muted
@@ -801,7 +801,7 @@ function LandingPage() {
                   <img
                     src={rachelPhoto}
                     alt="Sarah holding her Golden Retriever Daisy in the late afternoon light"
-                    className="h-full w-full object-contain bg-[#7A4A2E]"
+                    className="h-full w-full object-contain bg-[#1F1A17]"
                     onClick={handleHeroPlay}
                   />
                 )}
