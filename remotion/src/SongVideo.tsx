@@ -55,7 +55,7 @@ export const SongVideo: React.FC<SongVideoProps> = ({
       {/* Synced lyrics overlay (bottom) */}
       <Lyrics lyrics={lyrics} bodyFont={bodyFont} displayFont={displayFont} />
 
-      {/* RibbonSong branding (top) */}
+      {/* PawPrint Song branding (top) */}
       <Branding bodyFont={bodyFont} />
 
       {/* The actual song audio — Lambda fetches and embeds it */}

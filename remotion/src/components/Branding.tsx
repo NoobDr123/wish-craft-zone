@@ -5,7 +5,7 @@ interface Props {
   bodyFont: string;
 }
 
-// Top "RibbonSong" wordmark — small, refined, springs in at the start.
+// Top "PawPrint Song" wordmark — small, refined, springs in at the start.
 export const Branding: React.FC<Props> = ({ bodyFont }) => {
   const frame = useCurrentFrame();
   const { fps } = useVideoConfig();
@@ -40,7 +40,7 @@ export const Branding: React.FC<Props> = ({ bodyFont }) => {
           textTransform: "uppercase",
         }}
       >
-        RibbonSong
+        PawPrint Song
       </div>
     </AbsoluteFill>
   );

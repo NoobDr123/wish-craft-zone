@@ -117,7 +117,7 @@ serve(async (req) => {
         off_session: true,
         confirm: true,
         metadata: { orderId, upsellType, originalAmount: String(upsell.amount) },
-        description: `RibbonSong upsell: ${upsellType}`,
+        description: `PawPrint Song upsell: ${upsellType}`,
       });
 
       // Webhook will update the order row when payment_intent.succeeded fires,

@@ -1,4 +1,4 @@
-// Journey-aware copy + dynamic placeholders/tips for the RibbonSong quiz.
+// Journey-aware copy + dynamic placeholders/tips for the PawPrint Song quiz.
 // Ported from the spec's HTML prototype (getProfile, buildJourneyOptions,
 // buildThemeOptions, buildDynamicPlaceholders, buildTipsChips).
 

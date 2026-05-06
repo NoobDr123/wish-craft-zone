@@ -22,7 +22,7 @@ const SamplesSection = lazy(() => import("@/components/CheckoutSamples"));
 export const Route = createFileRoute("/checkout")({
   component: CheckoutPage,
   head: () => ({
-    meta: [{ title: "Almost There · RibbonSong" }],
+    meta: [{ title: "Almost There · PawPrint Song" }],
   }),
 });
 
@@ -636,11 +636,11 @@ function CheckoutFooter() {
             and{" "}
             <Link to="/privacy" className="underline hover:text-foreground">Privacy Policy</Link>.
             Your card will be charged <span className="font-semibold text-foreground">$29.99 USD</span>{" "}
-            today as a one-time payment to RibbonSong. No subscription, no recurring charges.
+            today as a one-time payment to PawPrint Song. No subscription, no recurring charges.
           </p>
           <p>
             Your payment information is encrypted and processed securely by Stripe.
-            RibbonSong never stores your card details. All transactions are billed in U.S. Dollars.
+            PawPrint Song never stores your card details. All transactions are billed in U.S. Dollars.
           </p>
           <p>
             Need help? Email{" "}
@@ -653,8 +653,8 @@ function CheckoutFooter() {
 
         {/* Legal address + copyright */}
         <div className="mt-6 border-t border-peach/60 pt-5 text-center text-[11px] text-muted-foreground/70">
-          <p>© {year} RibbonSong. All rights reserved.</p>
-          <p className="mt-1">RibbonSong is a registered trademark. Songs are created for personal, non-commercial use.</p>
+          <p>© {year} PawPrint Song. All rights reserved.</p>
+          <p className="mt-1">PawPrint Song is a registered trademark. Songs are created for personal, non-commercial use.</p>
         </div>
       </div>
     </footer>

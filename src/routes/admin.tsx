@@ -60,7 +60,7 @@ export const Route = createFileRoute("/admin")({
   component: AdminRoute,
   head: () => ({
     meta: [
-      { title: "Staff · RibbonSong" },
+      { title: "Staff · PawPrint Song" },
       { name: "robots", content: "noindex,nofollow,noarchive,nosnippet" },
       { name: "referrer", content: "no-referrer" },
     ],

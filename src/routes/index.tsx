@@ -74,7 +74,7 @@ export const Route = createFileRoute("/")({
   },
   head: () => ({
     meta: [
-      { title: "RibbonSong — Give them a song when words run out" },
+      { title: "PawPrint Song — Give them a song when words run out" },
       {
         name: "description",
         content:
@@ -82,7 +82,7 @@ export const Route = createFileRoute("/")({
       },
       {
         property: "og:title",
-        content: "RibbonSong — Give them a song when words run out",
+        content: "PawPrint Song — Give them a song when words run out",
       },
       {
         property: "og:description",
@@ -652,7 +652,7 @@ const faqs = [
   },
   {
     q: "Can I stay anonymous? I want it to be a surprise.",
-    a: "Yes. We never contact the recipient without your permission. Many families gift their RibbonSong as a surprise.",
+    a: "Yes. We never contact the recipient without your permission. Many families gift their PawPrint Song as a surprise.",
   },
   {
     q: "What if they've already passed?",
@@ -671,8 +671,8 @@ const faqs = [
     a: "No. The song is yours forever. No ads, no paywall, no renewal.",
   },
   {
-    q: "Who's behind RibbonSong?",
-    a: "RibbonSong was founded by a team who had each watched someone they love go through cancer. We started this because we couldn't find the right words either, and we believed music could hold what language alone could not.",
+    q: "Who's behind PawPrint Song?",
+    a: "PawPrint Song was founded by a team who had each watched someone they love go through cancer. We started this because we couldn't find the right words either, and we believed music could hold what language alone could not.",
   },
 ];
 
@@ -1001,7 +1001,7 @@ function LandingPage() {
           <div className="mx-auto mb-12 max-w-[760px] text-center md:mb-16">
             <Eyebrow center>How it works</Eyebrow>
             <h2 className="mb-4 font-display text-[clamp(30px,7.4vw,52px)] font-medium leading-[1.05] tracking-[-0.024em] text-[#1F1B16]">
-              How <em className="italic text-[#8D6FAF]">RibbonSong</em> Works
+              How <em className="italic text-[#8D6FAF]">PawPrint Song</em> Works
             </h2>
             <p className="mx-auto mt-4 max-w-[560px] text-[17px] leading-[1.55] text-[#5A5148]">
               You don't have to know music. You don't have to know what to say.
@@ -1238,7 +1238,7 @@ function LandingPage() {
               <em className="italic text-[#8D6FAF]">meet them there.</em>
             </h2>
             <p className="max-w-[560px] text-[16px] leading-[1.55] text-[#5A5148] md:text-[17px]">
-              Cancer doesn't touch two families the same way. A RibbonSong is
+              Cancer doesn't touch two families the same way. A PawPrint Song is
               shaped to honor exactly where your person is right now. Newly
               diagnosed, mid treatment, celebrating remission, or held in
               loving memory.

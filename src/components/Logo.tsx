@@ -1,5 +1,5 @@
 import { Link } from "@tanstack/react-router";
-import logoMark from "@/assets/ribbonsong-logo-v6.png";
+import logoMark from "@/assets/pawprintsong-logo.png";
 
 interface LogoProps {
   className?: string;
@@ -10,11 +10,11 @@ export function Logo({ className = "" }: LogoProps) {
     <Link
       to="/"
       className={`group inline-flex items-center gap-2 ${className}`}
-      aria-label="RibbonSong home"
+      aria-label="PawPrint Song home"
     >
       <RibbonMark className="h-8 w-8 transition-transform group-hover:rotate-[-6deg]" />
       <span className="font-display text-xl font-semibold tracking-tight text-foreground">
-        Ribbon<span className="text-primary">Song</span>
+        PawPrint<span className="text-primary"> Song</span>
       </span>
     </Link>
   );

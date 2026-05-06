@@ -19,7 +19,7 @@ export const Route = createFileRoute("/email/unsubscribe")({
     token: typeof search.token === "string" ? search.token : undefined,
   }),
   head: () => ({
-    meta: [{ title: "Unsubscribe · RibbonSong" }],
+    meta: [{ title: "Unsubscribe · PawPrint Song" }],
   }),
 });
 
@@ -108,7 +108,7 @@ function UnsubscribePage() {
 
           {status.kind === "valid" && (
             <>
-              <h1 className="font-display text-2xl text-foreground">Unsubscribe from RibbonSong emails?</h1>
+              <h1 className="font-display text-2xl text-foreground">Unsubscribe from PawPrint Song emails?</h1>
               <p className="mt-3 text-sm text-muted-foreground leading-relaxed">
                 You won't receive any more transactional emails from us — including order updates and song delivery
                 notifications. You can still place new orders any time.
@@ -141,14 +141,14 @@ function UnsubscribePage() {
               </div>
               <h1 className="font-display text-2xl text-foreground">You're unsubscribed.</h1>
               <p className="mt-3 text-sm text-muted-foreground leading-relaxed">
-                We've removed your email from our list. Thanks for being part of the RibbonSong story — we'd love to
+                We've removed your email from our list. Thanks for being part of the PawPrint Song story — we'd love to
                 make a song for you again any time.
               </p>
               <Link
                 to="/"
                 className="mt-7 inline-flex items-center justify-center rounded-full bg-primary px-6 py-3 text-sm font-medium text-primary-foreground transition-colors hover:bg-primary-hover"
               >
-                Back to RibbonSong
+                Back to PawPrint Song
               </Link>
             </>
           )}
@@ -166,7 +166,7 @@ function UnsubscribePage() {
                 to="/"
                 className="mt-7 inline-flex items-center justify-center rounded-full bg-primary px-6 py-3 text-sm font-medium text-primary-foreground transition-colors hover:bg-primary-hover"
               >
-                Back to RibbonSong
+                Back to PawPrint Song
               </Link>
             </>
           )}
@@ -187,7 +187,7 @@ function UnsubscribePage() {
                 to="/"
                 className="mt-7 inline-flex items-center justify-center rounded-full bg-primary px-6 py-3 text-sm font-medium text-primary-foreground transition-colors hover:bg-primary-hover"
               >
-                Back to RibbonSong
+                Back to PawPrint Song
               </Link>
             </>
           )}

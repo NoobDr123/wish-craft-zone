@@ -57,8 +57,8 @@ const SongDeliveredEmail = ({
   const earlyBody = TIER_BODY[tier] ?? TIER_BODY.standard
 
   const preview = isRecipient
-    ? `${buyer} made you a RibbonSong — it's ready now.`
-    : `${recipient}'s RibbonSong is ${earlyHeadline}.`
+    ? `${buyer} made you a PawPrint Song — it's ready now.`
+    : `${recipient}'s PawPrint Song is ${earlyHeadline}.`
 
   return (
     <Html lang="en" dir="ltr">

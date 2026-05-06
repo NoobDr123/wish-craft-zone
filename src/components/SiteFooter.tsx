@@ -11,7 +11,7 @@ export function SiteFooter() {
           className="inline-flex items-center gap-2 font-display text-[18px] font-semibold tracking-[-0.02em] text-[#F6F0E6]"
         >
           <RibbonMark className="h-6 w-6" />
-          RibbonSong
+          PawPrint Song
         </Link>
         <ul className="flex flex-wrap gap-7">
           <li>
@@ -45,7 +45,7 @@ export function SiteFooter() {
             </Link>
           </li>
         </ul>
-        <div>© {new Date().getFullYear()} RibbonSong</div>
+        <div>© {new Date().getFullYear()} PawPrint Song</div>
       </div>
     </footer>
   );

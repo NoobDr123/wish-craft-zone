@@ -5,13 +5,13 @@
 @custom-variant dark (&:is(.dark *));
 
 /*
- * RibbonSong design system.
- * Warm, emotional, hopeful, comforting. Never clinical.
+ * PawPrint Song design system.
+ * Warm, joyful, comforting, heartfelt. Made for honoring our pets.
  *
  * Brand:
- *   Cream background, warm terracotta CTA, ribbon lavender accent,
- *   soft peach for selected/muted surfaces. Playfair Display headings,
- *   Inter body.
+ *   Cream background, warm terracotta CTA (paw orange), amber accent,
+ *   soft peach for selected/muted surfaces. Fraunces headings,
+ *   Instrument Sans body.
  */
 
 @theme inline {
@@ -103,13 +103,13 @@
   --popover: #FBF6EC;
   --popover-foreground: #1F1B16;
 
-  /* Lavender — primary cancer-awareness */
-  --primary: #8D6FAF;
+  /* Terracotta — primary paw orange */
+  --primary: #D67D4A;
   --primary-foreground: #FFF7EE;
-  --primary-hover: #6B4F8A;
-  --lavender: #8D6FAF;
-  --lavender-deep: #6B4F8A;
-  --lavender-soft: #E5D9EF;
+  --primary-hover: #B8632F;
+  --lavender: #D67D4A;
+  --lavender-deep: #B8632F;
+  --lavender-soft: #F6DCC4;
 
   --secondary: #ECE2D0;
   --secondary-foreground: #1F1B16;
@@ -117,46 +117,46 @@
   --muted: #ECE2D0;
   --muted-foreground: #5A5148;
 
-  --accent: #E5D9EF;
+  --accent: #F6DCC4;
   --accent-foreground: #1F1B16;
 
-  /* Gold accent — #C9A85A */
-  --ribbon: #C9A85A;
+  /* Amber accent — warm honey gold */
+  --ribbon: #E5A84D;
   --ribbon-foreground: #1F1B16;
-  --gold: #C9A85A;
+  --gold: #E5A84D;
 
-  --peach: #ECE2D0;
+  --peach: #F6DCC4;
   --peach-foreground: #1F1B16;
 
-  --success: #4A7C59;
+  --success: #7A9E7E;
   --success-foreground: #FFF7EE;
 
   --destructive: #B5453A;
   --destructive-foreground: #FFF7EE;
 
-  --border: #D9CEB9;
-  --input: #D9CEB9;
-  --ring: #8D6FAF;
-  --line: #D9CEB9;
+  --border: #E1D3BC;
+  --input: #E1D3BC;
+  --ring: #D67D4A;
+  --line: #E1D3BC;
 
   --ink: #1F1B16;
   --ink-soft: #5A5148;
   --ink-faint: #8A8175;
 
-  --chart-1: #8D6FAF;
-  --chart-2: #C9A85A;
-  --chart-3: #4A7C59;
-  --chart-4: #ECE2D0;
+  --chart-1: #D67D4A;
+  --chart-2: #E5A84D;
+  --chart-3: #7A9E7E;
+  --chart-4: #F6DCC4;
   --chart-5: #B5453A;
 
   --sidebar: #F6F0E6;
   --sidebar-foreground: #1F1B16;
-  --sidebar-primary: #8D6FAF;
+  --sidebar-primary: #D67D4A;
   --sidebar-primary-foreground: #FFF7EE;
-  --sidebar-accent: #E5D9EF;
+  --sidebar-accent: #F6DCC4;
   --sidebar-accent-foreground: #1F1B16;
-  --sidebar-border: #D9CEB9;
-  --sidebar-ring: #8D6FAF;
+  --sidebar-border: #E1D3BC;
+  --sidebar-ring: #D67D4A;
 }
 
 .dark {

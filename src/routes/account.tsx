@@ -27,7 +27,7 @@ export const Route = createFileRoute("/account")({
   }),
   head: () => ({
     meta: [
-      { title: "My songs · RibbonSong" },
+      { title: "My songs · PawPrint Song" },
       { name: "robots", content: "noindex,nofollow" },
     ],
   }),
@@ -103,7 +103,7 @@ function AccountPage() {
             className="inline-flex items-center gap-2 font-display text-[18px] font-semibold tracking-[-0.02em] text-[#1F1B16]"
           >
             <RibbonMark className="h-6 w-6" />
-            RibbonSong
+            PawPrint Song
           </Link>
           <div className="flex items-center gap-3 sm:gap-4 text-sm">
             <Link
@@ -236,7 +236,7 @@ function EmptyState() {
       </div>
       <h2 className="mt-4 font-display text-2xl">No songs yet</h2>
       <p className="mt-2 text-sm text-[rgba(31,27,22,0.65)]">
-        When you create a RibbonSong, it'll show up here forever.
+        When you create a PawPrint Song, it'll show up here forever.
       </p>
       <Link
         to="/create"

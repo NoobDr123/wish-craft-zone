@@ -13,7 +13,7 @@ interface SampleSong {
 }
 
 /**
- * Below-the-fold "Hear other RibbonSongs we made" block.
+ * Below-the-fold "Hear other PawPrint Songs we made" block.
  *
  * Code-split (loaded only when the user scrolls near it) AND fetched on
  * mount via Supabase REST — no longer in the SSR loader, so the critical
@@ -70,7 +70,7 @@ export default function CheckoutSamples() {
       className="mt-6 rounded-3xl border border-peach/70 bg-card p-6 shadow-soft md:p-7"
     >
       <h2 className="flex items-center gap-2 font-display text-2xl font-bold text-foreground">
-        <Music2 className="h-5 w-5 text-primary" /> Hear Other RibbonSongs We Made
+        <Music2 className="h-5 w-5 text-primary" /> Hear Other PawPrint Songs We Made
       </h2>
       <div className="mt-5 space-y-5">
         {samples === null ? (

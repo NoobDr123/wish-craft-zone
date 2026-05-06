@@ -194,8 +194,8 @@ serve(async (req) => {
     // We use price_data so any promo-applied amount (stored on the order) is
     // honored without needing to re-create or sync Stripe Price objects.
     const productName = existingOrder.recipient_name
-      ? `RibbonSong personalized song for ${existingOrder.recipient_name}`
-      : "RibbonSong personalized song";
+      ? `PawPrint Song personalized song for ${existingOrder.recipient_name}`
+      : "PawPrint Song personalized song";
 
     const finalReturnUrl =
       typeof returnUrl === "string" && returnUrl.length > 0
@@ -221,7 +221,7 @@ serve(async (req) => {
       ],
       payment_intent_data: {
         setup_future_usage: "off_session",
-        description: "RibbonSong personalized song",
+        description: "PawPrint Song personalized song",
         metadata: { orderId, kind: "base_order" },
       },
       metadata: { orderId, kind: "base_order" },

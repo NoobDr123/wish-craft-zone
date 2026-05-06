@@ -7,7 +7,7 @@ import { ArrowRight, ShieldCheck, Star } from "lucide-react";
 export const Route = createFileRoute("/almost-there")({
   component: AlmostTherePage,
   head: () => ({
-    meta: [{ title: "Almost there · RibbonSong" }],
+    meta: [{ title: "Almost there · PawPrint Song" }],
   }),
 });
 
@@ -83,7 +83,7 @@ function AlmostTherePage() {
           </div>
         </div>
         <p className="mt-4 text-center text-sm font-medium text-foreground">
-          1,000+ families have shared their RibbonSong
+          1,000+ families have shared their PawPrint Song
         </p>
 
         {/* Testimonials */}
@@ -122,7 +122,7 @@ function AlmostTherePage() {
             </p>
           </div>
           <p className="mt-3 text-center text-[15px] leading-relaxed text-muted-foreground">
-            We're confident you'll love your RibbonSong. If you're not satisfied,
+            We're confident you'll love your PawPrint Song. If you're not satisfied,
             email us and we'll give you a full refund.
           </p>
         </div>

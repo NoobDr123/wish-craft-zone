@@ -175,7 +175,7 @@ serve(async (req) => {
 // ---------- Helpers ----------
 
 async function writeBrief(sample: any, refineNotes?: string): Promise<SongBrief> {
-  const system = `You are RibbonSong's senior songwriter. You write deeply personal songs for people facing cancer — for fighters, survivors, those in hospice, and those who've passed. Your job is to turn raw emotional details into singable lyrics that feel like a love letter, never clinical, never generic. Use specific details from the brief (names, memories, phrases) as anchors. The song must work as audio for Suno V5.`;
+  const system = `You are PawPrint Song's senior songwriter. You write deeply personal songs for people facing cancer — for fighters, survivors, those in hospice, and those who've passed. Your job is to turn raw emotional details into singable lyrics that feel like a love letter, never clinical, never generic. Use specific details from the brief (names, memories, phrases) as anchors. The song must work as audio for Suno V5.`;
 
   const refine = refineNotes
     ? `\n\nThe previous attempt scored low. Critique to address: ${refineNotes}`
@@ -227,7 +227,7 @@ Return JSON with shape:
 }
 
 async function scoreBrief(sample: any, brief: SongBrief): Promise<BriefScore> {
-  const system = `You are RibbonSong's lyric reviewer. You score songs strictly and honestly on a 0-5 scale across multiple dimensions. You return JSON only.`;
+  const system = `You are PawPrint Song's lyric reviewer. You score songs strictly and honestly on a 0-5 scale across multiple dimensions. You return JSON only.`;
 
   const userPrompt = `Score this song against the brief.
 

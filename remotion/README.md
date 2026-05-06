@@ -1,4 +1,4 @@
-# Remotion Video Template — RibbonSong
+# Remotion Video Template — PawPrint Song
 
 This folder contains the Remotion video template that renders a customer's song into a shareable MP4 (spinning vinyl + synced lyrics).
 

@@ -19,17 +19,17 @@ import { supabase } from "@/integrations/supabase/client";
 export const Route = createFileRoute("/contact")({
   head: () => ({
     meta: [
-      { title: "Contact Us — RibbonSong" },
+      { title: "Contact Us — PawPrint Song" },
       {
         name: "description",
         content:
-          "Get in touch with RibbonSong. Questions about your custom song, your order, or how it works? We're here to help.",
+          "Get in touch with PawPrint Song. Questions about your custom song, your order, or how it works? We're here to help.",
       },
-      { property: "og:title", content: "Contact Us — RibbonSong" },
+      { property: "og:title", content: "Contact Us — PawPrint Song" },
       {
         property: "og:description",
         content:
-          "Questions about your custom song or order? Reach the RibbonSong team — we usually reply within a few hours.",
+          "Questions about your custom song or order? Reach the PawPrint Song team — we usually reply within a few hours.",
       },
     ],
   }),

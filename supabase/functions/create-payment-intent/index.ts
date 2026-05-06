@@ -234,8 +234,8 @@ serve(async (req) => {
         automatic_payment_methods: { enabled: true, allow_redirects: "never" },
         setup_future_usage: "off_session",
         description: order.recipient_name
-          ? `RibbonSong personalized song for ${order.recipient_name}`
-          : "RibbonSong personalized song",
+          ? `PawPrint Song personalized song for ${order.recipient_name}`
+          : "PawPrint Song personalized song",
         metadata: { orderId, kind: "base_order" },
       });
     }

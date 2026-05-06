@@ -6,11 +6,11 @@ export const Route = createFileRoute("/terms")({
   component: TermsPage,
   head: () => ({
     meta: [
-      { title: "Terms of Service · RibbonSong" },
+      { title: "Terms of Service · PawPrint Song" },
       {
         name: "description",
         content:
-          "RibbonSong Terms of Service — the agreement between you and FlowsCommerce Solutions, LLC governing use of the RibbonSong personalized song service. Governed by the laws of the State of Delaware.",
+          "PawPrint Song Terms of Service — the agreement between you and FlowsCommerce Solutions, LLC governing use of the PawPrint Song personalized song service. Governed by the laws of the State of Delaware.",
       },
       { name: "robots", content: "index, follow" },
     ],
@@ -30,8 +30,8 @@ function TermsPage() {
 
         <div className="prose prose-neutral mt-10 max-w-none text-foreground/90 [&_a]:text-primary [&_a]:underline [&_h2]:font-display [&_h2]:text-2xl [&_h2]:font-semibold [&_h2]:mt-10 [&_h2]:mb-3 [&_h3]:font-display [&_h3]:text-lg [&_h3]:font-semibold [&_h3]:mt-6 [&_p]:leading-relaxed [&_p]:my-3 [&_ul]:my-3 [&_ul]:pl-6 [&_li]:my-1 [&_ul]:list-disc [&_ol]:my-3 [&_ol]:pl-6 [&_ol]:list-decimal">
           <p>
-            Welcome to RibbonSong. These Terms of Service (&ldquo;Terms&rdquo;)
-            govern your access to and use of the RibbonSong website
+            Welcome to PawPrint Song. These Terms of Service (&ldquo;Terms&rdquo;)
+            govern your access to and use of the PawPrint Song website
             (ribbonsong.com) and the personalized song gift services provided
             by FlowsCommerce Solutions, LLC (&ldquo;we,&rdquo; &ldquo;us,&rdquo;
             or &ldquo;our&rdquo;).
@@ -44,14 +44,14 @@ function TermsPage() {
 
           <h2>1. Who We Are</h2>
           <p>
-            RibbonSong is a personalized song gift service operated by
+            PawPrint Song is a personalized song gift service operated by
             FlowsCommerce Solutions, LLC, a Delaware Limited Liability Company
             located at 8 The Green STE D, Dover, DE 19901. Our services involve
             the creation of custom personalized songs as gifts, produced with
             the assistance of artificial intelligence and refined by our team.
           </p>
           <p>
-            Please note that RibbonSong is not a medical, grief-counseling, or
+            Please note that PawPrint Song is not a medical, grief-counseling, or
             therapeutic service. Our products are intended solely for personal
             entertainment and gifting purposes.
           </p>
@@ -91,7 +91,7 @@ function TermsPage() {
           <h2>4. Song Rights and Licensing</h2>
           <p>
             Upon full payment and delivery of your personalized song,
-            RibbonSong grants you a personal, non-exclusive, non-transferable,
+            PawPrint Song grants you a personal, non-exclusive, non-transferable,
             worldwide license to use, play, and share the song for personal,
             non-commercial purposes only.
           </p>
@@ -171,7 +171,7 @@ function TermsPage() {
           </p>
           <h3>Dispute Policy</h3>
           <p>
-            By purchasing from RibbonSong, you explicitly acknowledge and agree
+            By purchasing from PawPrint Song, you explicitly acknowledge and agree
             to the following:
           </p>
           <ol>
@@ -183,7 +183,7 @@ function TermsPage() {
             </li>
             <li>
               <strong>Contact Us First:</strong> You agree to contact
-              RibbonSong directly at{" "}
+              PawPrint Song directly at{" "}
               <a href="mailto:hello@ribbonsong.com">hello@ribbonsong.com</a> to
               resolve any issues, request revisions, or seek a refund before
               initiating any dispute or chargeback with your bank or credit
@@ -192,7 +192,7 @@ function TermsPage() {
             </li>
             <li>
               <strong>Consent to Evidence Collection:</strong> In the event of
-              a payment dispute, you acknowledge and agree that RibbonSong may
+              a payment dispute, you acknowledge and agree that PawPrint Song may
               submit your order details, delivery confirmation (including email
               open/click logs), IP address, timestamped quiz responses, and all
               communication logs as evidence to the payment processor and your

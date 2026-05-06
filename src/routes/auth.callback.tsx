@@ -9,7 +9,7 @@ export const Route = createFileRoute("/auth/callback")({
     redirect: typeof search.redirect === "string" ? search.redirect : undefined,
   }),
   head: () => ({
-    meta: [{ title: "Signing you in… · RibbonSong" }],
+    meta: [{ title: "Signing you in… · PawPrint Song" }],
   }),
 });
 

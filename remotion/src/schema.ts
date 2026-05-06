@@ -18,7 +18,7 @@ export const songVideoSchema = z.object({
   durationInSeconds: z.number(),
   // Synced lyrics. If empty, no lyrics overlay is shown.
   lyrics: z.array(lyricLineSchema).default([]),
-  // Brand color (hex). Defaults to RibbonSong primary.
+  // Brand color (hex). Defaults to PawPrint Song primary.
   primaryColor: z.string().default("#d4546a"),
   primaryColorGlow: z.string().default("#f59e9e"),
 });

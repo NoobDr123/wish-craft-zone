@@ -6,11 +6,11 @@ export const Route = createFileRoute("/privacy")({
   component: PrivacyPage,
   head: () => ({
     meta: [
-      { title: "Privacy Policy · RibbonSong" },
+      { title: "Privacy Policy · PawPrint Song" },
       {
         name: "description",
         content:
-          "RibbonSong Privacy Policy — what personal information we collect, how we use it, who we share it with, and the choices you have. Governed by the laws of the State of Delaware.",
+          "PawPrint Song Privacy Policy — what personal information we collect, how we use it, who we share it with, and the choices you have. Governed by the laws of the State of Delaware.",
       },
       { name: "robots", content: "index, follow" },
     ],
@@ -30,8 +30,8 @@ function PrivacyPage() {
 
         <div className="prose prose-neutral mt-10 max-w-none text-foreground/90 [&_a]:text-primary [&_a]:underline [&_h2]:font-display [&_h2]:text-2xl [&_h2]:font-semibold [&_h2]:mt-10 [&_h2]:mb-3 [&_h3]:font-display [&_h3]:text-lg [&_h3]:font-semibold [&_h3]:mt-6 [&_p]:leading-relaxed [&_p]:my-3 [&_ul]:my-3 [&_ul]:pl-6 [&_li]:my-1 [&_ul]:list-disc">
           <p>
-            This Privacy Policy explains how RibbonSong
-            (&ldquo;RibbonSong&rdquo;, &ldquo;we&rdquo;, &ldquo;us&rdquo;)
+            This Privacy Policy explains how PawPrint Song
+            (&ldquo;PawPrint Song&rdquo;, &ldquo;we&rdquo;, &ldquo;us&rdquo;)
             collects, uses, shares, and protects your personal information when
             you use ribbonsong.com and our song-creation service (the
             &ldquo;Service&rdquo;). By using the Service you agree to this
@@ -167,7 +167,7 @@ function PrivacyPage() {
 
           <h2>10. International users</h2>
           <p>
-            RibbonSong is operated from the United States. If you access the
+            PawPrint Song is operated from the United States. If you access the
             Service from outside the U.S., you understand that your information
             may be processed in the U.S. and other countries that may have
             different data-protection laws than your home country.

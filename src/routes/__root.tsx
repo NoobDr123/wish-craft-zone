@@ -37,14 +37,14 @@ export const Route = createRootRoute({
     meta: [
       { charSet: "utf-8" },
       { name: "viewport", content: "width=device-width, initial-scale=1" },
-      { title: "RibbonSong: Turn your love into a song" },
+      { title: "PawPrint Song: Turn your love into a song" },
       {
         name: "description",
         content:
           "A deeply personal, AI-crafted song for the fighter in your life. Because sometimes words aren't enough.",
       },
-      { name: "author", content: "RibbonSong" },
-      { property: "og:title", content: "RibbonSong: Turn your love into a song" },
+      { name: "author", content: "PawPrint Song" },
+      { property: "og:title", content: "PawPrint Song: Turn your love into a song" },
       {
         property: "og:description",
         content:
@@ -52,7 +52,7 @@ export const Route = createRootRoute({
       },
       { property: "og:type", content: "website" },
       { name: "twitter:card", content: "summary_large_image" },
-      { name: "twitter:title", content: "RibbonSong: Turn your love into a song" },
+      { name: "twitter:title", content: "PawPrint Song: Turn your love into a song" },
       { name: "description", content: "Transform the love, prayers, and memories of those affected by cancer into deeply personal songs that provide comfort, strength, and a lasting legacy." },
       { property: "og:description", content: "Transform the love, prayers, and memories of those affected by cancer into deeply personal songs that provide comfort, strength, and a lasting legacy." },
       { name: "twitter:description", content: "Transform the love, prayers, and memories of those affected by cancer into deeply personal songs that provide comfort, strength, and a lasting legacy." },
