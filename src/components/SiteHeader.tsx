@@ -7,28 +7,27 @@ export function SiteHeader() {
 
   return (
     <>
-      {/* Multi-color cancer awareness ribbon strip */}
+      {/* Warm sienna/bronze gradient strip — replaces legacy multi-color cancer ribbon */}
       <div
         className="h-[3px] w-full"
         style={{
           background:
-            "linear-gradient(to right, #E8A5B8 0%, #E8A5B8 14%, #B8E0E0 14%, #B8E0E0 28%, #E8D8A0 28%, #E8D8A0 42%, #E8B090 42%, #E8B090 56%, #B0D4A8 56%, #B0D4A8 70%, #C8B0E0 70%, #C8B0E0 84%, #9B2D77 84%, #9B2D77 100%)",
+            "linear-gradient(to right, #7A4A2E 0%, #B5532A 35%, #D9764A 55%, #B5532A 75%, #7A4A2E 100%)",
         }}
       />
 
-      {/* Promo bar */}
+      {/* Promo bar — dog-loss positioning */}
       <div className="bg-[#1F1A17] px-4 py-[10px] text-center text-[12px] font-medium tracking-[0.01em] text-[#F8F1E4] sm:px-5 sm:py-[11px] sm:text-[13px]">
-        <span className="mr-1.5 text-[#F5E6D8]">🎗️</span>
+        <span className="mr-1.5 text-[#F5E6D8]">🐾</span>
         <span className="hidden sm:inline">
-          For every fighter, every survivor, every loved one. Delivered with
-          care in five days.
+          For the dog you'll never stop missing. Delivered with care in five days.
         </span>
-        <span className="sm:hidden">Delivered with care in 5 days.</span>
+        <span className="sm:hidden">For the dog you miss. Delivered in 5 days.</span>
         <Link
           to="/create"
-          className="ml-2 border-b border-current text-[#C9A85A]"
+          className="ml-2 border-b border-current text-[#E8B58A]"
         >
-          Start My Song ❤️
+          Make Her Song 🐾
         </Link>
       </div>
 
@@ -58,7 +57,7 @@ export function SiteHeader() {
               to="/create"
               className="inline-flex shrink-0 items-center gap-2 rounded-full bg-[#B5532A] px-4 py-[10px] text-[13px] font-semibold text-[#FFF7EE] shadow-[0_6px_16px_rgba(181,83,42,0.28)] transition-all hover:-translate-y-px hover:bg-[#7A4A2E] hover:shadow-[0_10px_24px_rgba(181,83,42,0.35)] sm:gap-2.5 sm:px-[26px] sm:py-[14px] sm:text-[15px]"
             >
-              <span className="hidden sm:inline">Start My Custom Song 🎗️</span>
+              <span className="hidden sm:inline">Make Her Song 🐾</span>
               <span className="sm:hidden">Start Here →</span>
             </Link>
           </div>
