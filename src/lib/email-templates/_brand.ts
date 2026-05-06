@@ -8,7 +8,7 @@ export const BRAND = {
   rootDomain: "ribbonsong.com",
   rootUrl: "https://ribbonsong.com",
   logoUrl:
-    "https://tytxdnftsnspejnyfbmg.supabase.co/storage/v1/object/public/email-assets/ribbonsong-logo.png",
+    "https://tytxdnftsnspejnyfbmg.supabase.co/storage/v1/object/public/email-assets/pawprintsong-logo.png",
   // Synced with src/styles.css landing-page tokens (light theme)
   colors: {
     cream: "#F6F0E6",        // --background
