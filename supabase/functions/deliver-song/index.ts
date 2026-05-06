@@ -108,7 +108,10 @@ serve(async (req) => {
             to: t.email,
             data: {
               recipient_name: order.dog_name,
-              buyer_name: order.buyer_name ?? "Someone who loves you",
+              dog_name: order.dog_name,
+              dog_breed: order.dog_breed,
+              dog_gender: order.dog_gender,
+              buyer_name: order.buyer_name ?? "Someone who loved them",
               listen_url: listenUrl,
               portal_url: portalUrl,
               personal_note: order.personal_note ?? null,
@@ -178,8 +181,8 @@ async function syncFulfillmentToStripe(
   // Truncate description to Stripe's 350-char limit. Customer-facing string
   // shows on the receipt and bank statement context — helps reduce
   // "I don't recognize this charge" disputes.
-  const recipientName = String(order.dog_name ?? "your recipient").slice(0, 80);
-  const description = `Custom song delivered for ${recipientName} on ${deliveredAt.slice(0, 10)}`.slice(0, 350);
+  const recipientName = String(order.dog_name ?? "your dog").slice(0, 80);
+  const description = `PawprintSong tribute song delivered for ${recipientName} on ${deliveredAt.slice(0, 10)}`.slice(0, 350);
 
   await stripe.paymentIntents.update(order.stripe_payment_intent_id, {
     description,
