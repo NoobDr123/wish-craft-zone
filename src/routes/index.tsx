@@ -751,7 +751,7 @@ function LandingPage() {
           </div>
           <div className="grid items-center gap-8 md:grid-cols-[1.15fr_1fr] md:gap-[60px]">
             <div className="order-2 md:order-1">
-              <h1 className="mb-[22px] max-w-[700px] font-display text-[clamp(28px,7.5vw,64px)] font-medium italic leading-[1.08] tracking-[-0.025em] text-[#1F1A17] md:mb-[26px]">
+              <h1 className="mb-[20px] max-w-[640px] font-display text-[clamp(22px,3.4vw,34px)] font-medium italic leading-[1.22] tracking-[-0.018em] text-[#1F1A17] md:mb-[22px]">
                 <span className="font-display text-[1.05em] font-semibold not-italic text-[#B5532A]">
                   &ldquo;
                 </span>
@@ -767,7 +767,7 @@ function LandingPage() {
                 <br />
                 Lost Daisy, her 11-year-old Golden Retriever, in February
               </div>
-              <p className="mb-7 max-w-[540px] text-[16px] leading-[1.55] text-[#5A5148] md:mb-8 md:text-[18px]">
+              <p className="mb-7 max-w-[540px] text-[16px] leading-[1.55] text-[#5A5148] md:mb-8 md:text-[17px]">
                 When the house goes quiet, give yourself a song that brings her back into the room.{" "}
                 <strong className="font-semibold text-[#1F1A17]">
                   Written from your memories. Her name in every chorus. Yours to keep forever.
@@ -776,19 +776,38 @@ function LandingPage() {
               <div className="mb-5 flex w-full flex-col items-stretch gap-3">
                 <PrimaryBtn large fullWidth>Make Her Song 🐾</PrimaryBtn>
               </div>
-              {/* Trust row with prominent 30-day badge */}
-              <div className="mb-4 flex flex-wrap items-center gap-x-2 gap-y-1.5 text-[12.5px] font-medium text-[#5A5148]">
-                <span className="inline-flex items-center gap-1.5 rounded-full border border-[#B5532A]/30 bg-[#B5532A]/10 px-2.5 py-1 text-[11.5px] font-semibold uppercase tracking-[0.06em] text-[#B5532A]">
-                  <span className="flex h-4 w-4 items-center justify-center rounded-full bg-[#B5532A] text-[9px] font-bold leading-none text-[#F8F1E4]">
+
+              {/* Trust badges row — equal-weight pills, 30-day accented */}
+              <div className="mb-5 grid grid-cols-3 gap-2 sm:gap-2.5">
+                <div className="flex items-center justify-center gap-2 rounded-[12px] border-2 border-[#B5532A] bg-[#B5532A] px-2.5 py-2.5 text-center shadow-[0_4px_12px_-2px_rgba(181,83,42,0.35)]">
+                  <span className="flex h-7 w-7 shrink-0 items-center justify-center rounded-full border-2 border-[#F8F1E4] bg-[#F8F1E4] font-display text-[13px] font-bold leading-none text-[#B5532A]">
                     30
                   </span>
-                  Day money-back guarantee
-                </span>
-                <span className="text-[#8A8175]">·</span>
-                <span>Free rewrites</span>
-                <span className="text-[#8A8175]">·</span>
-                <span>Delivered in 5 days</span>
+                  <span className="text-left text-[10.5px] font-bold uppercase leading-[1.15] tracking-[0.04em] text-[#F8F1E4] sm:text-[11px]">
+                    Day money-back<br />guarantee
+                  </span>
+                </div>
+                <div className="flex items-center justify-center gap-2 rounded-[12px] border border-[#E8DDC9] bg-[#FDF7E9] px-2.5 py-2.5 text-center">
+                  <span className="flex h-7 w-7 shrink-0 items-center justify-center rounded-full border border-[#E8DDC9] bg-[#F8F1E4] text-[#B5532A]">
+                    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.2" strokeLinecap="round" strokeLinejoin="round" className="h-3.5 w-3.5">
+                      <path d="M3 12a9 9 0 1 0 3-6.7" />
+                      <polyline points="3 4 3 10 9 10" />
+                    </svg>
+                  </span>
+                  <span className="text-left text-[10.5px] font-bold uppercase leading-[1.15] tracking-[0.04em] text-[#1F1A17] sm:text-[11px]">
+                    Unlimited<br />free rewrites
+                  </span>
+                </div>
+                <div className="flex items-center justify-center gap-2 rounded-[12px] border border-[#E8DDC9] bg-[#FDF7E9] px-2.5 py-2.5 text-center">
+                  <span className="flex h-7 w-7 shrink-0 items-center justify-center rounded-full border border-[#E8DDC9] bg-[#F8F1E4] font-display text-[13px] font-bold leading-none text-[#B5532A]">
+                    5
+                  </span>
+                  <span className="text-left text-[10.5px] font-bold uppercase leading-[1.15] tracking-[0.04em] text-[#1F1A17] sm:text-[11px]">
+                    Day<br />delivery
+                  </span>
+                </div>
               </div>
+
               <div className="w-full text-[13px] leading-[1.4] text-[#5A5148] md:text-[13.5px]">
                 Made for{" "}
                 <strong className="text-[#1F1A17]">1,200+ dogs</strong>{" "}
