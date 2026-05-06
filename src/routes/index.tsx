@@ -745,7 +745,7 @@ function LandingPage() {
           <div className="mb-6 flex w-full flex-col items-center gap-3 text-center sm:mb-8 md:mb-12 md:gap-5">
             <span className="hidden h-px w-16 bg-[#8D6FAF]/50 md:block" />
             <h2 style={{ fontFamily: 'Nunito, system-ui, sans-serif', fontWeight: 800 }} className="text-[16px] uppercase leading-[1.3] tracking-[0.14em] text-[#8D6FAF] sm:text-[18px] md:whitespace-nowrap md:text-[26px] md:tracking-[0.16em] lg:text-[30px]">
-              The Most Meaningful Gift For Someone You Love Fighting Cancer
+              A Song For The Dog You'll Never Stop Missing
             </h2>
             <span className="hidden h-px w-16 bg-[#8D6FAF]/50 md:block" />
           </div>
@@ -755,32 +755,31 @@ function LandingPage() {
                 <span className="font-display text-[1.05em] font-semibold not-italic text-[#8D6FAF]">
                   &ldquo;
                 </span>
-                She was diagnosed 3 weeks ago. I didn&rsquo;t know what to say.
-                So I made her a song. She plays it before every infusion.
+                She's been gone three months. I made her a song. Now I play it on the drive to work, where she used to sit in the passenger seat. Some days it's the only thing that helps.
                 <span className="font-display text-[1.05em] font-semibold not-italic text-[#8D6FAF]">
                   &rdquo;
                 </span>
               </h1>
               <div className="mb-6 text-[13px] leading-[1.5] text-[#8A8175] md:mb-7 md:text-sm">
                 <strong className="font-semibold text-[#5A5148]">
-                  Rachel L., 34, Columbus, OH
+                  Sarah K., 38, Portland, OR
                 </strong>
                 <br />
-                Daughter of Margaret, 62, Stage 3 breast cancer, currently in treatment
+                Lost Daisy, her 11-year-old Golden Retriever, in February
               </div>
               <p className="mb-7 max-w-[540px] text-[16px] leading-[1.55] text-[#5A5148] md:mb-8 md:text-[18px]">
-                When cancer takes the words away, give them a personalized song that says what you can't, and reminds them they're loved on the hardest days.{" "}
+                When the house goes quiet, give yourself a song that brings her back into the room.{" "}
                 <strong className="font-semibold text-[#1F1B16]">
-                  Written just for them. Produced with care. Theirs to keep forever.
+                  Written from your memories. Her name in every chorus. Yours to keep forever.
                 </strong>
               </p>
               <div className="mb-7 flex w-full flex-col items-stretch gap-3">
-                <PrimaryBtn large fullWidth>Start My Custom Song 🎗️</PrimaryBtn>
+                <PrimaryBtn large fullWidth>Make Her Song 🐾</PrimaryBtn>
               </div>
               <div className="w-full text-center text-[13px] leading-[1.4] text-[#5A5148] md:text-[13.5px]">
-                Trusted by{" "}
-                <strong className="text-[#1F1B16]">2,400+ families</strong>{" "}
-                in hospitals, homes, and hospices
+                Made for{" "}
+                <strong className="text-[#1F1B16]">1,200+ dogs</strong>{" "}
+                who are gone but still loved
               </div>
             </div>
 
@@ -801,7 +800,7 @@ function LandingPage() {
                 ) : (
                   <img
                     src={rachelPhoto}
-                    alt="Rachel and her mother holding hands in the car after her last chemo infusion"
+                    alt="Sarah holding her Golden Retriever Daisy in the late afternoon light"
                     className="h-full w-full object-contain bg-[#1F1B16]"
                     onClick={handleHeroPlay}
                   />
@@ -867,9 +866,9 @@ function LandingPage() {
               </div>
               <div className="mt-3 px-1 text-[13px] leading-[1.5] text-[#5A5148] sm:text-[13.5px]">
                 <strong className="mr-1.5 text-[11px] font-semibold uppercase tracking-[0.12em] text-[#8D6FAF]">
-                  Hear Rachel's Song ·
+                  Hear Daisy's Song ·
                 </strong>
-                Made for her mom 3 weeks after the diagnosis. She plays it before every infusion.
+                Made for Sarah's Golden Retriever three months after she passed.
               </div>
             </div>
           </div>
@@ -991,7 +990,7 @@ function LandingPage() {
           </div>
 
           <div className="mt-12 text-center md:mt-14">
-            <PrimaryBtn large>Start My Custom Song 🎗️</PrimaryBtn>
+            <PrimaryBtn large>Make Her Song 🐾</PrimaryBtn>
           </div>
         </div>
       </section>
@@ -1137,7 +1136,7 @@ function LandingPage() {
           </div>
 
           <div className="mt-12 text-center">
-            <PrimaryBtn large>Start My Custom Song 🎗️</PrimaryBtn>
+            <PrimaryBtn large>Make Her Song 🐾</PrimaryBtn>
           </div>
         </div>
       </section>
@@ -1191,7 +1190,7 @@ function LandingPage() {
           </div>
 
           <div className="mt-10 text-center md:mt-12">
-            <PrimaryBtn large>Start My Custom Song 🎗️</PrimaryBtn>
+            <PrimaryBtn large>Make Her Song 🐾</PrimaryBtn>
           </div>
         </div>
       </section>
@@ -1382,7 +1381,7 @@ function LandingPage() {
             give someone a song that says everything you couldn't. There's just
             now.
           </p>
-          <PrimaryBtn large>Start My Custom Song 🎗️</PrimaryBtn>
+          <PrimaryBtn large>Make Her Song 🐾</PrimaryBtn>
           <div className="mt-6 text-[13px] text-[rgba(246,240,230,0.55)]">
             Delivered in 5 days · Free revisions · Money back guarantee
           </div>
