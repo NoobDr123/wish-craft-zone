@@ -1410,15 +1410,15 @@ function LandingPage() {
                   </svg>
 
                   {/* inner stamp */}
-                  <div className="absolute inset-[24px] flex flex-col items-center justify-center rounded-full border-2 border-[#1F1A17] bg-[#B5532A] text-center text-[#F8F1E4] shadow-[inset_0_2px_8px_rgba(0,0,0,0.18),0_8px_24px_rgba(122,74,46,0.25)]">
-                    <div className="font-display text-[64px] font-medium leading-none tracking-[-0.04em] md:text-[72px]">
+                  <div className="absolute inset-[24px] flex flex-col items-center justify-center rounded-full border-2 border-[#1F1A17] bg-gradient-to-br from-[#C25D32] to-[#9C4520] text-center text-[#F8F1E4] shadow-[inset_0_2px_10px_rgba(0,0,0,0.22),0_12px_32px_rgba(122,74,46,0.32)] md:inset-[34px] lg:inset-[40px]">
+                    <div className="font-display text-[68px] font-medium leading-none tracking-[-0.04em] md:text-[92px] lg:text-[108px]">
                       30
                     </div>
-                    <div className="mt-1 text-[10px] font-semibold uppercase tracking-[0.28em] text-[#F5E6D8]">
+                    <div className="mt-1 text-[10px] font-semibold uppercase tracking-[0.28em] text-[#F5E6D8] md:text-[11px]">
                       Day
                     </div>
-                    <div className="mt-2 h-px w-10 bg-[#F5E6D8]/50" />
-                    <div className="mt-2 text-[11px] font-semibold uppercase tracking-[0.18em] text-[#F8F1E4]">
+                    <div className="mt-2 h-px w-10 bg-[#F5E6D8]/50 md:w-14" />
+                    <div className="mt-2 text-[11px] font-semibold uppercase tracking-[0.18em] text-[#F8F1E4] md:text-[12px]">
                       Full refund
                     </div>
                   </div>
