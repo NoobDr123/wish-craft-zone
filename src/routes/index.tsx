@@ -773,10 +773,23 @@ function LandingPage() {
                   Written from your memories. Her name in every chorus. Yours to keep forever.
                 </strong>
               </p>
-              <div className="mb-7 flex w-full flex-col items-stretch gap-3">
+              <div className="mb-5 flex w-full flex-col items-stretch gap-3">
                 <PrimaryBtn large fullWidth>Make Her Song 🐾</PrimaryBtn>
               </div>
-              <div className="w-full text-center text-[13px] leading-[1.4] text-[#5A5148] md:text-[13.5px]">
+              {/* Trust row with prominent 30-day badge */}
+              <div className="mb-4 flex flex-wrap items-center gap-x-2 gap-y-1.5 text-[12.5px] font-medium text-[#5A5148]">
+                <span className="inline-flex items-center gap-1.5 rounded-full border border-[#B5532A]/30 bg-[#B5532A]/10 px-2.5 py-1 text-[11.5px] font-semibold uppercase tracking-[0.06em] text-[#B5532A]">
+                  <span className="flex h-4 w-4 items-center justify-center rounded-full bg-[#B5532A] text-[9px] font-bold leading-none text-[#F8F1E4]">
+                    30
+                  </span>
+                  Day money-back guarantee
+                </span>
+                <span className="text-[#8A8175]">·</span>
+                <span>Free rewrites</span>
+                <span className="text-[#8A8175]">·</span>
+                <span>Delivered in 5 days</span>
+              </div>
+              <div className="w-full text-[13px] leading-[1.4] text-[#5A5148] md:text-[13.5px]">
                 Made for{" "}
                 <strong className="text-[#1F1A17]">1,200+ dogs</strong>{" "}
                 who are gone but still loved
@@ -1467,8 +1480,16 @@ function LandingPage() {
             her, still in the music, whenever you need her.
           </p>
           <PrimaryBtn large>Make Her Song 🐾</PrimaryBtn>
-          <div className="mt-6 text-[13px] text-[rgba(246,240,230,0.55)]">
-            Delivered in 5 days · Free revisions · Money back guarantee
+          <div className="mt-6 flex flex-wrap items-center justify-center gap-x-3 gap-y-2 text-[13px] text-[rgba(246,240,230,0.75)]">
+            <span className="inline-flex items-center gap-1.5 rounded-full border border-[#F5E6D8]/30 bg-[#F8F1E4]/10 px-3 py-1 text-[11.5px] font-semibold uppercase tracking-[0.08em] text-[#F8F1E4]">
+              <span className="flex h-4 w-4 items-center justify-center rounded-full bg-[#F8F1E4] text-[9px] font-bold leading-none text-[#7A4A2E]">
+                30
+              </span>
+              Day money-back guarantee
+            </span>
+            <span>Delivered in 5 days</span>
+            <span className="text-[rgba(246,240,230,0.45)]">·</span>
+            <span>Free revisions</span>
           </div>
         </div>
       </section>
