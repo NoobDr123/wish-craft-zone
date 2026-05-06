@@ -635,39 +635,39 @@ function TrustBadges({ tone = "light" }: { tone?: "light" | "dark" }) {
     : "bg-[#F8F1E4] text-[#B5532A] ring-1 ring-[#E8DDC9]";
   const sideText = isDark ? "text-[#F8F1E4]" : "text-[#1F1A17]";
   return (
-    <div className="mx-auto mt-6 grid max-w-[640px] grid-cols-3 gap-2.5">
+    <div className="mx-auto mt-5 grid max-w-[480px] grid-cols-3 gap-2">
       {/* 30-day money back */}
-      <div className={`flex items-center gap-2.5 rounded-[14px] border-2 px-3 py-2.5 shadow-[0_6px_16px_-4px_rgba(181,83,42,0.35)] ${guaranteeBg}`}>
-        <span className={`relative flex h-9 w-9 shrink-0 items-center justify-center rounded-full shadow-[inset_0_1px_2px_rgba(0,0,0,0.12)] ${guaranteeIconBg}`}>
-          <span className="font-display text-[14px] font-bold leading-none tracking-[-0.02em]">30</span>
+      <div className={`flex items-center gap-1.5 rounded-[10px] border px-2 py-1.5 shadow-[0_3px_10px_-4px_rgba(181,83,42,0.3)] ${guaranteeBg}`}>
+        <span className={`relative flex h-6 w-6 shrink-0 items-center justify-center rounded-full shadow-[inset_0_1px_2px_rgba(0,0,0,0.12)] ${guaranteeIconBg}`}>
+          <span className="font-display text-[10px] font-bold leading-none tracking-[-0.02em]">30</span>
         </span>
-        <span className={`text-left text-[10.5px] font-bold uppercase leading-[1.2] tracking-[0.05em] sm:text-[11px] ${guaranteeText}`}>
+        <span className={`text-left text-[8.5px] font-bold uppercase leading-[1.15] tracking-[0.04em] sm:text-[9px] ${guaranteeText}`}>
           Day money-back<br />guarantee
         </span>
       </div>
       {/* Free rewrites */}
-      <div className={`flex items-center gap-2.5 rounded-[14px] border px-3 py-2.5 ${sideCardBg}`}>
-        <span className={`flex h-9 w-9 shrink-0 items-center justify-center rounded-full ${sideIconRing}`}>
-          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" className="h-[18px] w-[18px]">
+      <div className={`flex items-center gap-1.5 rounded-[10px] border px-2 py-1.5 ${sideCardBg}`}>
+        <span className={`flex h-6 w-6 shrink-0 items-center justify-center rounded-full ${sideIconRing}`}>
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.2" strokeLinecap="round" strokeLinejoin="round" className="h-3 w-3">
             <path d="M21 12a9 9 0 1 1-3.51-7.13" />
             <polyline points="21 4 21 10 15 10" />
           </svg>
         </span>
-        <span className={`text-left text-[10.5px] font-bold uppercase leading-[1.2] tracking-[0.05em] sm:text-[11px] ${sideText}`}>
+        <span className={`text-left text-[8.5px] font-bold uppercase leading-[1.15] tracking-[0.04em] sm:text-[9px] ${sideText}`}>
           Unlimited<br />free rewrites
         </span>
       </div>
       {/* 5-day delivery */}
-      <div className={`flex items-center gap-2.5 rounded-[14px] border px-3 py-2.5 ${sideCardBg}`}>
-        <span className={`flex h-9 w-9 shrink-0 items-center justify-center rounded-full ${sideIconRing}`}>
-          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" className="h-[18px] w-[18px]">
+      <div className={`flex items-center gap-1.5 rounded-[10px] border px-2 py-1.5 ${sideCardBg}`}>
+        <span className={`flex h-6 w-6 shrink-0 items-center justify-center rounded-full ${sideIconRing}`}>
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.2" strokeLinecap="round" strokeLinejoin="round" className="h-3 w-3">
             <rect x="3" y="5" width="18" height="16" rx="2" />
             <line x1="3" y1="10" x2="21" y2="10" />
             <line x1="8" y1="3" x2="8" y2="7" />
             <line x1="16" y1="3" x2="16" y2="7" />
           </svg>
         </span>
-        <span className={`text-left text-[10.5px] font-bold uppercase leading-[1.2] tracking-[0.05em] sm:text-[11px] ${sideText}`}>
+        <span className={`text-left text-[8.5px] font-bold uppercase leading-[1.15] tracking-[0.04em] sm:text-[9px] ${sideText}`}>
           Delivered in<br />5 days
         </span>
       </div>
@@ -839,45 +839,45 @@ function LandingPage() {
                 </strong>
               </p>
               <div className="mb-5 flex w-full flex-col items-stretch gap-3">
-                <PrimaryBtn large fullWidth>Make her song 🐾</PrimaryBtn>
+                <PrimaryBtn large fullWidth>Hear their song 🐾</PrimaryBtn>
               </div>
 
               {/* Trust badges row. refined icons, balanced weights */}
-              <div className="mb-5 grid grid-cols-3 gap-2.5">
+              <div className="mb-5 grid grid-cols-3 gap-2">
                 {/* 30-day money back. accented */}
-                <div className="flex items-center gap-2.5 rounded-[14px] border-2 border-[#B5532A] bg-gradient-to-b from-[#B5532A] to-[#9C4520] px-3 py-2.5 shadow-[0_6px_16px_-4px_rgba(181,83,42,0.45)]">
-                  <span className="relative flex h-9 w-9 shrink-0 items-center justify-center rounded-full bg-[#F8F1E4] text-[#B5532A] shadow-[inset_0_1px_2px_rgba(0,0,0,0.08)]">
-                    <span className="font-display text-[14px] font-bold leading-none tracking-[-0.02em]">30</span>
+                <div className="flex items-center gap-1.5 rounded-[10px] border border-[#B5532A] bg-gradient-to-b from-[#B5532A] to-[#9C4520] px-2 py-1.5 shadow-[0_3px_10px_-4px_rgba(181,83,42,0.4)]">
+                  <span className="relative flex h-6 w-6 shrink-0 items-center justify-center rounded-full bg-[#F8F1E4] text-[#B5532A] shadow-[inset_0_1px_2px_rgba(0,0,0,0.08)]">
+                    <span className="font-display text-[10px] font-bold leading-none tracking-[-0.02em]">30</span>
                   </span>
-                  <span className="text-left text-[10.5px] font-bold uppercase leading-[1.2] tracking-[0.05em] text-[#F8F1E4] sm:text-[11px]">
+                  <span className="text-left text-[8.5px] font-bold uppercase leading-[1.15] tracking-[0.04em] text-[#F8F1E4] sm:text-[9px]">
                     Day money-back<br />guarantee
                   </span>
                 </div>
 
                 {/* Free rewrites */}
-                <div className="flex items-center gap-2.5 rounded-[14px] border border-[#E8DDC9] bg-[#FDF7E9] px-3 py-2.5 shadow-[0_2px_6px_-2px_rgba(31,27,22,0.05)]">
-                  <span className="flex h-9 w-9 shrink-0 items-center justify-center rounded-full bg-[#F8F1E4] text-[#B5532A] ring-1 ring-[#E8DDC9]">
-                    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" className="h-[18px] w-[18px]">
+                <div className="flex items-center gap-1.5 rounded-[10px] border border-[#E8DDC9] bg-[#FDF7E9] px-2 py-1.5">
+                  <span className="flex h-6 w-6 shrink-0 items-center justify-center rounded-full bg-[#F8F1E4] text-[#B5532A] ring-1 ring-[#E8DDC9]">
+                    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.2" strokeLinecap="round" strokeLinejoin="round" className="h-3 w-3">
                       <path d="M21 12a9 9 0 1 1-3.51-7.13" />
                       <polyline points="21 4 21 10 15 10" />
                     </svg>
                   </span>
-                  <span className="text-left text-[10.5px] font-bold uppercase leading-[1.2] tracking-[0.05em] text-[#1F1A17] sm:text-[11px]">
+                  <span className="text-left text-[8.5px] font-bold uppercase leading-[1.15] tracking-[0.04em] text-[#1F1A17] sm:text-[9px]">
                     Unlimited<br />free rewrites
                   </span>
                 </div>
 
                 {/* 5-day delivery */}
-                <div className="flex items-center gap-2.5 rounded-[14px] border border-[#E8DDC9] bg-[#FDF7E9] px-3 py-2.5 shadow-[0_2px_6px_-2px_rgba(31,27,22,0.05)]">
-                  <span className="flex h-9 w-9 shrink-0 items-center justify-center rounded-full bg-[#F8F1E4] text-[#B5532A] ring-1 ring-[#E8DDC9]">
-                    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" className="h-[18px] w-[18px]">
+                <div className="flex items-center gap-1.5 rounded-[10px] border border-[#E8DDC9] bg-[#FDF7E9] px-2 py-1.5">
+                  <span className="flex h-6 w-6 shrink-0 items-center justify-center rounded-full bg-[#F8F1E4] text-[#B5532A] ring-1 ring-[#E8DDC9]">
+                    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.2" strokeLinecap="round" strokeLinejoin="round" className="h-3 w-3">
                       <rect x="3" y="5" width="18" height="16" rx="2" />
                       <line x1="3" y1="10" x2="21" y2="10" />
                       <line x1="8" y1="3" x2="8" y2="7" />
                       <line x1="16" y1="3" x2="16" y2="7" />
                     </svg>
                   </span>
-                  <span className="text-left text-[10.5px] font-bold uppercase leading-[1.2] tracking-[0.05em] text-[#1F1A17] sm:text-[11px]">
+                  <span className="text-left text-[8.5px] font-bold uppercase leading-[1.15] tracking-[0.04em] text-[#1F1A17] sm:text-[9px]">
                     Delivered in<br />5 days
                   </span>
                 </div>
@@ -1097,7 +1097,7 @@ function LandingPage() {
           </div>
 
           <div className="mt-12 text-center md:mt-14">
-            <PrimaryBtn large>Make her song 🐾</PrimaryBtn>
+            <PrimaryBtn large>Hear their song 🐾</PrimaryBtn>
             <TrustBadges />
           </div>
         </div>
@@ -1244,7 +1244,7 @@ function LandingPage() {
           </div>
 
           <div className="mt-12 text-center">
-            <PrimaryBtn large>Make her song 🐾</PrimaryBtn>
+            <PrimaryBtn large>Hear their song 🐾</PrimaryBtn>
             <TrustBadges />
           </div>
         </div>
@@ -1524,7 +1524,7 @@ function LandingPage() {
             There's no right time to give yourself this. There's just now. and
             her, still in the music, whenever you need her.
           </p>
-          <PrimaryBtn large>Make her song 🐾</PrimaryBtn>
+          <PrimaryBtn large>Hear their song 🐾</PrimaryBtn>
           <TrustBadges tone="dark" />
         </div>
       </section>
@@ -1545,7 +1545,7 @@ function LandingPage() {
               A song just for her. Ready in minutes.
             </span>
           </div>
-          <PrimaryBtn to="/create">Make her song 🐾</PrimaryBtn>
+          <PrimaryBtn to="/create">Hear their song 🐾</PrimaryBtn>
         </div>
       </div>
 
