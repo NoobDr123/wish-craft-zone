@@ -10,8 +10,8 @@ const supabase = createClient(
   Deno.env.get("SUPABASE_SERVICE_ROLE_KEY")!,
 );
 
-const FROM = "PawPrint Song <noreply@notify.ribbonsong.com>";
-const SENDER_DOMAIN = "notify.ribbonsong.com";
+const FROM = "PawPrint Song <noreply@notify.getpawprintsong.com>";
+const SENDER_DOMAIN = "notify.getpawprintsong.com";
 
 const corsHeaders = {
   "Access-Control-Allow-Origin": "*",
