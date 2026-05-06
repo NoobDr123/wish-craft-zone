@@ -609,7 +609,7 @@ function PrimaryBtn({
           track({ type: "lander_cta_click", payload: { to } })
         );
       }}
-      className={`group inline-flex items-center justify-center gap-2.5 rounded-full bg-[#8D6FAF] font-semibold text-[#FFF7EE] tracking-[0.005em] shadow-[0_6px_16px_rgba(141,111,175,0.28)] transition-all hover:-translate-y-px hover:bg-[#6B4F8A] hover:shadow-[0_10px_24px_rgba(141,111,175,0.35)] ${
+      className={`group inline-flex items-center justify-center gap-2.5 rounded-full bg-[#B5532A] font-semibold text-[#FFF7EE] tracking-[0.005em] shadow-[0_6px_16px_rgba(181,83,42,0.28)] transition-all hover:-translate-y-px hover:bg-[#7A4A2E] hover:shadow-[0_10px_24px_rgba(181,83,42,0.35)] ${
         large ? "px-[34px] py-[18px] text-[16.5px]" : "px-[26px] py-[14px] text-[15px]"
       } ${fullWidth ? "w-full" : ""}`}
     >
@@ -630,11 +630,11 @@ function Eyebrow({
 }) {
   return (
     <div
-      className={`mb-[22px] inline-flex items-center gap-2 text-[11.5px] font-semibold uppercase tracking-[0.16em] text-[#8D6FAF] ${
+      className={`mb-[22px] inline-flex items-center gap-2 text-[11.5px] font-semibold uppercase tracking-[0.16em] text-[#B5532A] ${
         center ? "justify-center" : ""
       } ${className}`}
     >
-      <span className="h-1.5 w-1.5 rounded-full bg-[#8D6FAF]" />
+      <span className="h-1.5 w-1.5 rounded-full bg-[#B5532A]" />
       {children}
     </div>
   );
@@ -736,27 +736,27 @@ function LandingPage() {
         })) satisfies FeaturedSample[]);
 
   return (
-    <div className="overflow-x-hidden bg-[#F6F0E6] font-sans text-[#1F1B16]">
+    <div className="overflow-x-hidden bg-[#F8F1E4] font-sans text-[#1F1A17]">
       <SiteHeader />
 
       {/* HERO */}
       <section className="relative overflow-hidden px-0 py-[40px] pb-[40px] sm:py-[70px] sm:pb-[60px]">
         <div className="mx-auto max-w-[1200px] px-5 sm:px-6">
           <div className="mb-6 flex w-full flex-col items-center gap-3 text-center sm:mb-8 md:mb-12 md:gap-5">
-            <span className="hidden h-px w-16 bg-[#8D6FAF]/50 md:block" />
-            <h2 style={{ fontFamily: 'Nunito, system-ui, sans-serif', fontWeight: 800 }} className="text-[16px] uppercase leading-[1.3] tracking-[0.14em] text-[#8D6FAF] sm:text-[18px] md:whitespace-nowrap md:text-[26px] md:tracking-[0.16em] lg:text-[30px]">
+            <span className="hidden h-px w-16 bg-[#B5532A]/50 md:block" />
+            <h2 style={{ fontFamily: 'Nunito, system-ui, sans-serif', fontWeight: 800 }} className="text-[16px] uppercase leading-[1.3] tracking-[0.14em] text-[#B5532A] sm:text-[18px] md:whitespace-nowrap md:text-[26px] md:tracking-[0.16em] lg:text-[30px]">
               A Song For The Dog You'll Never Stop Missing
             </h2>
-            <span className="hidden h-px w-16 bg-[#8D6FAF]/50 md:block" />
+            <span className="hidden h-px w-16 bg-[#B5532A]/50 md:block" />
           </div>
           <div className="grid items-center gap-8 md:grid-cols-[1.15fr_1fr] md:gap-[60px]">
             <div className="order-2 md:order-1">
-              <h1 className="mb-[22px] max-w-[700px] font-display text-[clamp(28px,7.5vw,64px)] font-medium italic leading-[1.08] tracking-[-0.025em] text-[#1F1B16] md:mb-[26px]">
-                <span className="font-display text-[1.05em] font-semibold not-italic text-[#8D6FAF]">
+              <h1 className="mb-[22px] max-w-[700px] font-display text-[clamp(28px,7.5vw,64px)] font-medium italic leading-[1.08] tracking-[-0.025em] text-[#1F1A17] md:mb-[26px]">
+                <span className="font-display text-[1.05em] font-semibold not-italic text-[#B5532A]">
                   &ldquo;
                 </span>
                 She's been gone three months. I made her a song. Now I play it on the drive to work, where she used to sit in the passenger seat. Some days it's the only thing that helps.
-                <span className="font-display text-[1.05em] font-semibold not-italic text-[#8D6FAF]">
+                <span className="font-display text-[1.05em] font-semibold not-italic text-[#B5532A]">
                   &rdquo;
                 </span>
               </h1>
@@ -769,7 +769,7 @@ function LandingPage() {
               </div>
               <p className="mb-7 max-w-[540px] text-[16px] leading-[1.55] text-[#5A5148] md:mb-8 md:text-[18px]">
                 When the house goes quiet, give yourself a song that brings her back into the room.{" "}
-                <strong className="font-semibold text-[#1F1B16]">
+                <strong className="font-semibold text-[#1F1A17]">
                   Written from your memories. Her name in every chorus. Yours to keep forever.
                 </strong>
               </p>
@@ -778,7 +778,7 @@ function LandingPage() {
               </div>
               <div className="w-full text-center text-[13px] leading-[1.4] text-[#5A5148] md:text-[13.5px]">
                 Made for{" "}
-                <strong className="text-[#1F1B16]">1,200+ dogs</strong>{" "}
+                <strong className="text-[#1F1A17]">1,200+ dogs</strong>{" "}
                 who are gone but still loved
               </div>
             </div>
@@ -790,7 +790,7 @@ function LandingPage() {
                   <video
                     src="/rachel-mother-real.mp4"
                     poster={rachelPhoto}
-                    className="h-full w-full object-contain bg-[#1F1B16]"
+                    className="h-full w-full object-contain bg-[#7A4A2E]"
                     autoPlay
                     loop
                     muted
@@ -801,7 +801,7 @@ function LandingPage() {
                   <img
                     src={rachelPhoto}
                     alt="Sarah holding her Golden Retriever Daisy in the late afternoon light"
-                    className="h-full w-full object-contain bg-[#1F1B16]"
+                    className="h-full w-full object-contain bg-[#7A4A2E]"
                     onClick={handleHeroPlay}
                   />
                 )}
@@ -826,9 +826,9 @@ function LandingPage() {
                   className="absolute inset-x-3 bottom-3 z-20 flex items-center justify-center gap-2.5 rounded-full bg-[rgba(246,240,230,0.97)] py-3 shadow-[0_8px_24px_rgba(0,0,0,0.28)] ring-1 ring-black/5 transition-all hover:-translate-y-px hover:shadow-[0_10px_28px_rgba(0,0,0,0.32)] sm:inset-x-4 sm:bottom-4 sm:py-3.5"
                 >
                   {!heroPlaying && (
-                    <span aria-hidden="true" className="animate-nudge-right text-[#8D6FAF] text-[14px] font-semibold sm:text-[15px]">›››</span>
+                    <span aria-hidden="true" className="animate-nudge-right text-[#B5532A] text-[14px] font-semibold sm:text-[15px]">›››</span>
                   )}
-                  <span className="flex h-8 w-8 items-center justify-center rounded-full bg-[#8D6FAF] sm:h-9 sm:w-9">
+                  <span className="flex h-8 w-8 items-center justify-center rounded-full bg-[#B5532A] sm:h-9 sm:w-9">
                     {heroPlaying ? (
                       <span className="flex gap-[3px]">
                         <span className="block h-3 w-[3px] rounded-sm bg-white sm:h-3.5" />
@@ -847,11 +847,11 @@ function LandingPage() {
                       />
                     )}
                   </span>
-                  <span className="text-[14px] font-semibold tracking-[0.005em] text-[#1F1B16] sm:text-[15px]">
+                  <span className="text-[14px] font-semibold tracking-[0.005em] text-[#1F1A17] sm:text-[15px]">
                     {heroPlaying ? "Pause" : "Listen to Example"}
                   </span>
                   {!heroPlaying && (
-                    <span aria-hidden="true" className="animate-nudge-left text-[#8D6FAF] text-[14px] font-semibold sm:text-[15px]">‹‹‹</span>
+                    <span aria-hidden="true" className="animate-nudge-left text-[#B5532A] text-[14px] font-semibold sm:text-[15px]">‹‹‹</span>
                   )}
                 </button>
 
@@ -865,7 +865,7 @@ function LandingPage() {
                 )}
               </div>
               <div className="mt-3 px-1 text-[13px] leading-[1.5] text-[#5A5148] sm:text-[13.5px]">
-                <strong className="mr-1.5 text-[11px] font-semibold uppercase tracking-[0.12em] text-[#8D6FAF]">
+                <strong className="mr-1.5 text-[11px] font-semibold uppercase tracking-[0.12em] text-[#B5532A]">
                   Hear Daisy's Song ·
                 </strong>
                 Made for Sarah's Golden Retriever three months after she passed.
@@ -878,7 +878,7 @@ function LandingPage() {
       {/* PRESS STRIP */}
       <div
         id="press"
-        className="border-y border-[#D9CEB9] bg-[#ECE2D0] px-0 py-7 md:py-9"
+        className="border-y border-[#E8DDC9] bg-[#ECE2D0] px-0 py-7 md:py-9"
       >
         <div className="mx-auto flex max-w-[1200px] flex-col items-center gap-5 px-5 sm:px-6 md:flex-row md:flex-wrap md:justify-between md:gap-10">
           <div className="shrink-0 text-center text-[11px] font-semibold uppercase tracking-[0.18em] text-[#8A8175] md:text-[11.5px]">
@@ -908,13 +908,13 @@ function LandingPage() {
       <section id="how" className="relative overflow-hidden px-0 py-[72px] md:py-[110px]">
         <div
           aria-hidden
-          className="pointer-events-none absolute inset-0 bg-[radial-gradient(ellipse_at_top,rgba(141,111,175,0.08),transparent_60%),radial-gradient(ellipse_at_bottom,rgba(232,197,71,0.06),transparent_55%)]"
+          className="pointer-events-none absolute inset-0 bg-[radial-gradient(ellipse_at_top,rgba(181,83,42,0.08),transparent_60%),radial-gradient(ellipse_at_bottom,rgba(232,197,71,0.06),transparent_55%)]"
         />
         <div className="relative mx-auto max-w-[1200px] px-5 sm:px-6">
           <div className="mx-auto mb-12 max-w-[760px] text-center md:mb-16">
             <Eyebrow center>How it works</Eyebrow>
-            <h2 className="mb-4 font-display text-[clamp(30px,7.4vw,52px)] font-medium leading-[1.05] tracking-[-0.024em] text-[#1F1B16]">
-              How <em className="italic text-[#8D6FAF]">PawPrint Song</em> Works
+            <h2 className="mb-4 font-display text-[clamp(30px,7.4vw,52px)] font-medium leading-[1.05] tracking-[-0.024em] text-[#1F1A17]">
+              How <em className="italic text-[#B5532A]">PawPrint Song</em> Works
             </h2>
             <p className="mx-auto mt-4 max-w-[560px] text-[17px] leading-[1.55] text-[#5A5148]">
               You don't have to know music. You don't have to know what to say.
@@ -925,7 +925,7 @@ function LandingPage() {
           <div className="relative grid grid-cols-1 gap-6 md:grid-cols-3 md:gap-7">
             <div
               aria-hidden
-              className="pointer-events-none absolute left-0 right-0 top-[44px] hidden h-px bg-gradient-to-r from-transparent via-[#D9CEB9] to-transparent md:block"
+              className="pointer-events-none absolute left-0 right-0 top-[44px] hidden h-px bg-gradient-to-r from-transparent via-[#E8DDC9] to-transparent md:block"
             />
 
             {[
@@ -965,24 +965,24 @@ function LandingPage() {
             ].map((s) => (
               <div
                 key={s.n}
-                className="group relative flex flex-col rounded-[20px] border border-[#D9CEB9] bg-[#FBF6EC]/80 p-7 backdrop-blur-sm transition-all duration-300 hover:-translate-y-[4px] hover:border-[#8D6FAF]/40 hover:bg-[#FBF6EC] hover:shadow-[0_14px_40px_-12px_rgba(141,111,175,0.25)] md:p-8"
+                className="group relative flex flex-col rounded-[20px] border border-[#E8DDC9] bg-[#FDF7E9]/80 p-7 backdrop-blur-sm transition-all duration-300 hover:-translate-y-[4px] hover:border-[#B5532A]/40 hover:bg-[#FDF7E9] hover:shadow-[0_14px_40px_-12px_rgba(181,83,42,0.25)] md:p-8"
               >
                 <div className="relative mb-5 flex items-center gap-3">
-                  <div className="flex h-[56px] w-[56px] items-center justify-center rounded-full border border-[#D9CEB9] bg-[#F6F0E6] font-display text-[20px] font-medium text-[#8D6FAF] shadow-[inset_0_1px_2px_rgba(255,255,255,0.6),0_2px_8px_rgba(31,27,22,0.04)] transition-all group-hover:border-[#8D6FAF]/50 group-hover:bg-white">
+                  <div className="flex h-[56px] w-[56px] items-center justify-center rounded-full border border-[#E8DDC9] bg-[#F8F1E4] font-display text-[20px] font-medium text-[#B5532A] shadow-[inset_0_1px_2px_rgba(255,255,255,0.6),0_2px_8px_rgba(31,27,22,0.04)] transition-all group-hover:border-[#B5532A]/50 group-hover:bg-white">
                     {s.n}
                   </div>
-                  <span className="text-[#8D6FAF]/70 transition-colors group-hover:text-[#8D6FAF]">
+                  <span className="text-[#B5532A]/70 transition-colors group-hover:text-[#B5532A]">
                     {s.icon}
                   </span>
                 </div>
 
-                <h3 className="mb-3 font-display text-[22px] font-medium leading-[1.2] tracking-[-0.012em] text-[#1F1B16] md:text-[24px]">
+                <h3 className="mb-3 font-display text-[22px] font-medium leading-[1.2] tracking-[-0.012em] text-[#1F1A17] md:text-[24px]">
                   {s.h}
                 </h3>
                 <p className="mb-4 text-[15px] leading-[1.6] text-[#5A5148] md:text-[15.5px]">
                   {s.p}
                 </p>
-                <p className="mt-auto border-t border-[#D9CEB9]/60 pt-4 text-[13.5px] italic leading-[1.55] text-[#8A8175]">
+                <p className="mt-auto border-t border-[#E8DDC9]/60 pt-4 text-[13.5px] italic leading-[1.55] text-[#8A8175]">
                   {s.m}
                 </p>
               </div>
@@ -1000,9 +1000,9 @@ function LandingPage() {
         <div className="mx-auto max-w-[1200px] px-5 sm:px-6">
           <div className="mx-auto mb-10 max-w-[720px] text-center md:mb-14">
             <Eyebrow center>Listen first</Eyebrow>
-            <h2 className="mb-3.5 font-display text-[clamp(28px,7vw,48px)] font-medium leading-[1.1] tracking-[-0.022em] text-[#1F1B16]">
+            <h2 className="mb-3.5 font-display text-[clamp(28px,7vw,48px)] font-medium leading-[1.1] tracking-[-0.022em] text-[#1F1A17]">
               Real songs, written for{" "}
-              <em className="italic text-[#8D6FAF]">real people.</em>
+              <em className="italic text-[#B5532A]">real people.</em>
             </h2>
             <p className="mx-auto mt-3.5 max-w-[560px] text-[17px] leading-[1.55] text-[#5A5148]">
               Press play on a few. Some are anthems. Some are lullabies. Some
@@ -1025,7 +1025,7 @@ function LandingPage() {
                         ? `Pause ${s.title}`
                         : `Play ${s.title}`
                   }
-                  className="group relative flex flex-col overflow-hidden rounded-[16px] border border-[#D9CEB9] bg-[#FBF6EC] text-left transition-all hover:-translate-y-[3px] hover:shadow-[0_8px_24px_rgba(31,27,22,0.08)] disabled:cursor-default"
+                  className="group relative flex flex-col overflow-hidden rounded-[16px] border border-[#E8DDC9] bg-[#FDF7E9] text-left transition-all hover:-translate-y-[3px] hover:shadow-[0_8px_24px_rgba(31,27,22,0.08)] disabled:cursor-default"
                 >
                   <div className="relative aspect-[5/4] overflow-hidden bg-[#ECE2D0]">
                     {s.cover_image_url && (
@@ -1050,13 +1050,13 @@ function LandingPage() {
                           {/* Sheen */}
                           <div className="absolute inset-0 rounded-full bg-[conic-gradient(from_120deg,transparent_0deg,rgba(255,255,255,0.08)_45deg,transparent_90deg,transparent_360deg)]" />
                           {/* Cover photo as label */}
-                          <div className="absolute left-1/2 top-1/2 aspect-square w-[46%] -translate-x-1/2 -translate-y-1/2 overflow-hidden rounded-full ring-2 ring-[#1F1B16]/40">
+                          <div className="absolute left-1/2 top-1/2 aspect-square w-[46%] -translate-x-1/2 -translate-y-1/2 overflow-hidden rounded-full ring-2 ring-[#1F1A17]/40">
                             <img
                               src={s.cover_image_url}
                               alt=""
                               className="h-full w-full object-cover"
                             />
-                            <div className="absolute left-1/2 top-1/2 h-2.5 w-2.5 -translate-x-1/2 -translate-y-1/2 rounded-full bg-[#F6F0E6] ring-1 ring-black/30" />
+                            <div className="absolute left-1/2 top-1/2 h-2.5 w-2.5 -translate-x-1/2 -translate-y-1/2 rounded-full bg-[#F8F1E4] ring-1 ring-black/30" />
                           </div>
                         </div>
                       </div>
@@ -1071,7 +1071,7 @@ function LandingPage() {
                         }`}
                       >
                         <span
-                          className={`relative z-10 flex h-14 w-14 items-center justify-center rounded-full bg-[#8D6FAF] shadow-[0_6px_18px_rgba(141,111,175,0.45)] transition-transform group-hover:scale-110 ${
+                          className={`relative z-10 flex h-14 w-14 items-center justify-center rounded-full bg-[#B5532A] shadow-[0_6px_18px_rgba(181,83,42,0.45)] transition-transform group-hover:scale-110 ${
                             isPlaying ? "opacity-0 group-hover:opacity-100" : ""
                           }`}
                         >
@@ -1095,19 +1095,19 @@ function LandingPage() {
                         </span>
                       </div>
                     ) : (
-                      <div className="absolute right-3 top-3 rounded-full bg-[rgba(31,27,22,0.7)] px-2.5 py-1 text-[10px] font-semibold uppercase tracking-[0.12em] text-[#F6F0E6]">
+                      <div className="absolute right-3 top-3 rounded-full bg-[rgba(31,27,22,0.7)] px-2.5 py-1 text-[10px] font-semibold uppercase tracking-[0.12em] text-[#F8F1E4]">
                         Coming soon
                       </div>
                     )}
                     {isPlaying && (
-                      <div className="absolute left-3 top-3 z-10 flex items-center gap-1.5 rounded-full bg-[rgba(31,27,22,0.75)] px-2.5 py-1 text-[10px] font-semibold uppercase tracking-[0.12em] text-[#F6F0E6]">
+                      <div className="absolute left-3 top-3 z-10 flex items-center gap-1.5 rounded-full bg-[rgba(31,27,22,0.75)] px-2.5 py-1 text-[10px] font-semibold uppercase tracking-[0.12em] text-[#F8F1E4]">
                         <span className="flex h-1.5 w-1.5 animate-pulse rounded-full bg-[#E8C547]" />
                         Now playing
                       </div>
                     )}
                   </div>
                   <div className="flex flex-1 flex-col p-[20px_22px_22px]">
-                    <h3 className="mb-2 font-display text-[19px] font-medium leading-[1.25] tracking-[-0.01em] text-[#1F1B16] md:text-[20px]">
+                    <h3 className="mb-2 font-display text-[19px] font-medium leading-[1.25] tracking-[-0.01em] text-[#1F1A17] md:text-[20px]">
                       {s.title}
                     </h3>
                     {s.quote ? (
@@ -1126,7 +1126,7 @@ function LandingPage() {
                           ? `Written for ${s.dog_name} · From a ${s.dog_breed.toLowerCase()}`
                           : null}
                     </div>
-                    <div className="mt-2 text-[11px] font-semibold uppercase tracking-[0.12em] text-[#8D6FAF]">
+                    <div className="mt-2 text-[11px] font-semibold uppercase tracking-[0.12em] text-[#B5532A]">
                       {s.genre_label}
                     </div>
                   </div>
@@ -1146,9 +1146,9 @@ function LandingPage() {
         <div className="mx-auto max-w-[1200px] px-5 sm:px-6">
           <div className="mb-10 max-w-[720px] md:mb-14">
             <Eyebrow>Who it's for</Eyebrow>
-            <h2 className="mb-3.5 font-display text-[clamp(28px,7vw,48px)] font-medium leading-[1.1] tracking-[-0.022em] text-[#1F1B16]">
+            <h2 className="mb-3.5 font-display text-[clamp(28px,7vw,48px)] font-medium leading-[1.1] tracking-[-0.022em] text-[#1F1A17]">
               No two dogs were the same.{" "}
-              <em className="italic text-[#8D6FAF]">Her song shouldn't be either.</em>
+              <em className="italic text-[#B5532A]">Her song shouldn't be either.</em>
             </h2>
             <p className="max-w-[560px] text-[16px] leading-[1.55] text-[#5A5148] md:text-[17px]">
               Whether she was a goofy lab who loved the world, a senior shepherd who watched over you for fifteen years, or a rescue mutt nobody understood but you — her song is shaped to fit her. By breed, by quirk, by the specific way she loved you.
@@ -1159,9 +1159,9 @@ function LandingPage() {
             {useCases.map((u) => (
               <div
                 key={u.eyebrow}
-                className="group relative flex flex-col overflow-hidden rounded-[16px] border border-[#D9CEB9] bg-[#FBF6EC] transition-all hover:-translate-y-[3px] hover:shadow-[0_8px_24px_rgba(31,27,22,0.08)]"
+                className="group relative flex flex-col overflow-hidden rounded-[16px] border border-[#E8DDC9] bg-[#FDF7E9] transition-all hover:-translate-y-[3px] hover:shadow-[0_8px_24px_rgba(31,27,22,0.08)]"
               >
-                <div className="relative aspect-[5/4] overflow-hidden bg-[#F6F0E6]">
+                <div className="relative aspect-[5/4] overflow-hidden bg-[#F8F1E4]">
                   <img
                     src={u.img}
                     alt=""
@@ -1172,10 +1172,10 @@ function LandingPage() {
                   />
                 </div>
                 <div className="flex flex-1 flex-col p-[22px_22px_24px]">
-                  <span className="mb-2 block text-[11px] font-semibold uppercase tracking-[0.14em] text-[#8D6FAF]">
+                  <span className="mb-2 block text-[11px] font-semibold uppercase tracking-[0.14em] text-[#B5532A]">
                     {u.eyebrow}
                   </span>
-                  <h3 className="mb-2 font-display text-[20px] font-medium leading-[1.2] tracking-[-0.01em] text-[#1F1B16] md:text-[22px]">
+                  <h3 className="mb-2 font-display text-[20px] font-medium leading-[1.2] tracking-[-0.01em] text-[#1F1A17] md:text-[22px]">
                     {u.label}
                   </h3>
                   <p className="text-[14px] leading-[1.55] text-[#5A5148]">
@@ -1198,8 +1198,8 @@ function LandingPage() {
         <div className="mx-auto max-w-[1200px] px-5 sm:px-6">
           <div className="mx-auto mb-10 max-w-[720px] text-center md:mb-14">
             <Eyebrow center>Real owners</Eyebrow>
-            <h2 className="mb-3.5 font-display text-[clamp(28px,7vw,48px)] font-medium leading-[1.1] tracking-[-0.022em] text-[#1F1B16]">
-              <em className="italic text-[#8D6FAF]">1,200+</em> dogs honored.
+            <h2 className="mb-3.5 font-display text-[clamp(28px,7vw,48px)] font-medium leading-[1.1] tracking-[-0.022em] text-[#1F1A17]">
+              <em className="italic text-[#B5532A]">1,200+</em> dogs honored.
               <br />
               Each song held something a frame couldn't.
             </h2>
@@ -1213,11 +1213,11 @@ function LandingPage() {
               return (
                 <div
                   key={i}
-                  className="flex flex-col rounded-[16px] border border-[#D9CEB9] bg-[#FBF6EC] p-[24px_22px]"
+                  className="flex flex-col rounded-[16px] border border-[#E8DDC9] bg-[#FDF7E9] p-[24px_22px]"
                 >
                   <div className="flex items-start gap-4">
                     <div className="min-w-0 flex-1">
-                      <p className="mb-4 text-[14.5px] leading-[1.55] text-[#1F1B16]">
+                      <p className="mb-4 text-[14.5px] leading-[1.55] text-[#1F1A17]">
                         {t.quote}
                       </p>
                     </div>
@@ -1255,13 +1255,13 @@ function LandingPage() {
                         }`}
                       />
                       {/* Center label */}
-                      <div className="absolute left-1/2 top-1/2 flex h-[34%] w-[34%] -translate-x-1/2 -translate-y-1/2 items-center justify-center rounded-full bg-[#8D6FAF]">
-                        <div className="h-[6px] w-[6px] rounded-full bg-[#FBF6EC]" />
+                      <div className="absolute left-1/2 top-1/2 flex h-[34%] w-[34%] -translate-x-1/2 -translate-y-1/2 items-center justify-center rounded-full bg-[#B5532A]">
+                        <div className="h-[6px] w-[6px] rounded-full bg-[#FDF7E9]" />
                       </div>
                       {/* Play/pause icon overlay */}
                       {!isPlaying && (
                         <div className="absolute inset-0 flex items-center justify-center">
-                          <div className="flex h-5 w-5 items-center justify-center rounded-full bg-[#FBF6EC]/95 shadow-[0_2px_6px_rgba(0,0,0,0.4)] sm:h-6 sm:w-6 md:h-7 md:w-7">
+                          <div className="flex h-5 w-5 items-center justify-center rounded-full bg-[#FDF7E9]/95 shadow-[0_2px_6px_rgba(0,0,0,0.4)] sm:h-6 sm:w-6 md:h-7 md:w-7">
                             <svg
                               width="10"
                               height="11"
@@ -1269,24 +1269,24 @@ function LandingPage() {
                               fill="none"
                               className="ml-[1px]"
                             >
-                              <path d="M0 0L11 6L0 12V0Z" fill="#1F1B16" />
+                              <path d="M0 0L11 6L0 12V0Z" fill="#1F1A17" />
                             </svg>
                           </div>
                         </div>
                       )}
                       {isPlaying && (
                         <div className="absolute inset-0 flex items-center justify-center">
-                          <div className="flex h-5 w-5 items-center justify-center rounded-full bg-[#FBF6EC]/95 shadow-[0_2px_6px_rgba(0,0,0,0.4)] sm:h-6 sm:w-6 md:h-7 md:w-7">
+                          <div className="flex h-5 w-5 items-center justify-center rounded-full bg-[#FDF7E9]/95 shadow-[0_2px_6px_rgba(0,0,0,0.4)] sm:h-6 sm:w-6 md:h-7 md:w-7">
                             <svg width="9" height="11" viewBox="0 0 10 12" fill="none">
-                              <rect x="0" y="0" width="3" height="12" fill="#1F1B16" />
-                              <rect x="7" y="0" width="3" height="12" fill="#1F1B16" />
+                              <rect x="0" y="0" width="3" height="12" fill="#1F1A17" />
+                              <rect x="7" y="0" width="3" height="12" fill="#1F1A17" />
                             </svg>
                           </div>
                         </div>
                       )}
                     </button>
                   </div>
-                  <div className="mt-4 flex items-center gap-3 border-t border-[#D9CEB9] pt-4">
+                  <div className="mt-4 flex items-center gap-3 border-t border-[#E8DDC9] pt-4">
                     <img
                       src={t.avatar}
                       alt=""
@@ -1294,7 +1294,7 @@ function LandingPage() {
                       className="h-10 w-10 rounded-full object-cover"
                     />
                     <div className="min-w-0">
-                      <div className="text-[13.5px] font-semibold text-[#1F1B16]">
+                      <div className="text-[13.5px] font-semibold text-[#1F1A17]">
                         {t.name}
                       </div>
                       <div className="text-[12px] leading-snug text-[#8A8175] break-words">
@@ -1312,14 +1312,14 @@ function LandingPage() {
       {/* GUARANTEE */}
       <section className="px-0 py-[64px] md:py-[100px]">
         <div className="mx-auto max-w-[820px] px-5 sm:px-6">
-          <div className="rounded-[20px] border-2 border-[#1F1B16] bg-[#FBF6EC] p-[40px_32px] text-center md:p-[60px_56px]">
-            <div className="mx-auto mb-5 inline-flex items-center gap-2 text-[11px] font-semibold uppercase tracking-[0.18em] text-[#8D6FAF]">
-              <span className="h-1.5 w-1.5 rounded-full bg-[#8D6FAF]" />
+          <div className="rounded-[20px] border-2 border-[#1F1A17] bg-[#FDF7E9] p-[40px_32px] text-center md:p-[60px_56px]">
+            <div className="mx-auto mb-5 inline-flex items-center gap-2 text-[11px] font-semibold uppercase tracking-[0.18em] text-[#B5532A]">
+              <span className="h-1.5 w-1.5 rounded-full bg-[#B5532A]" />
               Our promise
             </div>
-            <h2 className="mb-5 font-display text-[clamp(26px,5.5vw,38px)] font-medium leading-[1.18] tracking-[-0.018em] text-[#1F1B16]">
+            <h2 className="mb-5 font-display text-[clamp(26px,5.5vw,38px)] font-medium leading-[1.18] tracking-[-0.018em] text-[#1F1A17]">
               If it doesn't feel right,{" "}
-              <em className="italic text-[#8D6FAF]">we rewrite it.</em>
+              <em className="italic text-[#B5532A]">we rewrite it.</em>
               <br />
               If it still doesn't, you don't pay.
             </h2>
@@ -1338,9 +1338,9 @@ function LandingPage() {
         <div className="mx-auto max-w-[820px] px-5 sm:px-6">
           <div className="mb-10 text-center md:mb-14">
             <Eyebrow center>Common questions</Eyebrow>
-            <h2 className="font-display text-[clamp(28px,7vw,44px)] font-medium leading-[1.12] tracking-[-0.02em] text-[#1F1B16]">
+            <h2 className="font-display text-[clamp(28px,7vw,44px)] font-medium leading-[1.12] tracking-[-0.02em] text-[#1F1A17]">
               Everything you might be{" "}
-              <em className="italic text-[#8D6FAF]">wondering.</em>
+              <em className="italic text-[#B5532A]">wondering.</em>
             </h2>
           </div>
 
@@ -1348,11 +1348,11 @@ function LandingPage() {
             {faqs.map((f) => (
               <details
                 key={f.q}
-                className="group rounded-[14px] border border-[#D9CEB9] bg-[#FBF6EC] p-[20px_24px] transition-colors open:border-[#8D6FAF]"
+                className="group rounded-[14px] border border-[#E8DDC9] bg-[#FDF7E9] p-[20px_24px] transition-colors open:border-[#B5532A]"
               >
-                <summary className="flex cursor-pointer list-none items-center justify-between gap-4 font-display text-[17px] font-medium leading-[1.3] tracking-[-0.005em] text-[#1F1B16] md:text-[18px]">
+                <summary className="flex cursor-pointer list-none items-center justify-between gap-4 font-display text-[17px] font-medium leading-[1.3] tracking-[-0.005em] text-[#1F1A17] md:text-[18px]">
                   {f.q}
-                  <span className="shrink-0 text-[#8D6FAF] transition-transform group-open:rotate-45 text-[22px] leading-none">
+                  <span className="shrink-0 text-[#B5532A] transition-transform group-open:rotate-45 text-[22px] leading-none">
                     +
                   </span>
                 </summary>
@@ -1366,12 +1366,12 @@ function LandingPage() {
       </section>
 
       {/* FINAL CTA */}
-      <section className="bg-[#1F1B16] px-0 py-[72px] md:py-[110px]">
+      <section className="bg-[#7A4A2E] px-0 py-[72px] md:py-[110px]">
         <div className="mx-auto max-w-[820px] px-5 text-center sm:px-6">
-          <h2 className="mb-6 font-display text-[clamp(28px,7vw,52px)] font-medium italic leading-[1.1] tracking-[-0.02em] text-[#F6F0E6]">
-            <span className="not-italic text-[#E5D9EF]">&ldquo;</span>
+          <h2 className="mb-6 font-display text-[clamp(28px,7vw,52px)] font-medium italic leading-[1.1] tracking-[-0.02em] text-[#F8F1E4]">
+            <span className="not-italic text-[#F5E6D8]">&ldquo;</span>
             I play her song on the days the house feels too empty.
-            <span className="not-italic text-[#E5D9EF]">&rdquo;</span>
+            <span className="not-italic text-[#F5E6D8]">&rdquo;</span>
           </h2>
           <p className="mx-auto mb-8 max-w-[560px] text-[16px] leading-[1.6] text-[rgba(246,240,230,0.75)] md:text-[17px]">
             There's no right time to give yourself this. There's just now — and
