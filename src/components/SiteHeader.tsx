@@ -7,7 +7,7 @@ export function SiteHeader() {
 
   return (
     <>
-      {/* Warm sienna/bronze gradient strip — replaces legacy multi-color cancer ribbon */}
+      {/* Warm sienna/bronze gradient strip. replaces legacy multi-color cancer ribbon */}
       <div
         className="h-[3px] w-full"
         style={{
@@ -16,7 +16,7 @@ export function SiteHeader() {
         }}
       />
 
-      {/* Promo bar — dog-loss positioning */}
+      {/* Promo bar. dog-loss positioning */}
       <div className="bg-[#1F1A17] px-4 py-[10px] text-center text-[12px] font-medium tracking-[0.01em] text-[#F8F1E4] sm:px-5 sm:py-[11px] sm:text-[13px]">
         <span className="mr-1.5 text-[#F5E6D8]">🐾</span>
         <span className="hidden sm:inline">
