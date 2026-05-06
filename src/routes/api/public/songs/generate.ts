@@ -76,7 +76,7 @@ export const Route = createFileRoute("/api/public/songs/generate")({
         }
         const p = parsed.data;
 
-        // ---- Build the quiz_payload (matches what the brief generator expects) ----
+        // ---- Build the quiz_payload (mirror of inputs for traceability) ----
         const quizPayload = {
           source: "manus_api",
           external_ref: p.externalRef ?? null,
@@ -85,7 +85,7 @@ export const Route = createFileRoute("/api/public/songs/generate")({
           dog_breed: p.dogBreed ?? null,
           dog_photo_url: p.photoUrl ?? null,
           dog_personality: p.personality,
-          favorite_memory: p.memory,
+          dog_memory: p.memory,
           letter_to_dog: p.message,
           genre: p.genre,
           voice: p.voice,
@@ -93,13 +93,21 @@ export const Route = createFileRoute("/api/public/songs/generate")({
         };
 
         // ---- Insert order (server-side, bypasses RLS via admin client) ----
+        // CRITICAL: write personality/memory/letter to TOP-LEVEL columns — the
+        // brief generator reads those first and falls back to quiz_payload only
+        // for legacy/web-quiz orders.
         const { data: order, error: insErr } = await supabaseAdmin
           .from("orders")
           .insert({
             buyer_email: p.buyerEmail,
             buyer_name: p.buyerName ?? null,
             dog_name: p.dogName,
+            dog_gender: p.dogGender,
             dog_breed: p.dogBreed ?? null,
+            dog_photo_url: p.photoUrl ?? null,
+            dog_personality: p.personality,
+            dog_memory: p.memory,
+            letter_to_dog: p.message,
             genre: p.genre,
             voice: p.voice,
             song_title_idea: p.songTitleIdea ?? null,
