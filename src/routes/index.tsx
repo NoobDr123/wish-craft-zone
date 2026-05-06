@@ -27,14 +27,14 @@ export const Route = createFileRoute("/")({
       supabase
         .from("public_featured_samples")
         .select(
-          "id,title,quote,for_text,genre_label,cover_image_url,audio_url,lyrics,synced_lyrics,testimonial_slug,recipient_name,relationship",
+          "id,title,quote,for_text,genre_label,cover_image_url,audio_url,lyrics,synced_lyrics,testimonial_slug,dog_name,dog_breed",
         )
         .eq("id", HERO_SAMPLE_ID)
         .maybeSingle(),
       supabase
         .from("public_featured_samples")
         .select(
-          "id,title,quote,for_text,genre_label,cover_image_url,audio_url,lyrics,synced_lyrics,testimonial_slug,recipient_name,relationship",
+          "id,title,quote,for_text,genre_label,cover_image_url,audio_url,lyrics,synced_lyrics,testimonial_slug,dog_name,dog_breed",
         )
         .is("testimonial_slug", null)
         .not("audio_url", "is", null)
@@ -111,8 +111,8 @@ interface FeaturedSample {
   audio_url: string | null;
   lyrics: string | null;
   synced_lyrics?: SyncedLine[] | null;
-  recipient_name?: string | null;
-  relationship?: string | null;
+  dog_name?: string | null;
+  dog_breed?: string | null;
 }
 
 /**
@@ -817,8 +817,8 @@ function LandingPage() {
           cover_image_url: s.cover_image_url,
           audio_url: null,
           lyrics: null,
-          recipient_name: null,
-          relationship: null,
+          dog_name: null,
+          dog_breed: null,
         })) satisfies FeaturedSample[]);
 
   return (
@@ -1201,16 +1201,16 @@ function LandingPage() {
                       <p className="mb-3 text-[14px] italic leading-[1.55] text-[#5A5148]">
                         {s.quote}
                       </p>
-                    ) : s.recipient_name && s.relationship ? (
+                    ) : s.dog_name && s.dog_breed ? (
                       <p className="mb-3 text-[14px] italic leading-[1.55] text-[#5A5148]">
-                        A song made for {s.recipient_name}, from a {s.relationship.toLowerCase()} who couldn't find the words.
+                        A song made for {s.dog_name}, from a {s.dog_breed.toLowerCase()} who couldn't find the words.
                       </p>
                     ) : null}
                     <div className="mt-auto pt-2 text-[12px] leading-[1.5] text-[#8A8175]">
                       {s.for_text
                         ? s.for_text
-                        : s.recipient_name && s.relationship
-                          ? `Written for ${s.recipient_name} · From a ${s.relationship.toLowerCase()}`
+                        : s.dog_name && s.dog_breed
+                          ? `Written for ${s.dog_name} · From a ${s.dog_breed.toLowerCase()}`
                           : null}
                     </div>
                     <div className="mt-2 text-[11px] font-semibold uppercase tracking-[0.12em] text-[#8D6FAF]">

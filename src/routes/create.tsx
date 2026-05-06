@@ -3,31 +3,33 @@ import { createFileRoute, Link, useNavigate, useSearch } from "@tanstack/react-r
 import { QuizShell } from "@/components/QuizShell";
 import {
   EmailInput,
-  ListSelect,
   PillSelect,
   Question,
   TextArea,
   TextInput,
   TipChips,
 } from "@/components/QuizInputs";
-import { useQuizStore } from "@/stores/quizStore";
+import {
+  useQuizStore,
+  type DogBreedKey,
+  type DogGenderKey,
+  type GenreKey,
+  type VoiceKey,
+  pronouns,
+  resolveBreed,
+} from "@/stores/quizStore";
+import {
+  GENRE_OPTIONS,
+  LETTER_CHIPS,
+  MEMORY_CHIPS,
+  MEMORY_PLACEHOLDER,
+  letterPlaceholder,
+  personalityCopy,
+} from "@/lib/quizCopy";
 import { track, ensureSession } from "@/lib/tracking";
 import { supabase } from "@/integrations/supabase/client";
 import { useAuth } from "@/hooks/useAuth";
 import { Gift, AlertCircle } from "lucide-react";
-import {
-  getProfile,
-  journeyOptions,
-  themeOptions,
-  q4Copy,
-  q5Copy,
-  q6Copy,
-  q8Copy,
-  q4Tips,
-  q5Tips,
-  q6Tips,
-  q8Tips,
-} from "@/lib/quizCopy";
 
 type CreateSearch = { reward?: string; promo?: string };
 
@@ -41,48 +43,56 @@ export const Route = createFileRoute("/create")({
   },
   head: () => ({
     meta: [
-      { title: "Create Their Song · PawPrint Song" },
+      { title: "Tell us about your dog · PawPrint Song" },
       {
         name: "description",
         content:
-          "A gentle, guided conversation about the person you love. We'll turn their story into a song just for them.",
+          "A gentle, guided conversation about your dog. We'll turn her story into a song just for her.",
       },
     ],
   }),
 });
 
-const RELATIONSHIPS = [
-  "Husband",
-  "Wife",
-  "Mother",
-  "Father",
-  "Son",
-  "Daughter",
-  "Sibling",
-  "Grandparent",
-  "Friend",
+const BREEDS: DogBreedKey[] = [
+  "Labrador Retriever",
+  "Golden Retriever",
+  "German Shepherd",
+  "French Bulldog",
+  "Bulldog",
+  "Poodle",
+  "Goldendoodle / Labradoodle",
+  "Beagle",
+  "Rottweiler",
+  "Yorkshire Terrier",
+  "Dachshund",
+  "Boxer",
+  "Australian Shepherd",
+  "Border Collie",
+  "Pomeranian",
+  "Cavalier King Charles Spaniel",
+  "Chihuahua",
+  "Pit Bull / Staffordshire Terrier",
+  "Husky",
+  "Shih Tzu",
+  "Bernese Mountain Dog",
+  "Cocker Spaniel",
+  "Mixed breed (proudly)",
+  "Rescue, breed unknown",
   "Other",
-] as const;
+];
 
-const GENRES = [
-  "Acoustic Folk",
-  "Pop",
-  "Country",
-  "R&B / Soul",
-  "Gospel / Worship",
-  "Cinematic / Orchestral",
-  "Hip-Hop / Rap",
-  "Rock / Indie",
-] as const;
+const GENDERS: { value: DogGenderKey; label: string }[] = [
+  { value: "she", label: "She / her" },
+  { value: "he", label: "He / him" },
+];
 
-const TEMPOS = ["Slow & Tender", "Mid-tempo", "Upbeat & Triumphant"] as const;
-const VOICES = ["Female Voice", "Male Voice", "Duet", "No Preference"] as const;
+const VOICES: VoiceKey[] = ["Female Voice", "Male Voice"];
 
 const emailRe = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
 
 type QuizSnapshot = ReturnType<typeof useQuizStore.getState>;
 
-type Step = {
+interface Step {
   key: string;
   chapter: string;
   title: string;
@@ -91,9 +101,8 @@ type Step = {
   isValid: (q: QuizSnapshot) => boolean;
   render: () => React.ReactNode;
   nextLabel?: string;
-  /** Snapshot of the user's answer(s) for this step, for analytics payload. */
   answer: (q: QuizSnapshot) => Record<string, unknown>;
-};
+}
 
 function CreatePage() {
   const navigate = useNavigate();
@@ -104,14 +113,12 @@ function CreatePage() {
   const stepEnteredAt = useRef<number>(Date.now());
   const quizStartedAt = useRef<number | null>(null);
 
-  // Reward code validation state
   const [rewardStatus, setRewardStatus] = useState<
     "idle" | "validating" | "valid" | "invalid" | "needs_login"
   >("idle");
   const [rewardError, setRewardError] = useState<string | null>(null);
   const [rewardRemaining, setRewardRemaining] = useState<number | null>(null);
 
-  // Validate ?reward=CODE on mount (and whenever auth resolves)
   useEffect(() => {
     const code = search.reward?.trim();
     if (!code) return;
@@ -133,34 +140,28 @@ function CreatePage() {
         setRewardStatus("valid");
         setRewardRemaining(data.free_songs_remaining ?? null);
         q.set("reward_code", data.code);
-        // Pre-fill buyer email from logged-in user so the delivery step is skippable.
         if (user.email && !q.buyer_email) q.set("buyer_email", user.email);
       });
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [search.reward, user, authLoading]);
 
-  // Stash incoming ?promo=CODE (from Golden Ticket #2) so checkout auto-fills it.
   useEffect(() => {
     const promo = search.promo?.trim();
     if (promo) {
       try {
         sessionStorage.setItem("rs_pending_promo", promo);
       } catch {
-        /* ignore storage failures */
+        /* ignore */
       }
     }
   }, [search.promo]);
 
-  // Track quiz_start once per mount
   useEffect(() => {
     void ensureSession();
     quizStartedAt.current = Date.now();
     void track({ type: "quiz_start", stepIndex: 0 });
   }, []);
 
-  // Track question_view whenever step index changes.
-  // We read the step key/answer via a ref so the effect doesn't depend on `steps`
-  // (which is recreated each render).
   const stepRef = useRef<{ key?: string; answer?: Record<string, unknown> }>({});
   useEffect(() => {
     stepEnteredAt.current = Date.now();
@@ -172,69 +173,77 @@ function CreatePage() {
     });
   }, [index, q.buyer_email]);
 
-  const profile = useMemo(
-    () => getProfile(q.relationship, q.relationship_other, q.recipient_name, q.stage),
-    [q.relationship, q.relationship_other, q.recipient_name, q.stage],
-  );
-  const name = profile.name;
-
-  const journey = useMemo(() => journeyOptions(profile), [profile]);
-  const themes = useMemo(() => themeOptions(profile.stage), [profile.stage]);
-  const c4 = useMemo(() => q4Copy(profile), [profile]);
-  const c5 = useMemo(() => q5Copy(profile), [profile]);
-  const c6 = useMemo(() => q6Copy(profile), [profile]);
-  const c8 = useMemo(() => q8Copy(profile), [profile]);
-
-  // If a previously-selected theme is no longer valid for the current stage, clear it.
-  if (q.message && !themes.some((t) => t.value === q.message)) {
-    q.set("message", undefined);
-  }
+  const breedDisplay = useMemo(() => resolveBreed(q) ?? "your dog", [q.dog_breed, q.dog_breed_other]);
+  const pn = useMemo(() => pronouns(q.dog_gender), [q.dog_gender]);
+  const personality = useMemo(() => personalityCopy(q.dog_breed), [q.dog_breed]);
+  const dogName = q.dog_name.trim() || "your girl";
 
   const steps: Step[] = [
-    // 1. Relationship + (Other reveal) + first name
+    // 1. Basics — name, pronunciation, gender, breed
     {
-      key: "who_they_are",
-      chapter: "Who they are",
-      title: "Who is this song for?",
-      subtitle: "Pick whoever fits closest. We'll use their name in the song.",
+      key: "basics",
+      chapter: "Her name",
+      title: "Tell us about her.",
+      subtitle: "We'll use this to shape every line of her song.",
       isValid: (s) =>
-        !!s.relationship &&
-        s.recipient_name.trim().length > 1 &&
-        (s.relationship !== "Other" || s.relationship_other.trim().length > 1),
+        s.dog_name.trim().length >= 1 &&
+        !!s.dog_gender &&
+        !!s.dog_breed &&
+        (s.dog_breed !== "Other" || (s.dog_breed_other ?? "").trim().length >= 1),
       answer: (s) => ({
-        relationship: s.relationship,
-        relationship_other: s.relationship_other || undefined,
-        recipient_name: s.recipient_name,
+        dog_name: s.dog_name,
+        dog_gender: s.dog_gender,
+        dog_breed: s.dog_breed,
       }),
       render: () => (
         <div className="space-y-7">
-          <Question label="They are my…">
-            <PillSelect
-              options={RELATIONSHIPS}
-              value={q.relationship}
-              onChange={(v) => q.set("relationship", v)}
-              columns={3}
+          <Question label="Her name" helper="Just her name. Nicknames are welcome.">
+            <TextInput
+              placeholder="e.g. Daisy"
+              value={q.dog_name}
+              onChange={(e) => q.set("dog_name", e.target.value)}
+              maxLength={40}
+              autoFocus
             />
           </Question>
-          {q.relationship === "Other" && (
-            <Question label="Tell us how you know them" helper="A few words. Whatever feels true.">
+          <Question label="How do you say it? (optional)" helper="Only if it's tricky — 'DAY-zee', 'lou-LOO'…">
+            <TextInput
+              placeholder="e.g. DAY-zee"
+              value={q.pronunciation}
+              onChange={(e) => q.set("pronunciation", e.target.value)}
+              maxLength={40}
+            />
+          </Question>
+          <Question label="She is a…">
+            <PillSelect
+              options={GENDERS.map((g) => g.label)}
+              value={GENDERS.find((g) => g.value === q.dog_gender)?.label}
+              onChange={(label) => {
+                const found = GENDERS.find((g) => g.label === label);
+                if (found) q.set("dog_gender", found.value);
+              }}
+              columns={2}
+            />
+          </Question>
+          <Question label="Her breed">
+            <PillSelect
+              options={BREEDS}
+              value={q.dog_breed}
+              onChange={(v) => q.set("dog_breed", v as DogBreedKey)}
+              columns={2}
+            />
+          </Question>
+          {q.dog_breed === "Other" && (
+            <Question label="What breed is she?" helper="A few words.">
               <TextInput
-                placeholder="e.g. aunt, neighbor, godmother, best friend since childhood"
-                value={q.relationship_other}
-                onChange={(e) => q.set("relationship_other", e.target.value)}
-                maxLength={80}
+                placeholder="e.g. Italian Greyhound"
+                value={q.dog_breed_other}
+                onChange={(e) => q.set("dog_breed_other", e.target.value)}
+                maxLength={60}
                 autoFocus
               />
             </Question>
           )}
-          <Question label="Their first name" helper="Just their first name.">
-            <TextInput
-              placeholder="e.g. Sarah"
-              value={q.recipient_name}
-              onChange={(e) => q.set("recipient_name", e.target.value)}
-              maxLength={40}
-            />
-          </Question>
           <p className="rounded-2xl border border-border bg-secondary/40 px-4 py-3 text-center text-xs leading-relaxed text-muted-foreground">
             By continuing through this quiz you agree to our{" "}
             <Link to="/terms" className="font-medium text-foreground underline">
@@ -250,212 +259,173 @@ function CreatePage() {
       ),
     },
 
-    // 2. Journey stage (rich radio with sub-copy)
+    // 2. Photo (optional)
     {
-      key: "journey_stage",
-      chapter: "Their fight",
-      title: `Where is ${name} in their journey?`,
-      subtitle: "Pick what's closest right now. This shapes the tone of the whole song.",
-      isValid: (s) => !!s.stage,
-      answer: (s) => ({ stage: s.stage }),
+      key: "photo",
+      chapter: "Her face",
+      title: `A photo of ${dogName} (optional)`,
+      subtitle:
+        "We don't use the photo in the song — it just helps us picture her while we write. You can skip this.",
+      optional: true,
+      isValid: () => true,
+      answer: (s) => ({ has_photo: !!s.dog_photo_url }),
       render: () => (
-        <Question label="Choose what fits best today">
-          <div className="space-y-2.5">
-            {journey.map((opt) => {
-              const active = q.stage === opt.value;
-              return (
-                <button
-                  key={opt.value}
-                  type="button"
-                  onClick={() => q.set("stage", opt.value)}
-                  className={`flex w-full items-start justify-between gap-4 rounded-2xl border p-5 text-left transition-all ${
-                    active
-                      ? "border-primary bg-accent shadow-soft"
-                      : "border-border bg-card hover:border-primary/50 hover:bg-accent/40"
-                  }`}
-                >
-                  <span className="flex-1">
-                    <span className="block font-display text-lg font-medium text-foreground">
-                      {opt.title}
-                    </span>
-                    <span className="mt-1 block text-sm leading-relaxed text-muted-foreground">
-                      {opt.sub}
-                    </span>
-                  </span>
-                  <span
-                    className={`mt-1 flex h-5 w-5 shrink-0 items-center justify-center rounded-full border-2 transition-all ${
-                      active ? "border-primary bg-primary" : "border-border"
-                    }`}
-                  >
-                    {active && (
-                      <span className="h-2 w-2 rounded-full bg-primary-foreground" />
-                    )}
-                  </span>
-                </button>
-              );
-            })}
-          </div>
+        <Question label="Photo URL" helper="Paste a link to a photo (Google Photos, iCloud, etc.) or leave blank.">
+          <TextInput
+            placeholder="https://…"
+            value={q.dog_photo_url}
+            onChange={(e) => q.set("dog_photo_url", e.target.value)}
+            maxLength={500}
+          />
         </Question>
       ),
     },
 
-    // 3. Q4 — fighting for / holding onto / lived for
+    // 3. Personality
     {
-      key: "fighting_for",
-      chapter: "Their fight",
-      title: c4.question,
-      subtitle: c4.helper,
-      isValid: (s) => s.fighting_for.trim().length >= 1,
-      answer: (s) => ({ length: s.fighting_for.length }),
+      key: "personality",
+      chapter: "Who she was",
+      title: `Tell us who ${dogName} was.`,
+      subtitle: `What made ${pn.obj} unmistakably ${pn.poss} self? The little things — the dramatic ones, the weird ones, the ones only you noticed.`,
+      isValid: (s) => (s.dog_personality ?? "").trim().length >= 1,
+      answer: (s) => ({ length: (s.dog_personality ?? "").length }),
       render: () => (
-        <Question label={c4.sublabel}>
+        <Question label={`What made ${dogName} ${dogName}?`}>
           <TextArea
-            placeholder={c4.placeholder}
-            value={q.fighting_for}
-            onChange={(e) => q.set("fighting_for", e.target.value)}
-            rows={5}
+            placeholder={personality.placeholder}
+            value={q.dog_personality}
+            onChange={(e) => q.set("dog_personality", e.target.value)}
+            rows={6}
             autoFocus
           />
-          <TipChips chips={q4Tips(profile)} />
-        </Question>
-      ),
-    },
-
-    // 4. Q5 — qualities
-    {
-      key: "qualities",
-      chapter: "Their soul",
-      title: c5.question,
-      subtitle: c5.helper,
-      isValid: (s) => s.qualities.trim().length >= 1,
-      answer: (s) => ({ length: s.qualities.length }),
-      render: () => (
-        <Question label={c5.sublabel}>
-          <TextArea
-            placeholder={c5.placeholder}
-            value={q.qualities}
-            onChange={(e) => q.set("qualities", e.target.value)}
-            rows={5}
-          />
-          <TipChips chips={q5Tips(profile)} />
-        </Question>
-      ),
-    },
-
-    // 5. Q6 — one memory
-    {
-      key: "shared_memory",
-      chapter: "Their soul",
-      title: c6.question,
-      subtitle: c6.helper,
-      isValid: (s) => s.shared_memory.trim().length >= 1,
-      answer: (s) => ({ length: s.shared_memory.length }),
-      render: () => (
-        <Question label={c6.sublabel}>
-          <TextArea
-            placeholder={c6.placeholder}
-            value={q.shared_memory}
-            onChange={(e) => q.set("shared_memory", e.target.value)}
-            rows={5}
-          />
-          <TipChips chips={q6Tips(profile)} />
-        </Question>
-      ),
-    },
-
-    // 6. Q7 — theme (filtered by stage)
-    {
-      key: "core_message",
-      chapter: "The message",
-      title: "What's the heart of this song?",
-      subtitle: "Pick the one that says what you most want them to feel when they hear it.",
-      isValid: (s) => !!s.message && themes.some((t) => t.value === s.message),
-      answer: (s) => ({ message: s.message }),
-      render: () => (
-        <Question label="Choose what fits">
-          <ListSelect
-            options={themes.map((t) => t.title)}
-            value={themes.find((t) => t.value === q.message)?.title}
-            onChange={(label) => {
-              const found = themes.find((t) => t.title === label);
-              if (found) q.set("message", found.value);
-            }}
+          <TipChips
+            label={`Things people remember about a ${breedDisplay}`}
+            chips={personality.chips}
           />
         </Question>
       ),
     },
 
-    // 7. Q8 — letter
+    // 4. Memory
     {
-      key: "personal_words",
-      chapter: "The message",
-      title: c8.question,
-      subtitle: c8.helper,
-      isValid: (s) => s.personal_words.trim().length >= 1,
-      answer: (s) => ({ length: s.personal_words.length }),
+      key: "memory",
+      chapter: "Your story",
+      title: `One memory of ${dogName}.`,
+      subtitle:
+        "Don't pick the biggest one — pick the one that comes first. The little detail you keep replaying.",
+      isValid: (s) => (s.dog_memory ?? "").trim().length >= 1,
+      answer: (s) => ({ length: (s.dog_memory ?? "").length }),
       render: () => (
-        <Question label={c8.sublabel}>
+        <Question label="A moment, a day, a small thing">
           <TextArea
-            placeholder={c8.placeholder}
-            value={q.personal_words}
-            onChange={(e) => q.set("personal_words", e.target.value)}
+            placeholder={MEMORY_PLACEHOLDER}
+            value={q.dog_memory}
+            onChange={(e) => q.set("dog_memory", e.target.value)}
+            rows={6}
+          />
+          <TipChips chips={MEMORY_CHIPS} />
+        </Question>
+      ),
+    },
+
+    // 5. Letter
+    {
+      key: "letter",
+      chapter: "What you'd say",
+      title: `If you could say one thing to ${dogName} now…`,
+      subtitle:
+        "Write it like you're talking to her. Doesn't need to rhyme. Doesn't need to be neat. We'll do the rest.",
+      isValid: (s) => (s.letter_to_dog ?? "").trim().length >= 1,
+      answer: (s) => ({ length: (s.letter_to_dog ?? "").length }),
+      render: () => (
+        <Question label={`Your letter to ${dogName}`}>
+          <TextArea
+            placeholder={letterPlaceholder(q.dog_name)}
+            value={q.letter_to_dog}
+            onChange={(e) => q.set("letter_to_dog", e.target.value)}
             rows={8}
             autoFocus
           />
           <TipChips
-            label="Things that make letters unforgettable"
-            chips={q8Tips(profile)}
+            label="Things that make these letters unforgettable"
+            chips={LETTER_CHIPS}
           />
         </Question>
       ),
     },
 
-    // 8. Sound — genre + tempo + voice
+    // 6. Sound — genre + voice
     {
       key: "sound",
-      chapter: "Their sound",
-      title: "How should it sound?",
+      chapter: "Her sound",
+      title: "How should her song sound?",
       subtitle: "Pick what feels right. We'll shape everything to fit.",
-      isValid: (s) => !!s.genre && !!s.tempo && !!s.voice,
-      answer: (s) => ({ genre: s.genre, tempo: s.tempo, voice: s.voice }),
+      isValid: (s) => !!s.genre && !!s.voice,
+      answer: (s) => ({ genre: s.genre, voice: s.voice }),
       render: () => (
         <div className="space-y-7">
           <Question label="Genre">
-            <PillSelect
-              options={GENRES}
-              value={q.genre}
-              onChange={(v) => q.set("genre", v)}
-              columns={2}
-            />
-          </Question>
-          <Question label="Tempo">
-            <PillSelect
-              options={TEMPOS}
-              value={q.tempo}
-              onChange={(v) => q.set("tempo", v)}
-              columns={3}
-            />
+            <div className="grid gap-2.5 sm:grid-cols-2">
+              {GENRE_OPTIONS.map((opt) => {
+                const active = q.genre === opt.value;
+                return (
+                  <button
+                    key={opt.value}
+                    type="button"
+                    onClick={() => q.set("genre", opt.value as GenreKey)}
+                    className={`flex w-full items-start justify-between gap-4 rounded-2xl border p-4 text-left transition-all ${
+                      active
+                        ? "border-primary bg-accent shadow-soft"
+                        : "border-border bg-card hover:border-primary/50 hover:bg-accent/40"
+                    }`}
+                  >
+                    <span className="flex-1">
+                      <span className="block font-display text-base font-medium text-foreground">
+                        {opt.title}
+                      </span>
+                      <span className="mt-1 block text-xs leading-relaxed text-muted-foreground">
+                        {opt.subtitle}
+                      </span>
+                    </span>
+                    <span
+                      className={`mt-1 flex h-5 w-5 shrink-0 items-center justify-center rounded-full border-2 transition-all ${
+                        active ? "border-primary bg-primary" : "border-border"
+                      }`}
+                    >
+                      {active && <span className="h-2 w-2 rounded-full bg-primary-foreground" />}
+                    </span>
+                  </button>
+                );
+              })}
+            </div>
           </Question>
           <Question label="Voice">
             <PillSelect
               options={VOICES}
               value={q.voice}
-              onChange={(v) => q.set("voice", v)}
+              onChange={(v) => q.set("voice", v as VoiceKey)}
               columns={2}
+            />
+          </Question>
+          <Question label="A title idea (optional)" helper="Just a phrase or feeling. We'll write the title — this is a hint.">
+            <TextInput
+              placeholder="e.g. Daisy on the porch"
+              value={q.song_title_idea}
+              onChange={(e) => q.set("song_title_idea", e.target.value)}
+              maxLength={80}
             />
           </Question>
         </div>
       ),
     },
 
-    // 9. Buyer name + email
+    // 7. Contact
     {
       key: "delivery",
       chapter: "Delivery",
       title: "Where should we send it?",
-      subtitle: "We'll email you when it is ready, usually within 5 days.",
-      isValid: (s) =>
-        s.buyer_name.trim().length > 1 && emailRe.test(s.buyer_email),
+      subtitle: "We'll email you when it's ready — usually within 5 days.",
+      isValid: (s) => s.buyer_name.trim().length > 1 && emailRe.test(s.buyer_email),
       answer: (s) => ({ has_buyer_name: !!s.buyer_name, has_buyer_email: !!s.buyer_email }),
       nextLabel: "Review my order",
       render: () => (
@@ -487,7 +457,6 @@ function CreatePage() {
   const step = steps[safeIndex];
   const valid = step.isValid(q);
 
-  // Keep stepRef in sync so the question_view effect can include step metadata.
   stepRef.current = { key: step.key, answer: step.answer(q) };
 
   const next = () => {
@@ -502,25 +471,20 @@ function CreatePage() {
     });
     if (safeIndex < total - 1) setIndex(safeIndex + 1);
     else {
-      const totalTime = quizStartedAt.current
-        ? Date.now() - quizStartedAt.current
-        : null;
+      const totalTime = quizStartedAt.current ? Date.now() - quizStartedAt.current : null;
       void track({
         type: "quiz_complete",
         stepIndex: total,
         stepKey: step.key,
         timeOnStepMs: totalTime ?? undefined,
         payload: {
-          relationship: q.relationship,
-          stage: q.stage,
-          message: q.message,
+          dog_breed: q.dog_breed,
+          dog_gender: q.dog_gender,
           genre: q.genre,
-          tempo: q.tempo,
           voice: q.voice,
-          fighting_for_len: q.fighting_for.length,
-          qualities_len: q.qualities.length,
-          shared_memory_len: q.shared_memory.length,
-          personal_words_len: q.personal_words.length,
+          personality_len: (q.dog_personality ?? "").length,
+          memory_len: (q.dog_memory ?? "").length,
+          letter_len: (q.letter_to_dog ?? "").length,
         },
         buyerEmail: q.buyer_email || undefined,
       });
@@ -552,12 +516,9 @@ function CreatePage() {
               <div>
                 <p className="font-semibold">Free song unlocked 🎁</p>
                 <p className="mt-1 text-muted-foreground">
-                  Reward code <span className="font-mono">{search.reward}</span>{" "}
-                  applied. You won't be charged for this song.
+                  Reward code <span className="font-mono">{search.reward}</span> applied. You won't be charged for this song.
                   {rewardRemaining !== null
-                    ? ` ${rewardRemaining} free song${
-                        rewardRemaining === 1 ? "" : "s"
-                      } remaining on this code after redemption.`
+                    ? ` ${rewardRemaining} free song${rewardRemaining === 1 ? "" : "s"} remaining on this code after redemption.`
                     : ""}
                 </p>
               </div>
@@ -606,9 +567,7 @@ function CreatePage() {
         onNext={next}
         onBack={safeIndex > 0 ? back : undefined}
         isValid={valid}
-        nextLabel={
-          step.nextLabel ?? (safeIndex === total - 1 ? "Finish" : "Continue")
-        }
+        nextLabel={step.nextLabel ?? (safeIndex === total - 1 ? "Finish" : "Continue")}
         optional={step.optional}
       >
         {step.render()}

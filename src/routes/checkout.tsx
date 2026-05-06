@@ -4,7 +4,7 @@ import { Logo } from "@/components/Logo";
 import { PaymentTestModeBanner } from "@/components/PaymentTestModeBanner";
 import { StripeCustomCheckout } from "@/components/StripeCustomCheckout";
 import { ReviewSurveyModal } from "@/components/ReviewSurveyModal";
-import { useQuizStore, journeyStageOf, tenseOf } from "@/stores/quizStore";
+import { useQuizStore } from "@/stores/quizStore";
 import { supabase } from "@/integrations/supabase/client";
 import { buildOrderPatchForQuiz, ensureOrderForQuiz } from "@/lib/checkoutPrefetch";
 import {
@@ -116,7 +116,7 @@ function CheckoutPage() {
   useEffect(() => {
     setDeliveryDate(formatDeliveryDate());
   }, []);
-  const recipient = q.recipient_name || "your loved one";
+  const recipient = q.dog_name || "your dog";
 
   const quizPatch = hydrated
     ? buildOrderPatchForQuiz({ buyerEmail: email, buyerName: name })
@@ -149,58 +149,20 @@ function CheckoutPage() {
             ? crypto.randomUUID()
             : `${Date.now()}-${Math.random().toString(36).slice(2)}`;
 
-        const { journeyStageOf, tenseOf } = await import("@/stores/quizStore");
-        const journey = journeyStageOf(q.stage);
-        const tense = tenseOf(q.stage);
-        const relationshipResolved =
-          q.relationship === "Other" && q.relationship_other.trim()
-            ? q.relationship_other.trim()
-            : (q.relationship ?? null);
+        const patch = buildOrderPatchForQuiz({
+          buyerEmail: userEmail,
+          buyerName: q.buyer_name || undefined,
+        });
 
         const { error: insertError } = await supabase.from("orders").insert({
-          id: newOrderId,
+          ...patch,
           user_id: userId,
           buyer_email: userEmail,
-          buyer_name: q.buyer_name || null,
-          recipient_name: q.recipient_name,
-          relationship: relationshipResolved,
-          genre: q.genre ?? null,
-          tempo: q.tempo ?? null,
-          voice: q.voice ?? null,
-          song_title_idea: q.song_title_idea || null,
-          is_gift: q.is_gift,
-          recipient_email: q.recipient_email || null,
-          delivery_date: q.delivery_date || null,
-          personal_note: q.personal_note || null,
           amount_cents: 0,
           currency: "USD",
           status: "pending_payment",
           payment_status: "pending",
-          priority: journey === "hospice" ? "hospice" : "standard",
-          quiz_payload: {
-            q1_relationship: q.relationship,
-            q1_recipient_name: q.recipient_name,
-            q3_journey: q.stage,
-            q3_journey_stage: journey,
-            q3_tense: tense,
-            q4_fighting_for: q.fighting_for,
-            q5_qualities: q.qualities,
-            q6_shared_memory: q.shared_memory,
-            q7_theme: q.message,
-            q8_letter: q.personal_words,
-            q9_genre: q.genre,
-            q9_tempo: q.tempo,
-            q9_voice: q.voice,
-            stage: q.stage,
-            message: q.message,
-            fighting_for: q.fighting_for,
-            qualities: q.qualities,
-            shared_memory: q.shared_memory,
-            personal_words: q.personal_words,
-            relationship: relationshipResolved,
-            journey_stage: journey,
-            tense,
-          },
+          priority: "standard",
         });
         if (insertError) {
           console.error("[free redemption] order insert failed:", insertError);
@@ -208,7 +170,17 @@ function CheckoutPage() {
           setRedeemingFree(false);
           return;
         }
-        q.set("orderId", newOrderId);
+        // We need the orderId for the next step. Look it up by buyer_email + most recent.
+        const { data: createdOrder } = await supabase
+          .from("orders")
+          .select("id")
+          .eq("buyer_email", userEmail)
+          .eq("payment_status", "pending")
+          .order("created_at", { ascending: false })
+          .limit(1)
+          .maybeSingle();
+        const finalOrderId = createdOrder?.id ?? newOrderId;
+        q.set("orderId", finalOrderId);
 
         const { data, error: fnError } = await supabase.functions.invoke(
           "create-checkout",

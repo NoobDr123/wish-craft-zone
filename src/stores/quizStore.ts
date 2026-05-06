@@ -135,8 +135,44 @@ export interface QuizState {
   // Free-song reward redemption (set when user enters quiz via ?reward=CODE)
   reward_code?: string;
 
+  // ---------- Deprecated legacy fields (cancer-era quiz) ----------
+  // Kept as optional so legacy admin/checkout code still type-checks while
+  // we migrate. New code should use the dog_* fields above.
+  /** @deprecated use dog_name */
+  recipient_name?: string;
+  /** @deprecated use dog_breed */
+  relationship?: string;
+  /** @deprecated */
+  relationship_other?: string;
+  /** @deprecated */
+  stage?: string;
+  /** @deprecated */
+  tempo?: string;
+  /** @deprecated use dog_personality */
+  qualities?: string;
+  /** @deprecated use dog_memory */
+  shared_memory?: string;
+  /** @deprecated */
+  fighting_for?: string;
+  /** @deprecated use letter_to_dog */
+  personal_words?: string;
+  /** @deprecated */
+  message?: string;
+
   set: <K extends keyof QuizState>(key: K, value: QuizState[K]) => void;
   reset: () => void;
+}
+
+// ---------- Legacy type aliases (cancer-era code still imports these) ----------
+/** @deprecated */
+export type RelationshipKey = string;
+/** @deprecated map old stage strings to journey buckets — no-op shim */
+export function journeyStageOf(_stage?: string): "active" | "remission" | "memorial" | "hospice" | "memory" | "unknown" {
+  return "memory";
+}
+/** @deprecated */
+export function tenseOf(_stage?: string): "present" | "past" {
+  return "past";
 }
 
 const initial = {

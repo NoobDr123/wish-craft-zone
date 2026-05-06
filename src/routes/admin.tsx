@@ -1357,7 +1357,7 @@ function CustomerDetail({
             <tbody>
               {customer.orders.map((o: any) => (
                 <tr key={o.id} className="border-t border-border/40">
-                  <td className="p-2">{o.recipient_name}</td>
+                  <td className="p-2">{o.dog_name}</td>
                   <td className="p-2"><Badge variant="outline" className="text-[10px]">{o.status}</Badge></td>
                   <td className="p-2"><Badge variant={o.payment_status === "paid" ? "default" : o.payment_status === "failed" ? "destructive" : "outline"} className="text-[10px]">{o.payment_status}</Badge></td>
                   <td className="p-2 font-medium">{fmtMoney(o.amount_paid_cents ?? 0)}</td>
@@ -1582,7 +1582,7 @@ function UpsellsPanel() {
 
 interface OrderRow {
   id: string;
-  recipient_name: string;
+  dog_name: string;
   buyer_email: string;
   status: string;
   priority: string;
@@ -1608,7 +1608,7 @@ function OrdersPanel() {
   const load = async () => {
     let q = supabase
       .from("orders")
-      .select("id, recipient_name, buyer_email, status, priority, flagged_for_review, flag_reason, created_at, scheduled_delivery_at, delivered_at, is_gift, brief_score, amount_paid_cents, payment_status")
+      .select("id, dog_name, buyer_email, status, priority, flagged_for_review, flag_reason, created_at, scheduled_delivery_at, delivered_at, is_gift, brief_score, amount_paid_cents, payment_status")
       .not("buyer_email", "like", "pending+%@ribbonsong.com")
       .order("created_at", { ascending: false })
       .limit(200);
@@ -1677,7 +1677,7 @@ function OrdersPanel() {
             {orders.map((o) => (
               <tr key={o.id} className="border-b border-border/40 align-top">
                 <td className="p-3">
-                  <div className="font-medium">{o.recipient_name}</div>
+                  <div className="font-medium">{o.dog_name}</div>
                   {o.is_gift && <span className="text-xs text-muted-foreground">gift</span>}
                   {o.flagged_for_review && <Badge variant="destructive" className="ml-2 text-xs">flagged</Badge>}
                 </td>
@@ -2197,7 +2197,7 @@ function SamplesPanel() {
             {samples.map((s) => (
               <tr key={s.id} className="border-t border-border/40">
                 <td className="p-3 font-medium">{s.title}</td>
-                <td className="p-3 text-muted-foreground">{s.for_text ?? s.recipient_name}</td>
+                <td className="p-3 text-muted-foreground">{s.for_text ?? s.dog_name}</td>
                 <td className="p-3">{s.genre_label}</td>
                 <td className="p-3"><Badge variant="outline">{s.status}</Badge></td>
                 <td className="p-3">
@@ -2468,8 +2468,8 @@ interface ExplorerOrderRow {
   id: string;
   buyer_email: string;
   buyer_name: string | null;
-  recipient_name: string;
-  relationship: string | null;
+  dog_name: string;
+  dog_breed: string | null;
   status: string;
   payment_status: string;
   amount_cents: number;
@@ -2493,7 +2493,7 @@ function CustomerExplorerPanel() {
     setLoading(true);
     let q = supabase
       .from("orders")
-      .select("id, buyer_email, buyer_name, recipient_name, relationship, status, payment_status, amount_cents, amount_paid_cents, delivery_tier, is_gift, flagged_for_review, created_at, delivered_at, user_id")
+      .select("id, buyer_email, buyer_name, dog_name, dog_breed, status, payment_status, amount_cents, amount_paid_cents, delivery_tier, is_gift, flagged_for_review, created_at, delivered_at, user_id")
       .order("created_at", { ascending: false })
       .limit(500);
 
@@ -2517,7 +2517,7 @@ function CustomerExplorerPanel() {
     return (
       r.buyer_email?.toLowerCase().includes(s) ||
       r.buyer_name?.toLowerCase().includes(s) ||
-      r.recipient_name?.toLowerCase().includes(s) ||
+      r.dog_name?.toLowerCase().includes(s) ||
       r.id.toLowerCase().includes(s)
     );
   });
@@ -2605,8 +2605,8 @@ function CustomerExplorerPanel() {
                   <div className="text-xs text-muted-foreground">{r.buyer_email}</div>
                 </td>
                 <td className="p-3">
-                  <div>{r.recipient_name}</div>
-                  <div className="text-xs text-muted-foreground">{r.relationship || "—"}{r.is_gift ? " · gift" : ""}</div>
+                  <div>{r.dog_name}</div>
+                  <div className="text-xs text-muted-foreground">{r.dog_breed || "—"}{r.is_gift ? " · gift" : ""}</div>
                 </td>
                 <td className="p-3"><Badge variant="outline" className="text-xs">{r.status}</Badge></td>
                 <td className="p-3">
@@ -2660,7 +2660,7 @@ function CustomerDetailDrawer({ orderId, onClose }: { orderId: string; onClose: 
       const [evRes, emRes, otherRes, refRes, revRes, reactRes, sessRes] = await Promise.all([
         supabase.from("job_events").select("id, event_type, payload, created_at").eq("order_id", orderId).order("created_at", { ascending: false }).limit(200),
         email ? supabase.from("email_send_log").select("id, template_name, status, created_at, error_message").eq("recipient_email", email).order("created_at", { ascending: false }).limit(50) : Promise.resolve({ data: [] }),
-        email ? supabase.from("orders").select("id, recipient_name, status, payment_status, amount_paid_cents, created_at").eq("buyer_email", email).neq("id", orderId).order("created_at", { ascending: false }).limit(20) : Promise.resolve({ data: [] }),
+        email ? supabase.from("orders").select("id, dog_name, status, payment_status, amount_paid_cents, created_at").eq("buyer_email", email).neq("id", orderId).order("created_at", { ascending: false }).limit(20) : Promise.resolve({ data: [] }),
         supabase.from("refund_requests").select("id, request_type, reason, status, amount_cents, created_at").eq("order_id", orderId).order("created_at", { ascending: false }),
         supabase.from("revision_requests").select("id, notes, status, is_free, created_at").eq("order_id", orderId).order("created_at", { ascending: false }),
         supabase.from("reaction_videos").select("id, status, is_public, caption, created_at").eq("order_id", orderId).order("created_at", { ascending: false }),
@@ -2693,7 +2693,7 @@ function CustomerDetailDrawer({ orderId, onClose }: { orderId: string; onClose: 
             <div className="font-mono text-xs">{orderId}</div>
             {order && (
               <div className="mt-1 font-display text-lg font-semibold">
-                {order.recipient_name} <span className="text-muted-foreground font-normal text-sm">for {order.buyer_name || order.buyer_email}</span>
+                {order.dog_name} <span className="text-muted-foreground font-normal text-sm">for {order.buyer_name || order.buyer_email}</span>
               </div>
             )}
           </div>
@@ -2741,8 +2741,8 @@ function CustomerDetailDrawer({ orderId, onClose }: { orderId: string; onClose: 
             <Section title="Contact">
               <DetailField label="Buyer name" value={order.buyer_name || "—"} />
               <DetailField label="Buyer email" value={order.buyer_email} />
-              <DetailField label="Recipient" value={order.recipient_name} />
-              <DetailField label="Relationship" value={order.relationship || "—"} />
+              <DetailField label="Recipient" value={order.dog_name} />
+              <DetailField label="Breed" value={order.dog_breed || "—"} />
               <DetailField label="Is gift" value={order.is_gift ? "Yes" : "No"} />
               <DetailField label="Recipient email" value={order.recipient_email || "—"} />
               <DetailField label="Delivery date" value={order.delivery_date || "—"} />
@@ -2815,7 +2815,7 @@ function CustomerDetailDrawer({ orderId, onClose }: { orderId: string; onClose: 
                   {otherOrders.map((o) => (
                     <div key={o.id} className="px-3 py-2 flex items-center justify-between text-sm">
                       <div>
-                        <div className="font-medium">{o.recipient_name}</div>
+                        <div className="font-medium">{o.dog_name}</div>
                         <div className="text-xs text-muted-foreground">{new Date(o.created_at).toLocaleString()}</div>
                       </div>
                       <div className="flex items-center gap-2 text-xs">

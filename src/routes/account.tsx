@@ -11,7 +11,7 @@ import { supabase } from "@/integrations/supabase/client";
 
 interface OrderRow {
   id: string;
-  recipient_name: string;
+  dog_name: string;
   status: string;
   is_gift: boolean;
   delivered_at: string | null;
@@ -53,7 +53,7 @@ function AccountPage() {
     setFetching(true);
     supabase
       .from("orders")
-      .select("id, recipient_name, status, is_gift, delivered_at, created_at")
+      .select("id, dog_name, status, is_gift, delivered_at, created_at")
       .order("created_at", { ascending: false })
       .then(({ data, error }) => {
         if (cancelled) return;
@@ -150,7 +150,7 @@ function AccountPage() {
                   {orders.length > 1 ? "Now showing" : "Your song"}
                 </p>
                 <h1 className="mt-1 font-display text-3xl font-semibold sm:text-4xl">
-                  For {activeOrder.recipient_name}
+                  For {activeOrder.dog_name}
                 </h1>
                 <p className="mt-1 text-xs text-[rgba(31,27,22,0.5)]">
                   Ordered{" "}
@@ -215,7 +215,7 @@ function OrderSwitcher({
               }`}
             >
               <Music2 className="h-3.5 w-3.5" />
-              <span className="font-medium">{o.recipient_name}</span>
+              <span className="font-medium">{o.dog_name}</span>
               {o.is_gift && <Gift className="h-3 w-3 opacity-60" />}
               {inProgress && (
                 <span className="ml-1 inline-flex h-1.5 w-1.5 animate-pulse rounded-full bg-[#8D6FAF]" />
