@@ -236,7 +236,7 @@ function supportReply(d: Record<string, any>) {
 }
 
 function reactionApproved(d: Record<string, any>) {
-  const recipient = escape(d.recipient_name ?? "your loved one");
+  const recipient = escape(d.recipient_name ?? "your dog");
   const buyer = d.buyer_name ? escape(String(d.buyer_name).split(/\s+/)[0]) : "";
   const code = escape(d.reward_code ?? "");
   const freeSongs = Number(d.free_songs ?? 2);
@@ -289,7 +289,7 @@ function reactionApproved(d: Record<string, any>) {
 }
 
 function reactionRejected(d: Record<string, any>) {
-  const recipient = escape(d.recipient_name ?? "your loved one");
+  const recipient = escape(d.recipient_name ?? "your dog");
   const reason = escape(d.reason ?? "");
   const portalUrl = String(d.portal_url ?? "https://ribbonsong.com/dashboard");
 
@@ -333,7 +333,7 @@ function orderConfirmation(d: Record<string, any>) {
     typeof d.buyer_name === "string" && d.buyer_name.trim()
       ? d.buyer_name.split(/\s+/)[0]
       : "";
-  const recipient = escape(d.recipient_name ?? "your loved one");
+  const recipient = escape(d.recipient_name ?? "your dog");
   const orderRef = escape(d.order_ref ?? "");
   const dashboardUrl = String(d.dashboard_url ?? "https://ribbonsong.com/login");
 
@@ -465,7 +465,7 @@ function orderConfirmation(d: Record<string, any>) {
 }
 
 function songDelivered(d: Record<string, any>) {
-  const recipient = escape(d.recipient_name ?? "you");
+  const recipient = escape(d.recipient_name ?? "your dog");
   const buyer = escape(d.buyer_name ?? "Someone who loves you");
   const listen = String(d.listen_url ?? "");
   const portal = String(d.portal_url ?? "");
