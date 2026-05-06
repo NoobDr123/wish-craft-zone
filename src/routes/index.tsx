@@ -707,6 +707,15 @@ function LandingPage() {
   const heroAudioRef = useRef<HTMLAudioElement | null>(null);
   const [heroPlaying, setHeroPlaying] = useState(false);
   const [heroEverPlayed, setHeroEverPlayed] = useState(false);
+  const [showStickyCta, setShowStickyCta] = useState(false);
+
+  // Sticky CTA appears after scrolling past the hero
+  useEffect(() => {
+    const onScroll = () => setShowStickyCta(window.scrollY > 720);
+    window.addEventListener("scroll", onScroll, { passive: true });
+    onScroll();
+    return () => window.removeEventListener("scroll", onScroll);
+  }, []);
 
   // Funnel tracking. record one lander_view per session per page load
   useEffect(() => {
