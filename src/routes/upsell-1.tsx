@@ -92,7 +92,7 @@ function Upsell1() {
         "A third verse that ties their story together",
         "About 90 extra seconds of song to sit with",
       ]}
-      priceLabel="One-time add-on"
+      priceLabel="$19.99"
       declineLabel="No thanks, two verses is plenty"
       onAccept={accept}
       onDecline={decline}
