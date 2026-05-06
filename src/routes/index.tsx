@@ -27,14 +27,14 @@ export const Route = createFileRoute("/")({
       supabase
         .from("public_featured_samples")
         .select(
-          "id,title,quote,for_text,genre_label,cover_image_url,audio_url,lyrics,synced_lyrics,testimonial_slug,dog_name,relationship",
+          "id,title,quote,for_text,genre_label,cover_image_url,audio_url,lyrics,synced_lyrics,testimonial_slug,dog_name,dog_breed",
         )
         .eq("id", HERO_SAMPLE_ID)
         .maybeSingle(),
       supabase
         .from("public_featured_samples")
         .select(
-          "id,title,quote,for_text,genre_label,cover_image_url,audio_url,lyrics,synced_lyrics,testimonial_slug,dog_name,relationship",
+          "id,title,quote,for_text,genre_label,cover_image_url,audio_url,lyrics,synced_lyrics,testimonial_slug,dog_name,dog_breed",
         )
         .is("testimonial_slug", null)
         .not("audio_url", "is", null)
