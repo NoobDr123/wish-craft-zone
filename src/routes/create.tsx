@@ -265,17 +265,15 @@ function CreatePage() {
       chapter: "Her face",
       title: `A photo of ${dogName} (optional)`,
       subtitle:
-        "We don't use the photo in the song — it just helps us picture her while we write. You can skip this.",
+        "We don't use the photo in the song. It just helps us picture her while we write. You can skip this.",
       optional: true,
       isValid: () => true,
       answer: (s) => ({ has_photo: !!s.dog_photo_url }),
       render: () => (
-        <Question label="Photo URL" helper="Paste a link to a photo (Google Photos, iCloud, etc.) or leave blank.">
-          <TextInput
-            placeholder="https://…"
+        <Question label="Upload a photo" helper="Choose one from your device or photo gallery.">
+          <DogPhotoUploader
             value={q.dog_photo_url}
-            onChange={(e) => q.set("dog_photo_url", e.target.value)}
-            maxLength={500}
+            onChange={(url) => q.set("dog_photo_url", url)}
           />
         </Question>
       ),
