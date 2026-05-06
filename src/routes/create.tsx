@@ -9,6 +9,7 @@ import {
   TextInput,
   TipChips,
 } from "@/components/QuizInputs";
+import { BreedSelect } from "@/components/BreedSelect";
 import {
   useQuizStore,
   type DogBreedKey,
@@ -226,11 +227,10 @@ function CreatePage() {
             />
           </Question>
           <Question label="Her breed">
-            <PillSelect
+            <BreedSelect
               options={BREEDS}
               value={q.dog_breed}
               onChange={(v) => q.set("dog_breed", v as DogBreedKey)}
-              columns={2}
             />
           </Question>
           {q.dog_breed === "Other" && (
