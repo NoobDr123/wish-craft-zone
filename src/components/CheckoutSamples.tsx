@@ -9,7 +9,7 @@ interface SampleSong {
   for_text: string | null;
   quote: string | null;
   audio_url: string | null;
-  recipient_name: string;
+  dog_name: string | null;
 }
 
 /**
@@ -53,7 +53,7 @@ export default function CheckoutSamples() {
     (async () => {
       const { data } = await supabase
         .from("public_featured_samples")
-        .select("id,title,for_text,quote,audio_url,recipient_name")
+        .select("id,title,for_text,quote,audio_url,dog_name")
         .not("audio_url", "is", null)
         .order("sort_order", { ascending: true })
         .limit(3);

@@ -1,28 +1,42 @@
 import { useEffect } from "react";
 import { X } from "lucide-react";
-import { useQuizStore, type GenreKey, type RelationshipKey, type VoiceKey } from "@/stores/quizStore";
+import {
+  useQuizStore,
+  type DogBreedKey,
+  type DogGenderKey,
+  type GenreKey,
+  type VoiceKey,
+} from "@/stores/quizStore";
 
 interface ReviewSurveyModalProps {
   open: boolean;
   onClose: () => void;
 }
 
-const RELATIONSHIPS: RelationshipKey[] = [
-  "Husband", "Wife", "Mother", "Father", "Son", "Daughter",
-  "Sibling", "Grandparent", "Friend", "Other",
+const BREEDS: DogBreedKey[] = [
+  "Labrador Retriever",
+  "Golden Retriever",
+  "German Shepherd",
+  "Goldendoodle / Labradoodle",
+  "Husky",
+  "Pit Bull / Staffordshire Terrier",
+  "Mixed breed (proudly)",
+  "Rescue, breed unknown",
+  "Other",
 ];
 
-const GENRES: GenreKey[] = [
-  "Pop", "Country", "Acoustic Folk", "R&B / Soul", "Gospel / Worship",
-  "Rock / Indie", "Hip-Hop / Rap", "Cinematic / Orchestral",
+const GENDERS: { value: DogGenderKey; label: string }[] = [
+  { value: "she", label: "She / her" },
+  { value: "he", label: "He / him" },
 ];
 
-const VOICES: VoiceKey[] = ["Female Voice", "Male Voice", "Duet", "No Preference"];
+const GENRES: GenreKey[] = ["Acoustic", "Country", "Folk", "Lullaby", "Cinematic", "Instrumental only"];
+
+const VOICES: VoiceKey[] = ["Female Voice", "Male Voice"];
 
 export function ReviewSurveyModal({ open, onClose }: ReviewSurveyModalProps) {
   const q = useQuizStore();
 
-  // Lock background scroll while modal is open
   useEffect(() => {
     if (!open) return;
     const prev = document.body.style.overflow;
@@ -32,7 +46,6 @@ export function ReviewSurveyModal({ open, onClose }: ReviewSurveyModalProps) {
     };
   }, [open]);
 
-  // Close on Escape
   useEffect(() => {
     if (!open) return;
     const onKey = (e: KeyboardEvent) => {
@@ -56,13 +69,12 @@ export function ReviewSurveyModal({ open, onClose }: ReviewSurveyModalProps) {
         className="flex h-full w-full max-w-lg flex-col overflow-hidden rounded-3xl bg-background shadow-card md:max-h-[90vh]"
         onClick={(e) => e.stopPropagation()}
       >
-        {/* Header */}
         <header className="flex shrink-0 items-start justify-between border-b border-border px-6 py-5">
           <div>
             <h2 id="review-survey-title" className="font-display text-xl font-bold text-foreground">
-              Review and Edit Your Survey
+              Review and edit your answers
             </h2>
-            <p className="mt-1 text-sm text-muted-foreground">Scroll down to see your answers</p>
+            <p className="mt-1 text-sm text-muted-foreground">Scroll down to see all answers</p>
           </div>
           <button
             type="button"
@@ -74,69 +86,68 @@ export function ReviewSurveyModal({ open, onClose }: ReviewSurveyModalProps) {
           </button>
         </header>
 
-        {/* Scrollable body */}
         <div className="flex-1 overflow-y-auto px-6 py-6 space-y-8">
-          {/* Section 1: Basics */}
           <section>
             <h3 className="font-display text-sm font-bold uppercase tracking-wider text-primary">
-              Let's start with the basics
+              About her
             </h3>
-
             <div className="mt-5">
-              <label className="text-sm font-medium text-foreground">Who's this for?</label>
+              <label className="text-sm font-medium text-foreground">Her name</label>
+              <Input
+                value={q.dog_name}
+                onChange={(v) => q.set("dog_name", v)}
+                placeholder="e.g. Daisy"
+              />
+            </div>
+            <div className="mt-5">
+              <label className="text-sm font-medium text-foreground">Pronouns</label>
               <div className="mt-2 flex flex-wrap gap-2">
-                {RELATIONSHIPS.map((r) => (
+                {GENDERS.map((g) => (
                   <Pill
-                    key={r}
-                    selected={q.relationship === r}
-                    onClick={() => q.set("relationship", r)}
+                    key={g.value}
+                    selected={q.dog_gender === g.value}
+                    onClick={() => q.set("dog_gender", g.value)}
                   >
-                    {r}
+                    {g.label}
                   </Pill>
                 ))}
               </div>
             </div>
-
             <div className="mt-5">
-              <label className="text-sm font-medium text-foreground">What's their name?</label>
-              <Input
-                value={q.recipient_name}
-                onChange={(v) => q.set("recipient_name", v)}
-                placeholder="Their name"
-              />
+              <label className="text-sm font-medium text-foreground">Her breed</label>
+              <div className="mt-2 flex flex-wrap gap-2">
+                {BREEDS.map((b) => (
+                  <Pill
+                    key={b}
+                    selected={q.dog_breed === b}
+                    onClick={() => q.set("dog_breed", b)}
+                  >
+                    {b}
+                  </Pill>
+                ))}
+              </div>
             </div>
           </section>
 
-          {/* Section 2: Genre */}
           <section>
             <h3 className="font-display text-sm font-bold uppercase tracking-wider text-primary">
-              Choose a genre
+              Her sound
             </h3>
-
             <div className="mt-5">
-              <label className="text-sm font-medium text-foreground">Preferred Genre</label>
+              <label className="text-sm font-medium text-foreground">Genre</label>
               <div className="mt-2 flex flex-wrap gap-2">
                 {GENRES.map((g) => (
-                  <Pill
-                    key={g}
-                    selected={q.genre === g}
-                    onClick={() => q.set("genre", g)}
-                  >
+                  <Pill key={g} selected={q.genre === g} onClick={() => q.set("genre", g)}>
                     {g}
                   </Pill>
                 ))}
               </div>
             </div>
-
             <div className="mt-5">
-              <label className="text-sm font-medium text-foreground">Preferred Voice</label>
+              <label className="text-sm font-medium text-foreground">Voice</label>
               <div className="mt-2 flex flex-wrap gap-2">
                 {VOICES.map((v) => (
-                  <Pill
-                    key={v}
-                    selected={q.voice === v}
-                    onClick={() => q.set("voice", v)}
-                  >
+                  <Pill key={v} selected={q.voice === v} onClick={() => q.set("voice", v)}>
                     {v}
                   </Pill>
                 ))}
@@ -144,41 +155,37 @@ export function ReviewSurveyModal({ open, onClose }: ReviewSurveyModalProps) {
             </div>
           </section>
 
-          {/* Section 3: What makes them special */}
           <section>
             <h3 className="font-display text-sm font-bold uppercase tracking-wider text-primary">
-              What makes them special?
+              Her story
             </h3>
             <div className="mt-5">
-              <label className="text-sm font-medium text-foreground">Their beautiful qualities</label>
+              <label className="text-sm font-medium text-foreground">Who she was</label>
               <Textarea
-                value={q.qualities}
-                onChange={(v) => q.set("qualities", v)}
-                placeholder="Kind, funny, brave…"
+                value={q.dog_personality ?? ""}
+                onChange={(v) => q.set("dog_personality", v)}
+                placeholder="Goofy, loud, the world's biggest greeter…"
               />
             </div>
-
             <div className="mt-5">
-              <label className="text-sm font-medium text-foreground">A shared memory</label>
+              <label className="text-sm font-medium text-foreground">A memory</label>
               <Textarea
-                value={q.shared_memory}
-                onChange={(v) => q.set("shared_memory", v)}
-                placeholder="A moment you'll always remember together"
+                value={q.dog_memory ?? ""}
+                onChange={(v) => q.set("dog_memory", v)}
+                placeholder="The day you met. A walk that became a story…"
               />
             </div>
-
             <div className="mt-5">
-              <label className="text-sm font-medium text-foreground">A few personal words</label>
+              <label className="text-sm font-medium text-foreground">Your letter to her</label>
               <Textarea
-                value={q.personal_words}
-                onChange={(v) => q.set("personal_words", v)}
-                placeholder="Anything else you want to say in the song"
+                value={q.letter_to_dog ?? ""}
+                onChange={(v) => q.set("letter_to_dog", v)}
+                placeholder="If you could say one thing to her now…"
               />
             </div>
           </section>
         </div>
 
-        {/* Sticky footer */}
         <footer className="flex shrink-0 items-center justify-end gap-3 border-t border-border bg-background px-6 py-4">
           <button
             type="button"
