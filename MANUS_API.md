@@ -114,7 +114,7 @@ curl -X POST https://ribbonsong.com/api/public/songs/generate \
 | `delivered` | 100 |
 | `failed` | 0 |
 
-When `status === "delivered"`, `songUrl`, `coverImageUrl`, `lyrics`, `title`, and `shareSlug` are populated.
+When `status === "delivered"`, `songUrl` (raw audio file), `songPageUrl` (public listening page on ribbonsong.com), `coverImageUrl`, `lyrics`, `title`, and `shareSlug` are populated. Use `songPageUrl` if you want to send the customer a shareable link; use `songUrl` if you need the raw mp3.
 
 ### Polling guidance
 
