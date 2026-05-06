@@ -1186,7 +1186,7 @@ function LandingPage() {
 
       {/* HOW IT WORKS moved up — see after PRESS STRIP */}
       {/* TESTIMONIALS */}
-      <section id="stories" className="bg-[#ECE2D0] px-0 py-[64px] md:py-[100px]">
+      <section id="stories" className="bg-[#F3E7D2] px-0 py-[64px] md:py-[100px]">
         <div className="mx-auto max-w-[1200px] px-5 sm:px-6">
           <div className="mx-auto mb-10 max-w-[720px] text-center md:mb-14">
             <Eyebrow center>Real owners</Eyebrow>
