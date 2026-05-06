@@ -1531,6 +1531,24 @@ function LandingPage() {
 
       <SiteFooter />
 
+      {/* Sticky bottom CTA. appears after scrolling past hero */}
+      <div
+        className={`pointer-events-none fixed inset-x-0 bottom-0 z-40 flex justify-center px-4 pb-4 transition-all duration-300 ${
+          showStickyCta ? "translate-y-0 opacity-100" : "translate-y-6 opacity-0"
+        }`}
+        aria-hidden={!showStickyCta}
+      >
+        <div className="pointer-events-auto flex w-full max-w-[520px] items-center justify-between gap-3 rounded-full border border-[#1F1A17]/10 bg-[#FDF7E9]/95 px-4 py-2.5 shadow-[0_18px_40px_-12px_rgba(31,27,22,0.35)] backdrop-blur-md">
+          <div className="hidden min-w-0 flex-1 items-center gap-2 sm:flex">
+            <span className="text-[18px] leading-none">🐾</span>
+            <span className="truncate text-[13.5px] font-medium text-[#1F1A17]">
+              A song just for her. Ready in minutes.
+            </span>
+          </div>
+          <PrimaryBtn to="/create">Make her song 🐾</PrimaryBtn>
+        </div>
+      </div>
+
       {/* Inline sample audio player (no modal) */}
       <audio
         ref={sampleAudioRef}
