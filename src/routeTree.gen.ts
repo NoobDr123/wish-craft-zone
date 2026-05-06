@@ -38,6 +38,7 @@ import { Route as LovableEmailTransactionalPreviewRouteImport } from './routes/l
 import { Route as LovableEmailQueueProcessRouteImport } from './routes/lovable/email/queue/process'
 import { Route as LovableEmailAuthWebhookRouteImport } from './routes/lovable/email/auth/webhook'
 import { Route as LovableEmailAuthPreviewRouteImport } from './routes/lovable/email/auth/preview'
+import { Route as ApiPublicSongsStatusRouteImport } from './routes/api/public/songs/status'
 import { Route as ApiPublicSongsGenerateRouteImport } from './routes/api/public/songs/generate'
 
 const Upsell3Route = Upsell3RouteImport.update({
@@ -188,6 +189,11 @@ const LovableEmailAuthPreviewRoute = LovableEmailAuthPreviewRouteImport.update({
   path: '/lovable/email/auth/preview',
   getParentRoute: () => rootRouteImport,
 } as any)
+const ApiPublicSongsStatusRoute = ApiPublicSongsStatusRouteImport.update({
+  id: '/api/public/songs/status',
+  path: '/api/public/songs/status',
+  getParentRoute: () => rootRouteImport,
+} as any)
 const ApiPublicSongsGenerateRoute = ApiPublicSongsGenerateRouteImport.update({
   id: '/api/public/songs/generate',
   path: '/api/public/songs/generate',
@@ -220,6 +226,7 @@ export interface FileRoutesByFullPath {
   '/api/email/unsubscribe': typeof ApiEmailUnsubscribeRoute
   '/lovable/email/suppression': typeof LovableEmailSuppressionRoute
   '/api/public/songs/generate': typeof ApiPublicSongsGenerateRoute
+  '/api/public/songs/status': typeof ApiPublicSongsStatusRoute
   '/lovable/email/auth/preview': typeof LovableEmailAuthPreviewRoute
   '/lovable/email/auth/webhook': typeof LovableEmailAuthWebhookRoute
   '/lovable/email/queue/process': typeof LovableEmailQueueProcessRoute
@@ -252,6 +259,7 @@ export interface FileRoutesByTo {
   '/api/email/unsubscribe': typeof ApiEmailUnsubscribeRoute
   '/lovable/email/suppression': typeof LovableEmailSuppressionRoute
   '/api/public/songs/generate': typeof ApiPublicSongsGenerateRoute
+  '/api/public/songs/status': typeof ApiPublicSongsStatusRoute
   '/lovable/email/auth/preview': typeof LovableEmailAuthPreviewRoute
   '/lovable/email/auth/webhook': typeof LovableEmailAuthWebhookRoute
   '/lovable/email/queue/process': typeof LovableEmailQueueProcessRoute
@@ -285,6 +293,7 @@ export interface FileRoutesById {
   '/api/email/unsubscribe': typeof ApiEmailUnsubscribeRoute
   '/lovable/email/suppression': typeof LovableEmailSuppressionRoute
   '/api/public/songs/generate': typeof ApiPublicSongsGenerateRoute
+  '/api/public/songs/status': typeof ApiPublicSongsStatusRoute
   '/lovable/email/auth/preview': typeof LovableEmailAuthPreviewRoute
   '/lovable/email/auth/webhook': typeof LovableEmailAuthWebhookRoute
   '/lovable/email/queue/process': typeof LovableEmailQueueProcessRoute
@@ -319,6 +328,7 @@ export interface FileRouteTypes {
     | '/api/email/unsubscribe'
     | '/lovable/email/suppression'
     | '/api/public/songs/generate'
+    | '/api/public/songs/status'
     | '/lovable/email/auth/preview'
     | '/lovable/email/auth/webhook'
     | '/lovable/email/queue/process'
@@ -351,6 +361,7 @@ export interface FileRouteTypes {
     | '/api/email/unsubscribe'
     | '/lovable/email/suppression'
     | '/api/public/songs/generate'
+    | '/api/public/songs/status'
     | '/lovable/email/auth/preview'
     | '/lovable/email/auth/webhook'
     | '/lovable/email/queue/process'
@@ -383,6 +394,7 @@ export interface FileRouteTypes {
     | '/api/email/unsubscribe'
     | '/lovable/email/suppression'
     | '/api/public/songs/generate'
+    | '/api/public/songs/status'
     | '/lovable/email/auth/preview'
     | '/lovable/email/auth/webhook'
     | '/lovable/email/queue/process'
@@ -414,6 +426,7 @@ export interface RootRouteChildren {
   ApiEmailUnsubscribeRoute: typeof ApiEmailUnsubscribeRoute
   LovableEmailSuppressionRoute: typeof LovableEmailSuppressionRoute
   ApiPublicSongsGenerateRoute: typeof ApiPublicSongsGenerateRoute
+  ApiPublicSongsStatusRoute: typeof ApiPublicSongsStatusRoute
   LovableEmailAuthPreviewRoute: typeof LovableEmailAuthPreviewRoute
   LovableEmailAuthWebhookRoute: typeof LovableEmailAuthWebhookRoute
   LovableEmailQueueProcessRoute: typeof LovableEmailQueueProcessRoute
@@ -626,6 +639,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof LovableEmailAuthPreviewRouteImport
       parentRoute: typeof rootRouteImport
     }
+    '/api/public/songs/status': {
+      id: '/api/public/songs/status'
+      path: '/api/public/songs/status'
+      fullPath: '/api/public/songs/status'
+      preLoaderRoute: typeof ApiPublicSongsStatusRouteImport
+      parentRoute: typeof rootRouteImport
+    }
     '/api/public/songs/generate': {
       id: '/api/public/songs/generate'
       path: '/api/public/songs/generate'
@@ -682,6 +702,7 @@ const rootRouteChildren: RootRouteChildren = {
   ApiEmailUnsubscribeRoute: ApiEmailUnsubscribeRoute,
   LovableEmailSuppressionRoute: LovableEmailSuppressionRoute,
   ApiPublicSongsGenerateRoute: ApiPublicSongsGenerateRoute,
+  ApiPublicSongsStatusRoute: ApiPublicSongsStatusRoute,
   LovableEmailAuthPreviewRoute: LovableEmailAuthPreviewRoute,
   LovableEmailAuthWebhookRoute: LovableEmailAuthWebhookRoute,
   LovableEmailQueueProcessRoute: LovableEmailQueueProcessRoute,
