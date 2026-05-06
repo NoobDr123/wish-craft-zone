@@ -167,8 +167,8 @@ export interface QuizState {
 /** @deprecated */
 export type RelationshipKey = string;
 /** @deprecated map old stage strings to journey buckets — no-op shim */
-export function journeyStageOf(_stage?: string): "active" | "remission" | "memorial" | "hospice" | "unknown" {
-  return "unknown";
+export function journeyStageOf(_stage?: string): "active" | "remission" | "memorial" | "hospice" | "memory" | "unknown" {
+  return "memory";
 }
 /** @deprecated */
 export function tenseOf(_stage?: string): "present" | "past" {
