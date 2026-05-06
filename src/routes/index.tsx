@@ -675,6 +675,7 @@ function TrustBadges({ tone = "light" }: { tone?: "light" | "dark" }) {
   );
 }
 
+function Eyebrow({
   children,
   className = "",
   center,
