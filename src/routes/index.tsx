@@ -234,6 +234,7 @@ const fallbackSamples: Array<{
   for_text: string;
   genre_label: string;
   cover_image_url: string;
+  audio_url: string;
 }> = [
   {
     title: "Cheeto Paws",
@@ -241,8 +242,8 @@ const fallbackSamples: Array<{
       '"Her paws smelled like cheetos. I miss her smelly breath. I miss everything."',
     for_text: "Written for Max, 12 years. Yellow Lab.",
     genre_label: "Acoustic Singer-Songwriter · Female Voice",
-    cover_image_url:
-      "https://images.unsplash.com/photo-1543466835-00a7907e9de1?auto=format&fit=crop&w=600&q=80",
+    cover_image_url: whoCaregiver,
+    audio_url: RACHEL_SONG_URL,
   },
   {
     title: "Still on the Couch",
@@ -250,16 +251,16 @@ const fallbackSamples: Array<{
       '"I still leave the spot by the window open for her. Always will."',
     for_text: "Written for Bella, 9 years. Goldendoodle.",
     genre_label: "Soft Folk · Male Voice",
-    cover_image_url:
-      "https://images.unsplash.com/photo-1587300003388-59208cc962cb?auto=format&fit=crop&w=600&q=80",
+    cover_image_url: whoNewlyDiagnosed,
+    audio_url: RACHEL_SONG_URL,
   },
   {
     title: "Good Girl, Always",
     quote: '"Fifteen years. She got me through everything."',
     for_text: "Written for Ruby, 15 years. German Shepherd.",
     genre_label: "Country · Female Voice",
-    cover_image_url:
-      "https://images.unsplash.com/photo-1568572933382-74d440642117?auto=format&fit=crop&w=600&q=80",
+    cover_image_url: whoSurvivor,
+    audio_url: RACHEL_SONG_URL,
   },
   {
     title: "My Shadow",
@@ -267,16 +268,16 @@ const fallbackSamples: Array<{
       '"She was always two steps behind me. I keep forgetting to listen for her."',
     for_text: "Written for Charlie, 8 years. Border Collie.",
     genre_label: "Acoustic · Male Voice",
-    cover_image_url:
-      "https://images.unsplash.com/photo-1551717743-49959800b1f6?auto=format&fit=crop&w=600&q=80",
+    cover_image_url: whoMemory,
+    audio_url: RACHEL_SONG_URL,
   },
   {
     title: "The Front Door",
     quote: '"I still look for her when I come home."',
     for_text: "Written for Buddy, 13 years. Beagle.",
     genre_label: "Cinematic · Strings",
-    cover_image_url:
-      "https://images.unsplash.com/photo-1505628346881-b72b27e84530?auto=format&fit=crop&w=600&q=80",
+    cover_image_url: whoChild,
+    audio_url: RACHEL_SONG_URL,
   },
   {
     title: "Where the Sunbeam Was",
@@ -284,8 +285,8 @@ const fallbackSamples: Array<{
       '"She always found the warmest spot in the house. The room is colder now."',
     for_text: "Written for Rocky, 14 years. Mixed breed rescue.",
     genre_label: "Lullaby · Piano",
-    cover_image_url:
-      "https://images.unsplash.com/photo-1450778869180-41d0601e046e?auto=format&fit=crop&w=600&q=80",
+    cover_image_url: whoInTreatment,
+    audio_url: RACHEL_SONG_URL,
   },
 ];
 
