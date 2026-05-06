@@ -1377,7 +1377,7 @@ function LandingPage() {
               <circle cx="100" cy="100" r="42" />
             </svg>
 
-            <div className="relative grid gap-10 md:grid-cols-[300px,1fr] md:items-center md:gap-16 lg:grid-cols-[340px,1fr] lg:gap-20">
+            <div className="relative grid gap-10 md:grid-cols-[300px_1fr] md:items-center md:gap-16 lg:grid-cols-[340px_1fr] lg:gap-20">
               {/* The 30-DAY SEAL */}
               <div className="mx-auto md:mx-0">
                 <div className="relative h-[220px] w-[220px] md:h-[300px] md:w-[300px] lg:h-[340px] lg:w-[340px]">
