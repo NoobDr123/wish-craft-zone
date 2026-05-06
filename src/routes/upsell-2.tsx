@@ -112,20 +112,20 @@ function Upsell2() {
     <>
       <UpsellShell
         step={2}
-        badge="Priority gift delivery"
-        headline="Need their song in 24 hours?"
+        badge="Get their song faster"
+        headline="Hear your dog's song in 24 hours"
         description={
           <>
-            Standard delivery takes up to 5 days. Skip the line and get their
-            finished song in the next{" "}
-            <span className="font-semibold text-foreground">24 hours</span>,
-            perfect if the gift moment is coming up, for just{" "}
-            <span className="font-semibold text-foreground">$29.99</span>.
+            Standard takes up to 5 days. Skip the line and get the finished song
+            in your inbox in the next{" "}
+            <span className="font-semibold text-foreground">24 hours</span> —
+            ideal if there's a birthday, a vet visit, or you just can't wait
+            another night.
           </>
         }
         highlights={[
-          "Front of the queue, we start producing within the hour",
-          "Personally reviewed by our team before it reaches you",
+          "Front of the queue — we start producing within the hour",
+          "Hand-checked by a real human before it lands",
           "Emailed the moment it's ready, day or night",
         ]}
         priceLabel="$29.99"

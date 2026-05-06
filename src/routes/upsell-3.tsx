@@ -79,21 +79,21 @@ function Upsell3() {
   return (
     <UpsellShell
       step={3}
-      badge="The Perfectionist Pass"
-      headline="Make their song exactly right"
+      badge="Get it exactly right"
+      headline="Tweak your dog's song until it's perfect"
       description={
         <>
-          After you hear the first version, want to tweak a lyric, try a
-          different genre, or swap the voice? Unlock{" "}
+          Once you hear the first version, want to swap a lyric, try a softer
+          voice, or change the genre? Unlock{" "}
           <span className="font-semibold text-foreground">unlimited edits</span>{" "}
-          for 14 full days, only{" "}
-          <span className="font-semibold text-foreground">$32.99</span>.
+          for 14 full days — no extra fees, no caps, just keep refining until
+          it sounds like them.
         </>
       }
       highlights={[
-        "Unlimited lyric and tone refinements until it's perfect",
-        "Try a different genre, voice, or tempo anytime",
-        "14 days from delivery, no rush, no extra fees",
+        "Reword any lyric until it captures your dog perfectly",
+        "Try a different genre, voice, or tempo as many times as you like",
+        "14 days from delivery — no rush, no catches",
       ]}
       priceLabel="$32.99"
       declineLabel="No thanks, I trust the first version"

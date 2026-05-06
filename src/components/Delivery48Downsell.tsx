@@ -60,7 +60,7 @@ export function Delivery48Downsell({
         <div className="flex items-center gap-2 border-b border-primary/20 bg-primary/10 px-4 py-2.5 sm:px-5">
           <Clock className="h-3.5 w-3.5 text-primary" />
           <p className="text-[10px] font-bold uppercase tracking-[0.16em] text-primary sm:text-[11px]">
-            Wait, better deal inside
+            Wait — softer middle option
           </p>
         </div>
 
@@ -69,29 +69,28 @@ export function Delivery48Downsell({
             id="delivery-48-title"
             className="font-display text-xl font-semibold leading-tight text-foreground sm:text-2xl"
           >
-            Get it in 48 hours for just{" "}
+            Hear your dog's song in 48 hours for{" "}
             <span className="text-primary">$19.99</span>
           </h2>
 
           <p className="mt-2.5 text-sm leading-relaxed text-muted-foreground">
-            Not in a rush, but still don't want to wait 5 days? Skip ahead and
-            get their song in{" "}
-            <span className="font-semibold text-foreground">2 days</span>, at
+            Not in a rush, but five days feels like forever? Get the song in{" "}
+            <span className="font-semibold text-foreground">2 days</span> at
             two-thirds off the 24-hour price.
           </p>
 
           <ul className="mt-3.5 space-y-2 text-sm text-foreground">
             <li className="flex items-start gap-2.5">
               <span className="mt-1.5 h-1.5 w-1.5 shrink-0 rounded-full bg-success" />
-              <span>Delivered within 48 hours, not 5 days</span>
+              <span>In your inbox within 48 hours, not 5 days</span>
             </li>
             <li className="flex items-start gap-2.5">
               <span className="mt-1.5 h-1.5 w-1.5 shrink-0 rounded-full bg-success" />
-              <span>Same human quality check before delivery</span>
+              <span>Same human quality check before it lands</span>
             </li>
             <li className="flex items-start gap-2.5">
               <span className="mt-1.5 h-1.5 w-1.5 shrink-0 rounded-full bg-success" />
-              <span>One-time price, no subscriptions, no extras</span>
+              <span>One-time price, no subscriptions, no surprises</span>
             </li>
           </ul>
 
