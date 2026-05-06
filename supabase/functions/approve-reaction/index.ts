@@ -151,7 +151,7 @@ serve(async (req) => {
     // ---- Send approval email ----
     fireEmail(order.buyer_email, "reaction-approved", {
       buyer_name: order.buyer_name,
-      recipient_name: order.recipient_name,
+      recipient_name: order.dog_name,
       reward_code: reward.code,
       free_songs: reward.free_songs_remaining ?? 2,
       refund_amount_cents: refundResult?.amount ?? 0,

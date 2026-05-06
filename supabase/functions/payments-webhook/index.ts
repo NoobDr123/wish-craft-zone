@@ -295,7 +295,7 @@ async function sendOrderConfirmation(orderId: string) {
   const { data: order } = await supabase
     .from("orders")
     .select(
-      "id, buyer_email, buyer_name, recipient_name, relationship, genre, tempo, voice, song_title_idea, amount_cents, amount_paid_cents, currency, has_3rd_verse, is_rush, has_unlimited_edits, delivery_date, is_gift, recipient_email, created_at, product_config, confirmation_email_sent_at",
+      "id, buyer_email, buyer_name, dog_name, dog_breed, genre, tempo, voice, song_title_idea, amount_cents, amount_paid_cents, currency, has_3rd_verse, is_rush, has_unlimited_edits, delivery_date, is_gift, recipient_email, created_at, product_config, confirmation_email_sent_at",
     )
     .eq("id", orderId)
     .maybeSingle();
@@ -328,8 +328,8 @@ async function sendOrderConfirmation(orderId: string) {
       data: {
         buyer_name: order.buyer_name,
         buyer_email: order.buyer_email,
-        recipient_name: order.recipient_name,
-        relationship: order.relationship,
+        recipient_name: order.dog_name,
+        relationship: order.dog_breed,
         genre: order.genre,
         tempo: order.tempo,
         voice: order.voice,

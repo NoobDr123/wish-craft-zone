@@ -10,8 +10,8 @@ const supabase = createClient(
 const checkoutQuizPatchFields = new Set([
   "buyer_email",
   "buyer_name",
-  "recipient_name",
-  "relationship",
+  "dog_name",
+  "dog_breed",
   "genre",
   "tempo",
   "voice",
@@ -74,7 +74,7 @@ serve(async (req) => {
     let { data: existingOrder, error: orderErr } = await supabase
       .from("orders")
       .select(
-        "id, buyer_email, buyer_name, recipient_name, amount_cents, currency, stripe_customer_id, stripe_env, stripe_checkout_session_id, payment_status",
+        "id, buyer_email, buyer_name, dog_name, amount_cents, currency, stripe_customer_id, stripe_env, stripe_checkout_session_id, payment_status",
       )
       .eq("id", orderId)
       .maybeSingle();
@@ -89,7 +89,7 @@ serve(async (req) => {
     // inserts that can silently fail due to RLS or hydration races.
     if (!existingOrder) {
       const snapshot = sanitizeCheckoutQuizPatch(quizSnapshot) || sanitizeCheckoutQuizPatch(quizPatch);
-      if (!snapshot || !snapshot.recipient_name) {
+      if (!snapshot || !snapshot.dog_name) {
         console.error("[create-checkout] no order and insufficient snapshot to create one");
         return json({ error: "order_not_found", detail: "no_snapshot" }, 404);
       }
@@ -108,7 +108,7 @@ serve(async (req) => {
         .from("orders")
         .insert(insertRow)
         .select(
-          "id, buyer_email, buyer_name, recipient_name, amount_cents, currency, stripe_customer_id, stripe_env, stripe_checkout_session_id, payment_status",
+          "id, buyer_email, buyer_name, dog_name, amount_cents, currency, stripe_customer_id, stripe_env, stripe_checkout_session_id, payment_status",
         )
         .maybeSingle();
       if (insErr || !inserted) {
@@ -143,7 +143,7 @@ serve(async (req) => {
           const { data: refreshed } = await supabase
             .from("orders")
             .select(
-              "id, buyer_email, buyer_name, recipient_name, amount_cents, currency, stripe_customer_id, stripe_env, stripe_checkout_session_id, payment_status",
+              "id, buyer_email, buyer_name, dog_name, amount_cents, currency, stripe_customer_id, stripe_env, stripe_checkout_session_id, payment_status",
             )
             .eq("id", orderId)
             .maybeSingle();
@@ -193,8 +193,8 @@ serve(async (req) => {
     // Build the embedded Checkout Session.
     // We use price_data so any promo-applied amount (stored on the order) is
     // honored without needing to re-create or sync Stripe Price objects.
-    const productName = existingOrder.recipient_name
-      ? `PawPrint Song personalized song for ${existingOrder.recipient_name}`
+    const productName = existingOrder.dog_name
+      ? `PawPrint Song personalized song for ${existingOrder.dog_name}`
       : "PawPrint Song personalized song";
 
     const finalReturnUrl =
