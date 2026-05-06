@@ -44,6 +44,31 @@ serve(async (req) => {
       return json({ ok: true, skipped: "brief_exists" });
     }
 
+    // HARD GATE: refuse to generate without owner-provided context.
+    // Without these fields the model invents generic lyrics (often illness/grief
+    // tropes) that have nothing to do with the actual dog. Better to fail loud.
+    const q = (order.quiz_payload || {}) as Record<string, any>;
+    const personality = String(order.dog_personality ?? q.dog_personality ?? "").trim();
+    const memory = String(order.dog_memory ?? q.dog_memory ?? "").trim();
+    const letter = String(order.letter_to_dog ?? q.letter_to_dog ?? "").trim();
+    if (!personality && !memory && !letter) {
+      await supabase
+        .from("orders")
+        .update({
+          status: "brief_failed",
+          flagged_for_review: true,
+          flag_reason:
+            "Missing dog_personality, dog_memory, and letter_to_dog. Brief generator refuses to invent content without owner inputs.",
+        })
+        .eq("id", orderId);
+      await logEvent(orderId, "brief_refused_empty_inputs", {
+        has_personality: !!personality,
+        has_memory: !!memory,
+        has_letter: !!letter,
+      });
+      return json({ error: "missing_owner_inputs", message: "personality, memory, and letter_to_dog are all empty" }, 400);
+    }
+
     await supabase.from("orders").update({ status: "brief_generating" }).eq("id", orderId);
     await logEvent(orderId, "brief_generation_started", {});
 
