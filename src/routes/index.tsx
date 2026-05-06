@@ -574,7 +574,7 @@ const faqs = [
   },
   {
     q: "What if the song doesn't feel right?",
-    a: "We rewrite it. Free. As many times as it takes. If after all of that it still isn't right, we refund you in full. No questions.",
+    a: "We rewrite it. Free. As many times as it takes. And if after all of that it still isn't right, you have a full 30 days from delivery to request a complete refund. No questions, no fine print.",
   },
   {
     q: "Can I share the song? Use it at a memorial? Post it online?",
@@ -955,7 +955,7 @@ function LandingPage() {
                 n: "03",
                 h: "Delivered in 5 days.",
                 p: "Straight to your inbox. Streamable and downloadable, yours forever to share, gift, or play at the bedside.",
-                m: "Don't love it? You get one free rewrite, or a full refund. No questions.",
+                m: "Don't love it? Free rewrites — or a full refund within 30 days. No questions.",
                 icon: (
                   <svg viewBox="0 0 24 24" fill="none" className="h-5 w-5" stroke="currentColor" strokeWidth="1.7" strokeLinecap="round" strokeLinejoin="round">
                     <path d="M4 4h16c1.1 0 2 .9 2 2v12c0 1.1-.9 2-2 2H4c-1.1 0-2-.9-2-2V6c0-1.1.9-2 2-2z"/><polyline points="22,6 12,13 2,6"/>
