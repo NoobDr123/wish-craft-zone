@@ -730,7 +730,7 @@ function LandingPage() {
           for_text: s.for_text,
           genre_label: s.genre_label,
           cover_image_url: s.cover_image_url,
-          audio_url: null,
+          audio_url: s.audio_url,
           lyrics: null,
           dog_name: null,
           dog_breed: null,
