@@ -1,7 +1,6 @@
-// Generate-brief edge function.
-// Pulls an order, calls Claude Opus to write lyrics, calls Claude again to
-// score the lyrics, retries up to 2x if score is below threshold, then
-// persists brief + score to the order and enqueues submit_to_kie.
+// Generate-brief edge function (PawprintSong / dog-loss tribute songs).
+// Pulls an order, calls Claude to write lyrics for a song honoring a beloved dog,
+// scores them, retries up to 2x, then persists brief + score and enqueues KIE submission.
 
 import { serve } from "https://deno.land/std@0.168.0/http/server.ts";
 import { createClient } from "npm:@supabase/supabase-js@2";
@@ -20,7 +19,7 @@ const supabase = createClient(
 
 const WRITER_MODEL = "claude-opus-4-5";
 const SCORER_MODEL = "claude-opus-4-5";
-const PASS_SCORE = 3.8; // out of 5
+const PASS_SCORE = 3.8;
 const MAX_RETRIES = 2;
 
 serve(async (req) => {
@@ -41,7 +40,6 @@ serve(async (req) => {
 
     if (oErr || !order) return json({ error: "Order not found" }, 404);
 
-    // Idempotency — if we've already shipped a brief, no-op.
     if (order.brief && order.status !== "received" && order.status !== "upsells_complete") {
       return json({ ok: true, skipped: "brief_exists" });
     }
@@ -79,7 +77,6 @@ serve(async (req) => {
     }
 
     if (!bestBrief || !bestScore) {
-      // Fully failed all attempts — flag for review.
       await supabase
         .from("orders")
         .update({
@@ -91,7 +88,6 @@ serve(async (req) => {
       return json({ error: "Brief generation failed", lastError }, 500);
     }
 
-    // Persist best brief regardless of pass/fail of score (per user spec — no human gate).
     await supabase
       .from("orders")
       .update({
@@ -106,8 +102,6 @@ serve(async (req) => {
       final_score: bestScore.overall,
     });
 
-    // Enqueue Suno submission via the public enqueue_job RPC (pgmq schema is
-    // not exposed through PostgREST, so we wrap it in a security-definer fn).
     const { error: enqueueErr } = await supabase.rpc("enqueue_job" as any, {
       queue_name: "submit_to_kie",
       payload: { orderId },
@@ -128,119 +122,76 @@ serve(async (req) => {
   }
 });
 
-type JourneyStage = "active" | "hospice" | "memory";
-type Tense = "present" | "present_fading" | "past";
-
-function journeyStageFromOrder(order: any): JourneyStage {
-  const q = (order.quiz_payload || {}) as Record<string, any>;
-  const explicit = q.q3_journey_stage || q.journey_stage;
-  if (explicit === "memory" || explicit === "hospice" || explicit === "active") {
-    return explicit;
+function pronounsFor(gender?: string) {
+  if (gender === "he") {
+    return { sub: "he", obj: "him", poss: "his", goodWord: "good boy" };
   }
-  const stage = q.q3_journey || q.stage || "";
-  if (stage === "In loving memory") return "memory";
-  if (stage === "In hospice / final chapter") return "hospice";
-  return "active";
+  return { sub: "she", obj: "her", poss: "her", goodWord: "good girl" };
 }
 
-function tenseFromStage(j: JourneyStage): Tense {
-  if (j === "memory") return "past";
-  if (j === "hospice") return "present_fading";
-  return "present";
-}
-
-function tenseRulesFor(j: JourneyStage): string {
-  if (j === "memory") {
-    return `TENSE — CRITICAL HARD RULE (memory / passed):
-- The recipient has DIED. Write entirely in PAST tense for who they were ("you were", "you loved", "you held").
-- Use PRESENT tense ONLY for the writer's enduring love, memory, and the recipient's lasting impact ("I still hear you", "your light lives on").
-- NEVER use language that implies the person is still physically here ("you are fighting", "you will beat this", "we'll see you tomorrow"). This is a hard fail.
-- Tone: honoring, tender remembrance — not pitying, not falsely upbeat.`;
+function resolveBreed(order: any): string {
+  if (order.dog_breed === "Other" && order.dog_breed_other) {
+    return String(order.dog_breed_other);
   }
-  if (j === "hospice") {
-    return `TENSE — CRITICAL HARD RULE (hospice / final chapter):
-- The recipient is alive but in their final chapter. Write in PRESENT tense ("you are", "you hold", "I am here").
-- Acknowledge the moment honestly. It is okay to express rest, peace, letting go, gratitude.
-- DO NOT promise future recovery or victory ("you'll beat this", "next year we'll…"). Avoid battle/fight clichés unless the user used them.
-- DO NOT speak of them in past tense — they are still here. This is a hard fail.
-- Tone: tender, peaceful, present — gratitude and presence over fear.`;
-  }
-  return `TENSE — HARD RULE (active fight / survivor):
-- The recipient is alive and in active treatment, between treatments, or in remission. Write in PRESENT and FUTURE tense ("you are strong", "you will get through this", "we are with you").
-- DO NOT speak of them in past tense as if they had died. This is a hard fail.
-- Hope and forward motion are appropriate. Avoid overused warrior/battle clichés unless the user used those words themselves.`;
+  return order.dog_breed ?? "beloved dog";
 }
 
 async function writeBrief(order: any, refineNotes?: string): Promise<SongBrief> {
   const q = (order.quiz_payload || {}) as Record<string, any>;
   const has3rdVerse = order.has_3rd_verse === true;
   const verseCount = has3rdVerse ? 3 : 2;
-  const journey = journeyStageFromOrder(order);
-  const tense = tenseFromStage(journey);
-  const tenseRules = tenseRulesFor(journey);
-
-  const system = `You are PawPrint Song's senior songwriter. You write deeply personal songs for people facing cancer — for fighters, survivors, those in hospice, and those who have passed. Your job is to turn raw emotional details into singable lyrics that feel like a love letter, never clinical, never generic. Use specific details from the brief (names, memories, phrases) as anchors. The song must work as audio for Suno V5. You ALWAYS respect the requested grammatical tense — getting tense wrong (e.g. speaking of a deceased person as still alive, or telling someone in hospice they will recover) is the most painful failure possible and is unacceptable.`;
+  const p = pronounsFor(order.dog_gender);
+  const breed = resolveBreed(order);
+  const dogName = order.dog_name ?? "your dog";
 
   const refine = refineNotes
     ? `\n\nThe previous attempt scored low. Critique to address: ${refineNotes}`
     : "";
 
-  const fightingFor = q.q4_fighting_for ?? q.fighting_for ?? "";
-  const qualities = q.q5_qualities ?? q.qualities ?? "";
-  const sharedMemory = q.q6_shared_memory ?? q.shared_memory ?? "";
-  const theme = q.q7_theme ?? q.message ?? "";
-  const letter = q.q8_letter ?? q.personal_words ?? "";
+  const system = `You are PawprintSong's senior songwriter. You write tender, deeply personal tribute songs for people who have lost a beloved dog. Your job is to turn the owner's specific memories — the dog's name, breed, quirks, the small daily rituals, the inside jokes — into singable lyrics that feel like a love letter to a best friend who happened to walk on four paws. Never generic. Never saccharine. Never cliché. The song honors a real animal whose absence is shaped like a paw print on the floor. Write in PAST tense for who the dog was, but PRESENT tense is appropriate for the lasting love and the way the dog still shows up in the owner's life. The song must work as audio for Suno V5.`;
 
-  const userPrompt = `Write a personalized song.
+  const userPrompt = `Write a personalized tribute song for a beloved dog who has passed.
 
-JOURNEY STAGE: ${journey.toUpperCase()}  (tense: ${tense})
+THE DOG
+- Name: ${dogName}
+- Pronunciation note: ${order.quiz_payload?.pronunciation ?? ""}
+- Breed: ${breed}
+- Gender / pronouns: ${p.sub}/${p.obj}/${p.poss}  (e.g. "${p.sub} loved", "I miss ${p.obj}", "${p.poss} favorite spot")
+- Affectionate term: "${p.goodWord}"
 
-${tenseRules}
+WHO ${dogName.toUpperCase()} WAS — personality, quirks, the way ${p.sub} moved through the world
+${order.dog_personality ?? q.dog_personality ?? ""}
 
-RECIPIENT
-- Name: ${order.recipient_name}
-- Relationship to writer: ${order.relationship ?? q.q1_relationship ?? q.relationship ?? "Loved one"}
-- Stage: ${q.q3_journey ?? q.stage ?? "Unknown"}
-- Cancer type: ${q.cancer_type ?? "Unspecified"}
-- Age range: ${q.q1_age_range ?? q.age_range ?? "Adult"}
-- Pronunciation note: ${q.q1_pronunciation ?? q.pronunciation ?? ""}
+ONE SHARED MEMORY the owner can never forget
+${order.dog_memory ?? q.dog_memory ?? ""}
 
-THEIR STORY (use these as concrete imagery — never invent details)
-- ${journey === "memory" ? "What they lived for / held onto" : "Fighting for / holding onto"}: ${fightingFor}
-- Qualities ${journey === "memory" ? "you loved about them" : "you love about them"}: ${qualities}
-- One shared memory: ${sharedMemory}
-- Faith / beliefs (optional): ${q.faith_or_beliefs ?? ""}
-- Inside joke / shared phrase (optional): ${q.inside_joke ?? ""}
-- Little things — laugh, smell, gesture (optional): ${q.little_things ?? ""}
-
-THE MESSAGE
-- Core theme: ${theme}
-- Personal words / mini-letter from sender: ${letter}
-- Hope for them (optional): ${q.hope_for_them ?? ""}
+THE OWNER'S LETTER TO ${dogName.toUpperCase()} (this is the emotional core — mine it for specific phrases, images, small details)
+${order.letter_to_dog ?? q.letter_to_dog ?? ""}
 
 SOUND DIRECTION
-- Genre: ${order.genre ?? q.q9_genre ?? q.genre ?? "Acoustic Folk"}
-- Tempo: ${order.tempo ?? q.q9_tempo ?? q.tempo ?? "Mid-tempo"}
-- Voice: ${order.voice ?? q.q9_voice ?? q.voice ?? "No Preference"}
-- Title idea (optional): ${order.song_title_idea ?? q.q9_song_title_idea ?? q.song_title_idea ?? ""}
+- Genre: ${order.genre ?? q.genre ?? "Acoustic Folk"}
+- Voice: ${order.voice ?? q.voice ?? "Female Voice"}
+- Title idea (optional, treat as suggestion not mandate): ${order.song_title_idea ?? q.song_title_idea ?? ""}
 
 REQUIREMENTS
 - Structure: [Verse 1], [Chorus], ${verseCount === 3 ? "[Verse 2], [Chorus], [Verse 3], [Bridge], [Chorus], [Outro]" : "[Verse 2], [Bridge], [Chorus], [Outro]"}
 - Total length: ${verseCount === 3 ? "3:30–4:30" : "2:30–3:30"} of singable lyrics
-- Use the recipient's name at least twice
-- Weave in 2-3 specific details from the story above
-- Respect the tense rules above EXACTLY
-- Avoid clichés (warrior, battle, brave) unless the user used those words themselves
+- Use ${dogName} BY NAME at least twice (chorus and outro work well)
+- Weave in 2-3 specific images from the personality / memory / letter (NOT generic dog things — the actual details the owner gave you)
+- Use PAST tense for who ${p.sub} was; PRESENT tense for enduring love and how the absence still shows up
+- Avoid "rainbow bridge" unless the owner used those words; avoid generic pet-loss clichés ("crossed over", "running free in heaven") unless the owner's letter signals they want them
+- Pet-specific imagery encouraged: collar, leash, the door, paws on the floor, the bowl, the favorite spot, the way ${p.sub} greeted them, the quiet shape of ${p.poss} absence
+- The "${p.goodWord}" phrase is welcome in the chorus or outro if it fits naturally
 - Output as JSON only, no prose around it
 ${refine}
 
 Return JSON with shape:
 {
   "title": "Song Title",
-  "style_prompt": "short Suno style prompt, e.g. 'warm acoustic folk, fingerpicked guitar, female vocal, intimate, mid-tempo, hopeful'",
+  "style_prompt": "short Suno style prompt, e.g. 'warm acoustic folk, fingerpicked guitar, soft female vocal, intimate, mid-tempo, tender'",
   "lyrics": "[Verse 1]\\n...\\n\\n[Chorus]\\n...",
   "language": "en",
-  "emotional_tone": "tender/hopeful/etc."
+  "emotional_tone": "tender/honoring/etc."
 }`;
 
   const raw = await callClaude({
@@ -256,32 +207,23 @@ Return JSON with shape:
 
 async function scoreBrief(order: any, brief: SongBrief): Promise<BriefScore> {
   const q = (order.quiz_payload || {}) as Record<string, any>;
-  const journey = journeyStageFromOrder(order);
-  const tense = tenseFromStage(journey);
+  const dogName = order.dog_name ?? "the dog";
+  const p = pronounsFor(order.dog_gender);
 
-  const tenseGate =
-    journey === "memory"
-      ? `For MEMORY songs: lyrics MUST be in past tense for who they were. Present tense is allowed only for the writer's enduring love / their lasting impact. Any line that implies the person is still physically alive (e.g. "you are fighting", "we'll see you", "you will beat") = tense_correctness 0-1.`
-      : journey === "hospice"
-        ? `For HOSPICE songs: lyrics MUST be in present tense. They are alive in their final chapter. Lines promising future recovery ("you'll beat this", "next year we'll…") OR speaking of them in past tense as if they had died = tense_correctness 0-1.`
-        : `For ACTIVE songs: lyrics should be in present/future tense — they are alive and fighting. Speaking of them in past tense as if they had died = tense_correctness 0-1.`;
+  const system = `You are PawprintSong's lyric reviewer. You score tribute songs for beloved dogs strictly on a 0-5 scale. The hard gates are: (1) the song must use the dog's actual name, (2) the song must reference at least one SPECIFIC detail from the owner's letter / memory / personality (not generic dog imagery), and (3) the song must use the correct pronouns. You return JSON only.`;
 
-  const system = `You are PawPrint Song's lyric reviewer. You score songs strictly and honestly on a 0-5 scale across multiple dimensions. tense_correctness is a HARD GATE — get it wrong and the song cannot ship. You return JSON only.`;
+  const userPrompt = `Score this tribute song against the brief.
 
-  const userPrompt = `Score this song against the brief.
+DOG: ${dogName}  (pronouns: ${p.sub}/${p.obj}/${p.poss})
 
-JOURNEY STAGE: ${journey.toUpperCase()}  (required tense: ${tense})
+OWNER'S SOURCE MATERIAL — the song should mine these for specifics, not invent
+- Personality: ${order.dog_personality ?? q.dog_personality ?? ""}
+- Memory: ${order.dog_memory ?? q.dog_memory ?? ""}
+- Letter: ${order.letter_to_dog ?? q.letter_to_dog ?? ""}
 
-TENSE GATE RULE
-${tenseGate}
-
-BRIEF DETAILS
-- Recipient: ${order.recipient_name}
-- Relationship: ${order.relationship ?? q.q1_relationship ?? q.relationship}
-- Stage: ${q.q3_journey ?? q.stage}
-- Core theme: ${q.q7_theme ?? q.message}
-- Specifics that should appear: ${[q.q4_fighting_for ?? q.fighting_for, q.q5_qualities ?? q.qualities, q.q6_shared_memory ?? q.shared_memory, q.little_things, q.inside_joke].filter(Boolean).join(" | ")}
-- Genre/tempo: ${order.genre} / ${order.tempo}
+SOUND DIRECTION
+- Genre: ${order.genre ?? q.genre}
+- Voice: ${order.voice ?? q.voice}
 
 SONG
 Title: ${brief.title}
@@ -290,12 +232,12 @@ Lyrics:
 ${brief.lyrics}
 
 Score each 0-5:
-- emotional_resonance: does it feel true and tender?
-- specificity: does it use the brief's actual details (not generic)?
+- emotional_resonance: does it feel true and tender, like a real person's grief and love?
+- specificity: does it use the OWNER'S actual details (not generic "good boy" / "best friend" filler)?
 - flow_and_singability: does it scan, rhyme, breathe?
-- tonal_match: does it match the requested tone/genre?
+- tonal_match: does it match the requested genre/voice?
 - coherence: does the song hold together as one piece?
-- tense_correctness: HARD GATE — does it follow the tense rule above? 5 = perfectly consistent. 0-1 = any line breaks the rule.
+- name_and_pronouns: HARD GATE — uses ${dogName} by name at least twice AND uses ${p.sub}/${p.obj}/${p.poss} consistently? 5 = perfect. 0-1 = name missing or wrong pronouns.
 
 Return JSON:
 {
@@ -306,7 +248,7 @@ Return JSON:
   "coherence": 0-5,
   "tense_correctness": 0-5,
   "overall": weighted_average,
-  "notes": "1-3 sentences of critique highlighting weakest dimension. If tense_correctness < 3, quote the offending line(s)."
+  "notes": "1-3 sentences of critique highlighting the weakest dimension. If name_and_pronouns < 3, quote the offending line(s)."
 }`;
 
   const raw = await callClaude({
@@ -319,16 +261,17 @@ Return JSON:
 
   const parsed = parseJsonFromClaude(raw);
   const num = (v: any) => Number(v) || 0;
+  // Map name_and_pronouns gate onto the existing tense_correctness slot so the
+  // BriefScore type stays compatible with the rest of the pipeline.
+  const nameGate = num(parsed.name_and_pronouns ?? parsed.tense_correctness);
   const dims = {
     emotional_resonance: num(parsed.emotional_resonance),
     specificity: num(parsed.specificity),
     flow_and_singability: num(parsed.flow_and_singability),
     tonal_match: num(parsed.tonal_match),
     coherence: num(parsed.coherence),
-    tense_correctness: num(parsed.tense_correctness),
+    tense_correctness: nameGate,
   };
-  // Weighted overall: tense_correctness acts as a hard gate.
-  // If tense_correctness < 3, cap overall at min(other_avg, tense_correctness).
   const otherAvg =
     (dims.emotional_resonance +
       dims.specificity +
@@ -336,7 +279,7 @@ Return JSON:
       dims.tonal_match +
       dims.coherence) /
     5;
-  let overall = (otherAvg * 5 + dims.tense_correctness * 2) / 7; // tense weighted ~2x
+  let overall = (otherAvg * 5 + dims.tense_correctness * 2) / 7;
   if (dims.tense_correctness < 3) {
     overall = Math.min(overall, dims.tense_correctness);
   }
@@ -349,12 +292,10 @@ Return JSON:
 }
 
 function parseJsonFromClaude(raw: string): any {
-  // Claude sometimes wraps JSON in ```json fences. Strip them.
   const cleaned = raw
     .replace(/^```(?:json)?\s*/i, "")
     .replace(/\s*```$/i, "")
     .trim();
-  // Fall back to extracting first {...} block.
   try {
     return JSON.parse(cleaned);
   } catch {
