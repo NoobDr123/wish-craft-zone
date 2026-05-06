@@ -1,7 +1,7 @@
 // Tiny wrapper around Meta Pixel (`window.fbq`).
 //
 // The pixel script is injected from src/routes/__root.tsx and is gated to the
-// production hostnames (ribbonsong.com / www.getpawprintsong.com) so preview /
+// production hostnames (getpawprintsong.com / www.getpawprintsong.com) so preview /
 // lovable.dev domains never pollute the dataset. These helpers are safe to
 // call from anywhere — when fbq isn't on the page they simply no-op.
 
