@@ -176,7 +176,7 @@ function AdminLoginPage() {
                     required
                     value={email}
                     onChange={(e) => setEmail(e.target.value)}
-                    placeholder="you@ribbonsong.com"
+                    placeholder="you@getpawprintsong.com"
                     className="mt-1.5 w-full rounded-xl border border-peach bg-background px-4 py-3 text-base text-foreground outline-none transition-colors placeholder:text-muted-foreground/60 focus:border-primary"
                   />
                 </div>

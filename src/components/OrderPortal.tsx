@@ -388,7 +388,7 @@ function ShareSection({
   recipientName: string;
   sharePath: string | null;
 }) {
-  const shareUrl = sharePath ? `https://ribbonsong.com${sharePath}` : "";
+  const shareUrl = sharePath ? `https://getpawprintsong.com${sharePath}` : "";
   const shareText = `${recipientName}'s PawPrint Song is ready. Listen here: ${shareUrl}`;
   const encodedShareText = encodeURIComponent(shareText);
   const encodedShareUrl = encodeURIComponent(shareUrl);

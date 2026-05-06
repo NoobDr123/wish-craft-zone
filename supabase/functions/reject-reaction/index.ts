@@ -77,7 +77,7 @@ serve(async (req) => {
         buyer_name: order.buyer_name,
         recipient_name: order.dog_name,
         reason,
-        portal_url: `https://ribbonsong.com/portal/${reaction.order_id}`,
+        portal_url: `https://getpawprintsong.com/portal/${reaction.order_id}`,
       }).catch((e) => console.error("email send failed:", e));
     }
 

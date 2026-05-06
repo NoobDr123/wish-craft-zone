@@ -155,8 +155,8 @@ serve(async (req) => {
       reward_code: reward.code,
       free_songs: reward.free_songs_remaining ?? 2,
       refund_amount_cents: refundResult?.amount ?? 0,
-      portal_url: `https://ribbonsong.com/portal/${order.id}`,
-      create_url: `https://ribbonsong.com/create?reward=${reward.code}`,
+      portal_url: `https://getpawprintsong.com/portal/${order.id}`,
+      create_url: `https://getpawprintsong.com/create?reward=${reward.code}`,
     }).catch((e) => console.error("email send failed:", e));
 
     return json({

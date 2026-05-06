@@ -63,7 +63,7 @@ export const Route = createFileRoute("/api/public/songs/status")({
 
         const shareSlug = order.share_page_slug;
         const songPageUrl = shareSlug
-          ? `https://ribbonsong.com/listen/${shareSlug}`
+          ? `https://getpawprintsong.com/listen/${shareSlug}`
           : null;
 
         return json(200, {

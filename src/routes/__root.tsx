@@ -27,9 +27,9 @@ function NotFoundComponent() {
   );
 }
 
-// Meta Pixel — only fires on the production domain (ribbonsong.com / www.ribbonsong.com).
+// Meta Pixel — only fires on the production domain (ribbonsong.com / www.getpawprintsong.com).
 // Lovable preview URLs and lovable.dev are excluded so they don't pollute pixel data.
-const metaPixelScript = `(function(){var h=window.location.hostname;if(h!=='ribbonsong.com'&&h!=='www.ribbonsong.com')return;!function(f,b,e,v,n,t,s){if(f.fbq)return;n=f.fbq=function(){n.callMethod?n.callMethod.apply(n,arguments):n.queue.push(arguments)};if(!f._fbq)f._fbq=n;n.push=n;n.loaded=!0;n.version='2.0';n.queue=[];t=b.createElement(e);t.async=!0;t.src=v;s=b.getElementsByTagName(e)[0];s.parentNode.insertBefore(t,s)}(window,document,'script','https://connect.facebook.net/en_US/fbevents.js');fbq('init','1397546595537286');fbq('track','PageView');})();`;
+const metaPixelScript = `(function(){var h=window.location.hostname;if(h!=='getpawprintsong.com'&&h!=='www.getpawprintsong.com')return;!function(f,b,e,v,n,t,s){if(f.fbq)return;n=f.fbq=function(){n.callMethod?n.callMethod.apply(n,arguments):n.queue.push(arguments)};if(!f._fbq)f._fbq=n;n.push=n;n.loaded=!0;n.version='2.0';n.queue=[];t=b.createElement(e);t.async=!0;t.src=v;s=b.getElementsByTagName(e)[0];s.parentNode.insertBefore(t,s)}(window,document,'script','https://connect.facebook.net/en_US/fbevents.js');fbq('init','1397546595537286');fbq('track','PageView');})();`;
 
 export const Route = createRootRoute({
   head: () => ({

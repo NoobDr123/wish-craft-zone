@@ -32,7 +32,7 @@ function TermsPage() {
           <p>
             Welcome to PawPrint Song. These Terms of Service (&ldquo;Terms&rdquo;)
             govern your access to and use of the PawPrint Song website
-            (ribbonsong.com) and the personalized song gift services provided
+            (getpawprintsong.com) and the personalized song gift services provided
             by FlowsCommerce Solutions, LLC (&ldquo;we,&rdquo; &ldquo;us,&rdquo;
             or &ldquo;our&rdquo;).
           </p>
@@ -166,7 +166,7 @@ function TermsPage() {
             are issued solely at our discretion and only in cases where the
             final product fails to meet our quality standards. To request a
             refund or report a quality issue, you must contact us at{" "}
-            <a href="mailto:hello@ribbonsong.com">hello@ribbonsong.com</a>{" "}
+            <a href="mailto:hello@getpawprintsong.com">hello@getpawprintsong.com</a>{" "}
             within 30 days of delivery.
           </p>
           <h3>Dispute Policy</h3>
@@ -184,7 +184,7 @@ function TermsPage() {
             <li>
               <strong>Contact Us First:</strong> You agree to contact
               PawPrint Song directly at{" "}
-              <a href="mailto:hello@ribbonsong.com">hello@ribbonsong.com</a> to
+              <a href="mailto:hello@getpawprintsong.com">hello@getpawprintsong.com</a> to
               resolve any issues, request revisions, or seek a refund before
               initiating any dispute or chargeback with your bank or credit
               card issuer. We are committed to resolving any concerns promptly
@@ -295,7 +295,7 @@ function TermsPage() {
             8 The Green STE D<br />
             Dover, DE 19901<br />
             Email:{" "}
-            <a href="mailto:hello@ribbonsong.com">hello@ribbonsong.com</a>
+            <a href="mailto:hello@getpawprintsong.com">hello@getpawprintsong.com</a>
           </p>
         </div>
       </main>

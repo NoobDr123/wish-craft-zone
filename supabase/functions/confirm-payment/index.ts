@@ -314,7 +314,7 @@ async function sendOrderConfirmation(orderId: string) {
         has_3rd_verse: order.has_3rd_verse,
         has_unlimited_edits: order.has_unlimited_edits,
         created_at: order.created_at,
-        dashboard_url: "https://ribbonsong.com/login?redirect=/dashboard",
+        dashboard_url: "https://getpawprintsong.com/login?redirect=/dashboard",
       },
     }),
   });

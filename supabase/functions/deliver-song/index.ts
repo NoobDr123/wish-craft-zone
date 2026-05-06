@@ -14,7 +14,7 @@ const supabase = createClient(
   Deno.env.get("SUPABASE_SERVICE_ROLE_KEY")!,
 );
 
-const SITE_URL = "https://ribbonsong.com";
+const SITE_URL = "https://getpawprintsong.com";
 
 const corsHeaders = {
   "Access-Control-Allow-Origin": "*",

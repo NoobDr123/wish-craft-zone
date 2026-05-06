@@ -5,8 +5,8 @@ import * as React from "react";
 
 export const BRAND = {
   name: "PawPrint Song",
-  rootDomain: "ribbonsong.com",
-  rootUrl: "https://ribbonsong.com",
+  rootDomain: "getpawprintsong.com",
+  rootUrl: "https://getpawprintsong.com",
   logoUrl:
     "https://tytxdnftsnspejnyfbmg.supabase.co/storage/v1/object/public/email-assets/pawprintsong-logo.png",
   // Synced with src/styles.css landing-page tokens (light theme)
