@@ -87,6 +87,7 @@ curl -X POST https://ribbonsong.com/api/public/songs/generate \
   "progress": 65,
   "dogName": "Pippa",
   "songUrl": null,
+  "songPageUrl": null,
   "coverImageUrl": null,
   "lyrics": null,
   "title": null,
