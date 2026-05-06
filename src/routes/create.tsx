@@ -184,7 +184,7 @@ function CreatePage() {
       key: "basics",
       chapter: "Her name",
       title: "Tell us about her.",
-      subtitle: "We'll use this to shape every line of her song.",
+      subtitle: "Just the basics. Her name will be in every chorus.",
       isValid: (s) =>
         s.dog_name.trim().length >= 1 &&
         !!s.dog_gender &&
