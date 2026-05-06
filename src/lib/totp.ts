@@ -3,4 +3,4 @@
 // module is kept for backward compatibility but contains no secret-handling
 // logic.
 
-export const TOTP_ISSUER = "RibbonSong Admin";
+export const TOTP_ISSUER = "PawPrint Song Admin";

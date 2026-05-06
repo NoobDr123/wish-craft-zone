@@ -14,7 +14,7 @@ export const Route = createFileRoute("/admin/login")({
   component: AdminLoginRoute,
   head: () => ({
     meta: [
-      { title: "Staff sign-in · RibbonSong" },
+      { title: "Staff sign-in · PawPrint Song" },
       // Staff login should never be indexed.
       { name: "robots", content: "noindex,nofollow,noarchive,nosnippet" },
       { name: "referrer", content: "no-referrer" },
@@ -127,7 +127,7 @@ function AdminLoginPage() {
                 Staff sign-in
               </h1>
               <p className="mt-2 text-center text-sm text-muted-foreground">
-                Restricted access. For RibbonSong team members only.
+                Restricted access. For PawPrint Song team members only.
               </p>
 
               <div className="mt-6 rounded-2xl border border-primary/20 bg-primary/5 p-4">

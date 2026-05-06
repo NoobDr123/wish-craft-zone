@@ -98,7 +98,7 @@ async function rewriteBrief(order: any, changeNotes: string) {
   const oldBrief = order.brief;
   const q = order.quiz_payload || {};
 
-  const system = `You are RibbonSong's senior songwriter. The customer received a song and wants changes. Your job is to rewrite the lyrics + style based on their feedback while keeping everything that made the original good. Return JSON only.`;
+  const system = `You are PawPrint Song's senior songwriter. The customer received a song and wants changes. Your job is to rewrite the lyrics + style based on their feedback while keeping everything that made the original good. Return JSON only.`;
 
   const userPrompt = `The customer received this song and wants it regenerated with the following changes.
 

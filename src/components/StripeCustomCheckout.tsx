@@ -579,7 +579,7 @@ function PaymentForm({ amount, currency, email, name, returnUrl, paymentIntentId
       )}
 
       <p className="text-[12.5px] leading-snug text-muted-foreground">
-        By providing your card information, you authorize RibbonSong to charge your card for this
+        By providing your card information, you authorize PawPrint Song to charge your card for this
         order in accordance with our terms.
       </p>
 

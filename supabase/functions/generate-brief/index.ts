@@ -179,7 +179,7 @@ async function writeBrief(order: any, refineNotes?: string): Promise<SongBrief> 
   const tense = tenseFromStage(journey);
   const tenseRules = tenseRulesFor(journey);
 
-  const system = `You are RibbonSong's senior songwriter. You write deeply personal songs for people facing cancer — for fighters, survivors, those in hospice, and those who have passed. Your job is to turn raw emotional details into singable lyrics that feel like a love letter, never clinical, never generic. Use specific details from the brief (names, memories, phrases) as anchors. The song must work as audio for Suno V5. You ALWAYS respect the requested grammatical tense — getting tense wrong (e.g. speaking of a deceased person as still alive, or telling someone in hospice they will recover) is the most painful failure possible and is unacceptable.`;
+  const system = `You are PawPrint Song's senior songwriter. You write deeply personal songs for people facing cancer — for fighters, survivors, those in hospice, and those who have passed. Your job is to turn raw emotional details into singable lyrics that feel like a love letter, never clinical, never generic. Use specific details from the brief (names, memories, phrases) as anchors. The song must work as audio for Suno V5. You ALWAYS respect the requested grammatical tense — getting tense wrong (e.g. speaking of a deceased person as still alive, or telling someone in hospice they will recover) is the most painful failure possible and is unacceptable.`;
 
   const refine = refineNotes
     ? `\n\nThe previous attempt scored low. Critique to address: ${refineNotes}`
@@ -266,7 +266,7 @@ async function scoreBrief(order: any, brief: SongBrief): Promise<BriefScore> {
         ? `For HOSPICE songs: lyrics MUST be in present tense. They are alive in their final chapter. Lines promising future recovery ("you'll beat this", "next year we'll…") OR speaking of them in past tense as if they had died = tense_correctness 0-1.`
         : `For ACTIVE songs: lyrics should be in present/future tense — they are alive and fighting. Speaking of them in past tense as if they had died = tense_correctness 0-1.`;
 
-  const system = `You are RibbonSong's lyric reviewer. You score songs strictly and honestly on a 0-5 scale across multiple dimensions. tense_correctness is a HARD GATE — get it wrong and the song cannot ship. You return JSON only.`;
+  const system = `You are PawPrint Song's lyric reviewer. You score songs strictly and honestly on a 0-5 scale across multiple dimensions. tense_correctness is a HARD GATE — get it wrong and the song cannot ship. You return JSON only.`;
 
   const userPrompt = `Score this song against the brief.
 

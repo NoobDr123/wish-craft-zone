@@ -22,11 +22,11 @@ export const Route = createFileRoute("/processing")({
   component: ThankYouPage,
   head: () => ({
     meta: [
-      { title: "Thank you · Your order is confirmed · RibbonSong" },
+      { title: "Thank you · Your order is confirmed · PawPrint Song" },
       {
         name: "description",
         content:
-          "Your personalized RibbonSong is being crafted. View your order summary and what happens next.",
+          "Your personalized PawPrint Song is being crafted. View your order summary and what happens next.",
       },
     ],
   }),
@@ -284,7 +284,7 @@ function ThankYouPage() {
           <p className="mx-auto mt-3 max-w-lg text-balance text-[15px] leading-relaxed text-muted-foreground sm:mt-4 sm:text-base md:text-lg">
             Your order is confirmed. We've started crafting{" "}
             <span className="font-semibold text-primary">{recipient}</span>'s
-            personalized RibbonSong.
+            personalized PawPrint Song.
           </p>
 
           {orderRef && (
@@ -408,7 +408,7 @@ function ThankYouPage() {
               hearing their song for the first time, upload the clip from your
               dashboard, and we'll refund <strong>100% of your order</strong>{" "}
               <em>and</em> send you a code for{" "}
-              <strong>2 more free RibbonSongs</strong> — on us.
+              <strong>2 more free PawPrint Songs</strong> — on us.
             </p>
 
             {/* How it works — 3 quick steps */}

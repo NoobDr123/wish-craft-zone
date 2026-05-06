@@ -10,7 +10,7 @@ export const Route = createFileRoute("/scratch")({
   component: ScratchPage,
   head: () => ({
     meta: [
-      { title: "Scratch to reveal · RibbonSong" },
+      { title: "Scratch to reveal · PawPrint Song" },
       { name: "robots", content: "noindex,nofollow" },
     ],
   }),

@@ -1,4 +1,4 @@
-// Shared Anthropic client + brief schema for RibbonSong pipeline.
+// Shared Anthropic client + brief schema for PawPrint Song pipeline.
 
 const ANTHROPIC_URL = "https://api.anthropic.com/v1/messages";
 

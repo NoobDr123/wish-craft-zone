@@ -13,8 +13,8 @@ export const Route = createFileRoute("/listen/$id")({
     meta: [
       {
         title: loaderData?.title
-          ? `${loaderData.title} · A song for you · RibbonSong`
-          : "A song for you · RibbonSong",
+          ? `${loaderData.title} · A song for you · PawPrint Song`
+          : "A song for you · PawPrint Song",
       },
       {
         name: "description",
@@ -49,7 +49,7 @@ export const Route = createFileRoute("/listen/$id")({
           This song link may have been mistyped or is not yet delivered.
         </p>
         <Link to="/" className="mt-6 inline-block text-primary underline">
-          Back to RibbonSong
+          Back to PawPrint Song
         </Link>
       </div>
     </div>
@@ -121,7 +121,7 @@ function ListenPage() {
         <p className="mt-12 text-center text-xs text-muted-foreground">
           Made with love via{" "}
           <Link to="/" className="font-medium text-foreground underline">
-            RibbonSong
+            PawPrint Song
           </Link>
         </p>
       </main>

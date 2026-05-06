@@ -13,7 +13,7 @@ export const Route = createFileRoute("/login")({
     redirect: typeof search.redirect === "string" ? search.redirect : undefined,
   }),
   head: () => ({
-    meta: [{ title: "Track your song · RibbonSong" }],
+    meta: [{ title: "Track your song · PawPrint Song" }],
   }),
 });
 

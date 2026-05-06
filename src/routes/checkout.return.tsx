@@ -17,7 +17,7 @@ export const Route = createFileRoute("/checkout/return")({
     // old embedded-checkout flow still resolves correctly.
     session_id: typeof search.session_id === "string" ? search.session_id : undefined,
   }),
-  head: () => ({ meta: [{ title: "Payment confirmed · RibbonSong" }] }),
+  head: () => ({ meta: [{ title: "Payment confirmed · PawPrint Song" }] }),
 });
 
 function CheckoutReturnPage() {
@@ -126,7 +126,7 @@ function CheckoutReturnPage() {
                 value: Number((cents / 100).toFixed(2)),
                 currency: (order.currency || "USD").toUpperCase(),
                 content_type: "product",
-                content_name: "RibbonSong Personalized Song",
+                content_name: "PawPrint Song Personalized Song",
                 content_ids: [order.id],
                 order_id: order.id,
               },

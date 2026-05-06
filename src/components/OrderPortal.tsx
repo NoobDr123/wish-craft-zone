@@ -389,7 +389,7 @@ function ShareSection({
   sharePath: string | null;
 }) {
   const shareUrl = sharePath ? `https://ribbonsong.com${sharePath}` : "";
-  const shareText = `${recipientName}'s RibbonSong is ready. Listen here: ${shareUrl}`;
+  const shareText = `${recipientName}'s PawPrint Song is ready. Listen here: ${shareUrl}`;
   const encodedShareText = encodeURIComponent(shareText);
   const encodedShareUrl = encodeURIComponent(shareUrl);
 
@@ -418,8 +418,8 @@ function ShareSection({
     if (navigator.share) {
       try {
         await navigator.share({
-          title: `A RibbonSong for ${recipientName}`,
-          text: `${recipientName}'s RibbonSong is ready.`,
+          title: `A PawPrint Song for ${recipientName}`,
+          text: `${recipientName}'s PawPrint Song is ready.`,
           url: shareUrl,
         });
         return;
@@ -487,7 +487,7 @@ function ShareSection({
             <ShareOption href={`fb-messenger://share/?link=${encodedShareUrl}`} label="Messenger" />
             <ShareOption href={`sms:?&body=${encodedShareText}`} label="Text" />
             <ShareOption
-              href={`mailto:?subject=${encodeURIComponent(`A RibbonSong for ${recipientName}`)}&body=${encodedShareText}`}
+              href={`mailto:?subject=${encodeURIComponent(`A PawPrint Song for ${recipientName}`)}&body=${encodedShareText}`}
               label="Email"
             />
             <button
@@ -503,7 +503,7 @@ function ShareSection({
             onClick={copyMessage}
             className="mt-3 inline-flex items-center gap-1 text-xs font-medium text-[rgba(31,27,22,0.62)] underline underline-offset-4 hover:text-[#1F1B16]"
           >
-            <Copy className="h-3 w-3" /> Copy message: {recipientName}'s RibbonSong is ready
+            <Copy className="h-3 w-3" /> Copy message: {recipientName}'s PawPrint Song is ready
           </button>
         </div>
       )}

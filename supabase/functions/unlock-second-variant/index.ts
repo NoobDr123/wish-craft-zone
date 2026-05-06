@@ -75,7 +75,7 @@ serve(async (req) => {
         payment_method: order.stripe_payment_method_id,
         confirm: true,
         off_session: true,
-        description: "RibbonSong — alternate version unlock",
+        description: "PawPrint Song — alternate version unlock",
         metadata: {
           orderId,
           kind: "second_variant_unlock",

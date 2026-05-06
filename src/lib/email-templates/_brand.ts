@@ -1,10 +1,10 @@
-// Shared branding tokens for RibbonSong auth + transactional emails.
+// Shared branding tokens for PawPrint Song auth + transactional emails.
 // Email clients have very limited CSS — keep everything inline-friendly.
 
 import * as React from "react";
 
 export const BRAND = {
-  name: "RibbonSong",
+  name: "PawPrint Song",
   rootDomain: "ribbonsong.com",
   rootUrl: "https://ribbonsong.com",
   logoUrl:
