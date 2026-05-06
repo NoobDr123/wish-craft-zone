@@ -1472,7 +1472,7 @@ function LandingPage() {
       </section>
 
       {/* FAQ */}
-      <section id="faq" className="bg-[#ECE2D0] px-0 py-[64px] md:py-[100px]">
+      <section id="faq" className="bg-[#FDF7E9] px-0 py-[64px] md:py-[100px]">
         <div className="mx-auto max-w-[820px] px-5 sm:px-6">
           <div className="mb-10 text-center md:mb-14">
             <Eyebrow center>Common questions</Eyebrow>
