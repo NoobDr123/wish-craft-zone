@@ -31,7 +31,7 @@ export function UpsellShell({
   highlights,
   priceLabel,
 }: UpsellShellProps) {
-  const ctaText = acceptLabel || "Yes, Add this to my order";
+  const ctaText = acceptLabel || "Yes, add this to my song";
 
   return (
     <div className="min-h-screen bg-background">
