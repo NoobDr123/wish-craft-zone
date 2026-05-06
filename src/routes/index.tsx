@@ -236,110 +236,112 @@ const fallbackSamples: Array<{
   cover_image_url: string;
 }> = [
   {
-    title: "For My Mother (Through Chemo)",
+    title: "Cheeto Paws",
     quote:
-      '"She used to sing us to sleep. I wanted something she could play when she\'s scared."',
-    for_text: "Written for Diane, 58. Breast cancer, in treatment.",
-    genre_label: "Acoustic Folk · Female Voice",
+      '"Her paws smelled like cheetos. I miss her smelly breath. I miss everything."',
+    for_text: "Written for Max, 12 years. Yellow Lab.",
+    genre_label: "Acoustic Singer-Songwriter · Female Voice",
     cover_image_url:
-      "https://images.unsplash.com/photo-1508214751196-bcfd4ca60f91?auto=format&fit=crop&w=600&q=80",
+      "https://images.unsplash.com/photo-1543466835-00a7907e9de1?auto=format&fit=crop&w=600&q=80",
   },
   {
-    title: "Stronger Than the Storm",
-    quote: '"My son asks for it every time we get a clear scan."',
-    for_text: "Written for James, 12. Leukemia, in remission.",
-    genre_label: "Uplifting Pop · Male Voice",
+    title: "Still on the Couch",
+    quote:
+      '"I still leave the spot by the window open for her. Always will."',
+    for_text: "Written for Bella, 9 years. Goldendoodle.",
+    genre_label: "Soft Folk · Male Voice",
     cover_image_url:
-      "https://images.unsplash.com/photo-1503454537195-1dcabb73ffb9?auto=format&fit=crop&w=600&q=80",
+      "https://images.unsplash.com/photo-1587300003388-59208cc962cb?auto=format&fit=crop&w=600&q=80",
   },
   {
-    title: "Quiet Light (In Loving Memory)",
-    quote: '"We played it at her memorial instead of a hymn. It was her."',
-    for_text: "Written for Eleanor, 71. Ovarian cancer, in loving memory.",
+    title: "Good Girl, Always",
+    quote: '"Fifteen years. She got me through everything."',
+    for_text: "Written for Ruby, 15 years. German Shepherd.",
+    genre_label: "Country · Female Voice",
+    cover_image_url:
+      "https://images.unsplash.com/photo-1568572933382-74d440642117?auto=format&fit=crop&w=600&q=80",
+  },
+  {
+    title: "My Shadow",
+    quote:
+      '"She was always two steps behind me. I keep forgetting to listen for her."',
+    for_text: "Written for Charlie, 8 years. Border Collie.",
+    genre_label: "Acoustic · Male Voice",
+    cover_image_url:
+      "https://images.unsplash.com/photo-1551717743-49959800b1f6?auto=format&fit=crop&w=600&q=80",
+  },
+  {
+    title: "The Front Door",
+    quote: '"I still look for her when I come home."',
+    for_text: "Written for Buddy, 13 years. Beagle.",
     genre_label: "Cinematic · Strings",
     cover_image_url:
-      "https://images.unsplash.com/photo-1544005313-94ddf0286df2?auto=format&fit=crop&w=600&q=80",
+      "https://images.unsplash.com/photo-1505628346881-b72b27e84530?auto=format&fit=crop&w=600&q=80",
   },
   {
-    title: "The Promise (For Dad)",
-    quote: '"I gave it to him in hospice. He played it three times in a row."',
-    for_text: "Written for Tom, 64. Stage IV pancreatic.",
-    genre_label: "Country · Male Voice",
-    cover_image_url:
-      "https://images.unsplash.com/photo-1507003211169-0a1dd7228f2d?auto=format&fit=crop&w=600&q=80",
-  },
-  {
-    title: "Rachel's Anthem",
-    quote: '"Two years free of cancer. We play it at every birthday now."',
-    for_text: "Written for Rachel, 34. Breast cancer, survivor.",
-    genre_label: "Gospel · Female Voice",
-    cover_image_url:
-      "https://images.unsplash.com/photo-1531123897727-8f129e1688ce?auto=format&fit=crop&w=600&q=80",
-  },
-  {
-    title: "Carry Me Home",
+    title: "Where the Sunbeam Was",
     quote:
-      '"My husband\'s prayer set to music. The choir at his service sang it."',
-    for_text: "Written for David, 52. Glioblastoma, in loving memory.",
-    genre_label: "Worship · Duet",
+      '"She always found the warmest spot in the house. The room is colder now."',
+    for_text: "Written for Rocky, 14 years. Mixed breed rescue.",
+    genre_label: "Lullaby · Piano",
     cover_image_url:
-      "https://images.unsplash.com/photo-1518976024611-28bf4b48222e?auto=format&fit=crop&w=600&q=80",
+      "https://images.unsplash.com/photo-1450778869180-41d0601e046e?auto=format&fit=crop&w=600&q=80",
   },
 ];
 
 const useCases = [
   {
-    eyebrow: "Newly Diagnosed",
-    label: "When the world just changed",
-    body: "For the days right after the news, when nothing makes sense yet.",
+    eyebrow: "For your soul dog",
+    label: "The one who got you through everything",
+    body: "Fifteen years. The breakup. The move. The hardest year. She was there for all of it.",
     img: whoNewlyDiagnosed,
   },
   {
-    eyebrow: "In Treatment",
-    label: "A reminder on the hardest days",
-    body: "Something to play during chemo, on the drive home, in the quiet hours.",
+    eyebrow: "For your goofy girl",
+    label: "The one who made everyone laugh",
+    body: "The dramatic greeter. The food obsessive. The reason you came home faster.",
     img: whoInTreatment,
   },
   {
-    eyebrow: "For a Survivor",
-    label: "Every scan. Every milestone.",
-    body: "An anthem for the bell rung, the all-clear, the next birthday.",
+    eyebrow: "For your senior dog",
+    label: "The greying muzzle, the slow walks",
+    body: "The one you loved through her last good years. Soft mornings. Quiet evenings.",
     img: whoSurvivor,
   },
   {
-    eyebrow: "In Loving Memory",
-    label: "A keepsake that holds them",
-    body: "A song that carries their voice, their love, their light forward.",
+    eyebrow: "For your rescue",
+    label: "The one who chose you",
+    body: "She came from somewhere hard. You gave her the rest of her life. She gave you all of hers.",
     img: whoMemory,
   },
   {
-    eyebrow: "For a Child Fighting",
-    label: "Courage set to music",
-    body: "Something brave they can play when the hospital feels too big.",
+    eyebrow: "For the dog you lost too soon",
+    label: "The one you didn't get long enough with",
+    body: "Cancer at five. An accident. A heart that just stopped. The years you didn't get hurt the most.",
     img: whoChild,
   },
   {
-    eyebrow: "For a Caregiver",
-    label: "For the ones who stand beside them",
-    body: "For the partners, the parents, the friends who never let go.",
+    eyebrow: "For your childhood dog",
+    label: "The one who grew up with you",
+    body: "Family photos. The backyard. The dog who's been gone longer than she was here.",
     img: whoCaregiver,
   },
   {
-    eyebrow: "For a Parent",
-    label: "The ones who raised you",
-    body: "For your mom, your dad, the person who taught you what love is.",
+    eyebrow: "On the anniversary",
+    label: "For the day your body remembers first",
+    body: "One year. Five years. Ten. The grief doesn't end — it just changes shape.",
     img: whoParent,
   },
   {
-    eyebrow: "For Strength",
-    label: "When they need it most",
-    body: "Something to hold onto when the weight feels too much to carry.",
+    eyebrow: "For a friend who lost theirs",
+    label: "When you don't know what to say",
+    body: "The most thoughtful gift you can give someone grieving a dog. We'll write it from their memories.",
     img: whoStrength,
   },
   {
-    eyebrow: "For Yourself",
-    label: "A song for your own fight",
-    body: "Sometimes the song you need most is the one written for you.",
+    eyebrow: "For the dog still with you",
+    label: "Capture her while she's here",
+    body: "Many owners commission a song while their dog is still around — to hold every quirk before time takes them.",
     img: whoYourself,
   },
 ];
@@ -354,325 +356,237 @@ const testimonials: Array<{
   {
     slug: "david-k",
     quote:
-      '"I almost didn\'t order because it felt like too much. I was wrong. It\'s the only thing I gave him during the whole fight that he asked to hear again."',
+      '"I almost didn\'t order because it felt like too much. I was wrong. The first time I heard her name in the chorus I fell apart in the best way. It\'s the most precious thing I own."',
     name: "David K.",
-    meta: "Austin, TX  ·  Son, for his father in treatment",
+    meta: "Austin, TX  ·  For Bella, his 12-year-old Lab",
     avatar: "https://i.pravatar.cc/80?img=67",
   },
   {
     slug: "sarah-r",
     quote:
-      '"My mom played it in her earbuds during infusions. She said the nurses asked her what she was listening to every single week."',
+      '"My husband doesn\'t cry. He listened once, walked out to the porch, stayed there for an hour. When he came back in he just hugged me. That was about Cooper."',
     name: "Sarah R.",
-    meta: "Columbus, OH  ·  Daughter, for her mother",
+    meta: "Columbus, OH  ·  For Cooper, their Golden Retriever",
     avatar: "https://i.pravatar.cc/80?img=45",
   },
   {
     slug: "priya-sam",
     quote:
-      '"Two years free of cancer, and this song still plays at every birthday. It became our family\'s anthem. Our daughter asks for it by name now."',
+      '"It\'s been a year next week. We play it every Sunday morning, the way we used to take her for a walk. The kids ask for it by name now."',
     name: "Priya & Sam",
-    meta: "Seattle, WA  ·  Parents of a survivor",
+    meta: "Seattle, WA  ·  For Lulu, their family Boxer",
     avatar: "https://i.pravatar.cc/80?img=39",
   },
   {
     slug: "marcus-d",
     quote:
-      '"We played it at his bedside the night before he passed. The chorus said the things we couldn\'t. The most precious thing our family owns."',
+      '"My coworkers told me it was \'just a dog.\' This song was the first thing that took her seriously. I wept for an hour."',
     name: "Marcus D.",
-    meta: "Phoenix, AZ  ·  Brother, in loving memory",
+    meta: "Phoenix, AZ  ·  For Daisy, his Husky",
     avatar: "https://i.pravatar.cc/80?img=52",
   },
   {
     slug: "patricia-m",
     quote:
-      '"He heard it twice before we lost him. Thank you will never cover it."',
+      '"He played it twice and asked me to leave the room. He never talks about her since she went. The song let him do it without finding words. Thank you."',
     name: "Patricia M.",
-    meta: "Tampa, FL  ·  Wife, for her husband in hospice",
+    meta: "Tampa, FL  ·  For her father\'s Shepherd, Maggie",
     avatar: "https://i.pravatar.cc/80?img=23",
   },
   {
     slug: "jenna-l",
     quote:
-      '"It captured something I couldn\'t put into words for fifteen years. The first time I played it for her, we both just sat in the car and cried."',
+      '"I didn\'t realize it was the anniversary until I started crying for no reason. Then I remembered. I played the song. It helped."',
     name: "Jenna L.",
-    meta: "Denver, CO  ·  Daughter, for her mother in remission",
+    meta: "Denver, CO  ·  For Penny, her childhood dog",
     avatar: "https://i.pravatar.cc/80?img=29",
   },
   {
     slug: "elena-v",
     quote:
-      '"My dad isn\'t a crier. He listened once, walked out to the porch, and stayed there for an hour. When he came back in he just hugged me. That was everything."',
+      '"Our daughter is six. He was her first heartbreak. She asks us to play his song every night before bed. She talks to him through it."',
     name: "Elena V.",
-    meta: "San Diego, CA  ·  Daughter, for her father after surgery",
+    meta: "San Diego, CA  ·  For Buddy, their family dog",
     avatar: "https://i.pravatar.cc/80?img=47",
   },
   {
     slug: "trevor-h",
     quote:
-      '"We played it at her celebration of life. Three hundred people went silent. My aunt said it sounded like Mom wrote it herself."',
+      '"Fifteen years. He saw me through college, my divorce, my mom dying. The song talks about a beach where we used to walk. The most precious thing I own."',
     name: "Trevor H.",
-    meta: "Nashville, TN  ·  Son, in loving memory",
+    meta: "Nashville, TN  ·  For Sammy, his soul dog",
     avatar: "https://i.pravatar.cc/80?img=15",
   },
   {
     slug: "diane-w",
     quote:
-      '"I was skeptical until I heard it. They used the nickname only my husband called me. I sobbed in the kitchen for twenty minutes. Worth every penny."',
+      '"I gave it to my best friend on the one-year mark. She called me crying. She said it was the first thing in a year that made her remember loving Tucker without immediately remembering losing him."',
     name: "Diane W.",
-    meta: "Pittsburgh, PA  ·  Wife, after her husband\'s remission",
+    meta: "Pittsburgh, PA  ·  Gift, for her friend\'s Boxer",
     avatar: "https://i.pravatar.cc/80?img=31",
   },
   {
     slug: "rebecca-t",
     quote:
-      '"Our oncology nurses asked for a copy. They wanted to share it with another family. That\'s when I knew it wasn\'t just ours anymore."',
+      '"I made a slideshow with our song under it. My family on three continents watched it. My grandma in Poland called me crying. He was loved everywhere."',
     name: "Rebecca T.",
-    meta: "Minneapolis, MN  ·  Sister, for her brother in treatment",
+    meta: "Minneapolis, MN  ·  For Bear, her Bernese Mountain Dog",
     avatar: "https://i.pravatar.cc/80?img=44",
   },
   {
     slug: "aisha-m",
     quote:
-      '"My grandmother kept asking us to play it again. She said it was the first time in months she felt like herself. We played it the morning she passed."',
+      '"I kept the order private. I didn\'t want to explain why I was crying about a \'pet.\' Then I played it and I wasn\'t ashamed anymore."',
     name: "Aisha M.",
-    meta: "Atlanta, GA  ·  Granddaughter, for her grandmother in hospice",
+    meta: "Atlanta, GA  ·  For Coco, her Pomeranian",
     avatar: "https://i.pravatar.cc/80?img=49",
   },
   {
     slug: "michael-b",
     quote:
-      '"I gave it to him on his last birthday. He played it on repeat in the hospital and made the staff listen. He died proud of the life this song described."',
+      '"My dog passed eleven years ago. I always felt silly still missing him. The song made me feel less crazy. It made me feel like the love still counted."',
     name: "Michael B.",
-    meta: "Boston, MA  ·  Son, for his father in loving memory",
+    meta: "Boston, MA  ·  For Riley, his Lab from childhood",
     avatar: "https://i.pravatar.cc/80?img=53",
   },
   {
     slug: "carlos-r",
     quote:
-      '"Five years cancer-free this month. We still play our song on the anniversary. It\'s become how our kids understand what their mom went through."',
+      '"Five years gone. Still playing his song every birthday. The kids who never met him know him through the lyrics now."',
     name: "Carlos R.",
-    meta: "Miami, FL  ·  Husband, for his wife in remission",
+    meta: "Miami, FL  ·  For Bruno, his German Shepherd",
     avatar: "https://i.pravatar.cc/80?img=12",
   },
   {
     slug: "naomi-k",
     quote:
-      '"I gave it to my sister on day one of chemo. She made it her playlist for every infusion. She told me the song carried her through the worst weeks of her life."',
+      '"I gave it to my mom on the one-year anniversary of losing Pepper. She called me at 11pm sobbing thank you over and over."',
     name: "Naomi K.",
-    meta: "Brooklyn, NY  ·  Sister, for her sister in treatment",
+    meta: "Brooklyn, NY  ·  Gift, for her mother\'s Yorkie",
     avatar: "https://i.pravatar.cc/80?img=20",
   },
   {
     slug: "thomas-r",
     quote:
-      '"My wife passed in March. We played our song at her service and again on what would have been her birthday. Our kids know her voice through the lyrics now."',
+      '"I was a wreck for months. The song didn\'t fix it. But it gave me something to put the love into. Now I have somewhere to go when I miss her."',
     name: "Thomas R.",
-    meta: "Charleston, SC  ·  Husband, in loving memory",
+    meta: "Charleston, SC  ·  For Daisy, his rescue",
     avatar: "https://i.pravatar.cc/80?img=68",
   },
   {
     slug: "olivia-w",
     quote:
-      '"I ordered it the day my mom got the diagnosis. She listened on the drive to her first appointment. She said it gave her something to hold onto when she had nothing."',
+      '"My wife passed last spring. Her dog Roxy followed three months later. I played both songs back to back at her birthday. The whole family sat in silence."',
     name: "Olivia W.",
-    meta: "Portland, OR  ·  Daughter, for her mother newly diagnosed",
+    meta: "Portland, OR  ·  For Roxy, her late wife\'s dog",
     avatar: "https://i.pravatar.cc/80?img=5",
-  },
-  {
-    slug: "emma-c",
-    quote:
-      '"My twin brother and I lost our mom last spring. We played the song at her wake. People who never met her told us they felt like they had."',
-    name: "Emma C.",
-    meta: "Burlington, VT  ·  Daughter, in loving memory",
-    avatar: "https://i.pravatar.cc/80?img=10",
-  },
-  {
-    slug: "raj-p",
-    quote:
-      '"My father is from India and rarely shows emotion. He listened with his eyes closed, then asked me to play it again. Three times. He still plays it on Sundays."',
-    name: "Raj P.",
-    meta: "Edison, NJ  ·  Son, for his father in remission",
-    avatar: "https://i.pravatar.cc/80?img=60",
-  },
-  {
-    slug: "lauren-b",
-    quote:
-      '"I gave it to my best friend on her last day of radiation. She walked into her appointment with my voice in her ears. She rang the bell to our song."',
-    name: "Lauren B.",
-    meta: "Kansas City, MO  ·  Best friend, for a survivor",
-    avatar: "https://i.pravatar.cc/80?img=32",
-  },
-  {
-    slug: "javier-m",
-    quote:
-      '"Mi abuela barely spoke English at the end. The song was in Spanish. She held my hand the whole way through. She passed two days later."',
-    name: "Javier M.",
-    meta: "El Paso, TX  ·  Grandson, in loving memory",
-    avatar: "https://i.pravatar.cc/80?img=11",
-  },
-  {
-    slug: "kelly-d",
-    quote:
-      '"Stage IV. They told us six months. We made it eighteen. Our song played at every milestone. We still play it for the kids on her birthday."',
-    name: "Kelly D.",
-    meta: "Cleveland, OH  ·  Husband, in loving memory",
-    avatar: "https://i.pravatar.cc/80?img=14",
   },
   {
     slug: "maya-h",
     quote:
-      '"I am eleven years old. My dad has cancer. I ordered the song with my allowance and gave it to him for Father\'s Day. He cried. Mom helped me write this."',
+      '"I am eleven years old. My dog Zeke died of cancer last year. I saved my allowance and ordered him a song. My mom helped me write the prompt. I play it before bed."',
     name: "Maya H.",
-    meta: "Madison, WI  ·  Daughter, for her dad in treatment",
+    meta: "Madison, WI  ·  For Zeke, her childhood Lab",
     avatar: "https://i.pravatar.cc/80?img=16",
   },
   {
     slug: "william-t",
     quote:
-      '"I am 78. My wife of 54 years has Alzheimer\'s and is now in palliative care. The song talks about a beach we honeymooned on. She squeezed my hand at the chorus."',
+      '"I am 78. My wife of 54 years passed in March. Two months later we lost our dog Tilly. The song mentions both of them. I am not alone in this house anymore."',
     name: "William T.",
-    meta: "Sarasota, FL  ·  Husband, for his wife in hospice",
+    meta: "Sarasota, FL  ·  For Tilly",
     avatar: "https://i.pravatar.cc/80?img=51",
   },
   {
     slug: "tasha-w",
     quote:
-      '"I am a nurse on the oncology floor. A patient\'s family played their song for the room. Three of us cried at the nurses\' station. I ordered one for my own mom that night."',
+      '"I am a vet tech. I see this grief every week. I ordered a song for my own dog the night I started crying at work. It helped me come back the next morning."',
     name: "Tasha W.",
-    meta: "Detroit, MI  ·  Oncology nurse · Daughter",
+    meta: "Detroit, MI  ·  For Max, her Pit Bull mix",
     avatar: "https://i.pravatar.cc/80?img=48",
   },
   {
     slug: "henry-and-paul",
     quote:
-      '"My husband Paul was diagnosed at 41. We have two boys. The song is so they remember his laugh, his stupid jokes, the way he sang in the kitchen. They will."',
+      '"Our pup Pippa died at three from a sudden heart condition. We didn\'t get long enough. The song let us hold what little we had. It will play at our wedding next year — she should have been our flower girl."',
     name: "Henry & Paul",
-    meta: "Brooklyn, NY  ·  Husband, in loving memory",
+    meta: "Brooklyn, NY  ·  For Pippa, their Cavalier",
     avatar: "https://i.pravatar.cc/80?img=33",
   },
   {
     slug: "grace-l",
     quote:
-      '"Pediatric oncology unit. My daughter is six. They wheeled in a portable speaker so the whole hallway could hear. Even the doctors stopped working."',
+      '"He was a shelter dog who chose me at the worst time of my life. Fourteen years later he was the only thing left from that version of me. The song honored that. I cried like a child."',
     name: "Grace L.",
-    meta: "Cincinnati, OH  ·  Mother, for her daughter in treatment",
+    meta: "Cincinnati, OH  ·  For Boomer, her rescue mutt",
     avatar: "https://i.pravatar.cc/80?img=26",
   },
   {
     slug: "moshe-k",
     quote:
-      '"We played it at my father\'s shiva. The rabbi asked who wrote it. When I said it was custom, half the room asked for the link. Dad would have loved that."',
+      '"My grandfather lived alone with his dog Otis for ten years after grandma died. When Otis went, we made him this song for his birthday. He plays it on the porch every morning."',
     name: "Moshe K.",
-    meta: "Baltimore, MD  ·  Son, in loving memory",
+    meta: "Baltimore, MD  ·  For Otis, his grandfather\'s dog",
     avatar: "https://i.pravatar.cc/80?img=58",
   },
   {
     slug: "amelia-f",
     quote:
-      '"I am a hospice chaplain. I have officiated 200+ services. Three families have used your songs and they have all been the most powerful moment of the room. Thank you."',
+      '"I am a hospice nurse. A patient asked me to play her dog\'s song the night before she passed. They went together in her mind. Most peaceful thing I\'ve ever witnessed."',
     name: "Rev. Amelia F.",
-    meta: "Asheville, NC  ·  Hospice chaplain",
+    meta: "Asheville, NC  ·  Hospice nurse",
     avatar: "https://i.pravatar.cc/80?img=22",
   },
   {
     slug: "darnell-j",
     quote:
-      '"My pops fought cancer for nine years. Nine. We played the song the morning he passed. The hospice nurse said it was the most peaceful goodbye she has ever witnessed."',
+      '"My pops fought cancer for nine years. His dog Ranger never left his side. We played Ranger\'s song at the memorial — Ranger had passed six months earlier. Half the room cried."',
     name: "Darnell J.",
-    meta: "Chicago, IL  ·  Son, in loving memory",
+    meta: "Chicago, IL  ·  For Ranger, his father\'s dog",
     avatar: "https://i.pravatar.cc/80?img=59",
-  },
-  {
-    slug: "linda-and-ray",
-    quote:
-      '"Ray and I have been married 41 years. Breast cancer twice, both times beat. The song is our second wedding gift to each other. We dance to it in the kitchen."',
-    name: "Linda & Ray",
-    meta: "Des Moines, IA  ·  Wife, two-time survivor",
-    avatar: "https://i.pravatar.cc/80?img=24",
-  },
-  {
-    slug: "aiyana-r",
-    quote:
-      '"My grandfather was Lakota. The song honored his name and the prayers he taught us. My family said it sounded like home. He passed wearing the headphones."',
-    name: "Aiyana R.",
-    meta: "Rapid City, SD  ·  Granddaughter, in loving memory",
-    avatar: "https://i.pravatar.cc/80?img=35",
-  },
-  {
-    slug: "sergeant-m",
-    quote:
-      '"My sister is a Marine. Glioblastoma at 34. She did not cry once during treatment. She cried when we played her the song. That is when I knew it was right."',
-    name: "Sgt. Marcus T.",
-    meta: "San Antonio, TX  ·  Brother, for his sister in treatment",
-    avatar: "https://i.pravatar.cc/80?img=64",
-  },
-  {
-    slug: "yuki-h",
-    quote:
-      '"My mother does not speak English. The song was instrumental but used a melody she sang to me as a child. She recognized it instantly. We held each other and wept."',
-    name: "Yuki H.",
-    meta: "San Francisco, CA  ·  Daughter, for her mother in remission",
-    avatar: "https://i.pravatar.cc/80?img=19",
-  },
-  {
-    slug: "father-and-twins",
-    quote:
-      '"Our twins were born during my wife\'s chemo. We played her song in the delivery room while she was pumped full of medicine. They are two now. Mom is cancer-free."',
-    name: "Anthony R.",
-    meta: "Phoenix, AZ  ·  Husband, for his wife in remission",
-    avatar: "https://i.pravatar.cc/80?img=65",
-  },
-  {
-    slug: "claire-and-mom",
-    quote:
-      '"Mom is 92. Lung cancer, stage IV, refused treatment. She wanted dignity. We played her song as her last wish. She mouthed thank you. It will haunt me forever in the best way."',
-    name: "Claire D.",
-    meta: "Boise, ID  ·  Daughter, in loving memory",
-    avatar: "https://i.pravatar.cc/80?img=36",
-  },
-  {
-    slug: "iris-and-jamal",
-    quote:
-      '"My husband Jamal beat throat cancer last year. He lost his singing voice for nine months. The song uses his old recordings. He cried when he heard himself again."',
-    name: "Iris W.",
-    meta: "New Orleans, LA  ·  Wife, for her husband in remission",
-    avatar: "https://i.pravatar.cc/80?img=43",
   },
 ];
 
 const faqs = [
   {
     q: "How long does it take?",
-    a: "Standard delivery is five days. If you need it sooner, our 24-hour express option is available at checkout. If you're up against a hospice timeline or a specific date we need to hit, tell us. We will do everything in our power to meet the moment.",
+    a: "Standard delivery is five days. If you need it sooner — for an anniversary, a memorial, a date you need to hit — our 24-hour express option is available at checkout. Tell us what you're working with and we'll do everything we can to meet the moment.",
   },
   {
-    q: "What if I don't know what to say?",
-    a: "Most families don't. That's why the questionnaire is guided. The prompts bring the right memories up on their own. You don't have to find the words. You just have to answer.",
+    q: "What if I don't know what to write?",
+    a: "Most owners don't. The questionnaire is guided. Soft prompts and tap-to-insert tips bring the right memories up on their own. You don't have to find the words. You just have to remember her.",
   },
   {
-    q: "Can I stay anonymous? I want it to be a surprise.",
-    a: "Yes. We never contact the recipient without your permission. Many families gift their PawPrint Song as a surprise.",
+    q: "My dog passed years ago. Is it too late?",
+    a: "It's never too late. Some of our most moving songs have been written for dogs who've been gone five, ten, even fifteen years. The love doesn't expire. Neither does the song.",
   },
   {
-    q: "What if they've already passed?",
-    a: "Many of our most moving songs have been written in loving memory. You don't need their voice, their permission, or their knowledge. You just need your memories.",
+    q: "Will you use her name?",
+    a: "Always. Her name appears in every chorus and throughout the lyrics. It's her song, by name.",
+  },
+  {
+    q: "What if my dog is still alive?",
+    a: "Many owners commission a song while their dog is still here — to capture every quirk before time takes them. The song becomes something to play together now, and to hold onto later. Same form, same process.",
+  },
+  {
+    q: "What if my dog was a rescue and I don't know her breed?",
+    a: "Pick \"Rescue, breed unknown\" in the form. Tell us what you saw in her — the personality, the look, the way she loved you. That's all we need.",
   },
   {
     q: "What if the song doesn't feel right?",
     a: "We rewrite it. Free. As many times as it takes. If after all of that it still isn't right, we refund you in full. No questions.",
   },
   {
-    q: "Can I share it publicly? Use it at a memorial? Play it at church?",
-    a: "Yes to all of those. Once it's yours, it's yours.",
+    q: "Can I share the song? Use it at a memorial? Post it online?",
+    a: "Yes to all of those. Once it's hers, it's yours.",
   },
   {
     q: "Is this a subscription?",
     a: "No. The song is yours forever. No ads, no paywall, no renewal.",
   },
   {
-    q: "Who's behind PawPrint Song?",
-    a: "PawPrint Song was founded by a team who had each watched someone they love go through cancer. We started this because we couldn't find the right words either, and we believed music could hold what language alone could not.",
+    q: "Who's behind PawprintSong?",
+    a: "PawprintSong was started by people who lost their own dogs and couldn't find anything that took it as seriously as they needed it to. Pet sympathy cards, paw-print necklaces, generic memorial videos — none of it felt like the dog. We built this so the love had somewhere to go that wasn't a drawer.",
   },
 ];
 
