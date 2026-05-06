@@ -1184,57 +1184,6 @@ function LandingPage() {
         </div>
       </section>
 
-      {/* WHO IT'S FOR */}
-      <section id="who" className="px-0 py-[72px] md:py-[100px]">
-        <div className="mx-auto max-w-[1200px] px-5 sm:px-6">
-          <div className="mb-10 max-w-[720px] md:mb-14">
-            <Eyebrow>Who it's for</Eyebrow>
-            <h2 className="mb-3.5 font-display text-[clamp(28px,7vw,48px)] font-medium leading-[1.1] tracking-[-0.022em] text-[#1F1A17]">
-              No two dogs were the same.{" "}
-              <em className="italic text-[#B5532A]">Her song shouldn't be either.</em>
-            </h2>
-            <p className="max-w-[560px] text-[16px] leading-[1.55] text-[#5A5148] md:text-[17px]">
-              Whether she was a goofy lab who loved the world, a senior shepherd who watched over you for fifteen years, or a rescue mutt nobody understood but you — her song is shaped to fit her. By breed, by quirk, by the specific way she loved you.
-            </p>
-          </div>
-
-          <div className="grid grid-cols-1 gap-5 sm:grid-cols-2 lg:grid-cols-3">
-            {useCases.map((u) => (
-              <div
-                key={u.eyebrow}
-                className="group relative flex flex-col overflow-hidden rounded-[16px] border border-[#E8DDC9] bg-[#FDF7E9] transition-all hover:-translate-y-[3px] hover:shadow-[0_8px_24px_rgba(31,27,22,0.08)]"
-              >
-                <div className="relative aspect-[5/4] overflow-hidden bg-[#F8F1E4]">
-                  <img
-                    src={u.img}
-                    alt=""
-                    loading="lazy"
-                    width={512}
-                    height={640}
-                    className="h-full w-full object-cover transition-transform duration-700 group-hover:scale-[1.03]"
-                  />
-                </div>
-                <div className="flex flex-1 flex-col p-[22px_22px_24px]">
-                  <span className="mb-2 block text-[11px] font-semibold uppercase tracking-[0.14em] text-[#B5532A]">
-                    {u.eyebrow}
-                  </span>
-                  <h3 className="mb-2 font-display text-[20px] font-medium leading-[1.2] tracking-[-0.01em] text-[#1F1A17] md:text-[22px]">
-                    {u.label}
-                  </h3>
-                  <p className="text-[14px] leading-[1.55] text-[#5A5148]">
-                    {u.body}
-                  </p>
-                </div>
-              </div>
-            ))}
-          </div>
-
-          <div className="mt-10 text-center md:mt-12">
-            <PrimaryBtn large>Make Her Song 🐾</PrimaryBtn>
-          </div>
-        </div>
-      </section>
-
       {/* HOW IT WORKS moved up — see after PRESS STRIP */}
       {/* TESTIMONIALS */}
       <section id="stories" className="bg-[#ECE2D0] px-0 py-[64px] md:py-[100px]">
