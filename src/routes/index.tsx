@@ -830,7 +830,7 @@ function LandingPage() {
                 </strong>
               </p>
               <div className="mb-5 flex w-full flex-col items-stretch gap-3">
-                <PrimaryBtn large fullWidth>Make Her Song 🐾</PrimaryBtn>
+                <PrimaryBtn large fullWidth>Make her song 🐾</PrimaryBtn>
               </div>
 
               {/* Trust badges row. refined icons, balanced weights */}
@@ -1088,7 +1088,7 @@ function LandingPage() {
           </div>
 
           <div className="mt-12 text-center md:mt-14">
-            <PrimaryBtn large>Make Her Song 🐾</PrimaryBtn>
+            <PrimaryBtn large>Make her song 🐾</PrimaryBtn>
             <TrustBadges />
           </div>
         </div>
@@ -1235,7 +1235,7 @@ function LandingPage() {
           </div>
 
           <div className="mt-12 text-center">
-            <PrimaryBtn large>Make Her Song 🐾</PrimaryBtn>
+            <PrimaryBtn large>Make her song 🐾</PrimaryBtn>
             <TrustBadges />
           </div>
         </div>
@@ -1515,7 +1515,7 @@ function LandingPage() {
             There's no right time to give yourself this. There's just now. and
             her, still in the music, whenever you need her.
           </p>
-          <PrimaryBtn large>Make Her Song 🐾</PrimaryBtn>
+          <PrimaryBtn large>Make her song 🐾</PrimaryBtn>
           <TrustBadges tone="dark" />
         </div>
       </section>
