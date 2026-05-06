@@ -620,6 +620,61 @@ function PrimaryBtn({
   );
 }
 
+function TrustBadges({ tone = "light" }: { tone?: "light" | "dark" }) {
+  const isDark = tone === "dark";
+  const guaranteeBg = isDark
+    ? "bg-[#F8F1E4] border-[#F8F1E4]"
+    : "bg-gradient-to-b from-[#B5532A] to-[#9C4520] border-[#B5532A]";
+  const guaranteeIconBg = isDark ? "bg-[#7A4A2E] text-[#F8F1E4]" : "bg-[#F8F1E4] text-[#B5532A]";
+  const guaranteeText = isDark ? "text-[#7A4A2E]" : "text-[#F8F1E4]";
+  const sideCardBg = isDark
+    ? "bg-[#F8F1E4]/10 border-[#F8F1E4]/25 backdrop-blur-sm"
+    : "bg-[#FDF7E9] border-[#E8DDC9]";
+  const sideIconRing = isDark
+    ? "bg-[#F8F1E4]/15 text-[#F8F1E4] ring-1 ring-[#F8F1E4]/30"
+    : "bg-[#F8F1E4] text-[#B5532A] ring-1 ring-[#E8DDC9]";
+  const sideText = isDark ? "text-[#F8F1E4]" : "text-[#1F1A17]";
+  return (
+    <div className="mx-auto mt-6 grid max-w-[640px] grid-cols-3 gap-2.5">
+      {/* 30-day money back */}
+      <div className={`flex items-center gap-2.5 rounded-[14px] border-2 px-3 py-2.5 shadow-[0_6px_16px_-4px_rgba(181,83,42,0.35)] ${guaranteeBg}`}>
+        <span className={`relative flex h-9 w-9 shrink-0 items-center justify-center rounded-full shadow-[inset_0_1px_2px_rgba(0,0,0,0.12)] ${guaranteeIconBg}`}>
+          <span className="font-display text-[14px] font-bold leading-none tracking-[-0.02em]">30</span>
+        </span>
+        <span className={`text-left text-[10.5px] font-bold uppercase leading-[1.2] tracking-[0.05em] sm:text-[11px] ${guaranteeText}`}>
+          Day money-back<br />guarantee
+        </span>
+      </div>
+      {/* Free rewrites */}
+      <div className={`flex items-center gap-2.5 rounded-[14px] border px-3 py-2.5 ${sideCardBg}`}>
+        <span className={`flex h-9 w-9 shrink-0 items-center justify-center rounded-full ${sideIconRing}`}>
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" className="h-[18px] w-[18px]">
+            <path d="M21 12a9 9 0 1 1-3.51-7.13" />
+            <polyline points="21 4 21 10 15 10" />
+          </svg>
+        </span>
+        <span className={`text-left text-[10.5px] font-bold uppercase leading-[1.2] tracking-[0.05em] sm:text-[11px] ${sideText}`}>
+          Unlimited<br />free rewrites
+        </span>
+      </div>
+      {/* 5-day delivery */}
+      <div className={`flex items-center gap-2.5 rounded-[14px] border px-3 py-2.5 ${sideCardBg}`}>
+        <span className={`flex h-9 w-9 shrink-0 items-center justify-center rounded-full ${sideIconRing}`}>
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" className="h-[18px] w-[18px]">
+            <rect x="3" y="5" width="18" height="16" rx="2" />
+            <line x1="3" y1="10" x2="21" y2="10" />
+            <line x1="8" y1="3" x2="8" y2="7" />
+            <line x1="16" y1="3" x2="16" y2="7" />
+          </svg>
+        </span>
+        <span className={`text-left text-[10.5px] font-bold uppercase leading-[1.2] tracking-[0.05em] sm:text-[11px] ${sideText}`}>
+          Delivered in<br />5 days
+        </span>
+      </div>
+    </div>
+  );
+}
+
 function Eyebrow({
   children,
   className = "",
@@ -1034,6 +1089,7 @@ function LandingPage() {
 
           <div className="mt-12 text-center md:mt-14">
             <PrimaryBtn large>Make Her Song 🐾</PrimaryBtn>
+            <TrustBadges />
           </div>
         </div>
       </section>
@@ -1180,13 +1236,14 @@ function LandingPage() {
 
           <div className="mt-12 text-center">
             <PrimaryBtn large>Make Her Song 🐾</PrimaryBtn>
+            <TrustBadges />
           </div>
         </div>
       </section>
 
       {/* HOW IT WORKS moved up — see after PRESS STRIP */}
       {/* TESTIMONIALS */}
-      <section id="stories" className="bg-[#ECE2D0] px-0 py-[64px] md:py-[100px]">
+      <section id="stories" className="bg-[#F3E7D2] px-0 py-[64px] md:py-[100px]">
         <div className="mx-auto max-w-[1200px] px-5 sm:px-6">
           <div className="mx-auto mb-10 max-w-[720px] text-center md:mb-14">
             <Eyebrow center>Real owners</Eyebrow>
@@ -1302,13 +1359,13 @@ function LandingPage() {
       </section>
 
       {/* GUARANTEE */}
-      <section className="px-0 py-[64px] md:py-[100px]">
-        <div className="mx-auto max-w-[980px] px-5 sm:px-6">
-          <div className="relative overflow-hidden rounded-[24px] border-2 border-[#1F1A17] bg-[#FDF7E9] p-[44px_28px] md:p-[68px_64px]">
+      <section className="bg-[#ECE2D0] px-0 py-[64px] md:py-[110px]">
+        <div className="mx-auto max-w-[1080px] px-5 sm:px-6">
+          <div className="relative overflow-hidden rounded-[24px] border-2 border-[#1F1A17] bg-[#FDF7E9] p-[44px_28px] shadow-[0_30px_80px_-30px_rgba(31,27,22,0.25)] md:p-[80px_72px]">
             {/* decorative concentric arcs */}
             <svg
               aria-hidden="true"
-              className="pointer-events-none absolute -right-24 -top-24 h-[360px] w-[360px] text-[#B5532A]/10 md:-right-16 md:-top-16"
+              className="pointer-events-none absolute -right-24 -top-24 h-[420px] w-[420px] text-[#B5532A]/10 md:-right-20 md:-top-20 md:h-[520px] md:w-[520px]"
               viewBox="0 0 200 200"
               fill="none"
               stroke="currentColor"
@@ -1320,10 +1377,10 @@ function LandingPage() {
               <circle cx="100" cy="100" r="42" />
             </svg>
 
-            <div className="relative grid gap-10 md:grid-cols-[auto,1fr] md:items-center md:gap-14">
+            <div className="relative grid gap-10 md:grid-cols-[300px,1fr] md:items-center md:gap-16 lg:grid-cols-[340px,1fr] lg:gap-20">
               {/* The 30-DAY SEAL */}
               <div className="mx-auto md:mx-0">
-                <div className="relative h-[200px] w-[200px] md:h-[230px] md:w-[230px]">
+                <div className="relative h-[220px] w-[220px] md:h-[300px] md:w-[300px] lg:h-[340px] lg:w-[340px]">
                   {/* rotating outer ring with text */}
                   <svg
                     viewBox="0 0 200 200"
@@ -1353,15 +1410,15 @@ function LandingPage() {
                   </svg>
 
                   {/* inner stamp */}
-                  <div className="absolute inset-[24px] flex flex-col items-center justify-center rounded-full border-2 border-[#1F1A17] bg-[#B5532A] text-center text-[#F8F1E4] shadow-[inset_0_2px_8px_rgba(0,0,0,0.18),0_8px_24px_rgba(122,74,46,0.25)]">
-                    <div className="font-display text-[64px] font-medium leading-none tracking-[-0.04em] md:text-[72px]">
+                  <div className="absolute inset-[24px] flex flex-col items-center justify-center rounded-full border-2 border-[#1F1A17] bg-gradient-to-br from-[#C25D32] to-[#9C4520] text-center text-[#F8F1E4] shadow-[inset_0_2px_10px_rgba(0,0,0,0.22),0_12px_32px_rgba(122,74,46,0.32)] md:inset-[34px] lg:inset-[40px]">
+                    <div className="font-display text-[68px] font-medium leading-none tracking-[-0.04em] md:text-[92px] lg:text-[108px]">
                       30
                     </div>
-                    <div className="mt-1 text-[10px] font-semibold uppercase tracking-[0.28em] text-[#F5E6D8]">
+                    <div className="mt-1 text-[10px] font-semibold uppercase tracking-[0.28em] text-[#F5E6D8] md:text-[11px]">
                       Day
                     </div>
-                    <div className="mt-2 h-px w-10 bg-[#F5E6D8]/50" />
-                    <div className="mt-2 text-[11px] font-semibold uppercase tracking-[0.18em] text-[#F8F1E4]">
+                    <div className="mt-2 h-px w-10 bg-[#F5E6D8]/50 md:w-14" />
+                    <div className="mt-2 text-[11px] font-semibold uppercase tracking-[0.18em] text-[#F8F1E4] md:text-[12px]">
                       Full refund
                     </div>
                   </div>
@@ -1415,7 +1472,7 @@ function LandingPage() {
       </section>
 
       {/* FAQ */}
-      <section id="faq" className="bg-[#ECE2D0] px-0 py-[64px] md:py-[100px]">
+      <section id="faq" className="bg-[#FDF7E9] px-0 py-[64px] md:py-[100px]">
         <div className="mx-auto max-w-[820px] px-5 sm:px-6">
           <div className="mb-10 text-center md:mb-14">
             <Eyebrow center>Common questions</Eyebrow>
@@ -1459,17 +1516,7 @@ function LandingPage() {
             her, still in the music, whenever you need her.
           </p>
           <PrimaryBtn large>Make Her Song 🐾</PrimaryBtn>
-          <div className="mt-6 flex flex-wrap items-center justify-center gap-x-3 gap-y-2 text-[13px] text-[rgba(246,240,230,0.75)]">
-            <span className="inline-flex items-center gap-1.5 rounded-full border border-[#F5E6D8]/30 bg-[#F8F1E4]/10 px-3 py-1 text-[11.5px] font-semibold uppercase tracking-[0.08em] text-[#F8F1E4]">
-              <span className="flex h-4 w-4 items-center justify-center rounded-full bg-[#F8F1E4] text-[9px] font-bold leading-none text-[#7A4A2E]">
-                30
-              </span>
-              Day money-back guarantee
-            </span>
-            <span>Delivered in 5 days</span>
-            <span className="text-[rgba(246,240,230,0.45)]">·</span>
-            <span>Free revisions</span>
-          </div>
+          <TrustBadges tone="dark" />
         </div>
       </section>
 
