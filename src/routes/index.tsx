@@ -1089,6 +1089,7 @@ function LandingPage() {
 
           <div className="mt-12 text-center md:mt-14">
             <PrimaryBtn large>Make Her Song 🐾</PrimaryBtn>
+            <TrustBadges />
           </div>
         </div>
       </section>
@@ -1235,6 +1236,7 @@ function LandingPage() {
 
           <div className="mt-12 text-center">
             <PrimaryBtn large>Make Her Song 🐾</PrimaryBtn>
+            <TrustBadges />
           </div>
         </div>
       </section>
@@ -1514,17 +1516,7 @@ function LandingPage() {
             her, still in the music, whenever you need her.
           </p>
           <PrimaryBtn large>Make Her Song 🐾</PrimaryBtn>
-          <div className="mt-6 flex flex-wrap items-center justify-center gap-x-3 gap-y-2 text-[13px] text-[rgba(246,240,230,0.75)]">
-            <span className="inline-flex items-center gap-1.5 rounded-full border border-[#F5E6D8]/30 bg-[#F8F1E4]/10 px-3 py-1 text-[11.5px] font-semibold uppercase tracking-[0.08em] text-[#F8F1E4]">
-              <span className="flex h-4 w-4 items-center justify-center rounded-full bg-[#F8F1E4] text-[9px] font-bold leading-none text-[#7A4A2E]">
-                30
-              </span>
-              Day money-back guarantee
-            </span>
-            <span>Delivered in 5 days</span>
-            <span className="text-[rgba(246,240,230,0.45)]">·</span>
-            <span>Free revisions</span>
-          </div>
+          <TrustBadges tone="dark" />
         </div>
       </section>
 
