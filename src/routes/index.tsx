@@ -574,7 +574,7 @@ const faqs = [
   },
   {
     q: "What if the song doesn't feel right?",
-    a: "We rewrite it. Free. As many times as it takes. If after all of that it still isn't right, we refund you in full. No questions.",
+    a: "We rewrite it. Free. As many times as it takes. And if after all of that it still isn't right, you have a full 30 days from delivery to request a complete refund. No questions, no fine print.",
   },
   {
     q: "Can I share the song? Use it at a memorial? Post it online?",
@@ -773,10 +773,23 @@ function LandingPage() {
                   Written from your memories. Her name in every chorus. Yours to keep forever.
                 </strong>
               </p>
-              <div className="mb-7 flex w-full flex-col items-stretch gap-3">
+              <div className="mb-5 flex w-full flex-col items-stretch gap-3">
                 <PrimaryBtn large fullWidth>Make Her Song 🐾</PrimaryBtn>
               </div>
-              <div className="w-full text-center text-[13px] leading-[1.4] text-[#5A5148] md:text-[13.5px]">
+              {/* Trust row with prominent 30-day badge */}
+              <div className="mb-4 flex flex-wrap items-center gap-x-2 gap-y-1.5 text-[12.5px] font-medium text-[#5A5148]">
+                <span className="inline-flex items-center gap-1.5 rounded-full border border-[#B5532A]/30 bg-[#B5532A]/10 px-2.5 py-1 text-[11.5px] font-semibold uppercase tracking-[0.06em] text-[#B5532A]">
+                  <span className="flex h-4 w-4 items-center justify-center rounded-full bg-[#B5532A] text-[9px] font-bold leading-none text-[#F8F1E4]">
+                    30
+                  </span>
+                  Day money-back guarantee
+                </span>
+                <span className="text-[#8A8175]">·</span>
+                <span>Free rewrites</span>
+                <span className="text-[#8A8175]">·</span>
+                <span>Delivered in 5 days</span>
+              </div>
+              <div className="w-full text-[13px] leading-[1.4] text-[#5A5148] md:text-[13.5px]">
                 Made for{" "}
                 <strong className="text-[#1F1A17]">1,200+ dogs</strong>{" "}
                 who are gone but still loved
@@ -955,7 +968,7 @@ function LandingPage() {
                 n: "03",
                 h: "Delivered in 5 days.",
                 p: "Straight to your inbox. Streamable and downloadable, yours forever to share, gift, or play at the bedside.",
-                m: "Don't love it? You get one free rewrite, or a full refund. No questions.",
+                m: "Don't love it? Free rewrites — or a full refund within 30 days. No questions.",
                 icon: (
                   <svg viewBox="0 0 24 24" fill="none" className="h-5 w-5" stroke="currentColor" strokeWidth="1.7" strokeLinecap="round" strokeLinejoin="round">
                     <path d="M4 4h16c1.1 0 2 .9 2 2v12c0 1.1-.9 2-2 2H4c-1.1 0-2-.9-2-2V6c0-1.1.9-2 2-2z"/><polyline points="22,6 12,13 2,6"/>
@@ -1311,24 +1324,113 @@ function LandingPage() {
 
       {/* GUARANTEE */}
       <section className="px-0 py-[64px] md:py-[100px]">
-        <div className="mx-auto max-w-[820px] px-5 sm:px-6">
-          <div className="rounded-[20px] border-2 border-[#1F1A17] bg-[#FDF7E9] p-[40px_32px] text-center md:p-[60px_56px]">
-            <div className="mx-auto mb-5 inline-flex items-center gap-2 text-[11px] font-semibold uppercase tracking-[0.18em] text-[#B5532A]">
-              <span className="h-1.5 w-1.5 rounded-full bg-[#B5532A]" />
-              Our promise
+        <div className="mx-auto max-w-[980px] px-5 sm:px-6">
+          <div className="relative overflow-hidden rounded-[24px] border-2 border-[#1F1A17] bg-[#FDF7E9] p-[44px_28px] md:p-[68px_64px]">
+            {/* decorative concentric arcs */}
+            <svg
+              aria-hidden="true"
+              className="pointer-events-none absolute -right-24 -top-24 h-[360px] w-[360px] text-[#B5532A]/10 md:-right-16 md:-top-16"
+              viewBox="0 0 200 200"
+              fill="none"
+              stroke="currentColor"
+              strokeWidth="1"
+            >
+              <circle cx="100" cy="100" r="90" />
+              <circle cx="100" cy="100" r="74" />
+              <circle cx="100" cy="100" r="58" strokeDasharray="2 4" />
+              <circle cx="100" cy="100" r="42" />
+            </svg>
+
+            <div className="relative grid gap-10 md:grid-cols-[auto,1fr] md:items-center md:gap-14">
+              {/* The 30-DAY SEAL */}
+              <div className="mx-auto md:mx-0">
+                <div className="relative h-[200px] w-[200px] md:h-[230px] md:w-[230px]">
+                  {/* rotating outer ring with text */}
+                  <svg
+                    viewBox="0 0 200 200"
+                    className="absolute inset-0 h-full w-full animate-[spin_28s_linear_infinite] text-[#1F1A17]"
+                    aria-hidden="true"
+                  >
+                    <defs>
+                      <path
+                        id="sealCircle"
+                        d="M 100,100 m -82,0 a 82,82 0 1,1 164,0 a 82,82 0 1,1 -164,0"
+                      />
+                    </defs>
+                    <text
+                      fill="currentColor"
+                      style={{
+                        fontFamily: "var(--font-display, Georgia, serif)",
+                        fontSize: "13px",
+                        letterSpacing: "0.32em",
+                        textTransform: "uppercase",
+                        fontWeight: 500,
+                      }}
+                    >
+                      <textPath href="#sealCircle" startOffset="0">
+                        Money-back guarantee · No questions asked ·
+                      </textPath>
+                    </text>
+                  </svg>
+
+                  {/* inner stamp */}
+                  <div className="absolute inset-[24px] flex flex-col items-center justify-center rounded-full border-2 border-[#1F1A17] bg-[#B5532A] text-center text-[#F8F1E4] shadow-[inset_0_2px_8px_rgba(0,0,0,0.18),0_8px_24px_rgba(122,74,46,0.25)]">
+                    <div className="font-display text-[64px] font-medium leading-none tracking-[-0.04em] md:text-[72px]">
+                      30
+                    </div>
+                    <div className="mt-1 text-[10px] font-semibold uppercase tracking-[0.28em] text-[#F5E6D8]">
+                      Day
+                    </div>
+                    <div className="mt-2 h-px w-10 bg-[#F5E6D8]/50" />
+                    <div className="mt-2 text-[11px] font-semibold uppercase tracking-[0.18em] text-[#F8F1E4]">
+                      Full refund
+                    </div>
+                  </div>
+                </div>
+              </div>
+
+              {/* Copy */}
+              <div className="text-center md:text-left">
+                <div className="mb-4 inline-flex items-center gap-2 rounded-full border border-[#1F1A17]/15 bg-[#F8F1E4] px-3 py-1 text-[11px] font-semibold uppercase tracking-[0.18em] text-[#B5532A]">
+                  <span className="h-1.5 w-1.5 rounded-full bg-[#B5532A]" />
+                  Our promise
+                </div>
+                <h2 className="mb-5 font-display text-[clamp(26px,5.5vw,40px)] font-medium leading-[1.15] tracking-[-0.018em] text-[#1F1A17]">
+                  If it doesn't feel right,{" "}
+                  <em className="italic text-[#B5532A]">we rewrite it.</em>
+                  <br />
+                  Still not right? Full refund — for{" "}
+                  <span className="whitespace-nowrap rounded-md bg-[#B5532A]/12 px-1.5 py-0.5 text-[#B5532A]">
+                    30 full days.
+                  </span>
+                </h2>
+                <p className="mb-6 max-w-[520px] text-[15.5px] leading-[1.6] text-[#5A5148] md:text-[16.5px]">
+                  Every song goes through a careful review before it reaches you.
+                  If it isn't right, we revise it as many times as it takes — at no
+                  cost. And you have a full <strong className="font-semibold text-[#1F1A17]">30 days from delivery</strong> to ask for
+                  every cent back. No questions, no fine print.
+                </p>
+
+                {/* Reassurance row */}
+                <div className="grid grid-cols-1 gap-2 sm:grid-cols-3">
+                  {[
+                    { k: "✓", v: "Unlimited free rewrites" },
+                    { k: "✓", v: "30-day money back" },
+                    { k: "✓", v: "No questions asked" },
+                  ].map((r) => (
+                    <div
+                      key={r.v}
+                      className="flex items-center justify-center gap-2 rounded-[10px] border border-[#E8DDC9] bg-[#F8F1E4] px-3 py-2 text-[13px] font-medium text-[#1F1A17] sm:justify-start"
+                    >
+                      <span className="flex h-5 w-5 items-center justify-center rounded-full bg-[#B5532A] text-[11px] font-bold text-[#F8F1E4]">
+                        {r.k}
+                      </span>
+                      {r.v}
+                    </div>
+                  ))}
+                </div>
+              </div>
             </div>
-            <h2 className="mb-5 font-display text-[clamp(26px,5.5vw,38px)] font-medium leading-[1.18] tracking-[-0.018em] text-[#1F1A17]">
-              If it doesn't feel right,{" "}
-              <em className="italic text-[#B5532A]">we rewrite it.</em>
-              <br />
-              If it still doesn't, you don't pay.
-            </h2>
-            <p className="mx-auto max-w-[560px] text-[15.5px] leading-[1.6] text-[#5A5148] md:text-[16.5px]">
-              We know what's at stake. Every song goes through a careful review
-              before it reaches you. If it isn't right, we revise it as many
-              times as it takes — at no cost. And if after all of that you
-              still aren't moved, we refund you in full.
-            </p>
           </div>
         </div>
       </section>
@@ -1378,8 +1480,16 @@ function LandingPage() {
             her, still in the music, whenever you need her.
           </p>
           <PrimaryBtn large>Make Her Song 🐾</PrimaryBtn>
-          <div className="mt-6 text-[13px] text-[rgba(246,240,230,0.55)]">
-            Delivered in 5 days · Free revisions · Money back guarantee
+          <div className="mt-6 flex flex-wrap items-center justify-center gap-x-3 gap-y-2 text-[13px] text-[rgba(246,240,230,0.75)]">
+            <span className="inline-flex items-center gap-1.5 rounded-full border border-[#F5E6D8]/30 bg-[#F8F1E4]/10 px-3 py-1 text-[11.5px] font-semibold uppercase tracking-[0.08em] text-[#F8F1E4]">
+              <span className="flex h-4 w-4 items-center justify-center rounded-full bg-[#F8F1E4] text-[9px] font-bold leading-none text-[#7A4A2E]">
+                30
+              </span>
+              Day money-back guarantee
+            </span>
+            <span>Delivered in 5 days</span>
+            <span className="text-[rgba(246,240,230,0.45)]">·</span>
+            <span>Free revisions</span>
           </div>
         </div>
       </section>
