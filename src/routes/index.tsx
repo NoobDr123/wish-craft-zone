@@ -1359,13 +1359,13 @@ function LandingPage() {
       </section>
 
       {/* GUARANTEE */}
-      <section className="px-0 py-[64px] md:py-[100px]">
-        <div className="mx-auto max-w-[980px] px-5 sm:px-6">
-          <div className="relative overflow-hidden rounded-[24px] border-2 border-[#1F1A17] bg-[#FDF7E9] p-[44px_28px] md:p-[68px_64px]">
+      <section className="bg-[#ECE2D0] px-0 py-[64px] md:py-[110px]">
+        <div className="mx-auto max-w-[1080px] px-5 sm:px-6">
+          <div className="relative overflow-hidden rounded-[24px] border-2 border-[#1F1A17] bg-[#FDF7E9] p-[44px_28px] shadow-[0_30px_80px_-30px_rgba(31,27,22,0.25)] md:p-[80px_72px]">
             {/* decorative concentric arcs */}
             <svg
               aria-hidden="true"
-              className="pointer-events-none absolute -right-24 -top-24 h-[360px] w-[360px] text-[#B5532A]/10 md:-right-16 md:-top-16"
+              className="pointer-events-none absolute -right-24 -top-24 h-[420px] w-[420px] text-[#B5532A]/10 md:-right-20 md:-top-20 md:h-[520px] md:w-[520px]"
               viewBox="0 0 200 200"
               fill="none"
               stroke="currentColor"
@@ -1377,10 +1377,10 @@ function LandingPage() {
               <circle cx="100" cy="100" r="42" />
             </svg>
 
-            <div className="relative grid gap-10 md:grid-cols-[auto,1fr] md:items-center md:gap-14">
+            <div className="relative grid gap-10 md:grid-cols-[300px,1fr] md:items-center md:gap-16 lg:grid-cols-[340px,1fr] lg:gap-20">
               {/* The 30-DAY SEAL */}
               <div className="mx-auto md:mx-0">
-                <div className="relative h-[200px] w-[200px] md:h-[230px] md:w-[230px]">
+                <div className="relative h-[220px] w-[220px] md:h-[300px] md:w-[300px] lg:h-[340px] lg:w-[340px]">
                   {/* rotating outer ring with text */}
                   <svg
                     viewBox="0 0 200 200"
