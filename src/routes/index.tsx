@@ -74,7 +74,7 @@ export const Route = createFileRoute("/")({
   },
   head: () => ({
     meta: [
-      { title: "PawprintSong — A song that brings her back into the room" },
+      { title: "PawprintSong. A song that brings her back into the room" },
       {
         name: "description",
         content:
@@ -82,7 +82,7 @@ export const Route = createFileRoute("/")({
       },
       {
         property: "og:title",
-        content: "PawprintSong — A song that brings her back into the room",
+        content: "PawprintSong. A song that brings her back into the room",
       },
       {
         property: "og:description",
@@ -145,7 +145,7 @@ function KaraokeOverlay({
     const onTime = () => setT(a.currentTime);
     const syncFromAudio = () => setT(a.currentTime);
     setT(a.currentTime);
-    // Poll as a fallback — some browsers fire timeupdate sparsely (every 250ms+)
+    // Poll as a fallback. some browsers fire timeupdate sparsely (every 250ms+)
     // and we want smooth word-level highlighting.
     const interval = window.setInterval(() => {
       if (!a.paused) setT(a.currentTime);
@@ -330,7 +330,7 @@ const useCases = [
   {
     eyebrow: "On the anniversary",
     label: "For the day your body remembers first",
-    body: "One year. Five years. Ten. The grief doesn't end — it just changes shape.",
+    body: "One year. Five years. Ten. The grief doesn't end. it just changes shape.",
     img: whoParent,
   },
   {
@@ -342,7 +342,7 @@ const useCases = [
   {
     eyebrow: "For the dog still with you",
     label: "Capture her while she's here",
-    body: "Many owners commission a song while their dog is still around — to hold every quirk before time takes them.",
+    body: "Many owners commission a song while their dog is still around. to hold every quirk before time takes them.",
     img: whoYourself,
   },
 ];
@@ -509,7 +509,7 @@ const testimonials: Array<{
   {
     slug: "henry-and-paul",
     quote:
-      '"Our pup Pippa died at three from a sudden heart condition. We didn\'t get long enough. The song let us hold what little we had. It will play at our wedding next year — she should have been our flower girl."',
+      '"Our pup Pippa died at three from a sudden heart condition. We didn\'t get long enough. The song let us hold what little we had. It will play at our wedding next year. she should have been our flower girl."',
     name: "Henry & Paul",
     meta: "Brooklyn, NY  ·  For Pippa, their Cavalier",
     avatar: "https://i.pravatar.cc/80?img=33",
@@ -541,7 +541,7 @@ const testimonials: Array<{
   {
     slug: "darnell-j",
     quote:
-      '"My pops fought cancer for nine years. His dog Ranger never left his side. We played Ranger\'s song at the memorial — Ranger had passed six months earlier. Half the room cried."',
+      '"My pops fought cancer for nine years. His dog Ranger never left his side. We played Ranger\'s song at the memorial. Ranger had passed six months earlier. Half the room cried."',
     name: "Darnell J.",
     meta: "Chicago, IL  ·  For Ranger, his father\'s dog",
     avatar: "https://i.pravatar.cc/80?img=59",
@@ -551,7 +551,7 @@ const testimonials: Array<{
 const faqs = [
   {
     q: "How long does it take?",
-    a: "Standard delivery is five days. If you need it sooner — for an anniversary, a memorial, a date you need to hit — our 24-hour express option is available at checkout. Tell us what you're working with and we'll do everything we can to meet the moment.",
+    a: "Standard delivery is five days. If you need it sooner. for an anniversary, a memorial, a date you need to hit. our 24-hour express option is available at checkout. Tell us what you're working with and we'll do everything we can to meet the moment.",
   },
   {
     q: "What if I don't know what to write?",
@@ -567,11 +567,11 @@ const faqs = [
   },
   {
     q: "What if my dog is still alive?",
-    a: "Many owners commission a song while their dog is still here — to capture every quirk before time takes them. The song becomes something to play together now, and to hold onto later. Same form, same process.",
+    a: "Many owners commission a song while their dog is still here. to capture every quirk before time takes them. The song becomes something to play together now, and to hold onto later. Same form, same process.",
   },
   {
     q: "What if my dog was a rescue and I don't know her breed?",
-    a: "Pick \"Rescue, breed unknown\" in the form. Tell us what you saw in her — the personality, the look, the way she loved you. That's all we need.",
+    a: "Pick \"Rescue, breed unknown\" in the form. Tell us what you saw in her. the personality, the look, the way she loved you. That's all we need.",
   },
   {
     q: "What if the song doesn't feel right?",
@@ -587,7 +587,7 @@ const faqs = [
   },
   {
     q: "Who's behind PawprintSong?",
-    a: "PawprintSong was started by people who lost their own dogs and couldn't find anything that took it as seriously as they needed it to. Pet sympathy cards, paw-print necklaces, generic memorial videos — none of it felt like the dog. We built this so the love had somewhere to go that wasn't a drawer.",
+    a: "PawprintSong was started by people who lost their own dogs and couldn't find anything that took it as seriously as they needed it to. Pet sympathy cards, paw-print necklaces, generic memorial videos. none of it felt like the dog. We built this so the love had somewhere to go that wasn't a drawer.",
   },
 ];
 
@@ -708,7 +708,7 @@ function LandingPage() {
   const [heroPlaying, setHeroPlaying] = useState(false);
   const [heroEverPlayed, setHeroEverPlayed] = useState(false);
 
-  // Funnel tracking — record one lander_view per session per page load
+  // Funnel tracking. record one lander_view per session per page load
   useEffect(() => {
     void import("@/lib/tracking").then(({ track, ensureSession }) => {
       void ensureSession();
@@ -716,7 +716,7 @@ function LandingPage() {
     });
   }, []);
 
-  // Inline sample playback — one audio at a time, no modal
+  // Inline sample playback. one audio at a time, no modal
   const sampleAudioRef = useRef<HTMLAudioElement | null>(null);
   const [playingSampleId, setPlayingSampleId] = useState<string | null>(null);
 
@@ -774,7 +774,7 @@ function LandingPage() {
     }
   };
 
-  // Choose displayed list — real samples if available, otherwise the fallback set
+  // Choose displayed list. real samples if available, otherwise the fallback set
   const displaySamples =
     samples.length > 0
       ? samples
@@ -833,9 +833,9 @@ function LandingPage() {
                 <PrimaryBtn large fullWidth>Make Her Song 🐾</PrimaryBtn>
               </div>
 
-              {/* Trust badges row — refined icons, balanced weights */}
+              {/* Trust badges row. refined icons, balanced weights */}
               <div className="mb-5 grid grid-cols-3 gap-2.5">
-                {/* 30-day money back — accented */}
+                {/* 30-day money back. accented */}
                 <div className="flex items-center gap-2.5 rounded-[14px] border-2 border-[#B5532A] bg-gradient-to-b from-[#B5532A] to-[#9C4520] px-3 py-2.5 shadow-[0_6px_16px_-4px_rgba(181,83,42,0.45)]">
                   <span className="relative flex h-9 w-9 shrink-0 items-center justify-center rounded-full bg-[#F8F1E4] text-[#B5532A] shadow-[inset_0_1px_2px_rgba(0,0,0,0.08)]">
                     <span className="font-display text-[14px] font-bold leading-none tracking-[-0.02em]">30</span>
@@ -957,7 +957,7 @@ function LandingPage() {
                   <div className="absolute left-3 top-3 flex items-center gap-2 rounded-full bg-black/45 px-3 py-1.5 backdrop-blur-sm sm:left-4 sm:top-4">
                     <span className="flex h-2 w-2 animate-pulse rounded-full bg-[#E8C547]" />
                     <span className="text-[11px] font-medium uppercase tracking-[0.12em] text-white/95">
-                      {heroSample?.title ? `${heroSample.title} — Now playing` : "Now playing"}
+                      {heroSample?.title ? `${heroSample.title}. Now playing` : "Now playing"}
                     </span>
                   </div>
                 )}
@@ -1053,7 +1053,7 @@ function LandingPage() {
                 n: "03",
                 h: "Delivered in 5 days.",
                 p: "Straight to your inbox. Streamable and downloadable, yours forever to share, gift, or play at the bedside.",
-                m: "Don't love it? Free rewrites — or a full refund within 30 days. No questions.",
+                m: "Don't love it? Free rewrites. or a full refund within 30 days. No questions.",
                 icon: (
                   <svg viewBox="0 0 24 24" fill="none" className="h-5 w-5" stroke="currentColor" strokeWidth="1.7" strokeLinecap="round" strokeLinejoin="round">
                     <path d="M4 4h16c1.1 0 2 .9 2 2v12c0 1.1-.9 2-2 2H4c-1.1 0-2-.9-2-2V6c0-1.1.9-2 2-2z"/><polyline points="22,6 12,13 2,6"/>
@@ -1119,7 +1119,7 @@ function LandingPage() {
                   disabled={!s.audio_url}
                   aria-label={
                     !s.audio_url
-                      ? `${s.title} — coming soon`
+                      ? `${s.title}. coming soon`
                       : isPlaying
                         ? `Pause ${s.title}`
                         : `Play ${s.title}`
@@ -1241,7 +1241,7 @@ function LandingPage() {
         </div>
       </section>
 
-      {/* HOW IT WORKS moved up — see after PRESS STRIP */}
+      {/* HOW IT WORKS moved up. see after PRESS STRIP */}
       {/* TESTIMONIALS */}
       <section id="stories" className="bg-[#F3E7D2] px-0 py-[64px] md:py-[100px]">
         <div className="mx-auto max-w-[1200px] px-5 sm:px-6">
@@ -1435,14 +1435,14 @@ function LandingPage() {
                   If it doesn't feel right,{" "}
                   <em className="italic text-[#B5532A]">we rewrite it.</em>
                   <br />
-                  Still not right? Full refund — for{" "}
+                  Still not right? Full refund. for{" "}
                   <span className="whitespace-nowrap rounded-md bg-[#B5532A]/12 px-1.5 py-0.5 text-[#B5532A]">
                     30 full days.
                   </span>
                 </h2>
                 <p className="mb-6 max-w-[520px] text-[15.5px] leading-[1.6] text-[#5A5148] md:text-[16.5px]">
                   Every song goes through a careful review before it reaches you.
-                  If it isn't right, we revise it as many times as it takes — at no
+                  If it isn't right, we revise it as many times as it takes. at no
                   cost. And you have a full <strong className="font-semibold text-[#1F1A17]">30 days from delivery</strong> to ask for
                   every cent back. No questions, no fine print.
                 </p>
@@ -1512,7 +1512,7 @@ function LandingPage() {
             <span className="not-italic text-[#F5E6D8]">&rdquo;</span>
           </h2>
           <p className="mx-auto mb-8 max-w-[560px] text-[16px] leading-[1.6] text-[rgba(246,240,230,0.75)] md:text-[17px]">
-            There's no right time to give yourself this. There's just now — and
+            There's no right time to give yourself this. There's just now. and
             her, still in the music, whenever you need her.
           </p>
           <PrimaryBtn large>Make Her Song 🐾</PrimaryBtn>
