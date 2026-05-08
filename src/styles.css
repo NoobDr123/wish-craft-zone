@@ -104,9 +104,9 @@
   --popover-foreground: #1F1A17;
 
   /* Burnt Sienna — primary CTA */
-  --primary: #B5532A;
-  --primary-foreground: #FFF7EE;
-  --primary-hover: #7A4A2E;
+  --primary: #4FB477;
+  --primary-foreground: #FFFFFF;
+  --primary-hover: #3E9A63;
   --lavender: #B5532A;
   --lavender-deep: #7A4A2E;
   --lavender-soft: #F5E6D8;
@@ -121,8 +121,8 @@
   --accent-foreground: #1F1A17;
 
   /* Sage Green — secondary accent */
-  --ribbon: #7B8C6B;
-  --ribbon-foreground: #FFF7EE;
+  --ribbon: #4FB477;
+  --ribbon-foreground: #FFFFFF;
   --gold: #D4A29A;
 
   --peach: #D4A29A;
@@ -136,7 +136,7 @@
 
   --border: #E8DDC9;
   --input: #E8DDC9;
-  --ring: #B5532A;
+  --ring: #4FB477;
   --line: #E8DDC9;
 
   --ink: #1F1A17;
