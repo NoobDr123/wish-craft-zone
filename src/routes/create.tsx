@@ -283,31 +283,12 @@ function CreatePage() {
       key: "breed",
       chapter: "Their breed",
       title: `What breed is ${dogName}?`,
-      subtitle: "Pick the closest match. We'll tailor the lyrics to fit.",
+      subtitle: "Pick the closest match — or search any breed below.",
       isValid: (s) =>
         !!s.dog_breed &&
         (s.dog_breed !== "Other" || (s.dog_breed_other ?? "").trim().length >= 1),
       answer: (s) => ({ dog_breed: s.dog_breed }),
-      render: () => (
-        <div className="space-y-6">
-          <BreedSelect
-            options={BREEDS}
-            value={q.dog_breed}
-            onChange={(v) => q.set("dog_breed", v as DogBreedKey)}
-          />
-          {q.dog_breed === "Other" && (
-            <Question label={`What breed is ${dogName}?`} helper="A few words.">
-              <TextInput
-                placeholder="e.g. Italian Greyhound"
-                value={q.dog_breed_other}
-                onChange={(e) => q.set("dog_breed_other", e.target.value)}
-                maxLength={60}
-                autoFocus
-              />
-            </Question>
-          )}
-        </div>
-      ),
+      render: () => <BreedStep />,
     },
 
     // 2. Photo (optional)
