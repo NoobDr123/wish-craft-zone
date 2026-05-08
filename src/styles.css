@@ -103,13 +103,13 @@
   --popover: #FDF7E9;
   --popover-foreground: #1F1A17;
 
-  /* Warm Purple — PawPrint accent */
-  --primary: #8D6FAF;
+  /* Warm Terracotta — PawPrint accent */
+  --primary: #B5532A;
   --primary-foreground: #FFF7EE;
-  --primary-hover: #6B4F8A;
-  --lavender: #8D6FAF;
-  --lavender-deep: #6B4F8A;
-  --lavender-soft: #E5D9EF;
+  --primary-hover: #94411F;
+  --lavender: #B5532A;
+  --lavender-deep: #7A4A2E;
+  --lavender-soft: #F5E6D8;
 
   --secondary: #ECE2D0;
   --secondary-foreground: #1F1A17;
@@ -117,7 +117,7 @@
   --muted: #ECE2D0;
   --muted-foreground: #5A5148;
 
-  --accent: #E5D9EF;
+  --accent: #F5E6D8;
   --accent-foreground: #1F1A17;
 
   /* Sage Green — button CTA */
