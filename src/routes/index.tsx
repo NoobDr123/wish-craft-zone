@@ -839,7 +839,7 @@ function LandingPage() {
                 </strong>
               </p>
               <div className="mb-5 flex w-full flex-col items-stretch gap-3">
-                <PrimaryBtn large fullWidth>Hear their song 🐾</PrimaryBtn>
+                <PrimaryBtn large fullWidth>Hear their pawprint song 🐾</PrimaryBtn>
               </div>
 
               {/* Trust badges row. refined icons, balanced weights */}
@@ -1096,8 +1096,8 @@ function LandingPage() {
             ))}
           </div>
 
-          <div className="mt-12 text-center md:mt-14">
-            <PrimaryBtn large>Hear their song 🐾</PrimaryBtn>
+          <div className="mx-auto mt-12 flex max-w-[480px] flex-col items-stretch text-center md:mt-14">
+            <PrimaryBtn large fullWidth>Hear their pawprint song 🐾</PrimaryBtn>
             <TrustBadges />
           </div>
         </div>
@@ -1243,126 +1243,9 @@ function LandingPage() {
             })}
           </div>
 
-          <div className="mt-12 text-center">
-            <PrimaryBtn large>Hear their song 🐾</PrimaryBtn>
+          <div className="mx-auto mt-12 flex max-w-[480px] flex-col items-stretch text-center">
+            <PrimaryBtn large fullWidth>Hear their pawprint song 🐾</PrimaryBtn>
             <TrustBadges />
-          </div>
-        </div>
-      </section>
-
-      {/* HOW IT WORKS moved up. see after PRESS STRIP */}
-      {/* TESTIMONIALS */}
-      <section id="stories" className="bg-[#F3E7D2] px-0 py-[64px] md:py-[100px]">
-        <div className="mx-auto max-w-[1200px] px-5 sm:px-6">
-          <div className="mx-auto mb-10 max-w-[720px] text-center md:mb-14">
-            <Eyebrow center>Real owners</Eyebrow>
-            <h2 className="mb-3.5 font-display text-[clamp(28px,7vw,48px)] font-medium leading-[1.1] tracking-[-0.022em] text-[#1F1A17]">
-              <em className="italic text-[#B5532A]">1,200+</em> dogs honored.
-              <br />
-              Each song held something a frame couldn't.
-            </h2>
-          </div>
-
-          <div className="grid grid-cols-1 gap-5 sm:grid-cols-2 lg:grid-cols-3">
-            {testimonials.map((t, i) => {
-              const song = testimonialSongs[t.slug];
-              const hasAudio = !!song?.audio_url;
-              const isPlaying = hasAudio && playingSampleId === song!.id;
-              return (
-                <div
-                  key={i}
-                  className="flex flex-col rounded-[16px] border border-[#E8DDC9] bg-[#FDF7E9] p-[24px_22px]"
-                >
-                  <div className="flex items-start gap-4">
-                    <div className="min-w-0 flex-1">
-                      <p className="mb-4 text-[14.5px] leading-[1.55] text-[#1F1A17]">
-                        {t.quote}
-                      </p>
-                    </div>
-                    {/* Vinyl */}
-                    <button
-                      type="button"
-                      onClick={() => {
-                        if (!hasAudio) return;
-                        handleSamplePlay({
-                          id: song!.id,
-                          title: song!.title,
-                          quote: null,
-                          for_text: null,
-                          genre_label: "",
-                          cover_image_url: null,
-                          audio_url: song!.audio_url,
-                          lyrics: null,
-                        });
-                      }}
-                      aria-label={
-                        hasAudio
-                          ? isPlaying
-                            ? `Pause song for ${t.name}`
-                            : `Play song for ${t.name}`
-                          : `Song for ${t.name} is being prepared`
-                      }
-                      className={`group relative flex h-[52px] w-[52px] shrink-0 items-center justify-center rounded-full transition-transform sm:h-[60px] sm:w-[60px] md:h-[72px] md:w-[72px] ${
-                        hasAudio ? "cursor-pointer hover:scale-[1.04]" : "cursor-default opacity-60"
-                      }`}
-                    >
-                      {/* Vinyl disc */}
-                      <div
-                        className={`absolute inset-0 rounded-full bg-[radial-gradient(circle_at_center,#1a1a1a_0%,#0a0a0a_45%,#1a1a1a_50%,#0a0a0a_55%,#1a1a1a_60%,#0a0a0a_65%,#1a1a1a_70%,#0a0a0a_75%,#1a1a1a_80%,#0a0a0a_85%,#1a1a1a_100%)] shadow-[0_6px_14px_rgba(31,27,22,0.25)] ${
-                          isPlaying ? "animate-vinyl-spin" : ""
-                        }`}
-                      />
-                      {/* Center label */}
-                      <div className="absolute left-1/2 top-1/2 flex h-[34%] w-[34%] -translate-x-1/2 -translate-y-1/2 items-center justify-center rounded-full bg-[#B5532A]">
-                        <div className="h-[6px] w-[6px] rounded-full bg-[#FDF7E9]" />
-                      </div>
-                      {/* Play/pause icon overlay */}
-                      {!isPlaying && (
-                        <div className="absolute inset-0 flex items-center justify-center">
-                          <div className="flex h-5 w-5 items-center justify-center rounded-full bg-[#FDF7E9]/95 shadow-[0_2px_6px_rgba(0,0,0,0.4)] sm:h-6 sm:w-6 md:h-7 md:w-7">
-                            <svg
-                              width="10"
-                              height="11"
-                              viewBox="0 0 11 12"
-                              fill="none"
-                              className="ml-[1px]"
-                            >
-                              <path d="M0 0L11 6L0 12V0Z" fill="#1F1A17" />
-                            </svg>
-                          </div>
-                        </div>
-                      )}
-                      {isPlaying && (
-                        <div className="absolute inset-0 flex items-center justify-center">
-                          <div className="flex h-5 w-5 items-center justify-center rounded-full bg-[#FDF7E9]/95 shadow-[0_2px_6px_rgba(0,0,0,0.4)] sm:h-6 sm:w-6 md:h-7 md:w-7">
-                            <svg width="9" height="11" viewBox="0 0 10 12" fill="none">
-                              <rect x="0" y="0" width="3" height="12" fill="#1F1A17" />
-                              <rect x="7" y="0" width="3" height="12" fill="#1F1A17" />
-                            </svg>
-                          </div>
-                        </div>
-                      )}
-                    </button>
-                  </div>
-                  <div className="mt-4 flex items-center gap-3 border-t border-[#E8DDC9] pt-4">
-                    <img
-                      src={t.avatar}
-                      alt=""
-                      loading="lazy"
-                      className="h-10 w-10 rounded-full object-cover"
-                    />
-                    <div className="min-w-0">
-                      <div className="text-[13.5px] font-semibold text-[#1F1A17]">
-                        {t.name}
-                      </div>
-                      <div className="text-[12px] leading-snug text-[#8A8175] break-words">
-                        {t.meta}
-                      </div>
-                    </div>
-                  </div>
-                </div>
-              );
-            })}
           </div>
         </div>
       </section>
@@ -1521,11 +1404,12 @@ function LandingPage() {
             <span className="not-italic text-[#F5E6D8]">&rdquo;</span>
           </h2>
           <p className="mx-auto mb-8 max-w-[560px] text-[16px] leading-[1.6] text-[rgba(246,240,230,0.75)] md:text-[17px]">
-            There's no right time to give yourself this. There's just now. and
-            her, still in the music, whenever you need her.
+            There's no right time to give yourself this. There's just now. and them, still in the music, whenever you need them.
           </p>
-          <PrimaryBtn large>Hear their song 🐾</PrimaryBtn>
-          <TrustBadges tone="dark" />
+          <div className="mx-auto flex max-w-[480px] flex-col items-stretch">
+            <PrimaryBtn large fullWidth>Hear their pawprint song 🐾</PrimaryBtn>
+            <TrustBadges tone="dark" />
+          </div>
         </div>
       </section>
 
@@ -1542,10 +1426,10 @@ function LandingPage() {
           <div className="hidden min-w-0 flex-1 items-center gap-2 sm:flex">
             <span className="text-[18px] leading-none">🐾</span>
             <span className="truncate text-[13.5px] font-medium text-[#1F1A17]">
-              A song just for her. Ready in minutes.
+              A song just for them. Ready in minutes.
             </span>
           </div>
-          <PrimaryBtn to="/create">Hear their song 🐾</PrimaryBtn>
+          <PrimaryBtn to="/create">Hear their pawprint song 🐾</PrimaryBtn>
         </div>
       </div>
 
