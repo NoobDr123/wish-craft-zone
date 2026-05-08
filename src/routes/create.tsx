@@ -178,7 +178,7 @@ function CreatePage() {
   const breedDisplay = useMemo(() => resolveBreed(q) ?? "your dog", [q.dog_breed, q.dog_breed_other]);
   const pn = useMemo(() => pronouns(q.dog_gender), [q.dog_gender]);
   const personality = useMemo(() => personalityCopy(q.dog_breed), [q.dog_breed]);
-  const dogName = q.dog_name.trim() || "your girl";
+  const dogName = q.dog_name.trim() || "your dog";
 
   const steps: Step[] = [
     // 1. Basics — name, pronunciation, gender
