@@ -605,3 +605,100 @@ function CreatePage() {
     </>
   );
 }
+
+const TOP_BREEDS: DogBreedKey[] = [
+  "Labrador Retriever",
+  "Golden Retriever",
+  "German Shepherd",
+  "French Bulldog",
+  "Bulldog",
+  "Poodle",
+  "Goldendoodle / Labradoodle",
+  "Beagle",
+  "Rottweiler",
+  "Yorkshire Terrier",
+  "Dachshund",
+  "Boxer",
+  "Australian Shepherd",
+];
+
+function BreedStep() {
+  const q = useQuizStore();
+  const [query, setQuery] = useState("");
+  const otherBreeds = BREEDS.filter(
+    (b) => !TOP_BREEDS.includes(b) && b !== "Other"
+  );
+  const trimmed = query.trim().toLowerCase();
+  const matches = trimmed
+    ? otherBreeds.filter((b) => b.toLowerCase().includes(trimmed))
+    : [];
+  const isCustomTopBreed = !!q.dog_breed && TOP_BREEDS.includes(q.dog_breed);
+  const isOtherSelected = !!q.dog_breed && !TOP_BREEDS.includes(q.dog_breed);
+
+  return (
+    <div className="space-y-7">
+      <BreedSelect
+        options={TOP_BREEDS}
+        value={isCustomTopBreed ? q.dog_breed : undefined}
+        onChange={(v) => {
+          q.set("dog_breed", v as DogBreedKey);
+          q.set("dog_breed_other", "");
+          setQuery("");
+        }}
+      />
+
+      <Question
+        label="Don't see them? Search any breed"
+        helper="Type a few letters — we know hundreds."
+      >
+        <TextInput
+          placeholder="e.g. Italian Greyhound, Pug, Corgi…"
+          value={
+            isOtherSelected && !query
+              ? q.dog_breed === "Other"
+                ? q.dog_breed_other
+                : (q.dog_breed as string)
+              : query
+          }
+          onChange={(e) => {
+            setQuery(e.target.value);
+            // typing clears any previous selection so they can pick fresh
+            if (q.dog_breed) q.set("dog_breed", undefined as unknown as DogBreedKey);
+            q.set("dog_breed_other", e.target.value);
+          }}
+          maxLength={60}
+        />
+        {trimmed && matches.length > 0 && (
+          <div className="mt-2 max-h-64 overflow-y-auto rounded-2xl border border-border bg-card p-1 shadow-soft">
+            {matches.slice(0, 12).map((b) => (
+              <button
+                key={b}
+                type="button"
+                onClick={() => {
+                  q.set("dog_breed", b);
+                  q.set("dog_breed_other", "");
+                  setQuery(b);
+                }}
+                className="block w-full rounded-xl px-3 py-2 text-left text-[14px] text-foreground hover:bg-peach/30"
+              >
+                {b}
+              </button>
+            ))}
+          </div>
+        )}
+        {trimmed && matches.length === 0 && (
+          <button
+            type="button"
+            onClick={() => {
+              q.set("dog_breed", "Other");
+              q.set("dog_breed_other", query.trim());
+            }}
+            className="mt-2 w-full rounded-2xl border border-dashed border-primary/50 bg-primary/5 px-4 py-3 text-left text-[14px] text-foreground hover:bg-primary/10"
+          >
+            Use <strong>"{query.trim()}"</strong> as their breed
+          </button>
+        )}
+      </Question>
+    </div>
+  );
+}
