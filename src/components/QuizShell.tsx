@@ -93,7 +93,7 @@ export function QuizShell({
                 <button
                   type="button"
                   onClick={onNext}
-                  className="text-sm text-muted-foreground underline-offset-4 hover:text-foreground hover:underline"
+                  className="inline-flex items-center justify-center rounded-full border-2 border-primary/40 bg-card px-7 py-3.5 text-base font-semibold text-primary transition-all hover:border-primary hover:bg-primary/10"
                 >
                   Skip
                 </button>
