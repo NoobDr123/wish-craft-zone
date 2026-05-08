@@ -103,7 +103,7 @@ export function QuizShell({
                 type="button"
                 onClick={onNext}
                 disabled={!isValid}
-                className="inline-flex items-center justify-center rounded-full bg-primary px-8 py-3.5 text-sm font-medium text-primary-foreground shadow-soft transition-all hover:bg-primary-hover hover:shadow-glow disabled:cursor-not-allowed disabled:opacity-40 disabled:shadow-none"
+                className="inline-flex items-center justify-center rounded-full bg-ribbon px-8 py-3.5 text-sm font-medium text-ribbon-foreground shadow-soft transition-all hover:opacity-90 hover:shadow-glow disabled:cursor-not-allowed disabled:opacity-40 disabled:shadow-none"
               >
                 {nextLabel}
               </button>
