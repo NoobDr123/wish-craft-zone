@@ -59,7 +59,7 @@ export function BreedSelect<T extends string>({
             <div
               role="img"
               aria-label={opt}
-              className="h-9 w-9 shrink-0 rounded-md bg-peach/20"
+              className="h-12 w-12 shrink-0"
               style={{
                 backgroundImage: `url(${breedSprite})`,
                 backgroundSize: "500% 500%",
