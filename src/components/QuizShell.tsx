@@ -40,7 +40,7 @@ export function QuizShell({
         </div>
       </header>
 
-      <main className="px-6 pb-24 pt-12">
+      <main className="px-6 pb-40 pt-12 md:pb-24">
         <div className="mx-auto max-w-2xl">
           <div className="mb-10">
             <p className="mb-3 text-xs font-medium uppercase tracking-[0.2em] text-primary">
