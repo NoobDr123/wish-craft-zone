@@ -654,7 +654,7 @@ function TrustBadges({ tone = "light" }: { tone?: "light" | "dark" }) {
           </svg>
         </span>
         <span className={`text-left text-[8.5px] font-bold uppercase leading-[1.15] tracking-[0.04em] sm:text-[9px] ${sideText}`}>
-          Unlimited<br />free rewrites
+          Free<br />rewrites
         </span>
       </div>
       {/* 5-day delivery */}
@@ -863,7 +863,7 @@ function LandingPage() {
                     </svg>
                   </span>
                   <span className="text-left text-[8.5px] font-bold uppercase leading-[1.15] tracking-[0.04em] text-[#1F1A17] sm:text-[9px]">
-                    Unlimited<br />free rewrites
+                    Free<br />rewrites
                   </span>
                 </div>
 
