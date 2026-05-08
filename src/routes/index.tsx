@@ -839,7 +839,7 @@ function LandingPage() {
                 </strong>
               </p>
               <div className="mb-5 flex w-full flex-col items-stretch gap-3">
-                <PrimaryBtn large fullWidth>Hear their song 🐾</PrimaryBtn>
+                <PrimaryBtn large fullWidth>Hear their pawprint song 🐾</PrimaryBtn>
               </div>
 
               {/* Trust badges row. refined icons, balanced weights */}
@@ -1097,7 +1097,7 @@ function LandingPage() {
           </div>
 
           <div className="mt-12 text-center md:mt-14">
-            <PrimaryBtn large>Hear their song 🐾</PrimaryBtn>
+            <PrimaryBtn large>Hear their pawprint song 🐾</PrimaryBtn>
             <TrustBadges />
           </div>
         </div>
@@ -1244,7 +1244,7 @@ function LandingPage() {
           </div>
 
           <div className="mt-12 text-center">
-            <PrimaryBtn large>Hear their song 🐾</PrimaryBtn>
+            <PrimaryBtn large>Hear their pawprint song 🐾</PrimaryBtn>
             <TrustBadges />
           </div>
         </div>
@@ -1407,7 +1407,7 @@ function LandingPage() {
             There's no right time to give yourself this. There's just now. and
             her, still in the music, whenever you need her.
           </p>
-          <PrimaryBtn large>Hear their song 🐾</PrimaryBtn>
+          <PrimaryBtn large>Hear their pawprint song 🐾</PrimaryBtn>
           <TrustBadges tone="dark" />
         </div>
       </section>
@@ -1425,10 +1425,10 @@ function LandingPage() {
           <div className="hidden min-w-0 flex-1 items-center gap-2 sm:flex">
             <span className="text-[18px] leading-none">🐾</span>
             <span className="truncate text-[13.5px] font-medium text-[#1F1A17]">
-              A song just for her. Ready in minutes.
+              A song just for them. Ready in minutes.
             </span>
           </div>
-          <PrimaryBtn to="/create">Hear their song 🐾</PrimaryBtn>
+          <PrimaryBtn to="/create">Hear their pawprint song 🐾</PrimaryBtn>
         </div>
       </div>
 
