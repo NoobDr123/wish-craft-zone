@@ -40,7 +40,7 @@ export function QuizShell({
         </div>
       </header>
 
-      <main className="px-6 pb-24 pt-12">
+      <main className="px-6 pb-40 pt-12 md:pb-24">
         <div className="mx-auto max-w-2xl">
           <div className="mb-10">
             <p className="mb-3 text-xs font-medium uppercase tracking-[0.2em] text-primary">
@@ -68,7 +68,8 @@ export function QuizShell({
             {children}
           </div>
 
-          <div className="mt-12 flex items-center justify-between gap-4">
+          {/* Desktop action bar */}
+          <div className="mt-12 hidden items-center justify-between gap-4 md:flex">
             {onBack ? (
               <button
                 type="button"
@@ -110,6 +111,39 @@ export function QuizShell({
           </div>
         </div>
       </main>
+
+      {/* Mobile floating action bar */}
+      <div className="fixed inset-x-0 bottom-0 z-40 border-t border-border bg-background/95 px-4 pb-[max(1rem,env(safe-area-inset-bottom))] pt-3 backdrop-blur-md md:hidden">
+        <div className="mx-auto flex max-w-2xl items-center gap-3">
+          {onBack ? (
+            <button
+              type="button"
+              onClick={onBack}
+              aria-label="Back"
+              className="inline-flex h-14 w-14 shrink-0 items-center justify-center rounded-full border border-border bg-card text-foreground transition-colors active:bg-muted"
+            >
+              <ArrowLeft className="h-5 w-5" />
+            </button>
+          ) : null}
+          {optional && (
+            <button
+              type="button"
+              onClick={onNext}
+              className="inline-flex h-14 flex-1 items-center justify-center rounded-full border-2 border-primary/40 bg-card text-base font-semibold text-primary transition-all active:bg-primary/10"
+            >
+              Skip
+            </button>
+          )}
+          <button
+            type="button"
+            onClick={onNext}
+            disabled={!isValid}
+            className="inline-flex h-14 flex-[2] items-center justify-center rounded-full bg-primary text-base font-semibold text-primary-foreground shadow-soft transition-all active:bg-primary-hover disabled:cursor-not-allowed disabled:opacity-40 disabled:shadow-none"
+          >
+            {nextLabel} →
+          </button>
+        </div>
+      </div>
     </div>
   );
 }
