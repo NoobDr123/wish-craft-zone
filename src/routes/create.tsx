@@ -178,28 +178,24 @@ function CreatePage() {
   const breedDisplay = useMemo(() => resolveBreed(q) ?? "your dog", [q.dog_breed, q.dog_breed_other]);
   const pn = useMemo(() => pronouns(q.dog_gender), [q.dog_gender]);
   const personality = useMemo(() => personalityCopy(q.dog_breed), [q.dog_breed]);
-  const dogName = q.dog_name.trim() || "your girl";
+  const dogName = q.dog_name.trim() || "your dog";
 
   const steps: Step[] = [
-    // 1. Basics — name, pronunciation, gender, breed
+    // 1. Basics — name, pronunciation, gender
     {
       key: "basics",
-      chapter: "Her name",
-      title: "Tell us about her.",
-      subtitle: "Just the basics. Her name will be in every chorus.",
+      chapter: "Their name",
+      title: "Tell us about them.",
+      subtitle: "Just the basics. Their name will be in every chorus.",
       isValid: (s) =>
-        s.dog_name.trim().length >= 1 &&
-        !!s.dog_gender &&
-        !!s.dog_breed &&
-        (s.dog_breed !== "Other" || (s.dog_breed_other ?? "").trim().length >= 1),
+        s.dog_name.trim().length >= 1 && !!s.dog_gender,
       answer: (s) => ({
         dog_name: s.dog_name,
         dog_gender: s.dog_gender,
-        dog_breed: s.dog_breed,
       }),
       render: () => (
         <div className="space-y-7">
-          <Question label="Her name" helper="Just her name. Nicknames are welcome.">
+          <Question label="Their name" helper="Just their name. Nicknames are welcome.">
             <TextInput
               placeholder="e.g. Daisy"
               value={q.dog_name}
@@ -216,7 +212,7 @@ function CreatePage() {
               maxLength={40}
             />
           </Question>
-          <Question label="She is a…">
+          <Question label={`${dogName} is a…`}>
             <PillSelect
               options={GENDERS.map((g) => g.label)}
               value={GENDERS.find((g) => g.value === q.dog_gender)?.label}
@@ -227,24 +223,6 @@ function CreatePage() {
               columns={2}
             />
           </Question>
-          <Question label="Her breed">
-            <BreedSelect
-              options={BREEDS}
-              value={q.dog_breed}
-              onChange={(v) => q.set("dog_breed", v as DogBreedKey)}
-            />
-          </Question>
-          {q.dog_breed === "Other" && (
-            <Question label="What breed is she?" helper="A few words.">
-              <TextInput
-                placeholder="e.g. Italian Greyhound"
-                value={q.dog_breed_other}
-                onChange={(e) => q.set("dog_breed_other", e.target.value)}
-                maxLength={60}
-                autoFocus
-              />
-            </Question>
-          )}
           <p className="rounded-2xl border border-border bg-secondary/40 px-4 py-3 text-center text-xs leading-relaxed text-muted-foreground">
             By continuing through this quiz you agree to our{" "}
             <Link to="/terms" className="font-medium text-foreground underline">
@@ -256,6 +234,38 @@ function CreatePage() {
             </Link>
             .
           </p>
+        </div>
+      ),
+    },
+
+    // 2. Breed (own page)
+    {
+      key: "breed",
+      chapter: "Their breed",
+      title: `What breed is ${dogName}?`,
+      subtitle: "Pick the closest match. We'll tailor the lyrics to fit.",
+      isValid: (s) =>
+        !!s.dog_breed &&
+        (s.dog_breed !== "Other" || (s.dog_breed_other ?? "").trim().length >= 1),
+      answer: (s) => ({ dog_breed: s.dog_breed }),
+      render: () => (
+        <div className="space-y-6">
+          <BreedSelect
+            options={BREEDS}
+            value={q.dog_breed}
+            onChange={(v) => q.set("dog_breed", v as DogBreedKey)}
+          />
+          {q.dog_breed === "Other" && (
+            <Question label={`What breed is ${dogName}?`} helper="A few words.">
+              <TextInput
+                placeholder="e.g. Italian Greyhound"
+                value={q.dog_breed_other}
+                onChange={(e) => q.set("dog_breed_other", e.target.value)}
+                maxLength={60}
+                autoFocus
+              />
+            </Question>
+          )}
         </div>
       ),
     },
