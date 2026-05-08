@@ -1404,11 +1404,12 @@ function LandingPage() {
             <span className="not-italic text-[#F5E6D8]">&rdquo;</span>
           </h2>
           <p className="mx-auto mb-8 max-w-[560px] text-[16px] leading-[1.6] text-[rgba(246,240,230,0.75)] md:text-[17px]">
-            There's no right time to give yourself this. There's just now. and
-            her, still in the music, whenever you need her.
+            There's no right time to give yourself this. There's just now. and them, still in the music, whenever you need them.
           </p>
-          <PrimaryBtn large>Hear their pawprint song 🐾</PrimaryBtn>
-          <TrustBadges tone="dark" />
+          <div className="mx-auto flex max-w-[480px] flex-col items-stretch">
+            <PrimaryBtn large fullWidth>Hear their pawprint song 🐾</PrimaryBtn>
+            <TrustBadges tone="dark" />
+          </div>
         </div>
       </section>
 
