@@ -41,7 +41,7 @@ export function BreedSelect<T extends string>({
   onChange,
 }: BreedSelectProps<T>) {
   return (
-    <div className="grid grid-cols-2 gap-3 sm:grid-cols-3 md:grid-cols-4">
+    <div className="flex flex-col gap-2">
       {options.map((opt) => {
         const active = value === opt;
         const [col, row] = BREED_GRID[opt] ?? BREED_GRID["Other"];
@@ -50,27 +50,25 @@ export function BreedSelect<T extends string>({
             key={opt}
             type="button"
             onClick={() => onChange(opt)}
-            className={`group relative flex flex-col items-center overflow-hidden rounded-2xl border bg-card p-3 text-center transition-all ${
+            className={`group flex w-full items-center gap-3 rounded-xl border bg-card px-3 py-2 text-left transition-all ${
               active
                 ? "border-primary shadow-soft ring-2 ring-primary/40"
-                : "border-border hover:-translate-y-0.5 hover:border-primary/50 hover:bg-peach/30"
+                : "border-border hover:border-primary/50 hover:bg-peach/30"
             }`}
           >
-            <div className="aspect-square w-full overflow-hidden rounded-xl bg-peach/20">
-              <div
-                role="img"
-                aria-label={opt}
-                className="h-full w-full transition-transform duration-300 group-hover:scale-[1.04]"
-                style={{
-                  backgroundImage: `url(${breedSprite})`,
-                  backgroundSize: "500% 500%",
-                  backgroundPosition: `${col * 25}% ${row * 25}%`,
-                  backgroundRepeat: "no-repeat",
-                }}
-              />
-            </div>
+            <div
+              role="img"
+              aria-label={opt}
+              className="h-9 w-9 shrink-0 rounded-md bg-peach/20"
+              style={{
+                backgroundImage: `url(${breedSprite})`,
+                backgroundSize: "500% 500%",
+                backgroundPosition: `${col * 25}% ${row * 25}%`,
+                backgroundRepeat: "no-repeat",
+              }}
+            />
             <span
-              className={`mt-2.5 block text-[13px] font-medium leading-tight ${
+              className={`text-[14px] font-medium leading-tight ${
                 active ? "text-primary" : "text-foreground"
               }`}
             >
