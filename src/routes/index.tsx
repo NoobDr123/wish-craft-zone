@@ -1243,8 +1243,8 @@ function LandingPage() {
             })}
           </div>
 
-          <div className="mt-12 text-center">
-            <PrimaryBtn large>Hear their pawprint song 🐾</PrimaryBtn>
+          <div className="mx-auto mt-12 flex max-w-[480px] flex-col items-stretch text-center">
+            <PrimaryBtn large fullWidth>Hear their pawprint song 🐾</PrimaryBtn>
             <TrustBadges />
           </div>
         </div>
