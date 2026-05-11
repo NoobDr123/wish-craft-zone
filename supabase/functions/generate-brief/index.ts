@@ -165,7 +165,7 @@ async function writeBrief(order: any, refineNotes?: string): Promise<SongBrief> 
   const q = (order.quiz_payload || {}) as Record<string, any>;
   const has3rdVerse = order.has_3rd_verse === true;
   const verseCount = has3rdVerse ? 3 : 2;
-  const p = pronounsFor(order.dog_gender);
+  const p = pronounsFor(order.dog_gender ?? (order.quiz_payload as any)?.dog_gender);
   const breed = resolveBreed(order);
   const dogName = order.dog_name ?? "your dog";
 
