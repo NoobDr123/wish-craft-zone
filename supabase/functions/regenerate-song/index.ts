@@ -100,7 +100,7 @@ function pronounsFor(gender?: string) {
 async function rewriteBrief(order: any, changeNotes: string) {
   const oldBrief = order.brief;
   const q = order.quiz_payload || {};
-  const p = pronounsFor(order.dog_gender);
+  const p = pronounsFor(order.dog_gender ?? q.dog_gender);
   const dogName = order.dog_name ?? "the dog";
   const breed = order.dog_breed === "Other" ? order.dog_breed_other : order.dog_breed;
 
