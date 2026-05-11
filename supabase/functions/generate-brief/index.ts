@@ -165,7 +165,7 @@ async function writeBrief(order: any, refineNotes?: string): Promise<SongBrief> 
   const q = (order.quiz_payload || {}) as Record<string, any>;
   const has3rdVerse = order.has_3rd_verse === true;
   const verseCount = has3rdVerse ? 3 : 2;
-  const p = pronounsFor(order.dog_gender);
+  const p = pronounsFor(order.dog_gender ?? (order.quiz_payload as any)?.dog_gender);
   const breed = resolveBreed(order);
   const dogName = order.dog_name ?? "your dog";
 
@@ -233,7 +233,7 @@ Return JSON with shape:
 async function scoreBrief(order: any, brief: SongBrief): Promise<BriefScore> {
   const q = (order.quiz_payload || {}) as Record<string, any>;
   const dogName = order.dog_name ?? "the dog";
-  const p = pronounsFor(order.dog_gender);
+  const p = pronounsFor(order.dog_gender ?? (order.quiz_payload as any)?.dog_gender);
 
   const system = `You are PawprintSong's lyric reviewer. You score tribute songs for beloved dogs strictly on a 0-5 scale. The hard gates are: (1) the song must use the dog's actual name, (2) the song must reference at least one SPECIFIC detail from the owner's letter / memory / personality (not generic dog imagery), and (3) the song must use the correct pronouns. You return JSON only.`;
 
