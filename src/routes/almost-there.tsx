@@ -51,8 +51,8 @@ function AlmostTherePage() {
 
   useEffect(() => {
     if (!hydrated) return;
-    if (!q.recipient_name) navigate({ to: "/create" });
-  }, [hydrated, q.recipient_name, navigate]);
+    if (!q.dog_name || !q.buyer_email) navigate({ to: "/create" });
+  }, [hydrated, q.dog_name, q.buyer_email, navigate]);
 
   return (
     <div className="min-h-screen bg-background">
@@ -64,7 +64,7 @@ function AlmostTherePage() {
 
       <main className="mx-auto max-w-2xl px-6 py-10">
         <h1 className="text-balance text-center font-display text-4xl font-semibold leading-tight text-foreground md:text-5xl">
-          You're moments away from {q.recipient_name}'s song.
+          You're moments away from {q.dog_name || "your dog"}'s song.
         </h1>
 
         {/* Avatar row */}
