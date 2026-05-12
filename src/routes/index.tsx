@@ -1,6 +1,5 @@
 import { createFileRoute, Link } from "@tanstack/react-router";
 import { useEffect, useRef, useState } from "react";
-import rachelPhoto from "@/assets/rachel-mother-real.jpg";
 
 const RACHEL_SONG_URL =
   "https://tempfile.aiquickdraw.com/r/d4899ca946ec497dbd5e86027fb1b52f.mp3";
@@ -893,25 +892,17 @@ function LandingPage() {
             {/* Hero photo + song */}
             <div className="relative order-1 md:order-2">
               <div className="group relative aspect-[4/5] overflow-hidden rounded-[18px] bg-[#ECE2D0] shadow-[0_20px_60px_rgba(31,27,22,0.12)]">
-                {heroPlaying ? (
-                  <video
-                    src="/testimonials-sequential.mp4"
-                    poster={rachelPhoto}
-                    className="h-full w-full object-contain bg-[#1F1A17]"
-                    autoPlay
-                    loop
-                    muted
-                    playsInline
-                    onClick={handleHeroPlay}
-                  />
-                ) : (
-                  <img
-                    src={rachelPhoto}
-                    alt="Sarah holding her Golden Retriever Daisy in the late afternoon light"
-                    className="h-full w-full object-contain bg-[#1F1A17]"
-                    onClick={handleHeroPlay}
-                  />
-                )}
+                <video
+                  key={heroPlaying ? "hero-video-playing" : "hero-video-idle"}
+                  src="/testimonials-sequential.mp4"
+                  className="h-full w-full bg-[#1F1A17] object-contain"
+                  autoPlay={heroPlaying}
+                  loop
+                  muted
+                  playsInline
+                  preload="metadata"
+                  onClick={handleHeroPlay}
+                />
                 <div className="pointer-events-none absolute inset-x-0 bottom-0 h-1/3 bg-gradient-to-t from-black/55 via-black/15 to-transparent" />
 
                 <KaraokeOverlay
