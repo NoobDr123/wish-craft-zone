@@ -1,5 +1,5 @@
 import { useEffect, useRef, useState } from "react";
-import { Music2 } from "lucide-react";
+import { Music2, PawPrint, Heart } from "lucide-react";
 import { supabase } from "@/integrations/supabase/client";
 import { AudioPlayer } from "@/components/AudioPlayer";
 
@@ -10,6 +10,7 @@ interface SampleSong {
   quote: string | null;
   audio_url: string | null;
   dog_name: string | null;
+  gone_text?: string | null;
 }
 
 const FALLBACK_AUDIO =
@@ -19,26 +20,29 @@ const FALLBACK_SAMPLES: SampleSong[] = [
   {
     id: "fb-1",
     title: "Cheeto Paws",
-    for_text: "Written for Max, 12 years. Yellow Lab.",
+    for_text: "Written for Max · 12 years · Yellow Lab",
     quote: "Her paws smelled like cheetos. I miss her smelly breath. I miss everything.",
     audio_url: FALLBACK_AUDIO,
     dog_name: "Max",
+    gone_text: "Gone 3 months · still her favorite blanket on the couch",
   },
   {
     id: "fb-2",
     title: "Still on the Couch",
-    for_text: "Written for Bella, 9 years. Goldendoodle.",
+    for_text: "Written for Bella · 9 years · Goldendoodle",
     quote: "I still leave the spot by the window open for her. Always will.",
     audio_url: FALLBACK_AUDIO,
     dog_name: "Bella",
+    gone_text: "Gone 2 years · the window seat is still hers",
   },
   {
     id: "fb-3",
     title: "Good Girl, Always",
-    for_text: "Written for Ruby, 15 years. German Shepherd.",
+    for_text: "Written for Ruby · 15 years · German Shepherd",
     quote: "Fifteen years. She got me through everything.",
     audio_url: FALLBACK_AUDIO,
     dog_name: "Ruby",
+    gone_text: "Gone 8 months · 15 years of being everything",
   },
 ];
 
@@ -118,10 +122,25 @@ export default function CheckoutSamples() {
               key={s.id}
               className="rounded-2xl border border-peach/60 bg-background/60 p-4"
             >
-              <p className="font-semibold text-foreground">{s.title}</p>
-              {s.for_text && (
-                <p className="mt-0.5 text-xs text-muted-foreground">{s.for_text}</p>
+              <div className="flex items-start gap-3">
+                <span className="flex h-9 w-9 shrink-0 items-center justify-center rounded-full bg-primary/10 text-primary">
+                  <PawPrint className="h-4.5 w-4.5" strokeWidth={2.25} />
+                </span>
+                <div className="min-w-0 flex-1">
+                  <p className="font-semibold text-foreground">{s.title}</p>
+                  {s.for_text && (
+                    <p className="mt-0.5 text-xs text-muted-foreground">{s.for_text}</p>
+                  )}
+                </div>
+              </div>
+
+              {s.gone_text && (
+                <p className="mt-3 inline-flex items-center gap-1.5 rounded-full bg-primary/5 px-2.5 py-1 text-[11px] font-medium text-primary/90">
+                  <Heart className="h-3 w-3 fill-primary/70 text-primary/70" />
+                  {s.gone_text}
+                </p>
               )}
+
               {s.audio_url && (
                 <div className="mt-3">
                   <AudioPlayer src={s.audio_url} title={s.title} variant="compact" />
