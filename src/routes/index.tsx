@@ -830,10 +830,32 @@ function LandingPage() {
                 <br />
                 Lost Daisy, her 11-year-old Golden Retriever, in February
               </div>
-              <p className="mx-auto mb-7 max-w-[600px] text-balance text-[16.5px] leading-[1.65] text-[#5A5148] md:mb-8 md:text-[18px]">
-                Tell us about them. We'll take what you remember and turn it into{" "}
-                <strong className="font-semibold text-[#1F1A17]">a real song, written from your stories and recorded in studio</strong>, with their name in every chorus. Five days from now you'll have something you can play whenever you need them near. On the anniversary. On quiet mornings. On the days the house feels too empty without them.
-              </p>
+              <ul className="mx-auto mb-7 flex w-full max-w-[620px] flex-col gap-3.5 text-left text-[15.5px] leading-[1.6] text-[#5A5148] md:mb-8 md:gap-4 md:text-[16.5px]">
+                {[
+                  <>
+                    <strong className="font-semibold text-[#1F1A17]">A real song about your dog.</strong>{" "}
+                    Written from your stories. Recorded in studio with real instruments. Their name in every chorus. Not AI, not a template.
+                  </>,
+                  <>
+                    <strong className="font-semibold text-[#1F1A17]">Delivered in 5 days. Yours forever.</strong>{" "}
+                    Play it in the car. Play it on the anniversary. Play it on the days the house feels too empty without them.
+                  </>,
+                  <>
+                    <strong className="font-semibold text-[#1F1A17]">Keep them with you forever.</strong>{" "}
+                    A song that holds their name, their story, every weird thing only they did. Press play and they're back in the room with you.
+                  </>,
+                ].map((node, i) => (
+                  <li key={i} className="flex items-start gap-3">
+                    <span
+                      aria-hidden
+                      className="mt-[3px] flex h-5 w-5 shrink-0 items-center justify-center rounded-full bg-[#C25E33] text-[11px] font-bold text-[#FFF7EE] shadow-[0_1px_2px_rgba(31,27,22,0.15)]"
+                    >
+                      ✓
+                    </span>
+                    <span className="text-balance">{node}</span>
+                  </li>
+                ))}
+              </ul>
               <div className="mb-6 flex w-full flex-col items-stretch gap-3">
                 <PrimaryBtn large fullWidth>Start Their Custom Song 🐾</PrimaryBtn>
               </div>
