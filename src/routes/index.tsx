@@ -859,14 +859,13 @@ function LandingPage() {
               <div className="mb-6 flex w-full flex-col items-stretch gap-3">
                 <PrimaryBtn large fullWidth>Start Their Custom Song 🐾</PrimaryBtn>
               </div>
-...
-              <div className="mx-auto inline-flex w-full max-w-[440px] items-center justify-center gap-2.5 rounded-full border border-[#E8DDC9] bg-[#FDF7E9] px-4 py-2.5 text-center text-[13px] font-medium leading-[1.35] text-[#1F1A17] shadow-[0_2px_8px_rgba(31,27,22,0.04)] md:text-[13.5px]">
+              <div className="mx-auto inline-flex w-full max-w-[460px] items-center justify-center gap-2.5 rounded-full border border-[#E8DDC9] bg-[#FDF7E9] px-4 py-2.5 text-center text-[13px] font-medium leading-[1.35] text-[#1F1A17] shadow-[0_2px_8px_rgba(31,27,22,0.04)] md:text-[13.5px]">
                 <span className="relative flex h-2.5 w-2.5 shrink-0">
                   <span className="absolute inline-flex h-full w-full animate-ping rounded-full bg-[#D7263D] opacity-75" />
                   <span className="relative inline-flex h-2.5 w-2.5 rounded-full bg-[#D7263D] shadow-[0_0_0_2px_rgba(215,38,61,0.18)]" />
                 </span>
                 <span>
-                  <strong className="font-semibold text-[#1F1A17]">257 songs</strong> recorded today for the dogs whose names will never be forgotten.
+                  Today we've already made <strong className="font-semibold text-[#1F1A17]">257 songs</strong> about dogs their families miss.
                 </span>
               </div>
             </div>
