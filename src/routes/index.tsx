@@ -921,7 +921,7 @@ function LandingPage() {
                 <button
                   aria-label={heroPlaying ? "Pause song" : "Listen to Example"}
                   onClick={handleHeroPlay}
-                  className="absolute inset-x-3 bottom-3 z-20 flex items-center justify-center gap-2.5 rounded-full bg-[rgba(246,240,230,0.97)] py-3 shadow-[0_8px_24px_rgba(0,0,0,0.28)] ring-1 ring-black/5 transition-all hover:-translate-y-px hover:shadow-[0_10px_28px_rgba(0,0,0,0.32)] sm:inset-x-4 sm:bottom-4 sm:py-3.5"
+                  className="absolute inset-x-3 bottom-3 z-20 hidden items-center justify-center gap-2.5 rounded-full bg-[rgba(246,240,230,0.97)] py-3 shadow-[0_8px_24px_rgba(0,0,0,0.28)] ring-1 ring-black/5 transition-all hover:-translate-y-px hover:shadow-[0_10px_28px_rgba(0,0,0,0.32)] sm:flex sm:inset-x-4 sm:bottom-4 sm:py-3.5"
                 >
                   {!heroPlaying && (
                     <span aria-hidden="true" className="animate-nudge-right text-[#B5532A] text-[14px] font-semibold sm:text-[15px]">›››</span>
