@@ -1325,33 +1325,29 @@ function LandingPage() {
                   If it doesn't feel right,{" "}
                   <em className="italic text-[#B5532A]">we rewrite it.</em>
                   <br />
-                  Still not right? Full refund. for{" "}
-                  <span className="whitespace-nowrap rounded-md bg-[#B5532A]/12 px-1.5 py-0.5 text-[#B5532A]">
-                    30 full days.
-                  </span>
+                  Still not right? Full refund for{" "}
+                  <span className="whitespace-nowrap text-[#B5532A]">30 full days.</span>
                 </h2>
                 <p className="mb-6 max-w-[520px] text-[15.5px] leading-[1.6] text-[#5A5148] md:text-[16.5px]">
                   Every song goes through a careful review before it reaches you.
-                  If it isn't right, we revise it as many times as it takes. at no
-                  cost. And you have a full <strong className="font-semibold text-[#1F1A17]">30 days from delivery</strong> to ask for
-                  every cent back. No questions, no fine print.
+                  If it isn't right, we revise it at no cost. And you have a full{" "}
+                  <strong className="font-semibold text-[#1F1A17]">30 days from delivery</strong> to ask for every cent back. No questions, no fine print.
                 </p>
 
                 {/* Reassurance row */}
-                <div className="grid grid-cols-1 gap-2 sm:grid-cols-3">
+                <div className="grid grid-cols-1 gap-2 sm:grid-cols-2">
                   {[
-                    { k: "✓", v: "Unlimited free rewrites" },
-                    { k: "✓", v: "30-day money back" },
-                    { k: "✓", v: "No questions asked" },
-                  ].map((r) => (
+                    "1 free rewrite",
+                    "30-day money back, no questions asked",
+                  ].map((v) => (
                     <div
-                      key={r.v}
+                      key={v}
                       className="flex items-center justify-center gap-2 rounded-[10px] border border-[#E8DDC9] bg-[#F8F1E4] px-3 py-2 text-[13px] font-medium text-[#1F1A17] sm:justify-start"
                     >
-                      <span className="flex h-5 w-5 items-center justify-center rounded-full bg-[#B5532A] text-[11px] font-bold text-[#F8F1E4]">
-                        {r.k}
+                      <span className="flex h-5 w-5 shrink-0 items-center justify-center rounded-full bg-[#B5532A] text-[11px] font-bold text-[#F8F1E4]">
+                        ✓
                       </span>
-                      {r.v}
+                      {v}
                     </div>
                   ))}
                 </div>
