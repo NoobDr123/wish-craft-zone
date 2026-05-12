@@ -1002,12 +1002,6 @@ function LandingPage() {
                   <span aria-hidden="true" className="animate-nudge-left text-[#B5532A] text-[14px] font-semibold">‹‹‹</span>
                 )}
               </button>
-              <div className="mt-3 px-1 text-[13px] leading-[1.5] text-[#5A5148] sm:text-[13.5px]">
-                <strong className="mr-1.5 text-[11px] font-semibold uppercase tracking-[0.12em] text-[#B5532A]">
-                  Hear Daisy's Song ·
-                </strong>
-                Made for Sarah's Golden Retriever three months after she passed.
-              </div>
             </div>
           </div>
         </div>
