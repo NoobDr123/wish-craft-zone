@@ -315,6 +315,9 @@ function PaymentForm({ amount, currency, email, name, returnUrl, paymentIntentId
   // US is the primary market — always default to US regardless of browser locale.
   const [country, setCountry] = useState<string>("US");
   const [postalCode, setPostalCode] = useState<string>("");
+  // Track whether any wallet (Apple Pay / Google Pay / Link) actually rendered
+  // — so we can hide the "Or pay with card" divider when nothing is shown above.
+  const [hasWallet, setHasWallet] = useState(false);
 
   // Countries where Stripe / card networks expect a postal code with the billing address.
   const postalRequired = useMemo(
@@ -457,9 +460,19 @@ function PaymentForm({ amount, currency, email, name, returnUrl, paymentIntentId
 
   return (
     <form onSubmit={handleCardSubmit} className="space-y-5">
-      {/* Wallets — Apple Pay / Google Pay / Link only. */}
-      <div>
+      {/* Wallets — Apple Pay / Google Pay / Link only. Hidden entirely when
+          the device offers none (e.g. desktop Chrome with no Google Pay card). */}
+      <div className={hasWallet ? "" : "hidden"}>
         <ExpressCheckoutElement
+          onReady={({ availablePaymentMethods }) => {
+            const any = Boolean(
+              availablePaymentMethods &&
+                (availablePaymentMethods.applePay ||
+                  availablePaymentMethods.googlePay ||
+                  availablePaymentMethods.link),
+            );
+            setHasWallet(any);
+          }}
           onConfirm={() => void handleExpressConfirm()}
           options={{
             buttonHeight: 52,
@@ -478,13 +491,15 @@ function PaymentForm({ amount, currency, email, name, returnUrl, paymentIntentId
         />
       </div>
 
-      <div className="flex items-center gap-3">
-        <div className="h-px flex-1 bg-foreground/15" />
-        <span className="text-[11px] font-semibold uppercase tracking-[0.18em] text-foreground/60">
-          Or pay with card
-        </span>
-        <div className="h-px flex-1 bg-foreground/15" />
-      </div>
+      {hasWallet && (
+        <div className="flex items-center gap-3">
+          <div className="h-px flex-1 bg-foreground/15" />
+          <span className="text-[11px] font-semibold uppercase tracking-[0.18em] text-foreground/60">
+            Or pay with card
+          </span>
+          <div className="h-px flex-1 bg-foreground/15" />
+        </div>
+      )}
 
       {/* Card number */}
       <div className="space-y-2">
