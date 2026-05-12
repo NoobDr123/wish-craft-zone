@@ -813,8 +813,8 @@ function LandingPage() {
             <span className="hidden h-px w-16 bg-[#B5532A]/50 md:block" />
           </div>
           <div className="flex flex-col items-center gap-8 md:gap-12">
-            <div className="order-2 w-full max-w-[860px]">
-              <h1 className="mb-[20px] max-w-[640px] font-display text-[clamp(22px,3.4vw,34px)] font-medium italic leading-[1.22] tracking-[-0.018em] text-[#1F1A17] md:mb-[22px]">
+            <div className="order-2 flex w-full max-w-[860px] flex-col items-center text-center">
+              <h1 className="mx-auto mb-[20px] max-w-[640px] text-balance font-display text-[clamp(22px,3.4vw,34px)] font-medium italic leading-[1.22] tracking-[-0.018em] text-[#1F1A17] md:mb-[22px]">
                 <span className="font-display text-[1.05em] font-semibold not-italic text-[#B5532A]">
                   &ldquo;
                 </span>
@@ -830,62 +830,22 @@ function LandingPage() {
                 <br />
                 Lost Daisy, her 11-year-old Golden Retriever, in February
               </div>
-              <p className="mb-7 max-w-[560px] text-[16.5px] leading-[1.6] text-[#5A5148] md:mb-8 md:text-[18px]">
-                Tell us about them. We write the song.{" "}
-                <strong className="font-semibold text-[#1F1A17]">
-                  Five days later you've got a real recording
-                </strong>{" "}
-                you can play on the anniversary, on quiet mornings, or any time you want them near.
+              <p className="mx-auto mb-7 max-w-[600px] text-balance text-[16.5px] leading-[1.65] text-[#5A5148] md:mb-8 md:text-[18px]">
+                Tell us about them. We'll take what you remember and turn it into{" "}
+                <strong className="font-semibold text-[#1F1A17]">a real song, written from your stories and recorded in studio</strong>, with their name in every chorus. Five days from now you'll have something you can play whenever you need them near. On the anniversary. On quiet mornings. On the days the house feels too empty without them.
               </p>
               <div className="mb-6 flex w-full flex-col items-stretch gap-3">
                 <PrimaryBtn large fullWidth>Start Their Custom Song 🐾</PrimaryBtn>
               </div>
-
-              {/* Trust badges row — equal weight, no accent on any one */}
-              <div className="mb-4 grid grid-cols-3 gap-2">
-                {/* 30-day money back */}
-                <div className="flex items-center justify-center gap-1.5 rounded-[10px] border border-[#E8DDC9] bg-[#FDF7E9] px-2 py-1.5">
-                  <span className="flex h-6 w-6 shrink-0 items-center justify-center rounded-full bg-[#F8F1E4] text-[#B5532A] ring-1 ring-[#E8DDC9]">
-                    <span className="font-display text-[10px] font-bold leading-none tracking-[-0.02em]">30</span>
-                  </span>
-                  <span className="text-left text-[8.5px] font-bold uppercase leading-[1.15] tracking-[0.04em] text-[#1F1A17] sm:text-[9px]">
-                    Day money-back<br />guarantee
-                  </span>
-                </div>
-
-                {/* Free rewrites */}
-                <div className="flex items-center justify-center gap-1.5 rounded-[10px] border border-[#E8DDC9] bg-[#FDF7E9] px-2 py-1.5">
-                  <span className="flex h-6 w-6 shrink-0 items-center justify-center rounded-full bg-[#F8F1E4] text-[#B5532A] ring-1 ring-[#E8DDC9]">
-                    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.2" strokeLinecap="round" strokeLinejoin="round" className="h-3 w-3">
-                      <path d="M21 12a9 9 0 1 1-3.51-7.13" />
-                      <polyline points="21 4 21 10 15 10" />
-                    </svg>
-                  </span>
-                  <span className="text-left text-[8.5px] font-bold uppercase leading-[1.15] tracking-[0.04em] text-[#1F1A17] sm:text-[9px]">
-                    Free<br />rewrite
-                  </span>
-                </div>
-
-                {/* 5-day delivery */}
-                <div className="flex items-center justify-center gap-1.5 rounded-[10px] border border-[#E8DDC9] bg-[#FDF7E9] px-2 py-1.5">
-                  <span className="flex h-6 w-6 shrink-0 items-center justify-center rounded-full bg-[#F8F1E4] text-[#B5532A] ring-1 ring-[#E8DDC9]">
-                    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.2" strokeLinecap="round" strokeLinejoin="round" className="h-3 w-3">
-                      <rect x="3" y="5" width="18" height="16" rx="2" />
-                      <line x1="3" y1="10" x2="21" y2="10" />
-                      <line x1="8" y1="3" x2="8" y2="7" />
-                      <line x1="16" y1="3" x2="16" y2="7" />
-                    </svg>
-                  </span>
-                  <span className="text-left text-[8.5px] font-bold uppercase leading-[1.15] tracking-[0.04em] text-[#1F1A17] sm:text-[9px]">
-                    Delivered in<br />5 days
-                  </span>
-                </div>
-              </div>
-
-              <div className="w-full text-center text-[13px] leading-[1.4] text-[#5A5148] md:text-[13.5px]">
-                Made for{" "}
-                <strong className="text-[#1F1A17]">1,200+ dogs</strong>{" "}
-                who are gone but still loved
+...
+              <div className="mx-auto inline-flex w-full max-w-[440px] items-center justify-center gap-2.5 rounded-full border border-[#E8DDC9] bg-[#FDF7E9] px-4 py-2.5 text-center text-[13px] font-medium leading-[1.35] text-[#1F1A17] shadow-[0_2px_8px_rgba(31,27,22,0.04)] md:text-[13.5px]">
+                <span className="relative flex h-2.5 w-2.5 shrink-0">
+                  <span className="absolute inline-flex h-full w-full animate-ping rounded-full bg-[#D7263D] opacity-75" />
+                  <span className="relative inline-flex h-2.5 w-2.5 rounded-full bg-[#D7263D] shadow-[0_0_0_2px_rgba(215,38,61,0.18)]" />
+                </span>
+                <span>
+                  <strong className="font-semibold text-[#1F1A17]">257 songs</strong> recorded today for the dogs whose names will never be forgotten.
+                </span>
               </div>
             </div>
 
