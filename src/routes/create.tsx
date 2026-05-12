@@ -391,14 +391,6 @@ function CreatePage() {
               columns={2}
             />
           </Question>
-          <Question label="A title idea (optional)" helper="Just a phrase or feeling. We'll write the title — this is a hint.">
-            <TextInput
-              placeholder="e.g. Daisy on the porch"
-              value={q.song_title_idea}
-              onChange={(e) => q.set("song_title_idea", e.target.value)}
-              maxLength={80}
-            />
-          </Question>
         </div>
       ),
     },
