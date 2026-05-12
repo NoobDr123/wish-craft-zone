@@ -16,18 +16,18 @@ export function SiteHeader() {
         }}
       />
 
-      {/* Promo bar — special offer */}
-      <div className="bg-[#B5532A] px-4 py-[10px] text-center text-[12px] font-semibold tracking-[0.01em] text-[#FFF7EE] sm:px-5 sm:py-[11px] sm:text-[13px]">
-        <span className="mr-1.5">🐾</span>
+      {/* Promo bar. dog-loss positioning */}
+      <div className="bg-[#1F1A17] px-4 py-[10px] text-center text-[12px] font-medium tracking-[0.01em] text-[#F8F1E4] sm:px-5 sm:py-[11px] sm:text-[13px]">
+        <span className="mr-1.5 text-[#F5E6D8]">🐾</span>
         <span className="hidden sm:inline">
-          Special offer: 24-hour delivery, no extra charge.
+          For the dog you'll never stop missing. Delivered with care in five days.
         </span>
-        <span className="sm:hidden">24-hour delivery — no extra charge.</span>
+        <span className="sm:hidden">For the dog you miss. Delivered in 5 days.</span>
         <Link
           to="/create"
-          className="ml-2 border-b border-current text-[#FFE9D2] hover:text-white"
+          className="ml-2 border-b border-current text-[#E8B58A]"
         >
-          Start Their Song →
+          Make Her Song 🐾
         </Link>
       </div>
 
