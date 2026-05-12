@@ -895,7 +895,7 @@ function LandingPage() {
               <div className="group relative aspect-[4/5] overflow-hidden rounded-[18px] bg-[#ECE2D0] shadow-[0_20px_60px_rgba(31,27,22,0.12)]">
                 {heroPlaying ? (
                   <video
-                    src="/rachel-mother-real.mp4"
+                    src="/testimonials-sequential.mp4"
                     poster={rachelPhoto}
                     className="h-full w-full object-contain bg-[#1F1A17]"
                     autoPlay
