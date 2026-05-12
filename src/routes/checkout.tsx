@@ -397,13 +397,12 @@ function CheckoutPage() {
 
           <div className="flex flex-wrap items-center justify-between gap-3">
             <span className="rounded-full border-2 border-primary/40 bg-primary/5 px-3 py-1 text-xs font-bold tracking-wider text-primary">
-              {promoApplied ? `${promoApplied.discount_pct}% OFF` : "50% OFF"}
+              {promoApplied ? `${promoApplied.discount_pct}% OFF` : "50% OFF · TODAY ONLY"}
             </span>
             <p className="flex items-baseline gap-2">
-              {/* Reference price is always $99 — promo codes discount from
-                  the already-reduced $29.99, not from $99. */}
+              {/* Compare-at is 2× our price so the deal reads cleanly: $59.99 → $29.99. */}
               <span className="text-base font-medium text-muted-foreground line-through">
-                $99
+                $59.99
               </span>
               <span className="font-display text-3xl font-bold text-primary">
                 {promoApplied

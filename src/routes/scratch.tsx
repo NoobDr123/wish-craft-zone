@@ -41,33 +41,33 @@ function ScratchPage() {
     if (journey === "memory") {
       return {
         eyebrow: `A keepsake for ${firstName}'s memory`,
-        scratchHeadline: `A small gift, in honor of ${firstName}`,
+        scratchHeadline: `A small gift, in honor of ${firstName} 🐾`,
         scratchSub: `Scratch the gold below — we've set aside something gentle to help you create ${firstName}'s song.`,
-        claimHeadline: `Your tribute to ${firstName} just got easier 💛`,
-        claimSub: `Use this within 10 minutes to lock in -50% off ${firstName}'s memorial song.`,
-        ctaLabel: `Claim -50% off ${firstName}'s song`,
+        claimHeadline: `${firstName}'s tribute song — half off 💛`,
+        claimSub: `Use this within 10 minutes to lock in 50% off ${firstName}'s memorial song.`,
+        ctaLabel: `Claim 50% off ${firstName}'s song`,
         emoji: "🕊️",
       };
     }
     if (journey === "hospice") {
       return {
         eyebrow: `Every moment with ${firstName} matters`,
-        scratchHeadline: `A little something to help you reach ${firstName} sooner`,
+        scratchHeadline: `A little something to help you reach ${firstName} sooner 🐾`,
         scratchSub: `Scratch the gold — we've reserved a discount so ${firstName} can hear their song without delay.`,
-        claimHeadline: `Get ${firstName}'s song into their hands faster 💛`,
-        claimSub: `This -50% offer holds your priority slot for the next 10 minutes.`,
-        ctaLabel: `Claim -50% & prioritize ${firstName}`,
+        claimHeadline: `${firstName}'s song — half off, priority queue 💛`,
+        claimSub: `This 50% offer holds your priority slot for the next 10 minutes.`,
+        ctaLabel: `Claim 50% & prioritize ${firstName}`,
         emoji: "🤍",
       };
     }
     return {
-      eyebrow: `A surprise for ${firstName}${relationship ? `, your ${relationship.toLowerCase()}` : ""}`,
-      scratchHeadline: `You unlocked something special for ${firstName}!`,
-      scratchSub: `Scratch the gold below to reveal an exclusive discount on ${firstName}'s personalized song 👇`,
-      claimHeadline: `${firstName}'s song just got 50% off! 🎉`,
-      claimSub: `Lock it in within 10 minutes — this offer is only on this page.`,
-      ctaLabel: `Claim ${firstName}'s -50% offer`,
-      emoji: "🎁",
+      eyebrow: `A treat for ${firstName}${relationship ? `, your ${relationship.toLowerCase()}` : ""} 🐾`,
+      scratchHeadline: `${firstName} just unlocked a tail-wagging deal! 🐶`,
+      scratchSub: `Scratch the gold below to reveal an exclusive 50% off ${firstName}'s personalized song 👇`,
+      claimHeadline: `${firstName}'s song is 50% off! 🎉🐾`,
+      claimSub: `Lock it in within 10 minutes — this offer only lives on this page.`,
+      ctaLabel: `Claim ${firstName}'s 50% off`,
+      emoji: "🐶",
     };
   }, [journey, firstName, relationship]);
 
@@ -131,12 +131,12 @@ function ScratchPage() {
       ctx.textBaseline = "middle";
       ctx.font = "800 22px Inter, system-ui, sans-serif";
       const top = firstName
-        ? `✨ FOR ${firstName.toUpperCase()} ✨`
-        : "✨ SCRATCH HERE ✨";
+        ? `🐾 SCRATCH FOR ${firstName.toUpperCase()} 🐾`
+        : "🐾 SCRATCH HERE 🐾";
       ctx.fillText(top, rect.width / 2, rect.height / 2 - 14);
       ctx.font = "500 13px Inter, system-ui, sans-serif";
       ctx.fillText(
-        "Drag to reveal your discount",
+        "Drag to unlock your discount",
         rect.width / 2,
         rect.height / 2 + 14,
       );
@@ -316,18 +316,23 @@ function ScratchPage() {
           {/* Scratch card */}
           <div className="mt-8 select-none">
             <div className="relative mx-auto aspect-[5/3] w-full max-w-md overflow-hidden rounded-3xl border-2 border-[#c9914a]/40 bg-card shadow-card">
-              {/* Reveal layer — personalized */}
+              {/* Reveal layer — personalized, offer-driven */}
               <div className="absolute inset-0 flex flex-col items-center justify-center bg-peach/40 p-6 text-center">
                 {firstName && (
                   <span className="text-xs font-semibold uppercase tracking-[0.2em] text-primary/80">
-                    For {firstName}
+                    🐾 For {firstName} · 50% OFF
                   </span>
                 )}
-                <span className="mt-1 font-display text-7xl font-extrabold text-primary md:text-8xl">
-                  -50%
-                </span>
-                <span className="mt-1 text-sm font-medium text-foreground/70">
-                  off your personalized song
+                <div className="mt-1 flex items-baseline justify-center gap-3">
+                  <span className="font-display text-2xl font-medium text-muted-foreground line-through md:text-3xl">
+                    $59.99
+                  </span>
+                  <span className="font-display text-6xl font-extrabold text-primary md:text-7xl">
+                    $29.99
+                  </span>
+                </div>
+                <span className="mt-2 inline-flex items-center gap-1 rounded-full bg-primary/10 px-3 py-1 text-xs font-bold uppercase tracking-wider text-primary">
+                  You save $30 today
                 </span>
               </div>
               {/* Scratchable canvas overlay */}
@@ -389,21 +394,29 @@ function ScratchPage() {
             </p>
           </div>
 
-          {/* Discount badge — personalized */}
-          <div className="mt-8 flex flex-col items-center justify-center rounded-3xl border-2 border-primary/30 bg-peach/40 p-10 text-center shadow-card">
+          {/* Discount badge — personalized, offer-driven */}
+          <div className="mt-8 flex flex-col items-center justify-center rounded-3xl border-2 border-primary/30 bg-peach/40 p-8 text-center shadow-card">
             {firstName && (
               <span className="text-xs font-semibold uppercase tracking-[0.2em] text-primary/80">
-                {journey === "memory"
+                🐾 {journey === "memory"
                   ? `In honor of ${firstName}`
-                  : `${firstName}'s song`}
+                  : `${firstName}'s personalized song`}
               </span>
             )}
-            <span className="mt-2 font-display text-7xl font-extrabold text-primary md:text-8xl">
-              -50%
+            <div className="mt-2 flex items-baseline justify-center gap-3">
+              <span className="font-display text-3xl font-medium text-muted-foreground line-through md:text-4xl">
+                $59.99
+              </span>
+              <span className="font-display text-6xl font-extrabold text-primary md:text-7xl">
+                $29.99
+              </span>
+            </div>
+            <span className="mt-3 inline-flex items-center gap-1.5 rounded-full bg-primary px-4 py-1.5 text-xs font-bold uppercase tracking-wider text-primary-foreground">
+              50% OFF · You save $30
             </span>
-            <span className="mt-1 text-sm font-medium text-foreground/70">
-              off your personalized song
-            </span>
+            <p className="mt-3 text-sm text-foreground/70">
+              One-time payment · Delivered as MP3 + lyric video
+            </p>
           </div>
 
           {/* Countdown urgency banner */}
