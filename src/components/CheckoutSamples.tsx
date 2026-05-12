@@ -1,5 +1,5 @@
 import { useEffect, useRef, useState } from "react";
-import { Music2, PawPrint, Heart } from "lucide-react";
+import { Music2, PawPrint } from "lucide-react";
 import { supabase } from "@/integrations/supabase/client";
 import { AudioPlayer } from "@/components/AudioPlayer";
 
@@ -11,6 +11,7 @@ interface SampleSong {
   audio_url: string | null;
   dog_name: string | null;
   gone_text?: string | null;
+  memory_text?: string | null;
 }
 
 const FALLBACK_AUDIO =
@@ -24,7 +25,8 @@ const FALLBACK_SAMPLES: SampleSong[] = [
     quote: "Her paws smelled like cheetos. I miss her smelly breath. I miss everything.",
     audio_url: FALLBACK_AUDIO,
     dog_name: "Max",
-    gone_text: "Gone 3 months · still her favorite blanket on the couch",
+    gone_text: "Gone 3 months ago",
+    memory_text: "still her favorite blanket on the couch",
   },
   {
     id: "fb-2",
@@ -33,7 +35,8 @@ const FALLBACK_SAMPLES: SampleSong[] = [
     quote: "I still leave the spot by the window open for her. Always will.",
     audio_url: FALLBACK_AUDIO,
     dog_name: "Bella",
-    gone_text: "Gone 2 years · the window seat is still hers",
+    gone_text: "Gone 2 years ago",
+    memory_text: "the window seat is still hers",
   },
   {
     id: "fb-3",
@@ -42,7 +45,8 @@ const FALLBACK_SAMPLES: SampleSong[] = [
     quote: "Fifteen years. She got me through everything.",
     audio_url: FALLBACK_AUDIO,
     dog_name: "Ruby",
-    gone_text: "Gone 8 months · 15 years of being everything",
+    gone_text: "Gone 8 months ago",
+    memory_text: "15 years of being everything",
   },
 ];
 
@@ -123,23 +127,30 @@ export default function CheckoutSamples() {
               className="rounded-2xl border border-peach/60 bg-background/60 p-4"
             >
               <div className="flex items-start gap-3">
-                <span className="flex h-9 w-9 shrink-0 items-center justify-center rounded-full bg-primary/10 text-primary">
-                  <PawPrint className="h-4.5 w-4.5" strokeWidth={2.25} />
+                {/* Memorial silhouette: dark blacked-out paw avatar with small RIP tag */}
+                <span className="relative flex h-11 w-11 shrink-0 items-center justify-center rounded-full bg-foreground/85 text-background shadow-sm ring-1 ring-foreground/10">
+                  <PawPrint className="h-5 w-5 opacity-90" strokeWidth={2.25} />
+                  <span className="absolute -bottom-1 left-1/2 -translate-x-1/2 rounded-full bg-background px-1.5 py-px text-[8px] font-bold uppercase tracking-[0.12em] text-foreground/80 ring-1 ring-foreground/15">
+                    RIP
+                  </span>
                 </span>
                 <div className="min-w-0 flex-1">
                   <p className="font-semibold text-foreground">{s.title}</p>
                   {s.for_text && (
                     <p className="mt-0.5 text-xs text-muted-foreground">{s.for_text}</p>
                   )}
+                  {s.gone_text && (
+                    <p className="mt-1.5 text-[12px] font-semibold uppercase tracking-[0.08em] text-primary/90">
+                      {s.gone_text}
+                      {s.memory_text && (
+                        <span className="ml-1.5 font-normal normal-case tracking-normal text-muted-foreground">
+                          · {s.memory_text}
+                        </span>
+                      )}
+                    </p>
+                  )}
                 </div>
               </div>
-
-              {s.gone_text && (
-                <p className="mt-3 inline-flex items-center gap-1.5 rounded-full bg-primary/5 px-2.5 py-1 text-[11px] font-medium text-primary/90">
-                  <Heart className="h-3 w-3 fill-primary/70 text-primary/70" />
-                  {s.gone_text}
-                </p>
-              )}
 
               {s.audio_url && (
                 <div className="mt-3">
