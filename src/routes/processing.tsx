@@ -403,12 +403,11 @@ function ThankYouPage() {
               Get a full refund + 2 free songs
             </h3>
             <p className="mt-2 text-[13px] leading-relaxed text-amber-900/80 sm:text-sm">
-              Film{" "}
-              <span className="font-semibold text-amber-950">{recipient}</span>{" "}
-              hearing their song for the first time, upload the clip from your
-              dashboard, and we'll refund <strong>100% of your order</strong>{" "}
-              <em>and</em> send you a code for{" "}
-              <strong>2 more free PawPrint Songs</strong> — on us.
+              Record your reaction the first time you hear{" "}
+              <span className="font-semibold text-amber-950">{recipient}'s</span>{" "}
+              song, upload the clip from your dashboard, and we'll refund{" "}
+              <strong>100% of your order</strong> <em>and</em> send you a code
+              for <strong>2 more free PawPrint Songs</strong> on us.
             </p>
 
             {/* How it works — 3 quick steps */}
@@ -416,8 +415,8 @@ function ThankYouPage() {
               {[
                 {
                   n: "1",
-                  t: "Capture the moment",
-                  d: "Record their genuine reaction the first time they hear the song — phone camera is perfect.",
+                  t: "Record your reaction",
+                  d: "Capture your genuine reaction the first time you hear the song. Phone camera is perfect.",
                 },
                 {
                   n: "2",
