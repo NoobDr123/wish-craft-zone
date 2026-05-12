@@ -25,19 +25,19 @@ const TESTIMONIALS = [
     name: "Sarah K.",
     dog: "For Daisy, Golden Retriever, 11",
     quote:
-      "I almost closed the tab. So glad I didn't. Five days later I had a real song with her name in the chorus — I play it every morning on the drive she used to ride with me. Worth every cent.",
+      "I thought I was just buying a song. When Daisy's name came in during the chorus, I had to pull the car over. It felt like someone finally understood what she meant to me.",
   },
   {
     name: "Marcus T.",
     dog: "For Cooper, Black Lab, 13",
     quote:
-      "I expected a cheesy AI track. What I got was a real song, recorded with real instruments, that made my whole family cry on the anniversary. Best money I've spent on anything for him.",
+      "Cooper was with our family for thirteen years. The song turned little details from his life into something we can keep playing. My wife said it was the first gift that actually helped.",
   },
   {
     name: "Elena R.",
     dog: "For Juno, Rescue Collie, 9",
     quote:
-      "The discount made me finally pull the trigger. Within a week Juno had her own song. My kids ask to play it at bedtime. It's the closest thing to having her back in the room.",
+      "I almost waited because I did not know if it would be worth it. Now my kids ask for Juno's song at bedtime, and for three minutes it feels like she is back in the room with us.",
   },
 ];
 
@@ -79,7 +79,7 @@ function AlmostTherePage() {
           {q.dog_name || "Your dog"}'s song is one step away.
         </h1>
         <p className="mx-auto mt-4 max-w-[520px] text-balance text-center text-[15.5px] leading-relaxed text-muted-foreground md:text-base">
-          1,200+ families have already made a song for the dog they miss. Yours is next — and your discount is locked in for the next few minutes.
+          1,200+ families have already made a song for the dog they miss. Yours is next, and your discount is locked in for the next few minutes.
         </p>
 
         {/* Avatar row */}
@@ -134,7 +134,7 @@ function AlmostTherePage() {
               <ShieldCheck className="h-5 w-5 text-success" />
             </div>
             <p className="font-display text-lg font-semibold text-foreground">
-              30-Day Money-Back Guarantee
+              30 Day Money Back Guarantee
             </p>
           </div>
           <p className="mt-3 text-center text-[15px] leading-relaxed text-muted-foreground">
@@ -174,7 +174,7 @@ function AlmostTherePage() {
         </div>
 
         <p className="mt-6 text-center text-xs text-muted-foreground">
-          Secure checkout · One-time payment · No subscription
+          Secure checkout · One time payment · No subscription
         </p>
       </main>
     </div>
