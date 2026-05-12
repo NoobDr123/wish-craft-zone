@@ -122,10 +122,25 @@ export default function CheckoutSamples() {
               key={s.id}
               className="rounded-2xl border border-peach/60 bg-background/60 p-4"
             >
-              <p className="font-semibold text-foreground">{s.title}</p>
-              {s.for_text && (
-                <p className="mt-0.5 text-xs text-muted-foreground">{s.for_text}</p>
+              <div className="flex items-start gap-3">
+                <span className="flex h-9 w-9 shrink-0 items-center justify-center rounded-full bg-primary/10 text-primary">
+                  <PawPrint className="h-4.5 w-4.5" strokeWidth={2.25} />
+                </span>
+                <div className="min-w-0 flex-1">
+                  <p className="font-semibold text-foreground">{s.title}</p>
+                  {s.for_text && (
+                    <p className="mt-0.5 text-xs text-muted-foreground">{s.for_text}</p>
+                  )}
+                </div>
+              </div>
+
+              {s.gone_text && (
+                <p className="mt-3 inline-flex items-center gap-1.5 rounded-full bg-primary/5 px-2.5 py-1 text-[11px] font-medium text-primary/90">
+                  <Heart className="h-3 w-3 fill-primary/70 text-primary/70" />
+                  {s.gone_text}
+                </p>
               )}
+
               {s.audio_url && (
                 <div className="mt-3">
                   <AudioPlayer src={s.audio_url} title={s.title} variant="compact" />
