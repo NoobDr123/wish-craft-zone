@@ -344,7 +344,7 @@ function CheckoutPage() {
 
       <header className="border-b border-peach/60 bg-background/60 backdrop-blur">
         <div className="mx-auto max-w-2xl px-5 py-4">
-          <div className="flex items-center justify-between">
+          <div className="flex items-center justify-between gap-3">
             <Link
               to="/almost-there"
               className="inline-flex items-center gap-1.5 text-sm text-muted-foreground transition-colors hover:text-foreground"
@@ -352,13 +352,10 @@ function CheckoutPage() {
               <ArrowLeft className="h-4 w-4" /> Back
             </Link>
             <Logo />
-            <span className="hidden sm:inline-flex items-center gap-1.5 text-xs text-muted-foreground">
-              <ShieldCheck className="h-3.5 w-3.5" /> Secure
-            </span>
-            <span className="sm:hidden w-10" aria-hidden />
+            <span className="w-10 sm:w-16" aria-hidden />
           </div>
-          <p className="mt-2 flex items-center justify-center gap-1.5 text-[11px] font-medium text-muted-foreground sm:hidden">
-            <ShieldCheck className="h-3 w-3 text-success" />
+          <p className="mt-2 flex items-center justify-center gap-1.5 text-[11px] font-medium text-muted-foreground sm:text-xs">
+            <ShieldCheck className="h-3 w-3 text-success sm:h-3.5 sm:w-3.5" />
             Secure payment · Encrypted &amp; processed by Stripe
           </p>
         </div>
