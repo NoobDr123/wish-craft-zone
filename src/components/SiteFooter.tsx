@@ -31,12 +31,12 @@ export function SiteFooter() {
           </li>
           <li>
             <Link to="/terms" className="hover:text-[#F5E6D8]">
-              Terms
+              Terms and Conditions
             </Link>
           </li>
           <li>
             <Link to="/privacy" className="hover:text-[#F5E6D8]">
-              Privacy
+              Privacy Policy
             </Link>
           </li>
           <li>

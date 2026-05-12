@@ -12,8 +12,8 @@ export function Logo({ className = "" }: LogoProps) {
       className={`group inline-flex items-center gap-2 ${className}`}
       aria-label="PawPrint Song home"
     >
-      <RibbonMark className="h-8 w-8 transition-transform group-hover:rotate-[-6deg]" />
-      <span className="font-display text-xl font-semibold tracking-tight text-foreground">
+      <RibbonMark className="h-12 w-12 transition-transform group-hover:rotate-[-6deg] sm:h-14 sm:w-14" />
+      <span className="font-display text-2xl font-semibold tracking-tight text-foreground sm:text-[28px]">
         PawPrint<span className="text-primary"> Song</span>
       </span>
     </Link>

@@ -809,7 +809,7 @@ function LandingPage() {
           <div className="mb-6 flex w-full flex-col items-center gap-3 text-center sm:mb-8 md:mb-12 md:gap-5">
             <span className="hidden h-px w-16 bg-[#B5532A]/50 md:block" />
             <h2 style={{ fontFamily: 'Nunito, system-ui, sans-serif', fontWeight: 800 }} className="text-[16px] uppercase leading-[1.3] tracking-[0.14em] text-[#B5532A] sm:text-[18px] md:whitespace-nowrap md:text-[26px] md:tracking-[0.16em] lg:text-[30px]">
-              A Song For The Dog You'll Never Stop Missing
+              A Custom Song So The Dog You Loved Is Never Forgotten
             </h2>
             <span className="hidden h-px w-16 bg-[#B5532A]/50 md:block" />
           </div>
