@@ -16,18 +16,18 @@ export function SiteHeader() {
         }}
       />
 
-      {/* Promo bar. dog-loss positioning */}
-      <div className="bg-[#1F1A17] px-4 py-[10px] text-center text-[12px] font-medium tracking-[0.01em] text-[#F8F1E4] sm:px-5 sm:py-[11px] sm:text-[13px]">
-        <span className="mr-1.5 text-[#F5E6D8]">🐾</span>
+      {/* Promo bar — special offer */}
+      <div className="bg-[#B5532A] px-4 py-[10px] text-center text-[12px] font-semibold tracking-[0.01em] text-[#FFF7EE] sm:px-5 sm:py-[11px] sm:text-[13px]">
+        <span className="mr-1.5">🐾</span>
         <span className="hidden sm:inline">
-          For the dog you'll never stop missing. Delivered with care in five days.
+          Special offer: 24-hour delivery, no extra charge.
         </span>
-        <span className="sm:hidden">For the dog you miss. Delivered in 5 days.</span>
+        <span className="sm:hidden">24-hour delivery — no extra charge.</span>
         <Link
           to="/create"
-          className="ml-2 border-b border-current text-[#E8B58A]"
+          className="ml-2 border-b border-current text-[#FFE9D2] hover:text-white"
         >
-          Make Her Song 🐾
+          Start Their Song →
         </Link>
       </div>
 
@@ -57,8 +57,8 @@ export function SiteHeader() {
               to="/create"
               className="inline-flex shrink-0 items-center gap-2 rounded-full bg-[#B5532A] px-4 py-[10px] text-[13px] font-semibold text-[#FFF7EE] shadow-[0_6px_16px_rgba(181,83,42,0.28)] transition-all hover:-translate-y-px hover:bg-[#7A4A2E] hover:shadow-[0_10px_24px_rgba(181,83,42,0.35)] sm:gap-2.5 sm:px-[26px] sm:py-[14px] sm:text-[15px]"
             >
-              <span className="hidden sm:inline">Make Her Song 🐾</span>
-              <span className="sm:hidden">Start Here →</span>
+              <span className="hidden sm:inline">Start Their Custom Song 🐾</span>
+              <span className="sm:hidden">Start Their Song →</span>
             </Link>
           </div>
         </div>
