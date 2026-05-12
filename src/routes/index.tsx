@@ -609,7 +609,7 @@ function PrimaryBtn({
           track({ type: "lander_cta_click", payload: { to } })
         );
       }}
-      className={`group inline-flex items-center justify-center gap-2.5 rounded-full bg-[#1F1A17] font-semibold text-[#F8F1E4] tracking-[0.005em] shadow-[0_8px_22px_rgba(31,26,23,0.32)] ring-1 ring-[#B5532A]/40 transition-all hover:-translate-y-px hover:bg-[#2A211C] hover:ring-[#B5532A]/70 hover:shadow-[0_12px_28px_rgba(31,26,23,0.4)] ${
+      className={`group inline-flex items-center justify-center gap-2.5 rounded-full bg-gradient-to-b from-[#C25E33] to-[#A14820] font-semibold text-[#FFF7EE] tracking-[0.005em] shadow-[0_8px_22px_rgba(181,83,42,0.35)] ring-1 ring-[#1F1A17]/15 transition-all hover:-translate-y-px hover:from-[#B5532A] hover:to-[#8E3F1B] hover:shadow-[0_12px_28px_rgba(181,83,42,0.45)] ${
         large ? "px-[34px] py-[18px] text-[16.5px]" : "px-[26px] py-[14px] text-[15px]"
       } ${fullWidth ? "w-full" : ""}`}
     >
