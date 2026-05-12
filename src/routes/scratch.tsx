@@ -306,7 +306,7 @@ function ScratchPage() {
               <Sparkles className="h-3.5 w-3.5" />
               {copy.eyebrow}
             </span>
-            <div className="mt-5 text-5xl">{copy.emoji}</div>
+            <div className="mt-5 text-5xl">🐾</div>
             <h1 className="mt-4 text-balance font-display text-3xl font-bold leading-tight text-foreground md:text-4xl">
               {copy.scratchHeadline}
             </h1>
