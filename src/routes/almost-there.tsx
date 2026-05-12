@@ -22,19 +22,22 @@ const AVATARS = [
 
 const TESTIMONIALS = [
   {
-    name: "Sarah M.",
+    name: "Sarah K.",
+    dog: "For Daisy, Golden Retriever, 11",
     quote:
-      "I cried the moment it started playing. My mom said it was the most meaningful gift she'd ever received during her treatment.",
+      "I almost closed the tab. So glad I didn't. Five days later I had a real song with her name in the chorus — I play it every morning on the drive she used to ride with me. Worth every cent.",
   },
   {
-    name: "David R.",
+    name: "Marcus T.",
+    dog: "For Cooper, Black Lab, 13",
     quote:
-      "We played it at my wife's last chemo session. The whole infusion room was in tears. It captured her spirit perfectly.",
+      "I expected a cheesy AI track. What I got was a real song, recorded with real instruments, that made my whole family cry on the anniversary. Best money I've spent on anything for him.",
   },
   {
-    name: "Emily K.",
+    name: "Elena R.",
+    dog: "For Juno, Rescue Collie, 9",
     quote:
-      "My dad listens to his song every morning before radiation. It gives him strength. Worth every penny.",
+      "The discount made me finally pull the trigger. Within a week Juno had her own song. My kids ask to play it at bedtime. It's the closest thing to having her back in the room.",
   },
 ];
 
@@ -63,9 +66,21 @@ function AlmostTherePage() {
       </header>
 
       <main className="mx-auto max-w-2xl px-6 py-10">
+        <div className="mb-4 flex w-full justify-center">
+          <span className="inline-flex items-center gap-2 rounded-full border border-primary/30 bg-primary/10 px-3 py-1 text-[11px] font-semibold uppercase tracking-[0.18em] text-primary">
+            <span className="relative flex h-2 w-2">
+              <span className="absolute inline-flex h-full w-full animate-ping rounded-full bg-primary opacity-75" />
+              <span className="relative inline-flex h-2 w-2 rounded-full bg-primary" />
+            </span>
+            Your discount is reserved
+          </span>
+        </div>
         <h1 className="text-balance text-center font-display text-4xl font-semibold leading-tight text-foreground md:text-5xl">
-          You're moments away from {q.dog_name || "your dog"}'s song.
+          {q.dog_name || "Your dog"}'s song is one step away.
         </h1>
+        <p className="mx-auto mt-4 max-w-[520px] text-balance text-center text-[15.5px] leading-relaxed text-muted-foreground md:text-base">
+          1,200+ families have already made a song for the dog they miss. Yours is next — and your discount is locked in for the next few minutes.
+        </p>
 
         {/* Avatar row */}
         <div className="mt-8 flex items-center justify-center -space-x-3">
@@ -83,7 +98,7 @@ function AlmostTherePage() {
           </div>
         </div>
         <p className="mt-4 text-center text-sm font-medium text-foreground">
-          1,000+ families have shared their PawPrint Song
+          1,200+ dog families · 4.9★ average rating
         </p>
 
         {/* Testimonials */}
@@ -101,11 +116,12 @@ function AlmostTherePage() {
               <blockquote className="mt-3 text-[15px] leading-relaxed text-foreground">
                 &ldquo;{t.quote}&rdquo;
               </blockquote>
-              <figcaption className="mt-3 flex items-center gap-2 text-sm text-muted-foreground">
+              <figcaption className="mt-3 flex flex-wrap items-center gap-x-2 gap-y-1 text-sm text-muted-foreground">
                 <span className="font-medium text-foreground">{t.name}</span>
                 <span className="inline-flex items-center gap-1 text-success">
                   <ShieldCheck className="h-3.5 w-3.5" /> Verified
                 </span>
+                <span className="basis-full text-xs text-muted-foreground">{t.dog}</span>
               </figcaption>
             </figure>
           ))}
