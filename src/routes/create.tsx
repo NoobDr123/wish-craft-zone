@@ -22,10 +22,8 @@ import {
 } from "@/stores/quizStore";
 import {
   GENRE_OPTIONS,
-  LETTER_CHIPS,
   MEMORY_CHIPS,
   MEMORY_PLACEHOLDER,
-  letterPlaceholder,
   personalityCopy,
 } from "@/lib/quizCopy";
 import { track, ensureSession } from "@/lib/tracking";
