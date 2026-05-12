@@ -358,7 +358,7 @@ const testimonials: Array<{
     quote:
       '"I almost didn\'t order because it felt like too much. I was wrong. The first time I heard her name in the chorus I fell apart in the best way. It\'s the most precious thing I own."',
     name: "David K.",
-    meta: "Austin, TX  ·  For Bella, his 12-year-old Lab",
+    meta: "Delaware  ·  For Bella, his 12-year-old Lab",
     avatar: "https://i.pravatar.cc/80?img=67",
   },
   {
@@ -586,7 +586,7 @@ const faqs = [
   },
   {
     q: "Who's behind PawPrint Song?",
-    a: "PawPrint Song was founded in 2024 by Marcus Reed and Elena Whitford after losing their own dogs — Cooper, a 13-year-old Lab, and Juno, a rescue collie they had for nine years. They went looking for something that honored those dogs the way they deserved and found pet sympathy cards, paw-print necklaces, and generic memorial slideshows. None of it felt like the dog. So they built this: a small studio of songwriters and producers who turn your memories into a real, original song with your dog's name in it — written by people, recorded properly, yours to keep forever. We're now a team of seven based in Austin, TX, and we've made songs for more than 1,200 families. Every song still gets read by a human before it goes out.",
+    a: "PawPrint Song was founded in 2024 by Marcus Reed and Elena Whitford after losing their own dogs — Cooper, a 13-year-old Lab, and Juno, a rescue collie they had for nine years. They went looking for something that honored those dogs the way they deserved and found pet sympathy cards, paw-print necklaces, and generic memorial slideshows. None of it felt like the dog. So they built this: a small studio of songwriters and producers who turn your memories into a real, original song with your dog's name in it — written by people, recorded properly, yours to keep forever. We're now a team of seven based in Delaware, and we've made songs for more than 1,200 families. Every song still gets read by a human before it goes out.",
   },
 ];
 
