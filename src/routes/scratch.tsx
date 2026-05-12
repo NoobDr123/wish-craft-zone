@@ -394,21 +394,29 @@ function ScratchPage() {
             </p>
           </div>
 
-          {/* Discount badge — personalized */}
-          <div className="mt-8 flex flex-col items-center justify-center rounded-3xl border-2 border-primary/30 bg-peach/40 p-10 text-center shadow-card">
+          {/* Discount badge — personalized, offer-driven */}
+          <div className="mt-8 flex flex-col items-center justify-center rounded-3xl border-2 border-primary/30 bg-peach/40 p-8 text-center shadow-card">
             {firstName && (
               <span className="text-xs font-semibold uppercase tracking-[0.2em] text-primary/80">
-                {journey === "memory"
+                🐾 {journey === "memory"
                   ? `In honor of ${firstName}`
-                  : `${firstName}'s song`}
+                  : `${firstName}'s personalized song`}
               </span>
             )}
-            <span className="mt-2 font-display text-7xl font-extrabold text-primary md:text-8xl">
-              -50%
+            <div className="mt-2 flex items-baseline justify-center gap-3">
+              <span className="font-display text-3xl font-medium text-muted-foreground line-through md:text-4xl">
+                $59.99
+              </span>
+              <span className="font-display text-6xl font-extrabold text-primary md:text-7xl">
+                $29.99
+              </span>
+            </div>
+            <span className="mt-3 inline-flex items-center gap-1.5 rounded-full bg-primary px-4 py-1.5 text-xs font-bold uppercase tracking-wider text-primary-foreground">
+              50% OFF · You save $30
             </span>
-            <span className="mt-1 text-sm font-medium text-foreground/70">
-              off your personalized song
-            </span>
+            <p className="mt-3 text-sm text-foreground/70">
+              One-time payment · Delivered as MP3 + lyric video
+            </p>
           </div>
 
           {/* Countdown urgency banner */}
