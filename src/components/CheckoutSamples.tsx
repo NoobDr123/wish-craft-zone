@@ -1,5 +1,5 @@
 import { useEffect, useRef, useState } from "react";
-import { Music2 } from "lucide-react";
+import { Music2, PawPrint, Heart } from "lucide-react";
 import { supabase } from "@/integrations/supabase/client";
 import { AudioPlayer } from "@/components/AudioPlayer";
 
@@ -10,6 +10,7 @@ interface SampleSong {
   quote: string | null;
   audio_url: string | null;
   dog_name: string | null;
+  gone_text?: string | null;
 }
 
 const FALLBACK_AUDIO =
@@ -19,26 +20,29 @@ const FALLBACK_SAMPLES: SampleSong[] = [
   {
     id: "fb-1",
     title: "Cheeto Paws",
-    for_text: "Written for Max, 12 years. Yellow Lab.",
+    for_text: "Written for Max · 12 years · Yellow Lab",
     quote: "Her paws smelled like cheetos. I miss her smelly breath. I miss everything.",
     audio_url: FALLBACK_AUDIO,
     dog_name: "Max",
+    gone_text: "Gone 3 months · still her favorite blanket on the couch",
   },
   {
     id: "fb-2",
     title: "Still on the Couch",
-    for_text: "Written for Bella, 9 years. Goldendoodle.",
+    for_text: "Written for Bella · 9 years · Goldendoodle",
     quote: "I still leave the spot by the window open for her. Always will.",
     audio_url: FALLBACK_AUDIO,
     dog_name: "Bella",
+    gone_text: "Gone 2 years · the window seat is still hers",
   },
   {
     id: "fb-3",
     title: "Good Girl, Always",
-    for_text: "Written for Ruby, 15 years. German Shepherd.",
+    for_text: "Written for Ruby · 15 years · German Shepherd",
     quote: "Fifteen years. She got me through everything.",
     audio_url: FALLBACK_AUDIO,
     dog_name: "Ruby",
+    gone_text: "Gone 8 months · 15 years of being everything",
   },
 ];
 
