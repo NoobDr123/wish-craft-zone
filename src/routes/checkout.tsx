@@ -343,17 +343,24 @@ function CheckoutPage() {
       <PaymentTestModeBanner />
 
       <header className="border-b border-peach/60 bg-background/60 backdrop-blur">
-        <div className="mx-auto flex max-w-2xl items-center justify-between px-5 py-4">
-          <Link
-            to="/almost-there"
-            className="inline-flex items-center gap-1.5 text-sm text-muted-foreground transition-colors hover:text-foreground"
-          >
-            <ArrowLeft className="h-4 w-4" /> Back
-          </Link>
-          <Logo />
-          <span className="inline-flex items-center gap-1.5 text-xs text-muted-foreground">
-            <ShieldCheck className="h-3.5 w-3.5" /> Secure
-          </span>
+        <div className="mx-auto max-w-2xl px-5 py-4">
+          <div className="flex items-center justify-between">
+            <Link
+              to="/almost-there"
+              className="inline-flex items-center gap-1.5 text-sm text-muted-foreground transition-colors hover:text-foreground"
+            >
+              <ArrowLeft className="h-4 w-4" /> Back
+            </Link>
+            <Logo />
+            <span className="hidden sm:inline-flex items-center gap-1.5 text-xs text-muted-foreground">
+              <ShieldCheck className="h-3.5 w-3.5" /> Secure
+            </span>
+            <span className="sm:hidden w-10" aria-hidden />
+          </div>
+          <p className="mt-2 flex items-center justify-center gap-1.5 text-[11px] font-medium text-muted-foreground sm:hidden">
+            <ShieldCheck className="h-3 w-3 text-success" />
+            Secure payment · Encrypted &amp; processed by Stripe
+          </p>
         </div>
       </header>
 
