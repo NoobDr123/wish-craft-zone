@@ -210,7 +210,7 @@ function ThankYouPage() {
   }, [q.orderId, q.buyer_email]);
 
   const recipient =
-    order?.recipient_name || q.recipient_name || "your loved one";
+    order?.recipient_name || q.recipient_name || "your dog";
   const buyerEmail = order?.buyer_email || q.buyer_email || "";
   const buyerName = order?.buyer_name || q.buyer_name || "";
 
