@@ -10,7 +10,7 @@ import {
   TipChips,
 } from "@/components/QuizInputs";
 import { BreedSelect } from "@/components/BreedSelect";
-import { DogPhotoUploader } from "@/components/DogPhotoUploader";
+
 import {
   useQuizStore,
   type DogBreedKey,
