@@ -813,8 +813,8 @@ function LandingPage() {
             </h2>
             <span className="hidden h-px w-16 bg-[#B5532A]/50 md:block" />
           </div>
-          <div className="grid items-center gap-8 md:grid-cols-[1.15fr_1fr] md:gap-[60px]">
-            <div className="order-2 md:order-1">
+          <div className="flex flex-col items-center gap-8 md:gap-12">
+            <div className="order-2 w-full max-w-[860px]">
               <h1 className="mb-[20px] max-w-[640px] font-display text-[clamp(22px,3.4vw,34px)] font-medium italic leading-[1.22] tracking-[-0.018em] text-[#1F1A17] md:mb-[22px]">
                 <span className="font-display text-[1.05em] font-semibold not-italic text-[#B5532A]">
                   &ldquo;
