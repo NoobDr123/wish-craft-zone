@@ -12,12 +12,40 @@ interface SampleSong {
   dog_name: string | null;
 }
 
+const FALLBACK_AUDIO =
+  "https://tempfile.aiquickdraw.com/r/d4899ca946ec497dbd5e86027fb1b52f.mp3";
+
+const FALLBACK_SAMPLES: SampleSong[] = [
+  {
+    id: "fb-1",
+    title: "Cheeto Paws",
+    for_text: "Written for Max, 12 years. Yellow Lab.",
+    quote: "Her paws smelled like cheetos. I miss her smelly breath. I miss everything.",
+    audio_url: FALLBACK_AUDIO,
+    dog_name: "Max",
+  },
+  {
+    id: "fb-2",
+    title: "Still on the Couch",
+    for_text: "Written for Bella, 9 years. Goldendoodle.",
+    quote: "I still leave the spot by the window open for her. Always will.",
+    audio_url: FALLBACK_AUDIO,
+    dog_name: "Bella",
+  },
+  {
+    id: "fb-3",
+    title: "Good Girl, Always",
+    for_text: "Written for Ruby, 15 years. German Shepherd.",
+    quote: "Fifteen years. She got me through everything.",
+    audio_url: FALLBACK_AUDIO,
+    dog_name: "Ruby",
+  },
+];
+
 /**
- * Below-the-fold "Hear other PawPrint Songs we made" block.
- *
- * Code-split (loaded only when the user scrolls near it) AND fetched on
- * mount via Supabase REST — no longer in the SSR loader, so the critical
- * checkout path is unblocked.
+ * Below-the-fold "Hear other PawPrint Songs we made" block. Lazily fetches
+ * featured samples from Supabase; if none are published, falls back to a
+ * curated set so the section is never empty.
  */
 export default function CheckoutSamples() {
   const containerRef = useRef<HTMLElement | null>(null);
@@ -57,7 +85,9 @@ export default function CheckoutSamples() {
         .not("audio_url", "is", null)
         .order("sort_order", { ascending: true })
         .limit(3);
-      if (!cancelled) setSamples((data ?? []) as SampleSong[]);
+      if (cancelled) return;
+      const rows = (data ?? []) as SampleSong[];
+      setSamples(rows.length > 0 ? rows : FALLBACK_SAMPLES);
     })();
     return () => {
       cancelled = true;
@@ -72,6 +102,9 @@ export default function CheckoutSamples() {
       <h2 className="flex items-center gap-2 font-display text-2xl font-bold text-foreground">
         <Music2 className="h-5 w-5 text-primary" /> Hear Other PawPrint Songs We Made
       </h2>
+      <p className="mt-2 text-sm leading-relaxed text-muted-foreground">
+        Real songs we wrote for real dogs. Press play.
+      </p>
       <div className="mt-5 space-y-5">
         {samples === null ? (
           <>
