@@ -291,26 +291,6 @@ function CreatePage() {
       render: () => <BreedStep />,
     },
 
-    // 2. Photo (optional)
-    {
-      key: "photo",
-      chapter: "Her face",
-      title: `A photo of ${dogName} (optional)`,
-      subtitle:
-        "We don't use the photo in the song. It just helps us picture her while we write. You can skip this.",
-      optional: true,
-      isValid: () => true,
-      answer: (s) => ({ has_photo: !!s.dog_photo_url }),
-      render: () => (
-        <Question label="Upload a photo" helper="Choose one from your device or photo gallery.">
-          <DogPhotoUploader
-            value={q.dog_photo_url}
-            onChange={(url) => q.set("dog_photo_url", url)}
-          />
-        </Question>
-      ),
-    },
-
     // 3. Personality
     {
       key: "personality",
