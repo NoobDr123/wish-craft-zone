@@ -708,9 +708,13 @@ function LandingPage() {
   const [heroEverPlayed, setHeroEverPlayed] = useState(false);
   const [showStickyCta, setShowStickyCta] = useState(false);
 
-  // Sticky CTA appears after scrolling past the hero
+  // Sticky CTA appears after scrolling past the hero, hides near the bottom (FAQ/final CTA)
   useEffect(() => {
-    const onScroll = () => setShowStickyCta(window.scrollY > 720);
+    const onScroll = () => {
+      const y = window.scrollY;
+      const nearBottom = y + window.innerHeight >= document.documentElement.scrollHeight - 900;
+      setShowStickyCta(y > 720 && !nearBottom);
+    };
     window.addEventListener("scroll", onScroll, { passive: true });
     onScroll();
     return () => window.removeEventListener("scroll", onScroll);
