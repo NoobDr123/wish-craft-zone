@@ -256,7 +256,7 @@ function CheckoutPage() {
   async function handleApplyPromo() {
     setPromoError(null);
     if (!orderId) {
-      setPromoError("Please wait — order is initializing.");
+      setPromoError("Please wait, order is initializing.");
       return;
     }
     const code = promoCode.trim();
@@ -297,7 +297,7 @@ function CheckoutPage() {
           order_already_paid: "This order is already paid.",
           missing_code: "Enter a code first.",
           missing_order_id: "Order not ready yet, try again in a moment.",
-          order_not_found: "Order not found — please refresh.",
+          order_not_found: "Order not found. Please refresh.",
           internal_error: "Something went wrong. Please try again.",
         };
         setPromoError(friendly[errCode] || friendly.internal_error);
@@ -426,7 +426,7 @@ function CheckoutPage() {
                   </p>
                   <p className="text-muted-foreground">
                     {promoApplied.free
-                      ? "Your order is free — redirecting…"
+                      ? "Your order is free. Redirecting…"
                       : `You saved $${(promoApplied.discount_cents / 100).toFixed(2)}.`}
                   </p>
                 </div>
