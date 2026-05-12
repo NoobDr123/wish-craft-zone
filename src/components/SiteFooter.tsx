@@ -21,7 +21,7 @@ export function SiteFooter() {
               recorded in studio, with their name in every chorus.
             </p>
             <p className="mt-4 text-[12.5px] leading-[1.6] text-[rgba(246,240,230,0.5)]">
-              PawPrint Song · Austin, TX
+              PawPrint Song · Delaware
               <br />
               <a
                 href="mailto:hello@getpawprintsong.com"

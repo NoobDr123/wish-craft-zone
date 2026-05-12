@@ -358,7 +358,7 @@ const testimonials: Array<{
     quote:
       '"I almost didn\'t order because it felt like too much. I was wrong. The first time I heard her name in the chorus I fell apart in the best way. It\'s the most precious thing I own."',
     name: "David K.",
-    meta: "Austin, TX  ·  For Bella, his 12-year-old Lab",
+    meta: "Delaware  ·  For Bella, his 12-year-old Lab",
     avatar: "https://i.pravatar.cc/80?img=67",
   },
   {
@@ -586,7 +586,7 @@ const faqs = [
   },
   {
     q: "Who's behind PawPrint Song?",
-    a: "PawPrint Song was founded in 2024 by Marcus Reed and Elena Whitford after losing their own dogs — Cooper, a 13-year-old Lab, and Juno, a rescue collie they had for nine years. They went looking for something that honored those dogs the way they deserved and found pet sympathy cards, paw-print necklaces, and generic memorial slideshows. None of it felt like the dog. So they built this: a small studio of songwriters and producers who turn your memories into a real, original song with your dog's name in it — written by people, recorded properly, yours to keep forever. We're now a team of seven based in Austin, TX, and we've made songs for more than 1,200 families. Every song still gets read by a human before it goes out.",
+    a: "PawPrint Song was founded in 2024 by Marcus Reed and Elena Whitford after losing their own dogs — Cooper, a 13-year-old Lab, and Juno, a rescue collie they had for nine years. They went looking for something that honored those dogs the way they deserved and found pet sympathy cards, paw-print necklaces, and generic memorial slideshows. None of it felt like the dog. So they built this: a small studio of songwriters and producers who turn your memories into a real, original song with your dog's name in it — written by people, recorded properly, yours to keep forever. We're now a team of seven based in Delaware, and we've made songs for more than 1,200 families. Every song still gets read by a human before it goes out.",
   },
 ];
 
@@ -629,40 +629,40 @@ function TrustBadges({ tone = "light" }: { tone?: "light" | "dark" }) {
     : "bg-[#F8F1E4] text-[#B5532A] ring-1 ring-[#E8DDC9]";
   const labelText = isDark ? "text-[#F8F1E4]" : "text-[#1F1A17]";
   return (
-    <div className="mx-auto mt-5 grid max-w-[480px] grid-cols-3 gap-2">
+    <div className="mx-auto mt-5 grid w-full max-w-[520px] grid-cols-3 gap-2 sm:gap-2.5">
       {/* 30-day money back */}
-      <div className={`flex items-center justify-center gap-1.5 rounded-[10px] border px-2 py-1.5 ${cardBg}`}>
-        <span className={`flex h-6 w-6 shrink-0 items-center justify-center rounded-full ${iconRing}`}>
-          <span className="font-display text-[10px] font-bold leading-none tracking-[-0.02em]">30</span>
+      <div className={`flex flex-col items-center justify-center gap-1.5 rounded-[12px] border px-2 py-2.5 text-center ${cardBg}`}>
+        <span className={`flex h-7 w-7 shrink-0 items-center justify-center rounded-full ${iconRing}`}>
+          <span className="font-display text-[11px] font-bold leading-none tracking-[-0.02em]">30</span>
         </span>
-        <span className={`text-left text-[8.5px] font-bold uppercase leading-[1.15] tracking-[0.04em] sm:text-[9px] ${labelText}`}>
-          Day money-back<br />guarantee
+        <span className={`text-[9.5px] font-bold uppercase leading-[1.2] tracking-[0.05em] sm:text-[10px] ${labelText}`}>
+          Day money-back
         </span>
       </div>
-      {/* Free rewrites */}
-      <div className={`flex items-center justify-center gap-1.5 rounded-[10px] border px-2 py-1.5 ${cardBg}`}>
-        <span className={`flex h-6 w-6 shrink-0 items-center justify-center rounded-full ${iconRing}`}>
-          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.2" strokeLinecap="round" strokeLinejoin="round" className="h-3 w-3">
+      {/* Free rewrite */}
+      <div className={`flex flex-col items-center justify-center gap-1.5 rounded-[12px] border px-2 py-2.5 text-center ${cardBg}`}>
+        <span className={`flex h-7 w-7 shrink-0 items-center justify-center rounded-full ${iconRing}`}>
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.2" strokeLinecap="round" strokeLinejoin="round" className="h-3.5 w-3.5">
             <path d="M21 12a9 9 0 1 1-3.51-7.13" />
             <polyline points="21 4 21 10 15 10" />
           </svg>
         </span>
-        <span className={`text-left text-[8.5px] font-bold uppercase leading-[1.15] tracking-[0.04em] sm:text-[9px] ${labelText}`}>
-          Free<br />rewrite
+        <span className={`text-[9.5px] font-bold uppercase leading-[1.2] tracking-[0.05em] sm:text-[10px] ${labelText}`}>
+          1 free rewrite
         </span>
       </div>
       {/* 5-day delivery */}
-      <div className={`flex items-center justify-center gap-1.5 rounded-[10px] border px-2 py-1.5 ${cardBg}`}>
-        <span className={`flex h-6 w-6 shrink-0 items-center justify-center rounded-full ${iconRing}`}>
-          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.2" strokeLinecap="round" strokeLinejoin="round" className="h-3 w-3">
+      <div className={`flex flex-col items-center justify-center gap-1.5 rounded-[12px] border px-2 py-2.5 text-center ${cardBg}`}>
+        <span className={`flex h-7 w-7 shrink-0 items-center justify-center rounded-full ${iconRing}`}>
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.2" strokeLinecap="round" strokeLinejoin="round" className="h-3.5 w-3.5">
             <rect x="3" y="5" width="18" height="16" rx="2" />
             <line x1="3" y1="10" x2="21" y2="10" />
             <line x1="8" y1="3" x2="8" y2="7" />
             <line x1="16" y1="3" x2="16" y2="7" />
           </svg>
         </span>
-        <span className={`text-left text-[8.5px] font-bold uppercase leading-[1.15] tracking-[0.04em] sm:text-[9px] ${labelText}`}>
-          Delivered in<br />5 days
+        <span className={`text-[9.5px] font-bold uppercase leading-[1.2] tracking-[0.05em] sm:text-[10px] ${labelText}`}>
+          Delivered in 5 days
         </span>
       </div>
     </div>
@@ -1325,33 +1325,29 @@ function LandingPage() {
                   If it doesn't feel right,{" "}
                   <em className="italic text-[#B5532A]">we rewrite it.</em>
                   <br />
-                  Still not right? Full refund. for{" "}
-                  <span className="whitespace-nowrap rounded-md bg-[#B5532A]/12 px-1.5 py-0.5 text-[#B5532A]">
-                    30 full days.
-                  </span>
+                  Still not right? Full refund for{" "}
+                  <span className="whitespace-nowrap text-[#B5532A]">30 full days.</span>
                 </h2>
                 <p className="mb-6 max-w-[520px] text-[15.5px] leading-[1.6] text-[#5A5148] md:text-[16.5px]">
                   Every song goes through a careful review before it reaches you.
-                  If it isn't right, we revise it as many times as it takes. at no
-                  cost. And you have a full <strong className="font-semibold text-[#1F1A17]">30 days from delivery</strong> to ask for
-                  every cent back. No questions, no fine print.
+                  If it isn't right, we revise it at no cost. And you have a full{" "}
+                  <strong className="font-semibold text-[#1F1A17]">30 days from delivery</strong> to ask for every cent back. No questions, no fine print.
                 </p>
 
                 {/* Reassurance row */}
-                <div className="grid grid-cols-1 gap-2 sm:grid-cols-3">
+                <div className="grid grid-cols-1 gap-2 sm:grid-cols-2">
                   {[
-                    { k: "✓", v: "Unlimited free rewrites" },
-                    { k: "✓", v: "30-day money back" },
-                    { k: "✓", v: "No questions asked" },
-                  ].map((r) => (
+                    "1 free rewrite",
+                    "30-day money back, no questions asked",
+                  ].map((v) => (
                     <div
-                      key={r.v}
+                      key={v}
                       className="flex items-center justify-center gap-2 rounded-[10px] border border-[#E8DDC9] bg-[#F8F1E4] px-3 py-2 text-[13px] font-medium text-[#1F1A17] sm:justify-start"
                     >
-                      <span className="flex h-5 w-5 items-center justify-center rounded-full bg-[#B5532A] text-[11px] font-bold text-[#F8F1E4]">
-                        {r.k}
+                      <span className="flex h-5 w-5 shrink-0 items-center justify-center rounded-full bg-[#B5532A] text-[11px] font-bold text-[#F8F1E4]">
+                        ✓
                       </span>
-                      {r.v}
+                      {v}
                     </div>
                   ))}
                 </div>
