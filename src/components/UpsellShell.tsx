@@ -3,7 +3,7 @@ import { Logo } from "./Logo";
 import { CheckoutProgress } from "./CheckoutProgress";
 
 interface UpsellShellProps {
-  step: 1 | 2 | 3;
+  step: 1 | 2;
   badge: string;
   headline: string;
   description: React.ReactNode;
@@ -53,7 +53,7 @@ export function UpsellShell({
         <div className="mx-auto flex max-w-3xl items-center justify-between gap-2">
           <Logo />
           <p className="text-[11px] text-muted-foreground sm:text-sm">
-            Add-on {step} of 3
+            Add-on {step} of 2
           </p>
         </div>
       </header>
