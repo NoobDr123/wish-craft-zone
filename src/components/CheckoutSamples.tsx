@@ -2,6 +2,9 @@ import { useEffect, useRef, useState } from "react";
 import { Music2, PawPrint } from "lucide-react";
 import { supabase } from "@/integrations/supabase/client";
 import { AudioPlayer } from "@/components/AudioPlayer";
+import sampleYellowLab from "@/assets/sample-yellow-lab.jpg";
+import sampleGoldendoodle from "@/assets/sample-goldendoodle.jpg";
+import sampleGermanShepherd from "@/assets/sample-german-shepherd.jpg";
 
 interface SampleSong {
   id: string;
@@ -12,6 +15,7 @@ interface SampleSong {
   dog_name: string | null;
   gone_text?: string | null;
   memory_text?: string | null;
+  photo_url?: string | null;
 }
 
 const FALLBACK_AUDIO =
@@ -27,6 +31,7 @@ const FALLBACK_SAMPLES: SampleSong[] = [
     dog_name: "Max",
     gone_text: "Gone 3 months ago",
     memory_text: "still her favorite blanket on the couch",
+    photo_url: sampleYellowLab,
   },
   {
     id: "fb-2",
@@ -37,6 +42,7 @@ const FALLBACK_SAMPLES: SampleSong[] = [
     dog_name: "Bella",
     gone_text: "Gone 2 years ago",
     memory_text: "the window seat is still hers",
+    photo_url: sampleGoldendoodle,
   },
   {
     id: "fb-3",
@@ -47,6 +53,7 @@ const FALLBACK_SAMPLES: SampleSong[] = [
     dog_name: "Ruby",
     gone_text: "Gone 8 months ago",
     memory_text: "15 years of being everything",
+    photo_url: sampleGermanShepherd,
   },
 ];
 
@@ -127,9 +134,24 @@ export default function CheckoutSamples() {
               className="rounded-2xl border border-peach/60 bg-background/60 p-4"
             >
               <div className="flex items-start gap-3">
-                {/* Memorial silhouette: dark blacked-out paw avatar with small RIP tag */}
-                <span className="relative flex h-11 w-11 shrink-0 items-center justify-center rounded-full bg-foreground/85 text-background shadow-sm ring-1 ring-foreground/10">
-                  <PawPrint className="h-5 w-5 opacity-90" strokeWidth={2.25} />
+                {/* Memorial avatar: dog photo, desaturated and dimmed, with small RIP tag */}
+                <span className="relative block h-12 w-12 shrink-0 overflow-visible">
+                  <span className="block h-12 w-12 overflow-hidden rounded-full ring-1 ring-foreground/15 shadow-sm">
+                    {s.photo_url ? (
+                      <img
+                        src={s.photo_url}
+                        alt={s.dog_name ? `${s.dog_name}, in memory` : "In memory"}
+                        width={96}
+                        height={96}
+                        loading="lazy"
+                        className="h-full w-full object-cover [filter:grayscale(100%)_brightness(0.7)_contrast(1.05)]"
+                      />
+                    ) : (
+                      <span className="flex h-full w-full items-center justify-center bg-foreground/85 text-background">
+                        <PawPrint className="h-5 w-5" strokeWidth={2.25} />
+                      </span>
+                    )}
+                  </span>
                   <span className="absolute -bottom-1 left-1/2 -translate-x-1/2 rounded-full bg-background px-1.5 py-px text-[8px] font-bold uppercase tracking-[0.12em] text-foreground/80 ring-1 ring-foreground/15">
                     RIP
                   </span>
