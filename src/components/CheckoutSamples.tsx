@@ -104,10 +104,10 @@ export default function CheckoutSamples() {
       className="mt-6 rounded-3xl border border-peach/70 bg-card p-6 shadow-soft md:p-7"
     >
       <h2 className="flex items-center gap-2 font-display text-2xl font-bold text-foreground">
-        <Music2 className="h-5 w-5 text-primary" /> Songs we made for other dogs
+        <Music2 className="h-5 w-5 text-primary" /> Songs we made for other dog owners
       </h2>
       <p className="mt-2 text-sm leading-relaxed text-muted-foreground">
-        Real songs, written from real memories families shared with us. Yours will be just as personal, built only from what you tell us about your dog.
+        Real songs, written from real memories other owners shared with us. Yours will be just as personal, built only from what you tell us about your dog.
       </p>
       <div className="mt-5 space-y-5">
         {samples === null ? (
