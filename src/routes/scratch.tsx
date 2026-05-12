@@ -377,7 +377,7 @@ function ScratchPage() {
 
           <p className="mt-6 text-center text-sm text-muted-foreground">
             <Flame className="mr-1 inline h-4 w-4 text-primary" />
-            838 people claimed this discount today
+            838 families unlocked their gift today. You're next.
           </p>
         </main>
       ) : (
