@@ -458,7 +458,6 @@ function CreatePage() {
           voice: q.voice,
           personality_len: (q.dog_personality ?? "").length,
           memory_len: (q.dog_memory ?? "").length,
-          letter_len: (q.letter_to_dog ?? "").length,
         },
         buyerEmail: q.buyer_email || undefined,
       });
