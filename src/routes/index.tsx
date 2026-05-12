@@ -921,7 +921,7 @@ function LandingPage() {
                 <button
                   aria-label={heroPlaying ? "Pause song" : "Listen to Example"}
                   onClick={handleHeroPlay}
-                  className="absolute inset-x-3 bottom-3 z-20 flex items-center justify-center gap-2.5 rounded-full bg-[rgba(246,240,230,0.97)] py-3 shadow-[0_8px_24px_rgba(0,0,0,0.28)] ring-1 ring-black/5 transition-all hover:-translate-y-px hover:shadow-[0_10px_28px_rgba(0,0,0,0.32)] sm:inset-x-4 sm:bottom-4 sm:py-3.5"
+                  className="absolute inset-x-3 bottom-3 z-20 hidden items-center justify-center gap-2.5 rounded-full bg-[rgba(246,240,230,0.97)] py-3 shadow-[0_8px_24px_rgba(0,0,0,0.28)] ring-1 ring-black/5 transition-all hover:-translate-y-px hover:shadow-[0_10px_28px_rgba(0,0,0,0.32)] sm:flex sm:inset-x-4 sm:bottom-4 sm:py-3.5"
                 >
                   {!heroPlaying && (
                     <span aria-hidden="true" className="animate-nudge-right text-[#B5532A] text-[14px] font-semibold sm:text-[15px]">›››</span>
@@ -962,6 +962,41 @@ function LandingPage() {
                   </div>
                 )}
               </div>
+              {/* Mobile-only play button below video for better thumb reach */}
+              <button
+                aria-label={heroPlaying ? "Pause song" : "Listen to Example"}
+                onClick={handleHeroPlay}
+                className="mt-3 flex w-full items-center justify-center gap-2.5 rounded-full bg-[rgba(246,240,230,0.97)] py-3.5 shadow-[0_8px_24px_rgba(0,0,0,0.18)] ring-1 ring-black/5 transition-all active:translate-y-px sm:hidden"
+              >
+                {!heroPlaying && (
+                  <span aria-hidden="true" className="animate-nudge-right text-[#B5532A] text-[14px] font-semibold">›››</span>
+                )}
+                <span className="flex h-9 w-9 items-center justify-center rounded-full bg-[#B5532A]">
+                  {heroPlaying ? (
+                    <span className="flex gap-[3px]">
+                      <span className="block h-3.5 w-[3px] rounded-sm bg-white" />
+                      <span className="block h-3.5 w-[3px] rounded-sm bg-white" />
+                    </span>
+                  ) : (
+                    <span
+                      className="ml-[2px] inline-block"
+                      style={{
+                        width: 0,
+                        height: 0,
+                        borderLeft: "9px solid #ffffff",
+                        borderTop: "6px solid transparent",
+                        borderBottom: "6px solid transparent",
+                      }}
+                    />
+                  )}
+                </span>
+                <span className="text-[15px] font-semibold tracking-[0.005em] text-[#1F1A17]">
+                  {heroPlaying ? "Pause" : "Listen to Example"}
+                </span>
+                {!heroPlaying && (
+                  <span aria-hidden="true" className="animate-nudge-left text-[#B5532A] text-[14px] font-semibold">‹‹‹</span>
+                )}
+              </button>
               <div className="mt-3 px-1 text-[13px] leading-[1.5] text-[#5A5148] sm:text-[13.5px]">
                 <strong className="mr-1.5 text-[11px] font-semibold uppercase tracking-[0.12em] text-[#B5532A]">
                   Hear Daisy's Song ·
