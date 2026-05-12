@@ -10,7 +10,7 @@ import {
   TipChips,
 } from "@/components/QuizInputs";
 import { BreedSelect } from "@/components/BreedSelect";
-import { DogPhotoUploader } from "@/components/DogPhotoUploader";
+
 import {
   useQuizStore,
   type DogBreedKey,
@@ -22,10 +22,8 @@ import {
 } from "@/stores/quizStore";
 import {
   GENRE_OPTIONS,
-  LETTER_CHIPS,
   MEMORY_CHIPS,
   MEMORY_PLACEHOLDER,
-  letterPlaceholder,
   personalityCopy,
 } from "@/lib/quizCopy";
 import { track, ensureSession } from "@/lib/tracking";
@@ -291,26 +289,6 @@ function CreatePage() {
       render: () => <BreedStep />,
     },
 
-    // 2. Photo (optional)
-    {
-      key: "photo",
-      chapter: "Her face",
-      title: `A photo of ${dogName} (optional)`,
-      subtitle:
-        "We don't use the photo in the song. It just helps us picture her while we write. You can skip this.",
-      optional: true,
-      isValid: () => true,
-      answer: (s) => ({ has_photo: !!s.dog_photo_url }),
-      render: () => (
-        <Question label="Upload a photo" helper="Choose one from your device or photo gallery.">
-          <DogPhotoUploader
-            value={q.dog_photo_url}
-            onChange={(url) => q.set("dog_photo_url", url)}
-          />
-        </Question>
-      ),
-    },
-
     // 3. Personality
     {
       key: "personality",
@@ -354,32 +332,6 @@ function CreatePage() {
             rows={6}
           />
           <TipChips chips={MEMORY_CHIPS} />
-        </Question>
-      ),
-    },
-
-    // 5. Letter
-    {
-      key: "letter",
-      chapter: "What you'd say",
-      title: `If you could say one thing to ${dogName} now…`,
-      subtitle:
-        "Write it like you're talking to her. Doesn't need to rhyme. Doesn't need to be neat. We'll do the rest.",
-      isValid: (s) => (s.letter_to_dog ?? "").trim().length >= 1,
-      answer: (s) => ({ length: (s.letter_to_dog ?? "").length }),
-      render: () => (
-        <Question label={`Your letter to ${dogName}`}>
-          <TextArea
-            placeholder={letterPlaceholder(q.dog_name)}
-            value={q.letter_to_dog}
-            onChange={(e) => q.set("letter_to_dog", e.target.value)}
-            rows={8}
-            autoFocus
-          />
-          <TipChips
-            label="Things that make these letters unforgettable"
-            chips={LETTER_CHIPS}
-          />
         </Question>
       ),
     },
@@ -435,14 +387,6 @@ function CreatePage() {
               value={q.voice}
               onChange={(v) => q.set("voice", v as VoiceKey)}
               columns={2}
-            />
-          </Question>
-          <Question label="A title idea (optional)" helper="Just a phrase or feeling. We'll write the title — this is a hint.">
-            <TextInput
-              placeholder="e.g. Daisy on the porch"
-              value={q.song_title_idea}
-              onChange={(e) => q.set("song_title_idea", e.target.value)}
-              maxLength={80}
             />
           </Question>
         </div>
@@ -514,7 +458,6 @@ function CreatePage() {
           voice: q.voice,
           personality_len: (q.dog_personality ?? "").length,
           memory_len: (q.dog_memory ?? "").length,
-          letter_len: (q.letter_to_dog ?? "").length,
         },
         buyerEmail: q.buyer_email || undefined,
       });
