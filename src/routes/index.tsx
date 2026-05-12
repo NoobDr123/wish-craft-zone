@@ -876,6 +876,7 @@ function LandingPage() {
                 <video
                   key={heroPlaying ? "hero-video-playing" : "hero-video-idle"}
                   src="/testimonials-sequential.mp4"
+                  poster="/testimonials-poster.jpg"
                   className="h-full w-full bg-[#1F1A17] object-contain"
                   autoPlay={heroPlaying}
                   loop
