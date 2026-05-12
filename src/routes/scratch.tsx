@@ -131,12 +131,12 @@ function ScratchPage() {
       ctx.textBaseline = "middle";
       ctx.font = "800 22px Inter, system-ui, sans-serif";
       const top = firstName
-        ? `✨ FOR ${firstName.toUpperCase()} ✨`
-        : "✨ SCRATCH HERE ✨";
+        ? `🐾 SCRATCH FOR ${firstName.toUpperCase()} 🐾`
+        : "🐾 SCRATCH HERE 🐾";
       ctx.fillText(top, rect.width / 2, rect.height / 2 - 14);
       ctx.font = "500 13px Inter, system-ui, sans-serif";
       ctx.fillText(
-        "Drag to reveal your discount",
+        "Drag to unlock your discount",
         rect.width / 2,
         rect.height / 2 + 14,
       );
