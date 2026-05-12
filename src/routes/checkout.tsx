@@ -110,6 +110,7 @@ function CheckoutPage() {
   const emailValid = emailRe.test(email);
   const nameValid = name.trim().length > 1;
   const ready = emailValid && nameValid;
+  const hasSongDetails = Boolean(q.dog_name || q.orderId || orderId);
 
   // Compute delivery date only on client to avoid SSR/CSR hydration mismatch
   const [deliveryDate, setDeliveryDate] = useState<string>("");
@@ -518,7 +519,7 @@ function CheckoutPage() {
                 quizSnapshot={quizPatch}
                 onError={(msg: string) => setError(msg)}
               />
-            ) : (
+            ) : hasSongDetails ? (
               <div className="space-y-4 p-4 md:p-6">
                 {creatingOrder && (
                   <p className="text-center text-sm text-muted-foreground">
@@ -541,8 +542,42 @@ function CheckoutPage() {
                 <div className="h-32 animate-pulse rounded-xl bg-foreground/5" />
                 <div className="h-14 animate-pulse rounded-2xl bg-primary/30" />
               </div>
+            ) : (
+              <div className="p-4 md:p-6">
+                <div className="rounded-2xl border border-primary/25 bg-primary/5 p-4 text-center">
+                  <p className="font-display text-lg font-semibold text-foreground">
+                    Add your dog details first
+                  </p>
+                  <p className="mt-2 text-sm leading-relaxed text-muted-foreground">
+                    Tell us who the doggy song is for, then your secure payment form will load here.
+                  </p>
+                  <Link
+                    to="/create"
+                    className="mt-4 inline-flex items-center justify-center rounded-xl bg-primary px-4 py-3 text-sm font-semibold text-primary-foreground transition-colors hover:bg-primary-hover"
+                  >
+                    Finish song details
+                  </Link>
+                </div>
+              </div>
             )}
           </div>
+        </section>
+
+        <section className="mt-5 rounded-3xl border border-peach/70 bg-card p-5 shadow-soft sm:p-6">
+          <h3 className="flex items-center gap-2 font-display text-xl font-bold text-foreground">
+            <Music2 className="h-5 w-5 text-primary" /> Your doggy song
+          </h3>
+          <p className="mt-3 text-[15px] leading-relaxed text-muted-foreground">
+            A custom song made for <span className="font-semibold text-foreground">{recipient}</span>, built from the memories you shared and delivered to your email by {deliveryDate || "your delivery date"}.
+          </p>
+          <ul className="mt-4 grid gap-3 text-sm text-foreground sm:grid-cols-3">
+            {["Personal lyrics", "Studio vocal", "1 free rewrite"].map((item) => (
+              <li key={item} className="flex items-center gap-2 rounded-2xl bg-primary/5 px-3 py-2">
+                <CheckCircle2 className="h-4 w-4 shrink-0 text-success" />
+                <span className="font-medium">{item}</span>
+              </li>
+            ))}
+          </ul>
         </section>
 
         {/* Samples — lazy-loaded below the fold */}
