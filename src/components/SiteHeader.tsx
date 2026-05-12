@@ -42,24 +42,17 @@ export function SiteHeader() {
             <Link to="/" hash="stories" className="transition-colors hover:text-[#B5532A]">Stories</Link>
             <Link to="/" hash="faq" className="transition-colors hover:text-[#B5532A]">FAQ</Link>
           </nav>
-          <div className="flex items-center gap-3 text-[14.5px] sm:gap-5">
+          <div className="flex items-center gap-5 text-[14.5px]">
             {!loading &&
               (user ? (
-                <Link to="/account" className="hidden text-[#5A5148] transition-colors hover:text-[#1F1A17] sm:inline">
+                <Link to="/account" className="text-[#5A5148] transition-colors hover:text-[#B5532A]">
                   My account
                 </Link>
               ) : (
-                <Link to="/login" search={{ redirect: undefined }} className="hidden text-[#5A5148] transition-colors hover:text-[#1F1A17] sm:inline">
+                <Link to="/login" search={{ redirect: undefined }} className="text-[#5A5148] transition-colors hover:text-[#B5532A]">
                   Sign in
                 </Link>
               ))}
-            <Link
-              to="/create"
-              className="inline-flex shrink-0 items-center gap-2 rounded-full bg-[#1F1A17] px-4 py-[10px] text-[13px] font-semibold text-[#F8F1E4] shadow-[0_8px_20px_rgba(31,26,23,0.3)] ring-1 ring-[#B5532A]/40 transition-all hover:-translate-y-px hover:bg-[#2A211C] hover:ring-[#B5532A]/70 hover:shadow-[0_12px_26px_rgba(31,26,23,0.4)] sm:gap-2.5 sm:px-[26px] sm:py-[14px] sm:text-[15px]"
-            >
-              <span className="hidden sm:inline">Start Their Custom Song 🐾</span>
-              <span className="sm:hidden">Start Their Song →</span>
-            </Link>
           </div>
         </div>
       </header>
