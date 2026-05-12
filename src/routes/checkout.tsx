@@ -204,9 +204,7 @@ function CheckoutPage() {
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [hydrated, q.reward_code]);
 
-  // Ensure an order row exists so the embedded checkout can request a session.
-  // The actual Stripe Checkout Session is created by <StripeEmbeddedCheckout>
-  // via fetchClientSecret(), so we only need an orderId here.
+  // Ensure an order row exists so the payment form can request a PaymentIntent.
   const startedRef = useRef(false);
   useEffect(() => {
     if (!hydrated) return;
@@ -233,7 +231,7 @@ function CheckoutPage() {
       })
       .finally(() => setCreatingOrder(false));
     // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [hydrated, q.recipient_name, q.reward_code, orderId]);
+  }, [hydrated, q.dog_name, q.reward_code, orderId]);
 
   // Persist buyer email/name and the latest quiz payload to the order as they type (debounced).
   useEffect(() => {
