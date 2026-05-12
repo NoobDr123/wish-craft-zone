@@ -38,38 +38,40 @@ function ScratchPage() {
 
   // Stage-aware copy
   const copy = useMemo(() => {
+    const dog = firstName || "they";
     if (journey === "memory") {
       return {
-        eyebrow: `A keepsake for ${firstName}'s memory`,
-        scratchHeadline: `A small gift, in honor of ${firstName} 🐾`,
-        scratchSub: `Scratch the gold below — we've set aside something gentle to help you create ${firstName}'s song.`,
-        claimHeadline: `${firstName}'s tribute song — half off 💛`,
-        claimSub: `Use this within 10 minutes to lock in 50% off ${firstName}'s memorial song.`,
-        ctaLabel: `Claim 50% off ${firstName}'s song`,
-        emoji: "🕊️",
+        eyebrow: "You made it this far",
+        scratchHeadline: `${firstName || "They"} would be proud of you.`,
+        scratchSub: `You told us who ${dog} really ${firstName ? "was" : "were"}. That takes guts. So we put something aside for you. Scratch to find out what.`,
+        cardLabel: `A gift toward ${firstName || "their"} song`,
+        claimHeadline: `${firstName || "Their"} tribute song — half off 💛`,
+        claimSub: `Use this within 10 minutes to lock in 50% off ${firstName ? `${firstName}'s` : "their"} memorial song.`,
+        ctaLabel: `Claim 50% off ${firstName ? `${firstName}'s` : "their"} song`,
       };
     }
     if (journey === "hospice") {
       return {
-        eyebrow: `Every moment with ${firstName} matters`,
-        scratchHeadline: `A little something to help you reach ${firstName} sooner 🐾`,
-        scratchSub: `Scratch the gold — we've reserved a discount so ${firstName} can hear their song without delay.`,
-        claimHeadline: `${firstName}'s song — half off, priority queue 💛`,
+        eyebrow: "You made it this far",
+        scratchHeadline: `${firstName || "They"} would be proud of you.`,
+        scratchSub: `You told us who ${dog} really is. That takes guts. So we put something aside for you. Scratch to find out what.`,
+        cardLabel: `A gift toward ${firstName || "their"} song`,
+        claimHeadline: `${firstName || "Their"} song — half off, priority queue 💛`,
         claimSub: `This 50% offer holds your priority slot for the next 10 minutes.`,
-        ctaLabel: `Claim 50% & prioritize ${firstName}`,
-        emoji: "🤍",
+        ctaLabel: `Claim 50% & prioritize ${firstName || "them"}`,
       };
     }
     return {
-      eyebrow: `A treat for ${firstName}${relationship ? `, your ${relationship.toLowerCase()}` : ""} 🐾`,
-      scratchHeadline: `${firstName} just unlocked a tail-wagging deal! 🐶`,
-      scratchSub: `Scratch the gold below to reveal an exclusive 50% off ${firstName}'s personalized song 👇`,
-      claimHeadline: `${firstName}'s song is 50% off! 🎉🐾`,
+      eyebrow: "You made it this far",
+      scratchHeadline: `${firstName || "They"} would be proud of you.`,
+      scratchSub: `You told us who ${dog} really ${firstName ? "is" : "are"}. That takes guts. So we put something aside for you. Scratch to find out what.`,
+      cardLabel: `A gift toward ${firstName || "their"} song`,
+      claimHeadline: `${firstName ? `${firstName}'s` : "Their"} song is 50% off 🎉`,
       claimSub: `Lock it in within 10 minutes — this offer only lives on this page.`,
-      ctaLabel: `Claim ${firstName}'s 50% off`,
-      emoji: "🐶",
+      ctaLabel: `Claim ${firstName ? `${firstName}'s` : "your"} 50% off`,
     };
-  }, [journey, firstName, relationship]);
+  }, [journey, firstName]);
+
 
   useEffect(() => {
     const unsubscribe = useQuizStore.persist.onFinishHydration(() => setHydrated(true));
@@ -304,7 +306,7 @@ function ScratchPage() {
               <Sparkles className="h-3.5 w-3.5" />
               {copy.eyebrow}
             </span>
-            <div className="mt-5 text-5xl">{copy.emoji}</div>
+            <div className="mt-5 text-5xl">🐾</div>
             <h1 className="mt-4 text-balance font-display text-3xl font-bold leading-tight text-foreground md:text-4xl">
               {copy.scratchHeadline}
             </h1>
@@ -375,7 +377,7 @@ function ScratchPage() {
 
           <p className="mt-6 text-center text-sm text-muted-foreground">
             <Flame className="mr-1 inline h-4 w-4 text-primary" />
-            838 people claimed this discount today
+            838 families unlocked their gift today. You're next.
           </p>
         </main>
       ) : (
