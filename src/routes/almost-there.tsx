@@ -104,11 +104,12 @@ function AlmostTherePage() {
               <blockquote className="mt-3 text-[15px] leading-relaxed text-foreground">
                 &ldquo;{t.quote}&rdquo;
               </blockquote>
-              <figcaption className="mt-3 flex items-center gap-2 text-sm text-muted-foreground">
+              <figcaption className="mt-3 flex flex-wrap items-center gap-x-2 gap-y-1 text-sm text-muted-foreground">
                 <span className="font-medium text-foreground">{t.name}</span>
                 <span className="inline-flex items-center gap-1 text-success">
                   <ShieldCheck className="h-3.5 w-3.5" /> Verified
                 </span>
+                <span className="basis-full text-xs text-muted-foreground">{t.dog}</span>
               </figcaption>
             </figure>
           ))}
