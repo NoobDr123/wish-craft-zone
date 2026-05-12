@@ -213,7 +213,7 @@ function CheckoutPage() {
     if (q.reward_code) return; // free path handles it
     if (startedRef.current) return;
     if (orderId) return;
-    if (!q.recipient_name && !q.orderId) return;
+    if (!q.dog_name && !q.orderId) return;
     startedRef.current = true;
 
     setCreatingOrder(true);
