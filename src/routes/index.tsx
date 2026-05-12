@@ -963,10 +963,15 @@ function LandingPage() {
                 )}
               </div>
               {/* Mobile-only play button below video for better thumb reach */}
+              <div className="mt-4 flex items-center gap-3 sm:hidden">
+                <span aria-hidden="true" className="h-px flex-1 bg-gradient-to-r from-transparent via-[#B5532A]/50 to-[#B5532A]/70" />
+                <span aria-hidden="true" className="text-[10px] font-semibold uppercase tracking-[0.2em] text-[#B5532A]">Tap to play</span>
+                <span aria-hidden="true" className="h-px flex-1 bg-gradient-to-l from-transparent via-[#B5532A]/50 to-[#B5532A]/70" />
+              </div>
               <button
                 aria-label={heroPlaying ? "Pause song" : "Listen to Example"}
                 onClick={handleHeroPlay}
-                className="mt-3 flex w-full items-center justify-center gap-2.5 rounded-full bg-[rgba(246,240,230,0.97)] py-3.5 shadow-[0_8px_24px_rgba(0,0,0,0.18)] ring-1 ring-black/5 transition-all active:translate-y-px sm:hidden"
+                className="mt-2.5 flex w-full items-center justify-center gap-2.5 rounded-full bg-[rgba(246,240,230,0.97)] py-3.5 shadow-[0_10px_28px_rgba(181,83,42,0.22)] ring-2 ring-[#B5532A]/35 transition-all active:translate-y-px sm:hidden"
               >
                 {!heroPlaying && (
                   <span aria-hidden="true" className="animate-nudge-right text-[#B5532A] text-[14px] font-semibold">›››</span>
