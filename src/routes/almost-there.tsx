@@ -22,19 +22,22 @@ const AVATARS = [
 
 const TESTIMONIALS = [
   {
-    name: "Sarah M.",
+    name: "Sarah K.",
+    dog: "For Daisy, Golden Retriever, 11",
     quote:
-      "I cried the moment it started playing. My mom said it was the most meaningful gift she'd ever received during her treatment.",
+      "I almost closed the tab. So glad I didn't. Five days later I had a real song with her name in the chorus — I play it every morning on the drive she used to ride with me. Worth every cent.",
   },
   {
-    name: "David R.",
+    name: "Marcus T.",
+    dog: "For Cooper, Black Lab, 13",
     quote:
-      "We played it at my wife's last chemo session. The whole infusion room was in tears. It captured her spirit perfectly.",
+      "I expected a cheesy AI track. What I got was a real song, recorded with real instruments, that made my whole family cry on the anniversary. Best money I've spent on anything for him.",
   },
   {
-    name: "Emily K.",
+    name: "Elena R.",
+    dog: "For Juno, Rescue Collie, 9",
     quote:
-      "My dad listens to his song every morning before radiation. It gives him strength. Worth every penny.",
+      "The discount made me finally pull the trigger. Within a week Juno had her own song. My kids ask to play it at bedtime. It's the closest thing to having her back in the room.",
   },
 ];
 
