@@ -9,7 +9,6 @@
 // Additionally, you should also exclude this file from your linter and/or formatter to prevent it from being checked or modified.
 
 import { Route as rootRouteImport } from './routes/__root'
-import { Route as Upsell3RouteImport } from './routes/upsell-3'
 import { Route as Upsell2RouteImport } from './routes/upsell-2'
 import { Route as Upsell1RouteImport } from './routes/upsell-1'
 import { Route as TermsRouteImport } from './routes/terms'
@@ -41,11 +40,6 @@ import { Route as LovableEmailAuthPreviewRouteImport } from './routes/lovable/em
 import { Route as ApiPublicSongsStatusRouteImport } from './routes/api/public/songs/status'
 import { Route as ApiPublicSongsGenerateRouteImport } from './routes/api/public/songs/generate'
 
-const Upsell3Route = Upsell3RouteImport.update({
-  id: '/upsell-3',
-  path: '/upsell-3',
-  getParentRoute: () => rootRouteImport,
-} as any)
 const Upsell2Route = Upsell2RouteImport.update({
   id: '/upsell-2',
   path: '/upsell-2',
@@ -216,7 +210,6 @@ export interface FileRoutesByFullPath {
   '/terms': typeof TermsRoute
   '/upsell-1': typeof Upsell1Route
   '/upsell-2': typeof Upsell2Route
-  '/upsell-3': typeof Upsell3Route
   '/admin/login': typeof AdminLoginRoute
   '/auth/callback': typeof AuthCallbackRoute
   '/checkout/return': typeof CheckoutReturnRoute
@@ -249,7 +242,6 @@ export interface FileRoutesByTo {
   '/terms': typeof TermsRoute
   '/upsell-1': typeof Upsell1Route
   '/upsell-2': typeof Upsell2Route
-  '/upsell-3': typeof Upsell3Route
   '/admin/login': typeof AdminLoginRoute
   '/auth/callback': typeof AuthCallbackRoute
   '/checkout/return': typeof CheckoutReturnRoute
@@ -283,7 +275,6 @@ export interface FileRoutesById {
   '/terms': typeof TermsRoute
   '/upsell-1': typeof Upsell1Route
   '/upsell-2': typeof Upsell2Route
-  '/upsell-3': typeof Upsell3Route
   '/admin/login': typeof AdminLoginRoute
   '/auth/callback': typeof AuthCallbackRoute
   '/checkout/return': typeof CheckoutReturnRoute
@@ -318,7 +309,6 @@ export interface FileRouteTypes {
     | '/terms'
     | '/upsell-1'
     | '/upsell-2'
-    | '/upsell-3'
     | '/admin/login'
     | '/auth/callback'
     | '/checkout/return'
@@ -351,7 +341,6 @@ export interface FileRouteTypes {
     | '/terms'
     | '/upsell-1'
     | '/upsell-2'
-    | '/upsell-3'
     | '/admin/login'
     | '/auth/callback'
     | '/checkout/return'
@@ -384,7 +373,6 @@ export interface FileRouteTypes {
     | '/terms'
     | '/upsell-1'
     | '/upsell-2'
-    | '/upsell-3'
     | '/admin/login'
     | '/auth/callback'
     | '/checkout/return'
@@ -418,7 +406,6 @@ export interface RootRouteChildren {
   TermsRoute: typeof TermsRoute
   Upsell1Route: typeof Upsell1Route
   Upsell2Route: typeof Upsell2Route
-  Upsell3Route: typeof Upsell3Route
   AuthCallbackRoute: typeof AuthCallbackRoute
   EmailUnsubscribeRoute: typeof EmailUnsubscribeRoute
   ListenIdRoute: typeof ListenIdRoute
@@ -436,13 +423,6 @@ export interface RootRouteChildren {
 
 declare module '@tanstack/react-router' {
   interface FileRoutesByPath {
-    '/upsell-3': {
-      id: '/upsell-3'
-      path: '/upsell-3'
-      fullPath: '/upsell-3'
-      preLoaderRoute: typeof Upsell3RouteImport
-      parentRoute: typeof rootRouteImport
-    }
     '/upsell-2': {
       id: '/upsell-2'
       path: '/upsell-2'
@@ -694,7 +674,6 @@ const rootRouteChildren: RootRouteChildren = {
   TermsRoute: TermsRoute,
   Upsell1Route: Upsell1Route,
   Upsell2Route: Upsell2Route,
-  Upsell3Route: Upsell3Route,
   AuthCallbackRoute: AuthCallbackRoute,
   EmailUnsubscribeRoute: EmailUnsubscribeRoute,
   ListenIdRoute: ListenIdRoute,
@@ -712,3 +691,12 @@ const rootRouteChildren: RootRouteChildren = {
 export const routeTree = rootRouteImport
   ._addFileChildren(rootRouteChildren)
   ._addFileTypes<FileRouteTypes>()
+
+import type { getRouter } from './router.tsx'
+import type { createStart } from '@tanstack/react-start'
+declare module '@tanstack/react-start' {
+  interface Register {
+    ssr: true
+    router: Awaited<ReturnType<typeof getRouter>>
+  }
+}

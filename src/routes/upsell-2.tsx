@@ -1,7 +1,6 @@
 import { createFileRoute, useNavigate } from "@tanstack/react-router";
 import { useEffect, useState } from "react";
 import { UpsellShell } from "@/components/UpsellShell";
-import { Delivery48Downsell } from "@/components/Delivery48Downsell";
 import { useQuizStore } from "@/stores/quizStore";
 import { supabase } from "@/integrations/supabase/client";
 import { stripeEnvironment } from "@/lib/stripe";
@@ -15,132 +14,90 @@ function Upsell2() {
   const navigate = useNavigate();
   const q = useQuizStore();
   const [processing, setProcessing] = useState(false);
-  const [showDownsell, setShowDownsell] = useState(false);
-  const [downsellProcessing, setDownsellProcessing] = useState(false);
 
   useEffect(() => {
     void track({
       type: "upsell_view",
-      upsellType: "rush_delivery",
+      upsellType: "unlimited_edits",
       orderId: q.orderId,
       buyerEmail: q.buyer_email || undefined,
     });
   }, [q.orderId, q.buyer_email]);
 
+  const finishAndAdvance = async () => {
+    // Tell the backend upsell decisions are done — flips status to
+    // upsells_complete which fires the trigger that enqueues brief generation.
+    if (q.orderId) {
+      try {
+        await supabase.functions.invoke("mark-upsells-complete", {
+          body: { orderId: q.orderId, sessionId: q.checkoutSessionId },
+        });
+      } catch (err) {
+        console.warn("mark-upsells-complete failed (non-fatal):", err);
+      }
+    }
+    navigate({ to: "/processing" });
+  };
+
   const accept = async () => {
     void track({
       type: "upsell_accept",
-      upsellType: "rush_delivery",
+      upsellType: "unlimited_edits",
       orderId: q.orderId,
       buyerEmail: q.buyer_email || undefined,
-      amountCents: 2999,
+      amountCents: 3299,
     });
     if (!q.orderId) {
-      navigate({ to: "/upsell-3" });
+      await finishAndAdvance();
       return;
     }
     setProcessing(true);
     const { data } = await supabase.functions.invoke("charge-upsell", {
       body: {
         orderId: q.orderId,
-        upsellType: "rush_delivery",
+        upsellType: "unlimited_edits",
         environment: stripeEnvironment,
         sessionId: q.checkoutSessionId,
       },
     });
-    if (data?.success) q.set("is_rush", true);
-    navigate({ to: "/upsell-3" });
+    if (data?.success) q.set("has_unlimited_edits", true);
+    await finishAndAdvance();
   };
 
-  // Decline 24h rush → open the slim 48-hour downsell.
-  const decline = () => {
+  const decline = async () => {
     void track({
       type: "upsell_decline",
-      upsellType: "rush_delivery",
+      upsellType: "unlimited_edits",
       orderId: q.orderId,
       buyerEmail: q.buyer_email || undefined,
     });
-    void track({
-      type: "upsell_view",
-      upsellType: "delivery_48h",
-      orderId: q.orderId,
-      buyerEmail: q.buyer_email || undefined,
-    });
-    setShowDownsell(true);
-  };
-
-  const accept48 = async () => {
-    void track({
-      type: "upsell_accept",
-      upsellType: "delivery_48h",
-      orderId: q.orderId,
-      buyerEmail: q.buyer_email || undefined,
-      amountCents: 1499,
-    });
-    if (!q.orderId) {
-      setShowDownsell(false);
-      navigate({ to: "/upsell-3" });
-      return;
-    }
-    setDownsellProcessing(true);
-    const { data } = await supabase.functions.invoke("charge-upsell", {
-      body: {
-        orderId: q.orderId,
-        upsellType: "delivery_48h",
-        environment: stripeEnvironment,
-        sessionId: q.checkoutSessionId,
-      },
-    });
-    if (data?.success) q.set("is_rush", true);
-    setDownsellProcessing(false);
-    setShowDownsell(false);
-    navigate({ to: "/upsell-3" });
-  };
-
-  const decline48 = () => {
-    void track({
-      type: "upsell_decline",
-      upsellType: "delivery_48h",
-      orderId: q.orderId,
-      buyerEmail: q.buyer_email || undefined,
-    });
-    setShowDownsell(false);
-    navigate({ to: "/upsell-3" });
+    await finishAndAdvance();
   };
 
   return (
-    <>
-      <UpsellShell
-        step={2}
-        badge="Get their song faster"
-        headline="Hear your dog's song in 24 hours"
-        description={
-          <>
-            Standard takes up to 5 days. Skip the line and get the finished song
-            in your inbox in the next{" "}
-            <span className="font-semibold text-foreground">24 hours</span> —
-            ideal if there's a birthday, a vet visit, or you just can't wait
-            another night.
-          </>
-        }
-        highlights={[
-          "Front of the queue — we start producing within the hour",
-          "Hand-checked by a real human before it lands",
-          "Emailed the moment it's ready, day or night",
-        ]}
-        priceLabel="$29.99"
-        declineLabel="No thanks, I can wait 5 days"
-        onAccept={accept}
-        onDecline={decline}
-        processing={processing}
-      />
-
-      <Delivery48Downsell
-        open={showDownsell}
-        processing={downsellProcessing}
-        onAccept={accept48}
-        onDecline={decline48}
-      />
-    </>
+    <UpsellShell
+      step={2}
+      badge="Get it exactly right"
+      headline="Tweak your dog's song until it's perfect"
+      description={
+        <>
+          Once you hear the first version, want to swap a lyric, try a softer
+          voice, or change the genre? Unlock{" "}
+          <span className="font-semibold text-foreground">unlimited edits</span>{" "}
+          for 14 full days. No extra fees, no caps, just keep refining until it
+          sounds like them.
+        </>
+      }
+      highlights={[
+        "Reword any lyric until it captures your dog perfectly",
+        "Try a different genre, voice, or tempo as many times as you like",
+        "14 days from delivery, no rush, no catches",
+      ]}
+      priceLabel="$32.99"
+      declineLabel="No thanks, I trust the first version"
+      onAccept={accept}
+      onDecline={decline}
+      processing={processing}
+    />
   );
 }
