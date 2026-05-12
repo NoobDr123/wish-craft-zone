@@ -509,7 +509,7 @@ function CheckoutPage() {
               ourselves above, so we wait for them to be valid before mounting
               the form (Stripe needs them for billing details + receipts). */}
           <div className="mt-6 border-t border-peach/70">
-            {orderId && ready ? (
+            {orderId ? (
               <StripeCustomCheckout
                 orderId={orderId}
                 amountVersion={amountVersion}
@@ -522,11 +522,6 @@ function CheckoutPage() {
               />
             ) : (
               <div className="space-y-4 p-4 md:p-6">
-                {!ready && orderId && (
-                  <p className="text-center text-sm text-muted-foreground">
-                    Enter your email and name above to load payment options.
-                  </p>
-                )}
                 {creatingOrder && (
                   <p className="text-center text-sm text-muted-foreground">
                     Preparing your secure checkout…
