@@ -315,6 +315,9 @@ function PaymentForm({ amount, currency, email, name, returnUrl, paymentIntentId
   // US is the primary market — always default to US regardless of browser locale.
   const [country, setCountry] = useState<string>("US");
   const [postalCode, setPostalCode] = useState<string>("");
+  // Track whether any wallet (Apple Pay / Google Pay / Link) actually rendered
+  // — so we can hide the "Or pay with card" divider when nothing is shown above.
+  const [hasWallet, setHasWallet] = useState(false);
 
   // Countries where Stripe / card networks expect a postal code with the billing address.
   const postalRequired = useMemo(
