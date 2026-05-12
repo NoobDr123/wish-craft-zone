@@ -830,32 +830,32 @@ function LandingPage() {
                 <br />
                 Lost Daisy, her 11-year-old Golden Retriever, in February
               </div>
-              <ul className="mx-auto mb-7 flex w-full max-w-[620px] flex-col gap-3.5 text-left text-[15.5px] leading-[1.6] text-[#5A5148] md:mb-8 md:gap-4 md:text-[16.5px]">
+              <div className="mx-auto mb-8 grid w-full max-w-[980px] grid-cols-1 gap-8 text-left md:mb-10 md:grid-cols-3 md:gap-10 lg:gap-12">
                 {[
-                  <>
-                    <strong className="font-semibold text-[#1F1A17]">A real song about your dog.</strong>{" "}
-                    Written from your stories. Recorded in studio with real instruments. Their name in every chorus. Not AI, not a template.
-                  </>,
-                  <>
-                    <strong className="font-semibold text-[#1F1A17]">Delivered in 5 days. Yours forever.</strong>{" "}
-                    Play it in the car. Play it on the anniversary. Play it on the days the house feels too empty without them.
-                  </>,
-                  <>
-                    <strong className="font-semibold text-[#1F1A17]">Keep them with you forever.</strong>{" "}
-                    A song that holds their name, their story, every weird thing only they did. Press play and they're back in the room with you.
-                  </>,
-                ].map((node, i) => (
-                  <li key={i} className="flex items-start gap-3">
-                    <span
-                      aria-hidden
-                      className="mt-[3px] flex h-5 w-5 shrink-0 items-center justify-center rounded-full bg-[#C25E33] text-[11px] font-bold text-[#FFF7EE] shadow-[0_1px_2px_rgba(31,27,22,0.15)]"
-                    >
-                      ✓
-                    </span>
-                    <span className="text-balance">{node}</span>
-                  </li>
+                  {
+                    title: <>A real song about your dog.</>,
+                    body: "Written from your stories. Recorded in studio with real instruments. Their name in every chorus. Not AI, not a template.",
+                  },
+                  {
+                    title: <>Delivered in 5 days. <em className="font-display italic">Yours forever.</em></>,
+                    body: "Play it in the car. Play it on the anniversary. Play it on the days the house feels too empty without them.",
+                  },
+                  {
+                    title: <>Keep them with you forever.</>,
+                    body: "A song that holds their name, their story, every weird thing only they did. Press play and they're back in the room with you.",
+                  },
+                ].map((item, i) => (
+                  <div key={i} className="flex flex-col items-start text-left">
+                    <span aria-hidden className="mb-4 block h-[2px] w-8 bg-[#C25E33] md:mb-5" />
+                    <h3 className="mb-2.5 font-display text-[19px] font-semibold leading-[1.25] tracking-[-0.01em] text-[#1F1A17] md:text-[20px]">
+                      {item.title}
+                    </h3>
+                    <p className="text-[14.5px] leading-[1.6] text-[#5A5148] md:text-[15px]">
+                      {item.body}
+                    </p>
+                  </div>
                 ))}
-              </ul>
+              </div>
               <div className="mb-6 flex w-full flex-col items-stretch gap-3">
                 <PrimaryBtn large fullWidth>Start Their Custom Song 🐾</PrimaryBtn>
               </div>
