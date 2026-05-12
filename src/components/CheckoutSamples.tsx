@@ -2,6 +2,9 @@ import { useEffect, useRef, useState } from "react";
 import { Music2, PawPrint } from "lucide-react";
 import { supabase } from "@/integrations/supabase/client";
 import { AudioPlayer } from "@/components/AudioPlayer";
+import sampleYellowLab from "@/assets/sample-yellow-lab.jpg";
+import sampleGoldendoodle from "@/assets/sample-goldendoodle.jpg";
+import sampleGermanShepherd from "@/assets/sample-german-shepherd.jpg";
 
 interface SampleSong {
   id: string;
@@ -12,6 +15,7 @@ interface SampleSong {
   dog_name: string | null;
   gone_text?: string | null;
   memory_text?: string | null;
+  photo_url?: string | null;
 }
 
 const FALLBACK_AUDIO =
@@ -27,6 +31,7 @@ const FALLBACK_SAMPLES: SampleSong[] = [
     dog_name: "Max",
     gone_text: "Gone 3 months ago",
     memory_text: "still her favorite blanket on the couch",
+    photo_url: sampleYellowLab,
   },
   {
     id: "fb-2",
@@ -37,6 +42,7 @@ const FALLBACK_SAMPLES: SampleSong[] = [
     dog_name: "Bella",
     gone_text: "Gone 2 years ago",
     memory_text: "the window seat is still hers",
+    photo_url: sampleGoldendoodle,
   },
   {
     id: "fb-3",
@@ -47,6 +53,7 @@ const FALLBACK_SAMPLES: SampleSong[] = [
     dog_name: "Ruby",
     gone_text: "Gone 8 months ago",
     memory_text: "15 years of being everything",
+    photo_url: sampleGermanShepherd,
   },
 ];
 
