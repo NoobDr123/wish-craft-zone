@@ -312,12 +312,29 @@ function PaymentForm({ amount, currency, email, name, returnUrl, paymentIntentId
   const elements = useElements();
   const [submitting, setSubmitting] = useState(false);
   const [error, setError] = useState<string | null>(null);
-  // US is the primary market — always default to US regardless of browser locale.
+  // Country is auto-detected from buyer IP (Cloudflare trace). Defaults to US.
   const [country, setCountry] = useState<string>("US");
   const [postalCode, setPostalCode] = useState<string>("");
   // Track whether any wallet (Apple Pay / Google Pay / Link) actually rendered
-  // — so we can hide the "Or pay with card" divider when nothing is shown above.
+  // so we can hide the "Or pay with card" divider when nothing is shown above.
   const [hasWallet, setHasWallet] = useState(false);
+
+  useEffect(() => {
+    let cancelled = false;
+    (async () => {
+      try {
+        const res = await fetch("https://www.cloudflare.com/cdn-cgi/trace", { cache: "no-store" });
+        const text = await res.text();
+        const match = text.match(/^loc=([A-Z]{2})/m);
+        if (!cancelled && match && match[1]) setCountry(match[1]);
+      } catch {
+        // ignore, keep US default
+      }
+    })();
+    return () => {
+      cancelled = true;
+    };
+  }, []);
 
   // Countries where Stripe / card networks expect a postal code with the billing address.
   const postalRequired = useMemo(
@@ -544,39 +561,7 @@ function PaymentForm({ amount, currency, email, name, returnUrl, paymentIntentId
         </div>
       </div>
 
-      {/* Country */}
-      <div className="space-y-2">
-        <label className="block text-[15px] font-semibold text-foreground">Country</label>
-        <div className="relative">
-          <select
-            value={country}
-            onChange={(e) => setCountry(e.target.value)}
-            className="w-full appearance-none rounded-2xl border border-[#E5D9C8] bg-[#FBF6EC] px-4 py-[14px] pr-10 text-[16px] text-foreground transition-colors focus:border-primary focus:outline-none focus:ring-[3px] focus:ring-primary/15"
-          >
-            {COUNTRIES.map((c) => (
-              <option key={c.code} value={c.code}>
-                {c.label}
-              </option>
-            ))}
-          </select>
-          <svg
-            aria-hidden="true"
-            className="pointer-events-none absolute right-4 top-1/2 h-4 w-4 -translate-y-1/2 text-foreground/60"
-            viewBox="0 0 20 20"
-            fill="none"
-          >
-            <path
-              d="M5 7.5l5 5 5-5"
-              stroke="currentColor"
-              strokeWidth="1.75"
-              strokeLinecap="round"
-              strokeLinejoin="round"
-            />
-          </svg>
-        </div>
-      </div>
-
-      {/* Postal / ZIP code */}
+      {/* Postal / ZIP code (country auto-detected from IP) */}
       {postalRequired && (
         <div className="space-y-2">
           <label className="block text-[15px] font-semibold text-foreground">{postalLabel}</label>
