@@ -1,7 +1,7 @@
 import { Gift, ShieldCheck, X, Clock } from "lucide-react";
 import { useEffect } from "react";
 
-interface Delivery48DownsellProps {
+interface Rush24DownsellProps {
   open: boolean;
   processing?: boolean;
   onAccept: () => void;
@@ -9,17 +9,16 @@ interface Delivery48DownsellProps {
 }
 
 /**
- * Slim "last chance" downsell shown when a user declines the 24-hour rush
- * upsell. Offers a cheaper middle option: 48-hour delivery for $19.99 — faster
- * than the 5-day standard, half the price of the 24-hour rush.
+ * Slim "last chance" downsell shown when a user declines the 90-minute
+ * priority delivery upsell. Offers the 24-hour rush at $29.99 — slower than
+ * priority but still much faster than the 5-day standard turnaround.
  */
-export function Delivery48Downsell({
+export function Rush24Downsell({
   open,
   processing,
   onAccept,
   onDecline,
-}: Delivery48DownsellProps) {
-  // Lock body scroll while open
+}: Rush24DownsellProps) {
   useEffect(() => {
     if (!open) return;
     const prev = document.body.style.overflow;
@@ -35,18 +34,15 @@ export function Delivery48Downsell({
     <div
       role="dialog"
       aria-modal="true"
-      aria-labelledby="delivery-48-title"
+      aria-labelledby="rush-24-title"
       className="fixed inset-0 z-[60] flex items-end justify-center px-3 pb-3 sm:items-center sm:px-4 sm:pb-0"
     >
-      {/* Backdrop */}
       <div
         className="absolute inset-0 bg-foreground/40 backdrop-blur-sm"
         onClick={processing ? undefined : onDecline}
       />
 
-      {/* Slim popup — bottom sheet on mobile, centered on desktop */}
       <div className="relative w-full max-w-md overflow-hidden rounded-2xl border border-border bg-card shadow-lg">
-        {/* Close */}
         <button
           onClick={onDecline}
           disabled={processing}
@@ -56,50 +52,49 @@ export function Delivery48Downsell({
           <X className="h-4 w-4" />
         </button>
 
-        {/* Slim header band */}
         <div className="flex items-center gap-2 border-b border-primary/20 bg-primary/10 px-4 py-2.5 sm:px-5">
           <Clock className="h-3.5 w-3.5 text-primary" />
           <p className="text-[10px] font-bold uppercase tracking-[0.16em] text-primary sm:text-[11px]">
-            Wait — softer middle option
+            Wait, softer middle option
           </p>
         </div>
 
         <div className="px-5 pb-5 pt-4 sm:px-6 sm:pb-6 sm:pt-5">
           <h2
-            id="delivery-48-title"
+            id="rush-24-title"
             className="font-display text-xl font-semibold leading-tight text-foreground sm:text-2xl"
           >
-            Hear your dog's song in 48 hours for{" "}
-            <span className="text-primary">$19.99</span>
+            Get the song in 24 hours for{" "}
+            <span className="text-primary">$29.99</span>
           </h2>
 
           <p className="mt-2.5 text-sm leading-relaxed text-muted-foreground">
-            Not in a rush, but five days feels like forever? Get the song in{" "}
-            <span className="font-semibold text-foreground">2 days</span> at
-            two-thirds off the 24-hour price.
+            Not in a 90-minute hurry, but five days feels like forever? Skip
+            the line and get the finished song in your inbox in the next{" "}
+            <span className="font-semibold text-foreground">24 hours</span>.
           </p>
 
           <ul className="mt-3.5 space-y-2 text-sm text-foreground">
             <li className="flex items-start gap-2.5">
               <span className="mt-1.5 h-1.5 w-1.5 shrink-0 rounded-full bg-success" />
-              <span>In your inbox within 48 hours, not 5 days</span>
+              <span>Front of the queue, we start producing within the hour</span>
             </li>
             <li className="flex items-start gap-2.5">
               <span className="mt-1.5 h-1.5 w-1.5 shrink-0 rounded-full bg-success" />
-              <span>Same human quality check before it lands</span>
+              <span>Hand-checked by a real human before it lands</span>
             </li>
             <li className="flex items-start gap-2.5">
               <span className="mt-1.5 h-1.5 w-1.5 shrink-0 rounded-full bg-success" />
-              <span>One-time price, no subscriptions, no surprises</span>
+              <span>Emailed the moment it's ready, day or night</span>
             </li>
           </ul>
 
           <div className="mt-4 flex items-baseline justify-between border-t border-border/60 pt-3.5">
             <span className="text-xs font-medium uppercase tracking-wider text-muted-foreground">
-              48-hour delivery
+              24-hour delivery
             </span>
             <span className="font-display text-2xl font-semibold text-foreground">
-              $19.99
+              $29.99
             </span>
           </div>
 
@@ -116,7 +111,7 @@ export function Delivery48Downsell({
             ) : (
               <>
                 <Gift className="h-4 w-4" />
-                Yes, deliver in 48 hours
+                Yes, deliver in 24 hours
               </>
             )}
           </button>
