@@ -66,9 +66,21 @@ function AlmostTherePage() {
       </header>
 
       <main className="mx-auto max-w-2xl px-6 py-10">
+        <div className="mb-4 flex w-full justify-center">
+          <span className="inline-flex items-center gap-2 rounded-full border border-primary/30 bg-primary/10 px-3 py-1 text-[11px] font-semibold uppercase tracking-[0.18em] text-primary">
+            <span className="relative flex h-2 w-2">
+              <span className="absolute inline-flex h-full w-full animate-ping rounded-full bg-primary opacity-75" />
+              <span className="relative inline-flex h-2 w-2 rounded-full bg-primary" />
+            </span>
+            Your discount is reserved
+          </span>
+        </div>
         <h1 className="text-balance text-center font-display text-4xl font-semibold leading-tight text-foreground md:text-5xl">
-          You're moments away from {q.dog_name || "your dog"}'s song.
+          {q.dog_name || "Your dog"}'s song is one step away.
         </h1>
+        <p className="mx-auto mt-4 max-w-[520px] text-balance text-center text-[15.5px] leading-relaxed text-muted-foreground md:text-base">
+          1,200+ families have already made a song for the dog they miss. Yours is next — and your discount is locked in for the next few minutes.
+        </p>
 
         {/* Avatar row */}
         <div className="mt-8 flex items-center justify-center -space-x-3">
@@ -86,7 +98,7 @@ function AlmostTherePage() {
           </div>
         </div>
         <p className="mt-4 text-center text-sm font-medium text-foreground">
-          1,000+ families have shared their PawPrint Song
+          1,200+ dog families · 4.9★ average rating
         </p>
 
         {/* Testimonials */}
