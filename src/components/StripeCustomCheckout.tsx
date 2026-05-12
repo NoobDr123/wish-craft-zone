@@ -460,9 +460,19 @@ function PaymentForm({ amount, currency, email, name, returnUrl, paymentIntentId
 
   return (
     <form onSubmit={handleCardSubmit} className="space-y-5">
-      {/* Wallets — Apple Pay / Google Pay / Link only. */}
-      <div>
+      {/* Wallets — Apple Pay / Google Pay / Link only. Hidden entirely when
+          the device offers none (e.g. desktop Chrome with no Google Pay card). */}
+      <div className={hasWallet ? "" : "hidden"}>
         <ExpressCheckoutElement
+          onReady={({ availablePaymentMethods }) => {
+            const any = Boolean(
+              availablePaymentMethods &&
+                (availablePaymentMethods.applePay ||
+                  availablePaymentMethods.googlePay ||
+                  availablePaymentMethods.link),
+            );
+            setHasWallet(any);
+          }}
           onConfirm={() => void handleExpressConfirm()}
           options={{
             buttonHeight: 52,
@@ -481,13 +491,15 @@ function PaymentForm({ amount, currency, email, name, returnUrl, paymentIntentId
         />
       </div>
 
-      <div className="flex items-center gap-3">
-        <div className="h-px flex-1 bg-foreground/15" />
-        <span className="text-[11px] font-semibold uppercase tracking-[0.18em] text-foreground/60">
-          Or pay with card
-        </span>
-        <div className="h-px flex-1 bg-foreground/15" />
-      </div>
+      {hasWallet && (
+        <div className="flex items-center gap-3">
+          <div className="h-px flex-1 bg-foreground/15" />
+          <span className="text-[11px] font-semibold uppercase tracking-[0.18em] text-foreground/60">
+            Or pay with card
+          </span>
+          <div className="h-px flex-1 bg-foreground/15" />
+        </div>
+      )}
 
       {/* Card number */}
       <div className="space-y-2">
