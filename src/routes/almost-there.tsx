@@ -174,7 +174,7 @@ function AlmostTherePage() {
         </div>
 
         <p className="mt-6 text-center text-xs text-muted-foreground">
-          Secure checkout · One-time payment · No subscription
+          Secure checkout · One time payment · No subscription
         </p>
       </main>
     </div>
