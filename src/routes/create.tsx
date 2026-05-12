@@ -532,8 +532,8 @@ function CreatePage() {
         </div>
       )}
       <QuizShell
-        current={safeIndex + 1}
-        total={total}
+        current={Math.min(safeIndex + 1, total - 1)}
+        total={total - 1}
         chapter={step.chapter}
         title={step.title}
         subtitle={step.subtitle}
