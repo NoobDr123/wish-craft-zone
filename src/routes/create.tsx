@@ -338,32 +338,6 @@ function CreatePage() {
       ),
     },
 
-    // 5. Letter
-    {
-      key: "letter",
-      chapter: "What you'd say",
-      title: `If you could say one thing to ${dogName} now…`,
-      subtitle:
-        "Write it like you're talking to her. Doesn't need to rhyme. Doesn't need to be neat. We'll do the rest.",
-      isValid: (s) => (s.letter_to_dog ?? "").trim().length >= 1,
-      answer: (s) => ({ length: (s.letter_to_dog ?? "").length }),
-      render: () => (
-        <Question label={`Your letter to ${dogName}`}>
-          <TextArea
-            placeholder={letterPlaceholder(q.dog_name)}
-            value={q.letter_to_dog}
-            onChange={(e) => q.set("letter_to_dog", e.target.value)}
-            rows={8}
-            autoFocus
-          />
-          <TipChips
-            label="Things that make these letters unforgettable"
-            chips={LETTER_CHIPS}
-          />
-        </Question>
-      ),
-    },
-
     // 6. Sound — genre + voice
     {
       key: "sound",
