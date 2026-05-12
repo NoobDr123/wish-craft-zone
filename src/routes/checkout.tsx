@@ -570,22 +570,6 @@ function CheckoutPage() {
           </div>
         </section>
 
-        <section className="mt-5 rounded-3xl border border-peach/70 bg-card p-5 shadow-soft sm:p-6">
-          <h3 className="flex items-center gap-2 font-display text-xl font-bold text-foreground">
-            <Music2 className="h-5 w-5 text-primary" /> Your doggy song
-          </h3>
-          <p className="mt-3 text-[15px] leading-relaxed text-muted-foreground">
-            A custom song made for <span className="font-semibold text-foreground">{recipient}</span>, built from the memories you shared and delivered to your email by {deliveryDate || "your delivery date"}.
-          </p>
-          <ul className="mt-4 grid gap-3 text-sm text-foreground sm:grid-cols-3">
-            {["Personal lyrics", "Studio vocal", "1 free rewrite"].map((item) => (
-              <li key={item} className="flex items-center gap-2 rounded-2xl bg-primary/5 px-3 py-2">
-                <CheckCircle2 className="h-4 w-4 shrink-0 text-success" />
-                <span className="font-medium">{item}</span>
-              </li>
-            ))}
-          </ul>
-        </section>
 
         {/* Samples — lazy-loaded below the fold */}
         <Suspense fallback={null}>
