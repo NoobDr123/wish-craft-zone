@@ -27,7 +27,7 @@ export function SiteHeader() {
           to="/create"
           className="ml-2 border-b border-current text-[#E8B58A]"
         >
-          Make Her Song 🐾
+          Start Their Custom Song 🐾
         </Link>
       </div>
 
@@ -55,7 +55,7 @@ export function SiteHeader() {
               ))}
             <Link
               to="/create"
-              className="inline-flex shrink-0 items-center gap-2 rounded-full bg-[#B5532A] px-4 py-[10px] text-[13px] font-semibold text-[#FFF7EE] shadow-[0_6px_16px_rgba(181,83,42,0.28)] transition-all hover:-translate-y-px hover:bg-[#7A4A2E] hover:shadow-[0_10px_24px_rgba(181,83,42,0.35)] sm:gap-2.5 sm:px-[26px] sm:py-[14px] sm:text-[15px]"
+              className="inline-flex shrink-0 items-center gap-2 rounded-full bg-[#1F1A17] px-4 py-[10px] text-[13px] font-semibold text-[#F8F1E4] shadow-[0_8px_20px_rgba(31,26,23,0.3)] ring-1 ring-[#B5532A]/40 transition-all hover:-translate-y-px hover:bg-[#2A211C] hover:ring-[#B5532A]/70 hover:shadow-[0_12px_26px_rgba(31,26,23,0.4)] sm:gap-2.5 sm:px-[26px] sm:py-[14px] sm:text-[15px]"
             >
               <span className="hidden sm:inline">Start Their Custom Song 🐾</span>
               <span className="sm:hidden">Start Their Song →</span>
