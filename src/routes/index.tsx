@@ -585,8 +585,8 @@ const faqs = [
     a: "No. The song is yours forever. No ads, no paywall, no renewal.",
   },
   {
-    q: "Who's behind PawprintSong?",
-    a: "PawprintSong was started by people who lost their own dogs and couldn't find anything that took it as seriously as they needed it to. Pet sympathy cards, paw-print necklaces, generic memorial videos. none of it felt like the dog. We built this so the love had somewhere to go that wasn't a drawer.",
+    q: "Who's behind PawPrint Song?",
+    a: "PawPrint Song was founded in 2024 by Marcus Reed and Elena Whitford after losing their own dogs — Cooper, a 13-year-old Lab, and Juno, a rescue collie they had for nine years. They went looking for something that honored those dogs the way they deserved and found pet sympathy cards, paw-print necklaces, and generic memorial slideshows. None of it felt like the dog. So they built this: a small studio of songwriters and producers who turn your memories into a real, original song with your dog's name in it — written by people, recorded properly, yours to keep forever. We're now a team of seven based in Austin, TX, and we've made songs for more than 1,200 families. Every song still gets read by a human before it goes out.",
   },
 ];
 
@@ -621,44 +621,39 @@ function PrimaryBtn({
 
 function TrustBadges({ tone = "light" }: { tone?: "light" | "dark" }) {
   const isDark = tone === "dark";
-  const guaranteeBg = isDark
-    ? "bg-[#F8F1E4] border-[#F8F1E4]"
-    : "bg-gradient-to-b from-[#B5532A] to-[#9C4520] border-[#B5532A]";
-  const guaranteeIconBg = isDark ? "bg-[#7A4A2E] text-[#F8F1E4]" : "bg-[#F8F1E4] text-[#B5532A]";
-  const guaranteeText = isDark ? "text-[#7A4A2E]" : "text-[#F8F1E4]";
-  const sideCardBg = isDark
+  const cardBg = isDark
     ? "bg-[#F8F1E4]/10 border-[#F8F1E4]/25 backdrop-blur-sm"
     : "bg-[#FDF7E9] border-[#E8DDC9]";
-  const sideIconRing = isDark
+  const iconRing = isDark
     ? "bg-[#F8F1E4]/15 text-[#F8F1E4] ring-1 ring-[#F8F1E4]/30"
     : "bg-[#F8F1E4] text-[#B5532A] ring-1 ring-[#E8DDC9]";
-  const sideText = isDark ? "text-[#F8F1E4]" : "text-[#1F1A17]";
+  const labelText = isDark ? "text-[#F8F1E4]" : "text-[#1F1A17]";
   return (
     <div className="mx-auto mt-5 grid max-w-[480px] grid-cols-3 gap-2">
       {/* 30-day money back */}
-      <div className={`flex items-center gap-1.5 rounded-[10px] border px-2 py-1.5 shadow-[0_3px_10px_-4px_rgba(181,83,42,0.3)] ${guaranteeBg}`}>
-        <span className={`relative flex h-6 w-6 shrink-0 items-center justify-center rounded-full shadow-[inset_0_1px_2px_rgba(0,0,0,0.12)] ${guaranteeIconBg}`}>
+      <div className={`flex items-center justify-center gap-1.5 rounded-[10px] border px-2 py-1.5 ${cardBg}`}>
+        <span className={`flex h-6 w-6 shrink-0 items-center justify-center rounded-full ${iconRing}`}>
           <span className="font-display text-[10px] font-bold leading-none tracking-[-0.02em]">30</span>
         </span>
-        <span className={`text-left text-[8.5px] font-bold uppercase leading-[1.15] tracking-[0.04em] sm:text-[9px] ${guaranteeText}`}>
+        <span className={`text-left text-[8.5px] font-bold uppercase leading-[1.15] tracking-[0.04em] sm:text-[9px] ${labelText}`}>
           Day money-back<br />guarantee
         </span>
       </div>
       {/* Free rewrites */}
-      <div className={`flex items-center gap-1.5 rounded-[10px] border px-2 py-1.5 ${sideCardBg}`}>
-        <span className={`flex h-6 w-6 shrink-0 items-center justify-center rounded-full ${sideIconRing}`}>
+      <div className={`flex items-center justify-center gap-1.5 rounded-[10px] border px-2 py-1.5 ${cardBg}`}>
+        <span className={`flex h-6 w-6 shrink-0 items-center justify-center rounded-full ${iconRing}`}>
           <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.2" strokeLinecap="round" strokeLinejoin="round" className="h-3 w-3">
             <path d="M21 12a9 9 0 1 1-3.51-7.13" />
             <polyline points="21 4 21 10 15 10" />
           </svg>
         </span>
-        <span className={`text-left text-[8.5px] font-bold uppercase leading-[1.15] tracking-[0.04em] sm:text-[9px] ${sideText}`}>
+        <span className={`text-left text-[8.5px] font-bold uppercase leading-[1.15] tracking-[0.04em] sm:text-[9px] ${labelText}`}>
           Free<br />rewrite
         </span>
       </div>
       {/* 5-day delivery */}
-      <div className={`flex items-center gap-1.5 rounded-[10px] border px-2 py-1.5 ${sideCardBg}`}>
-        <span className={`flex h-6 w-6 shrink-0 items-center justify-center rounded-full ${sideIconRing}`}>
+      <div className={`flex items-center justify-center gap-1.5 rounded-[10px] border px-2 py-1.5 ${cardBg}`}>
+        <span className={`flex h-6 w-6 shrink-0 items-center justify-center rounded-full ${iconRing}`}>
           <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.2" strokeLinecap="round" strokeLinejoin="round" className="h-3 w-3">
             <rect x="3" y="5" width="18" height="16" rx="2" />
             <line x1="3" y1="10" x2="21" y2="10" />
@@ -666,7 +661,7 @@ function TrustBadges({ tone = "light" }: { tone?: "light" | "dark" }) {
             <line x1="16" y1="3" x2="16" y2="7" />
           </svg>
         </span>
-        <span className={`text-left text-[8.5px] font-bold uppercase leading-[1.15] tracking-[0.04em] sm:text-[9px] ${sideText}`}>
+        <span className={`text-left text-[8.5px] font-bold uppercase leading-[1.15] tracking-[0.04em] sm:text-[9px] ${labelText}`}>
           Delivered in<br />5 days
         </span>
       </div>
@@ -835,30 +830,31 @@ function LandingPage() {
                 <br />
                 Lost Daisy, her 11-year-old Golden Retriever, in February
               </div>
-              <p className="mb-7 max-w-[540px] text-[16px] leading-[1.55] text-[#5A5148] md:mb-8 md:text-[17px]">
-                When the house goes quiet, give yourself a song that brings her back into the room.{" "}
+              <p className="mb-7 max-w-[560px] text-[16.5px] leading-[1.6] text-[#5A5148] md:mb-8 md:text-[18px]">
+                Tell us about them. We write the song.{" "}
                 <strong className="font-semibold text-[#1F1A17]">
-                  Written from your memories. Her name in every chorus. Yours to keep forever.
-                </strong>
+                  Five days later you've got a real recording
+                </strong>{" "}
+                you can play on the anniversary, on quiet mornings, or any time you want them near.
               </p>
-              <div className="mb-5 flex w-full flex-col items-stretch gap-3">
+              <div className="mb-6 flex w-full flex-col items-stretch gap-3">
                 <PrimaryBtn large fullWidth>Start Their Custom Song 🐾</PrimaryBtn>
               </div>
 
-              {/* Trust badges row. refined icons, balanced weights */}
-              <div className="mb-5 grid grid-cols-3 gap-2">
-                {/* 30-day money back. accented */}
-                <div className="flex items-center gap-1.5 rounded-[10px] border border-[#B5532A] bg-gradient-to-b from-[#B5532A] to-[#9C4520] px-2 py-1.5 shadow-[0_3px_10px_-4px_rgba(181,83,42,0.4)]">
-                  <span className="relative flex h-6 w-6 shrink-0 items-center justify-center rounded-full bg-[#F8F1E4] text-[#B5532A] shadow-[inset_0_1px_2px_rgba(0,0,0,0.08)]">
+              {/* Trust badges row — equal weight, no accent on any one */}
+              <div className="mb-4 grid grid-cols-3 gap-2">
+                {/* 30-day money back */}
+                <div className="flex items-center justify-center gap-1.5 rounded-[10px] border border-[#E8DDC9] bg-[#FDF7E9] px-2 py-1.5">
+                  <span className="flex h-6 w-6 shrink-0 items-center justify-center rounded-full bg-[#F8F1E4] text-[#B5532A] ring-1 ring-[#E8DDC9]">
                     <span className="font-display text-[10px] font-bold leading-none tracking-[-0.02em]">30</span>
                   </span>
-                  <span className="text-left text-[8.5px] font-bold uppercase leading-[1.15] tracking-[0.04em] text-[#F8F1E4] sm:text-[9px]">
+                  <span className="text-left text-[8.5px] font-bold uppercase leading-[1.15] tracking-[0.04em] text-[#1F1A17] sm:text-[9px]">
                     Day money-back<br />guarantee
                   </span>
                 </div>
 
                 {/* Free rewrites */}
-                <div className="flex items-center gap-1.5 rounded-[10px] border border-[#E8DDC9] bg-[#FDF7E9] px-2 py-1.5">
+                <div className="flex items-center justify-center gap-1.5 rounded-[10px] border border-[#E8DDC9] bg-[#FDF7E9] px-2 py-1.5">
                   <span className="flex h-6 w-6 shrink-0 items-center justify-center rounded-full bg-[#F8F1E4] text-[#B5532A] ring-1 ring-[#E8DDC9]">
                     <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.2" strokeLinecap="round" strokeLinejoin="round" className="h-3 w-3">
                       <path d="M21 12a9 9 0 1 1-3.51-7.13" />
@@ -871,7 +867,7 @@ function LandingPage() {
                 </div>
 
                 {/* 5-day delivery */}
-                <div className="flex items-center gap-1.5 rounded-[10px] border border-[#E8DDC9] bg-[#FDF7E9] px-2 py-1.5">
+                <div className="flex items-center justify-center gap-1.5 rounded-[10px] border border-[#E8DDC9] bg-[#FDF7E9] px-2 py-1.5">
                   <span className="flex h-6 w-6 shrink-0 items-center justify-center rounded-full bg-[#F8F1E4] text-[#B5532A] ring-1 ring-[#E8DDC9]">
                     <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.2" strokeLinecap="round" strokeLinejoin="round" className="h-3 w-3">
                       <rect x="3" y="5" width="18" height="16" rx="2" />
@@ -886,7 +882,7 @@ function LandingPage() {
                 </div>
               </div>
 
-              <div className="w-full text-[13px] leading-[1.4] text-[#5A5148] md:text-[13.5px]">
+              <div className="w-full text-center text-[13px] leading-[1.4] text-[#5A5148] md:text-[13.5px]">
                 Made for{" "}
                 <strong className="text-[#1F1A17]">1,200+ dogs</strong>{" "}
                 who are gone but still loved
