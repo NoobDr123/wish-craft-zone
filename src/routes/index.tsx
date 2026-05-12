@@ -890,8 +890,8 @@ function LandingPage() {
             </div>
 
             {/* Hero photo + song */}
-            <div className="relative order-1 md:order-2">
-              <div className="group relative aspect-[4/5] overflow-hidden rounded-[18px] bg-[#ECE2D0] shadow-[0_20px_60px_rgba(31,27,22,0.12)]">
+            <div className="relative order-1 w-full max-w-[860px]">
+              <div className="group relative aspect-video overflow-hidden rounded-[18px] bg-[#ECE2D0] shadow-[0_20px_60px_rgba(31,27,22,0.12)]">
                 <video
                   key={heroPlaying ? "hero-video-playing" : "hero-video-idle"}
                   src="/testimonials-sequential.mp4"
