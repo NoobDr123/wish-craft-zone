@@ -175,14 +175,6 @@ export function ReviewSurveyModal({ open, onClose }: ReviewSurveyModalProps) {
                 placeholder="The day you met. A walk that became a story…"
               />
             </div>
-            <div className="mt-5">
-              <label className="text-sm font-medium text-foreground">Your letter to her</label>
-              <Textarea
-                value={q.letter_to_dog ?? ""}
-                onChange={(v) => q.set("letter_to_dog", v)}
-                placeholder="If you could say one thing to her now…"
-              />
-            </div>
           </section>
         </div>
 
