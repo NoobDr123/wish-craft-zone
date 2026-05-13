@@ -583,6 +583,8 @@ function songDeliveredPersonal(d: Record<string, any>) {
 
   return { subject, html, text };
 }
+
+function escape(s: string) {
   return String(s)
     .replace(/&/g, "&amp;")
     .replace(/</g, "&lt;")
