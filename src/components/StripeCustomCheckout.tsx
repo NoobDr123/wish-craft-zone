@@ -574,3 +574,54 @@ function PaymentForm({ amount, currency, email, name, country, onCountryChange, 
     </form>
   );
 }
+
+/**
+ * Compact country picker that lives inline with the postal label.
+ * Collapsed by default — shows just the current flag + country code as a
+ * subtle "change" trigger. Expands into a native <select> on click so we
+ * don't ship yet another popover for one field.
+ */
+function CountryPicker({
+  country,
+  onCountryChange,
+}: {
+  country: SupportedCountry;
+  onCountryChange: (next: SupportedCountry) => void;
+}) {
+  const [open, setOpen] = useState(false);
+  const current = SUPPORTED_COUNTRIES.find((c) => c.code === country);
+
+  if (!open) {
+    return (
+      <button
+        type="button"
+        onClick={() => setOpen(true)}
+        className="flex items-center gap-1 text-[12.5px] font-medium text-muted-foreground transition-colors hover:text-primary"
+        aria-label="Change billing country"
+      >
+        <span>{current?.flag ?? "🌐"}</span>
+        <span>{current?.code ?? country}</span>
+        <span className="underline decoration-dotted underline-offset-2">change</span>
+      </button>
+    );
+  }
+
+  return (
+    <select
+      autoFocus
+      value={country}
+      onChange={(e) => {
+        onCountryChange(e.target.value as SupportedCountry);
+        setOpen(false);
+      }}
+      onBlur={() => setOpen(false)}
+      className="rounded-lg border border-[#E5D9C8] bg-[#FBF6EC] px-2 py-1 text-[12.5px] font-medium text-foreground focus:border-primary focus:outline-none focus:ring-2 focus:ring-primary/20"
+    >
+      {SUPPORTED_COUNTRIES.map((c) => (
+        <option key={c.code} value={c.code}>
+          {c.flag} {c.label}
+        </option>
+      ))}
+    </select>
+  );
+}
