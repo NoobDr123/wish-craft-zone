@@ -1309,6 +1309,8 @@ function CrmPanel() {
                         customer={c}
                         emails={emailLogs[c.email] ?? []}
                         events={quizEvents[c.email] ?? []}
+                        onOpenOrder={(id) => setDrawerOrderId(id)}
+                        onActed={() => load()}
                       />
                     </td>
                   </tr>
@@ -1325,6 +1327,10 @@ function CrmPanel() {
           </tbody>
         </table>
       </div>
+
+      {drawerOrderId && (
+        <CustomerDetailDrawer orderId={drawerOrderId} onClose={() => setDrawerOrderId(null)} />
+      )}
     </>
   );
 }
