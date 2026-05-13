@@ -1253,6 +1253,12 @@ function CrmPanel() {
       if (!c.buyerName && (o.buyer_name || o.customer_name)) {
         c.buyerName = o.buyer_name ?? o.customer_name;
       }
+      if (o.scheduled_delivery_at && !o.delivered_at && o.status !== "delivered") {
+        c.pendingDeliveryCount += 1;
+        if (!c.nextScheduledDeliveryAt || o.scheduled_delivery_at < c.nextScheduledDeliveryAt) {
+          c.nextScheduledDeliveryAt = o.scheduled_delivery_at;
+        }
+      }
     }
 
     setCustomers(
