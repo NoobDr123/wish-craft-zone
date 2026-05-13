@@ -28,6 +28,12 @@ serve(async (req) => {
     const rendered = render(template, data ?? {});
     if (!rendered) return json({ error: `Unknown template: ${template}` }, 400);
 
+    // Tracking: rewrite links + inject open pixel. Done before suppression so
+    // we don't waste a messageId; messageId generated below is used here too.
+    const trackingMessageId = crypto.randomUUID();
+    const TRACK_BASE = `${Deno.env.get("SUPABASE_URL")!}/functions/v1/email-track`;
+    rendered.html = injectTracking(rendered.html, trackingMessageId, TRACK_BASE);
+
     // Suppression check
     const { data: suppressed } = await supabase
       .from("suppressed_emails")
@@ -51,7 +57,7 @@ serve(async (req) => {
     const idemKey =
       (typeof idempotencyKey === "string" && idempotencyKey) ||
       `${template}:${to.toLowerCase()}:${data?.order_id ?? data?.orderId ?? ""}`;
-    const messageId = crypto.randomUUID();
+    const messageId = trackingMessageId;
 
     // Get-or-create one unsubscribe token per recipient email.
     const lowerTo = to.toLowerCase();
@@ -597,4 +603,24 @@ function json(body: unknown, status = 200) {
     status,
     headers: { ...corsHeaders, "Content-Type": "application/json" },
   });
+}
+
+// ---- tracking helpers ----
+function injectTracking(html: string, mid: string, trackBase: string): string {
+  if (!html) return html;
+  // Rewrite anchors: href="https://..." -> tracker
+  let out = html.replace(/href\s*=\s*"(https?:\/\/[^"]+)"/gi, (_m, url) => {
+    // Skip if it's already a tracker URL or unsubscribe / mailto
+    if (url.startsWith(trackBase) || /\/unsubscribe/i.test(url)) return `href="${url}"`;
+    const tracked = `${trackBase}?mid=${encodeURIComponent(mid)}&e=click&u=${encodeURIComponent(url)}`;
+    return `href="${tracked}"`;
+  });
+  // Inject 1x1 open pixel before </body>, or append at end
+  const pixel = `<img src="${trackBase}?mid=${encodeURIComponent(mid)}&e=open" width="1" height="1" alt="" style="display:none;border:0;outline:none;text-decoration:none;" />`;
+  if (/<\/body>/i.test(out)) {
+    out = out.replace(/<\/body>/i, `${pixel}</body>`);
+  } else {
+    out = out + pixel;
+  }
+  return out;
 }

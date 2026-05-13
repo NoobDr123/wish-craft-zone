@@ -1689,10 +1689,10 @@ function OrderRow({
         order.buyer_email
           ? supabase
               .from("email_send_log")
-              .select("id, message_id, template_name, status, error_message, created_at")
+              .select("id, message_id, template_name, status, error_message, created_at, opened_at, open_count, clicked_at, click_count")
               .eq("recipient_email", order.buyer_email)
               .order("created_at", { ascending: false })
-              .limit(40)
+              .limit(80)
           : Promise.resolve({ data: [] as any[] }),
       ]);
       if (!active) return;
@@ -1896,10 +1896,20 @@ function OrderRow({
                         <div className="font-medium truncate">{e.template_name}</div>
                         {e.error_message && <div className="text-destructive truncate">{e.error_message}</div>}
                       </div>
-                      <div className="flex items-center gap-2 shrink-0">
+                      <div className="flex items-center gap-1.5 shrink-0">
                         <Badge variant={e.status === "sent" ? "default" : e.status === "failed" || e.status === "bounced" ? "destructive" : "outline"} className="text-[10px]">
                           {e.status}
                         </Badge>
+                        {e.opened_at && (
+                          <Badge variant="outline" className="text-[10px] border-emerald-500/40 text-emerald-700 dark:text-emerald-400" title={`First opened ${new Date(e.opened_at).toLocaleString()}`}>
+                            opened{e.open_count > 1 ? ` ×${e.open_count}` : ""}
+                          </Badge>
+                        )}
+                        {e.clicked_at && (
+                          <Badge variant="outline" className="text-[10px] border-blue-500/40 text-blue-700 dark:text-blue-400" title={`First clicked ${new Date(e.clicked_at).toLocaleString()}`}>
+                            clicked{e.click_count > 1 ? ` ×${e.click_count}` : ""}
+                          </Badge>
+                        )}
                         <span className="text-muted-foreground text-[10px]">{new Date(e.created_at).toLocaleString()}</span>
                       </div>
                     </div>
