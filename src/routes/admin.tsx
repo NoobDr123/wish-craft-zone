@@ -2937,6 +2937,21 @@ function SupportPanel() {
 
   const selected = threads.find((t) => t.id === selectedId);
 
+  // Resolve linked order from order_id_text (UUID) → orders row.
+  useEffect(() => {
+    const ref = selected?.order_id_text;
+    setLinkedOrder(null);
+    if (!ref) return;
+    const isUuid = /^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/i.test(ref);
+    if (!isUuid) return;
+    supabase
+      .from("orders")
+      .select("id, buyer_email, buyer_name, dog_name, status, payment_status, amount_paid_cents, currency, delivered_at, created_at")
+      .eq("id", ref)
+      .maybeSingle()
+      .then(({ data }) => setLinkedOrder(data));
+  }, [selected?.order_id_text]);
+
   const replyFn = useServerFn(replySupportMessage);
 
   const sendReply = async () => {
