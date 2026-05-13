@@ -165,9 +165,9 @@ function supportNotification(d: Record<string, any>) {
   const html = `<!doctype html>
 <html><body style="margin:0;padding:0;background:#ffffff;font-family:'Instrument Sans',Inter,Arial,sans-serif;">
   <table width="100%" cellpadding="0" cellspacing="0"><tr><td align="center" style="padding:32px 16px;">
-    <table width="560" cellpadding="0" cellspacing="0" style="background:#FBF6EC;padding:32px 24px;max-width:560px;">
+    <table width="560" cellpadding="0" cellspacing="0" style="background:#F6F0E6;padding:32px 24px;max-width:560px;">
       <tr><td>
-        <p style="font-size:12px;font-weight:600;letter-spacing:0.16em;text-transform:uppercase;color:#8D6FAF;margin:0 0 16px;">New support message</p>
+        <p style="font-size:12px;font-weight:600;letter-spacing:0.16em;text-transform:uppercase;color:#B5532A;margin:0 0 16px;">New support message</p>
         <h1 style="font-family:'Fraunces',Georgia,serif;font-size:22px;font-weight:600;line-height:1.2;color:#1F1B16;margin:0 0 16px;">${subjectLine}</h1>
         <table width="100%" cellpadding="0" cellspacing="0" style="margin:0 0 18px;">
           <tr><td style="padding:6px 0;font-size:13px;color:#5A5148;">From</td><td style="padding:6px 0;font-size:13px;color:#1F1B16;font-weight:600;text-align:right;">${name} &lt;${senderEmail}&gt;</td></tr>
@@ -175,7 +175,7 @@ function supportNotification(d: Record<string, any>) {
         </table>
         <div style="background:#ffffff;border:1px solid #D9CEB9;border-radius:8px;padding:16px;font-size:14px;line-height:1.6;color:#1F1B16;margin:0 0 22px;">${body}</div>
         <p style="margin:0;text-align:center;">
-          <a href="${inboxUrl}" style="background:#8D6FAF;color:#ffffff;font-size:14px;font-weight:600;border-radius:999px;padding:12px 24px;text-decoration:none;display:inline-block;">Open inbox</a>
+          <a href="${inboxUrl}" style="background:#B5532A;color:#ffffff;font-size:14px;font-weight:600;border-radius:999px;padding:12px 24px;text-decoration:none;display:inline-block;">Open inbox</a>
         </p>
       </td></tr>
     </table>
@@ -192,10 +192,10 @@ function supportAcknowledgment(d: Record<string, any>) {
   const html = `<!doctype html>
 <html><body style="margin:0;padding:0;background:#ffffff;font-family:'Instrument Sans',Inter,Arial,sans-serif;">
   <table width="100%" cellpadding="0" cellspacing="0"><tr><td align="center" style="padding:40px 20px;">
-    <table width="560" cellpadding="0" cellspacing="0" style="background:#FBF6EC;padding:40px 28px;max-width:560px;">
+    <table width="560" cellpadding="0" cellspacing="0" style="background:#F6F0E6;padding:40px 28px;max-width:560px;">
       <tr><td>
         <p style="font-family:'Fraunces',Georgia,serif;font-size:26px;font-weight:700;color:#1F1B16;margin:0 0 4px;">PawPrint Song</p>
-        <p style="font-size:12px;font-weight:500;letter-spacing:0.16em;text-transform:uppercase;color:#8D6FAF;margin:0 0 28px;">Message received</p>
+        <p style="font-size:12px;font-weight:500;letter-spacing:0.16em;text-transform:uppercase;color:#B5532A;margin:0 0 28px;">Message received</p>
         <h1 style="font-family:'Fraunces',Georgia,serif;font-size:28px;font-weight:600;line-height:1.2;color:#1F1B16;margin:0 0 16px;">Thanks ${name} — we got it.</h1>
         <p style="font-size:16px;line-height:1.6;color:#1F1B16;margin:0 0 16px;">A real human on our team will read your message and reply within a few hours (usually faster).</p>
         <p style="font-size:14px;line-height:1.6;color:#5A5148;margin:0 0 16px;">If it's about an existing order, having your order ID handy will help us move quickly.</p>
@@ -218,10 +218,10 @@ function supportReply(d: Record<string, any>) {
   const html = `<!doctype html>
 <html><body style="margin:0;padding:0;background:#ffffff;font-family:'Instrument Sans',Inter,Arial,sans-serif;">
   <table width="100%" cellpadding="0" cellspacing="0"><tr><td align="center" style="padding:40px 20px;">
-    <table width="560" cellpadding="0" cellspacing="0" style="background:#FBF6EC;padding:40px 28px;max-width:560px;">
+    <table width="560" cellpadding="0" cellspacing="0" style="background:#F6F0E6;padding:40px 28px;max-width:560px;">
       <tr><td>
         <p style="font-family:'Fraunces',Georgia,serif;font-size:26px;font-weight:700;color:#1F1B16;margin:0 0 4px;">PawPrint Song</p>
-        <p style="font-size:12px;font-weight:500;letter-spacing:0.16em;text-transform:uppercase;color:#8D6FAF;margin:0 0 28px;">A reply from our team</p>
+        <p style="font-size:12px;font-weight:500;letter-spacing:0.16em;text-transform:uppercase;color:#B5532A;margin:0 0 28px;">A reply from our team</p>
         <h1 style="font-family:'Fraunces',Georgia,serif;font-size:24px;font-weight:600;line-height:1.25;color:#1F1B16;margin:0 0 18px;">Hi ${name},</h1>
         <div style="font-size:16px;line-height:1.65;color:#1F1B16;margin:0 0 22px;">${body}</div>
         <p style="font-size:14px;color:#5A5148;line-height:1.55;margin:0 0 8px;">Just hit reply if you need anything else — your reply lands straight in our inbox.</p>
@@ -253,10 +253,10 @@ function reactionApproved(d: Record<string, any>) {
   const html = `<!doctype html>
 <html><body style="margin:0;padding:0;background:#ffffff;font-family:'Instrument Sans',Inter,Arial,sans-serif;">
   <table width="100%" cellpadding="0" cellspacing="0"><tr><td align="center" style="padding:40px 20px;">
-    <table width="560" cellpadding="0" cellspacing="0" style="background:#FBF6EC;padding:40px 28px;max-width:560px;">
+    <table width="560" cellpadding="0" cellspacing="0" style="background:#F6F0E6;padding:40px 28px;max-width:560px;">
       <tr><td>
         <p style="font-family:'Fraunces',Georgia,serif;font-size:26px;font-weight:700;color:#1F1B16;margin:0 0 4px;">PawPrint Song</p>
-        <p style="font-size:12px;font-weight:500;letter-spacing:0.16em;text-transform:uppercase;color:#8D6FAF;margin:0 0 32px;">Reaction approved</p>
+        <p style="font-size:12px;font-weight:500;letter-spacing:0.16em;text-transform:uppercase;color:#B5532A;margin:0 0 32px;">Reaction approved</p>
         <h1 style="font-family:'Fraunces',Georgia,serif;font-size:30px;font-weight:600;line-height:1.15;color:#1F1B16;margin:0 0 16px;">${heading}</h1>
         <p style="font-size:16px;line-height:1.6;color:#1F1B16;margin:0 0 22px;">
           We watched your reaction to ${recipient}'s song and it made our day.
@@ -266,15 +266,15 @@ function reactionApproved(d: Record<string, any>) {
           ${refundCents > 0 ? `<li>We refunded <strong>$${refundDollars}</strong> back to your card. It usually arrives in 5–10 business days.</li>` : ""}
           <li>You've unlocked <strong>${freeSongs} free songs</strong> on us.</li>
         </ul>
-        <div style="background:#ffffff;border:1px dashed #8D6FAF;border-radius:14px;padding:20px;text-align:center;margin:0 0 24px;">
-          <p style="font-size:12px;font-weight:600;letter-spacing:0.14em;text-transform:uppercase;color:#8D6FAF;margin:0 0 6px;">Your reward code</p>
+        <div style="background:#ffffff;border:1px dashed #B5532A;border-radius:14px;padding:20px;text-align:center;margin:0 0 24px;">
+          <p style="font-size:12px;font-weight:600;letter-spacing:0.14em;text-transform:uppercase;color:#B5532A;margin:0 0 6px;">Your reward code</p>
           <p style="font-family:'SF Mono',Menlo,monospace;font-size:24px;font-weight:700;letter-spacing:0.14em;color:#1F1B16;margin:0;">${code}</p>
         </div>
         <p style="margin:24px 0;text-align:center;">
-          <a href="${createUrl}" style="background:#8D6FAF;color:#ffffff;font-size:15px;font-weight:600;border-radius:999px;padding:14px 28px;text-decoration:none;display:inline-block;">Create a free song now</a>
+          <a href="${createUrl}" style="background:#B5532A;color:#ffffff;font-size:15px;font-weight:600;border-radius:999px;padding:14px 28px;text-decoration:none;display:inline-block;">Create a free song now</a>
         </p>
         <p style="font-size:13px;color:#5A5148;text-align:center;margin:0 0 16px;">
-          Or visit your <a href="${portalUrl}" style="color:#8D6FAF;">song portal</a> to see all your rewards.
+          Or visit your <a href="${portalUrl}" style="color:#B5532A;">song portal</a> to see all your rewards.
         </p>
         <div style="border-top:1px solid #D9CEB9;margin:32px 0 20px;"></div>
         <p style="font-size:12px;line-height:1.6;color:#5A5148;margin:8px 0 0;">Sent from PawPrint Song — turning love into songs.</p>
@@ -297,10 +297,10 @@ function reactionRejected(d: Record<string, any>) {
   const html = `<!doctype html>
 <html><body style="margin:0;padding:0;background:#ffffff;font-family:'Instrument Sans',Inter,Arial,sans-serif;">
   <table width="100%" cellpadding="0" cellspacing="0"><tr><td align="center" style="padding:40px 20px;">
-    <table width="560" cellpadding="0" cellspacing="0" style="background:#FBF6EC;padding:40px 28px;max-width:560px;">
+    <table width="560" cellpadding="0" cellspacing="0" style="background:#F6F0E6;padding:40px 28px;max-width:560px;">
       <tr><td>
         <p style="font-family:'Fraunces',Georgia,serif;font-size:26px;font-weight:700;color:#1F1B16;margin:0 0 4px;">PawPrint Song</p>
-        <p style="font-size:12px;font-weight:500;letter-spacing:0.16em;text-transform:uppercase;color:#8D6FAF;margin:0 0 32px;">Re-found program</p>
+        <p style="font-size:12px;font-weight:500;letter-spacing:0.16em;text-transform:uppercase;color:#B5532A;margin:0 0 32px;">Re-found program</p>
         <h1 style="font-family:'Fraunces',Georgia,serif;font-size:28px;font-weight:600;line-height:1.2;color:#1F1B16;margin:0 0 16px;">A note about your reaction video</h1>
         <p style="font-size:16px;line-height:1.6;color:#1F1B16;margin:0 0 18px;">
           Thank you for sharing the reaction to ${recipient}'s song. Unfortunately we
@@ -314,7 +314,7 @@ function reactionRejected(d: Record<string, any>) {
           Your song stays yours regardless.
         </p>
         <p style="margin:24px 0;text-align:center;">
-          <a href="${portalUrl}" style="background:#8D6FAF;color:#ffffff;font-size:15px;font-weight:600;border-radius:999px;padding:14px 28px;text-decoration:none;display:inline-block;">Upload a new video</a>
+          <a href="${portalUrl}" style="background:#B5532A;color:#ffffff;font-size:15px;font-weight:600;border-radius:999px;padding:14px 28px;text-decoration:none;display:inline-block;">Upload a new video</a>
         </p>
         <div style="border-top:1px solid #D9CEB9;margin:32px 0 20px;"></div>
         <p style="font-size:12px;line-height:1.6;color:#5A5148;margin:8px 0 0;">Sent from PawPrint Song — turning love into songs.</p>
@@ -403,10 +403,10 @@ function orderConfirmation(d: Record<string, any>) {
   const html = `<!doctype html>
 <html><body style="margin:0;padding:0;background:#ffffff;font-family:"Instrument Sans",Inter,Arial,sans-serif;">
   <table width="100%" cellpadding="0" cellspacing="0"><tr><td align="center" style="padding:40px 20px;">
-    <table width="560" cellpadding="0" cellspacing="0" style="background:#FBF6EC;border-radius:0;padding:40px 28px;max-width:560px;">
+    <table width="560" cellpadding="0" cellspacing="0" style="background:#F6F0E6;border-radius:0;padding:40px 28px;max-width:560px;">
       <tr><td>
         <p style="font-family:'Fraunces','Iowan Old Style',Georgia,serif;font-size:26px;font-weight:700;color:#1F1B16;margin:0 0 4px;letter-spacing:-0.01em;">PawPrint Song</p>
-        <p style="font-size:12px;font-weight:500;letter-spacing:0.16em;text-transform:uppercase;color:#8D6FAF;margin:0 0 32px;">Order confirmed</p>
+        <p style="font-size:12px;font-weight:500;letter-spacing:0.16em;text-transform:uppercase;color:#B5532A;margin:0 0 32px;">Order confirmed</p>
         <h1 style="font-family:'Fraunces','Iowan Old Style',Georgia,serif;font-size:30px;font-weight:600;line-height:1.15;color:#1F1B16;margin:0 0 16px;">${escape(heading)}</h1>
         <p style="font-size:16px;line-height:1.6;color:#1F1B16;margin:0 0 22px;">
           We've started crafting <strong>${recipient}</strong>'s personalized PawPrint Song.
@@ -418,12 +418,12 @@ function orderConfirmation(d: Record<string, any>) {
           ${rowsHtml}
           <tr>
             <td style="padding:14px 0 0;font-size:15px;color:#1F1B16;font-weight:700;">Total paid</td>
-            <td style="padding:14px 0 0;font-size:18px;color:#8D6FAF;font-weight:700;text-align:right;">${total}</td>
+            <td style="padding:14px 0 0;font-size:18px;color:#B5532A;font-weight:700;text-align:right;">${total}</td>
           </tr>
         </table>
 
         <p style="margin:24px 0;text-align:center;">
-          <a href="${dashboardUrl}" style="background:#8D6FAF;color:#ffffff;font-size:15px;font-weight:600;border-radius:999px;padding:14px 28px;text-decoration:none;display:inline-block;">View my dashboard</a>
+          <a href="${dashboardUrl}" style="background:#B5532A;color:#ffffff;font-size:15px;font-weight:600;border-radius:999px;padding:14px 28px;text-decoration:none;display:inline-block;">View my dashboard</a>
         </p>
         <p style="font-size:13px;color:#5A5148;line-height:1.55;margin:0 0 8px;text-align:center;">
           Sign in with this email address (${escape(String(d.buyer_email ?? ""))}) to track progress, request edits, and download your song.
@@ -485,7 +485,7 @@ function songDelivered(d: Record<string, any>) {
 
   const promoBlock = promo
     ? `<div style="background:#ECE2D0;border-radius:14px;padding:18px;margin:0 0 22px;text-align:center;">
-        <p style="font-size:12px;font-weight:600;letter-spacing:0.14em;text-transform:uppercase;color:#8D6FAF;margin:0 0 6px;">10% off your next song</p>
+        <p style="font-size:12px;font-weight:600;letter-spacing:0.14em;text-transform:uppercase;color:#B5532A;margin:0 0 6px;">10% off your next song</p>
         <p style="font-family:'SF Mono',Menlo,monospace;font-size:20px;font-weight:700;letter-spacing:0.1em;color:#1F1B16;margin:0;">${promo}</p>
         <p style="font-size:12px;color:#5A5148;margin:6px 0 0;">Valid for 180 days</p>
        </div>`
@@ -496,15 +496,15 @@ function songDelivered(d: Record<string, any>) {
   const html = `<!doctype html>
 <html><body style="margin:0;padding:0;background:#ffffff;font-family:'Instrument Sans',Inter,Arial,sans-serif;">
   <table width="100%" cellpadding="0" cellspacing="0"><tr><td align="center" style="padding:40px 20px;">
-    <table width="560" cellpadding="0" cellspacing="0" style="background:#FBF6EC;border-radius:0;padding:40px 28px;max-width:560px;">
+    <table width="560" cellpadding="0" cellspacing="0" style="background:#F6F0E6;border-radius:0;padding:40px 28px;max-width:560px;">
       <tr><td>
         <p style="font-family:'Fraunces','Iowan Old Style',Georgia,serif;font-size:26px;font-weight:700;color:#1F1B16;margin:0 0 4px;letter-spacing:-0.01em;">PawPrint Song</p>
-        <p style="font-size:12px;font-weight:500;letter-spacing:0.16em;text-transform:uppercase;color:#8D6FAF;margin:0 0 32px;">A song made with love</p>
+        <p style="font-size:12px;font-weight:500;letter-spacing:0.16em;text-transform:uppercase;color:#B5532A;margin:0 0 32px;">A song made with love</p>
         <h1 style="font-family:'Fraunces','Iowan Old Style',Georgia,serif;font-size:30px;font-weight:600;line-height:1.15;color:#1F1B16;margin:0 0 16px;">${escape(heading)}</h1>
         <p style="font-size:16px;line-height:1.6;color:#1F1B16;margin:0 0 22px;">${intro}</p>
-        ${note ? `<blockquote style="margin:0 0 22px;padding:14px 18px;background:#E5D9EF;border-left:3px solid #8D6FAF;font-style:italic;color:#1F1B16;font-size:15px;line-height:1.55;">"${note}"</blockquote>` : ""}
-        <p style="margin:24px 0;"><a href="${listen}" style="background:#8D6FAF;color:#ffffff;font-size:15px;font-weight:600;border-radius:999px;padding:14px 28px;text-decoration:none;display:inline-block;">Listen to the song</a></p>
-        <p style="font-size:14px;color:#5A5148;line-height:1.55;margin:0 0 16px;">Or copy this link: <a style="color:#8D6FAF;" href="${listen}">${listen}</a></p>
+        ${note ? `<blockquote style="margin:0 0 22px;padding:14px 18px;background:#ECE2D0;border-left:3px solid #B5532A;font-style:italic;color:#1F1B16;font-size:15px;line-height:1.55;">"${note}"</blockquote>` : ""}
+        <p style="margin:24px 0;"><a href="${listen}" style="background:#B5532A;color:#ffffff;font-size:15px;font-weight:600;border-radius:999px;padding:14px 28px;text-decoration:none;display:inline-block;">Listen to the song</a></p>
+        <p style="font-size:14px;color:#5A5148;line-height:1.55;margin:0 0 16px;">Or copy this link: <a style="color:#B5532A;" href="${listen}">${listen}</a></p>
         ${portalBlock}
         ${promoBlock}
         <div style="border-top:1px solid #D9CEB9;margin:32px 0 20px;"></div>
