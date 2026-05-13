@@ -1362,7 +1362,7 @@ function CrmPanel() {
         .eq("recipient_email", email)
         .order("created_at", { ascending: false })
         .limit(50);
-      setEmailLogs((m) => ({ ...m, [email]: logs ?? [] }));
+      setEmailLogs((m) => ({ ...m, [email]: dedupeEmailLogs(logs ?? []) }));
     }
     if (!quizEvents[email]) {
       const { data: evts } = await supabase
