@@ -3307,61 +3307,97 @@ function SupportPanel() {
               </div>
 
               <div className="flex-1 overflow-y-auto p-5 space-y-3">
-                {messages.map((m) => (
-                  <div
-                    key={m.id}
-                    className={`max-w-[85%] rounded-2xl px-4 py-3 text-sm whitespace-pre-wrap ${
-                      m.direction === "inbound"
-                        ? "bg-muted/50 text-foreground"
-                        : "ml-auto bg-primary/15 text-foreground"
-                    }`}
-                  >
-                    <div className="mb-1 text-[11px] font-medium uppercase tracking-wider text-muted-foreground">
-                      {m.direction === "inbound" ? selected.sender_name : "You"} ·{" "}
-                      {new Date(m.created_at).toLocaleString()}
+                {messages.map((m: any) => {
+                  if (m.kind === "transactional") {
+                    const failed = m.status && m.status !== "sent";
+                    return (
+                      <div
+                        key={m.id}
+                        className={`ml-auto max-w-[85%] rounded-2xl border px-4 py-2 text-xs ${
+                          failed
+                            ? "border-destructive/40 bg-destructive/5 text-destructive"
+                            : "border-border bg-muted/30 text-muted-foreground"
+                        }`}
+                      >
+                        <div className="font-medium uppercase tracking-wider text-[10px]">
+                          📧 {m.template_name} · {m.status}
+                        </div>
+                        <div className="mt-0.5 text-[11px] opacity-70">
+                          {new Date(m.created_at).toLocaleString()}
+                        </div>
+                        {m.error_message && (
+                          <div className="mt-1 text-[11px]">{m.error_message}</div>
+                        )}
+                      </div>
+                    );
+                  }
+                  return (
+                    <div
+                      key={m.id}
+                      className={`max-w-[85%] rounded-2xl px-4 py-3 text-sm whitespace-pre-wrap ${
+                        m.direction === "inbound"
+                          ? "bg-muted/50 text-foreground"
+                          : "ml-auto bg-primary/15 text-foreground"
+                      }`}
+                    >
+                      <div className="mb-1 text-[11px] font-medium uppercase tracking-wider text-muted-foreground">
+                        {m.direction === "inbound" ? selected.sender_name : "You"} ·{" "}
+                        {new Date(m.created_at).toLocaleString()}
+                      </div>
+                      {m.body}
                     </div>
-                    {m.body}
+                  );
+                })}
+                {messages.length === 0 && (
+                  <div className="text-center text-sm text-muted-foreground py-8">
+                    No messages yet.
                   </div>
-                ))}
+                )}
               </div>
 
-              <div className="border-t border-border p-4 space-y-3">
-                {selected.ai_suggested_reply && !reply && (
-                  <button
-                    type="button"
-                    onClick={() => setReply(selected.ai_suggested_reply)}
-                    className="w-full rounded-lg border border-primary/40 bg-primary/5 px-3 py-2 text-left text-xs hover:bg-primary/10 transition-colors"
-                  >
-                    <div className="font-semibold uppercase tracking-wider text-[10px] text-primary mb-1">
-                      ✨ AI suggested reply — click to use
-                    </div>
-                    <div className="text-foreground/80 line-clamp-3 whitespace-pre-wrap">
-                      {selected.ai_suggested_reply}
-                    </div>
-                  </button>
-                )}
-                <Textarea
-                  rows={4}
-                  placeholder={`Reply to ${selected.sender_name}…`}
-                  value={reply}
-                  onChange={(e) => setReply(e.target.value)}
-                  maxLength={10000}
-                  className="resize-none"
-                />
-                <div className="flex items-center justify-between gap-3">
-                  <label className="flex items-center gap-2 text-xs text-muted-foreground">
-                    <input
-                      type="checkbox"
-                      checked={closeAfter}
-                      onChange={(e) => setCloseAfter(e.target.checked)}
-                    />
-                    Close thread after sending
-                  </label>
-                  <Button onClick={sendReply} disabled={!reply.trim() || sending}>
-                    {sending ? "Sending…" : "Send reply"}
-                  </Button>
+              {selected.__synthetic ? (
+                <div className="border-t border-border p-4 text-xs text-muted-foreground text-center">
+                  No inbound replies from this customer. Transactional emails only.
                 </div>
-              </div>
+              ) : (
+                <div className="border-t border-border p-4 space-y-3">
+                  {selected.ai_suggested_reply && !reply && (
+                    <button
+                      type="button"
+                      onClick={() => setReply(selected.ai_suggested_reply)}
+                      className="w-full rounded-lg border border-primary/40 bg-primary/5 px-3 py-2 text-left text-xs hover:bg-primary/10 transition-colors"
+                    >
+                      <div className="font-semibold uppercase tracking-wider text-[10px] text-primary mb-1">
+                        ✨ AI suggested reply — click to use
+                      </div>
+                      <div className="text-foreground/80 line-clamp-3 whitespace-pre-wrap">
+                        {selected.ai_suggested_reply}
+                      </div>
+                    </button>
+                  )}
+                  <Textarea
+                    rows={4}
+                    placeholder={`Reply to ${selected.sender_name}…`}
+                    value={reply}
+                    onChange={(e) => setReply(e.target.value)}
+                    maxLength={10000}
+                    className="resize-none"
+                  />
+                  <div className="flex items-center justify-between gap-3">
+                    <label className="flex items-center gap-2 text-xs text-muted-foreground">
+                      <input
+                        type="checkbox"
+                        checked={closeAfter}
+                        onChange={(e) => setCloseAfter(e.target.checked)}
+                      />
+                      Close thread after sending
+                    </label>
+                    <Button onClick={sendReply} disabled={!reply.trim() || sending}>
+                      {sending ? "Sending…" : "Send reply"}
+                    </Button>
+                  </div>
+                </div>
+              )}
             </>
           )}
         </div>
