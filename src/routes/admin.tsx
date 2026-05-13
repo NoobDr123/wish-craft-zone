@@ -1479,27 +1479,28 @@ function UpsellsPanel() {
 
   if (!data) return <div className="text-muted-foreground">Loading…</div>;
 
-  // Order matches the live funnel: Upsell 1 → Upsell 2 (+ 48h downsell) → Upsell 3.
-  const types = ["extra_verse", "rush_delivery", "delivery_48h", "unlimited_edits"];
+  // Order matches the live funnel: Upsell 1 (90min priority) + 24h downsell → Upsell 2 (extra verse) → Upsell 3 (unlimited edits).
+  const types = ["express_90min", "rush_delivery", "extra_verse", "unlimited_edits"];
   const labels: Record<string, string> = {
-    extra_verse: "Upsell 1 — Extra verse ($19.99)",
-    rush_delivery: "Upsell 2 — Rush delivery 24h ($29.99)",
-    delivery_48h: "Upsell 2 downsell — Delivery 48h ($19.99)",
+    express_90min: "Upsell 1 — 90-min priority delivery ($59.99)",
+    rush_delivery: "Upsell 1 downsell — 24h rush delivery ($39.99)",
+    extra_verse: "Upsell 2 — Extra verse ($19.99)",
     unlimited_edits: "Upsell 3 — Unlimited edits ($32.99)",
   };
   const prices: Record<string, number> = {
+    express_90min: 5999,
+    rush_delivery: 3999,
     extra_verse: 1999,
-    rush_delivery: 2999,
-    delivery_48h: 1999,
     unlimited_edits: 3299,
   };
   // Maps a tracked upsell to the order column we use to confirm it was actually
-  // charged. delivery_48h has no dedicated column (it sets is_rush=true just
-  // like rush_delivery), so we skip the "confirmed in orders" line for it.
+  // charged. express_90min and rush_delivery both flip is_rush, so we read
+  // product_config to disambiguate the 90min path; rush_delivery falls back
+  // to is_rush on legacy orders.
   const orderField: Record<string, string | null> = {
     extra_verse: "has_3rd_verse",
+    express_90min: null,
     rush_delivery: "is_rush",
-    delivery_48h: null,
     unlimited_edits: "has_unlimited_edits",
   };
 
