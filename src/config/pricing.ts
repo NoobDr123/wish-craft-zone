@@ -4,7 +4,8 @@ export const PRICING = {
   base: 2999, // $29.99
   upsells: {
     extraVerse: 1999, // $19.99
-    rushDelivery: 5900, // $59.00
+    rushDelivery: 3999, // $39.99 — 24h downsell
+    priority90min: 5999, // $59.99 — top-priority upsell
     unlimitedEdits: 3299, // $32.99
   },
   currency: "usd",
