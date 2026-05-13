@@ -299,9 +299,9 @@ function PaymentForm({ amount, currency, email, name, country, onCountryChange, 
   // so we can hide the "Or pay with card" divider when nothing is shown above.
   const [hasWallet, setHasWallet] = useState(false);
 
-  // Postal code is always required for our 5 supported markets.
-  const postalRequired = true;
-
+  // Postal code is required for most countries; some (Hong Kong, Ireland,
+  // UAE, etc.) don't have one — hide the field entirely there.
+  const postalRequired = postalRequiredFor(country);
   const postalLabel = country === "US" ? "ZIP code" : "Postal code";
   const postalPlaceholder = country === "US" ? "90210" : "Postal code";
 
@@ -311,10 +311,10 @@ function PaymentForm({ amount, currency, email, name, country, onCountryChange, 
       email: email?.trim() || undefined,
       address: {
         country,
-        postal_code: postalCode.trim() || undefined,
+        postal_code: postalRequired ? (postalCode.trim() || undefined) : undefined,
       },
     }),
-    [name, email, country, postalCode],
+    [name, email, country, postalCode, postalRequired],
   );
 
   const cardNumberOptions: StripeCardNumberElementOptions = useMemo(
