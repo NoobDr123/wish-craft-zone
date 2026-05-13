@@ -2701,7 +2701,7 @@ function CustomerExplorerPanel() {
   const stats = {
     total: filtered.length,
     paid: filtered.filter((r) => r.payment_status === "paid").length,
-    revenue: filtered.reduce((s, r) => s + (r.amount_paid_cents ?? 0), 0),
+    revenue: filtered.reduce((s, r) => s + toUsdCents(r.amount_paid_cents, r.currency), 0),
   };
 
   return (
