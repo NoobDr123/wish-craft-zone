@@ -1130,6 +1130,7 @@ function CrmPanel() {
   const [expanded, setExpanded] = useState<string | null>(null);
   const [emailLogs, setEmailLogs] = useState<Record<string, any[]>>({});
   const [quizEvents, setQuizEvents] = useState<Record<string, any[]>>({});
+  const [drawerOrderId, setDrawerOrderId] = useState<string | null>(null);
 
   const load = async (signal?: { active: boolean }) => {
     setLoading(true);
