@@ -178,6 +178,8 @@ async function handlePaymentSucceeded(pi: any, env: StripeEnv) {
       isT3st = (promo?.code || "").toUpperCase() === "T3ST";
     }
 
+    const baseUsd = await getSettledUsdCents(createStripeClient(env), pi.id);
+
     await supabase
       .from("orders")
       .update({
@@ -187,6 +189,7 @@ async function handlePaymentSucceeded(pi: any, env: StripeEnv) {
         stripe_env: env,
         payment_status: "paid",
         amount_paid_cents: pi.amount_received ?? pi.amount ?? 0,
+        ...(baseUsd != null ? { amount_paid_usd_cents: baseUsd } : {}),
         // T3ST: skip upsell pages — fires the brief-generation trigger immediately.
         status: isT3st ? "upsells_complete" : "awaiting_upsells",
       })
