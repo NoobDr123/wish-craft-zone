@@ -2989,6 +2989,22 @@ function SupportPanel() {
           <p className="mt-1 text-sm text-muted-foreground">
             Messages from the contact form. Replies email the customer directly.
           </p>
+          <label className="mt-2 inline-flex items-center gap-2 text-xs text-muted-foreground cursor-pointer">
+            <input
+              type="checkbox"
+              checked={autoReplyOn}
+              onChange={async (e) => {
+                const next = e.target.checked;
+                setAutoReplyOn(next);
+                try {
+                  await setAutoReplyFn({ data: { enabled: next } });
+                } catch {
+                  setAutoReplyOn(!next);
+                }
+              }}
+            />
+            🤖 Auto-reply to thank-you / praise messages
+          </label>
         </div>
         <div className="flex gap-2">
           {(["all", "new", "open", "closed", "spam"] as const).map((f) => (
