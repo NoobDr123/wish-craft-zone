@@ -39,17 +39,17 @@ serve(async (req) => {
 
     if (paymentIntentId && typeof paymentIntentId === "string") {
       pi = await stripe.paymentIntents.retrieve(paymentIntentId, {
-        expand: ["latest_charge"],
+        expand: ["latest_charge.balance_transaction"],
       });
     } else if (sessionId && typeof sessionId === "string") {
       const session = await stripe.checkout.sessions.retrieve(sessionId, {
-        expand: ["payment_intent", "payment_intent.latest_charge"],
+        expand: ["payment_intent", "payment_intent.latest_charge.balance_transaction"],
       });
       resolvedSessionId = session.id;
       const piRef = session.payment_intent;
       if (typeof piRef === "string") {
         pi = await stripe.paymentIntents.retrieve(piRef, {
-          expand: ["latest_charge"],
+          expand: ["latest_charge.balance_transaction"],
         });
       } else if (piRef && typeof piRef === "object") {
         pi = piRef;
