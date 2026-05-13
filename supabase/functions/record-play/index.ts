@@ -150,7 +150,7 @@ async function syncPlayCountToStripe(orderId: string, playCount: number) {
   });
 }
 
-async function syncShareEventToStripe(orderId: string, kind: "view" | "share", count: number) {
+async function syncShareEventToStripe(orderId: string, kind: "view" | "share" | "download", count: number) {
   const { data: order } = await supabase
     .from("orders")
     .select("stripe_payment_intent_id, stripe_env")
@@ -164,11 +164,12 @@ async function syncShareEventToStripe(orderId: string, kind: "view" | "share", c
   const stripe = createStripeClient(env);
 
   const now = new Date().toISOString();
-  await stripe.paymentIntents.update(order.stripe_payment_intent_id, {
-    metadata: kind === "view"
-      ? { share_view_count: String(count), last_share_view_at: now }
-      : { share_link_shared_count: String(count), last_share_link_shared_at: now },
-  });
+  const metadata = kind === "view"
+    ? { share_view_count: String(count), last_share_view_at: now }
+    : kind === "share"
+      ? { share_link_shared_count: String(count), last_share_link_shared_at: now }
+      : { download_count: String(count), last_downloaded_at: now };
+  await stripe.paymentIntents.update(order.stripe_payment_intent_id, { metadata });
 }
 
 function json(body: unknown, status = 200) {
