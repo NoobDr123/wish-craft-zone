@@ -1540,7 +1540,309 @@ function CustomerDetail({
 }
 
 /* =====================================================================
-   Upsells panel
+   OrderRow — smooth inline order card with quiz, brief, ETA, timeline,
+   per-order emails, and all admin actions (incl. regenerate-song).
+   ===================================================================== */
+function OrderRow({
+  order,
+  busy,
+  callFn,
+  onOpenDrawer,
+}: {
+  order: any;
+  busy: string | null;
+  callFn: (fn: string, body: any, label: string, orderId: string) => Promise<void>;
+  onOpenDrawer?: (orderId: string) => void;
+}) {
+  const [open, setOpen] = useState(false);
+  const [details, setDetails] = useState<{
+    events: any[];
+    emails: any[];
+  } | null>(null);
+  const [loading, setLoading] = useState(false);
+  const [now, setNow] = useState(() => Date.now());
+
+  // Live ticker for ETA countdown
+  useEffect(() => {
+    if (!open) return;
+    const t = setInterval(() => setNow(Date.now()), 1000);
+    return () => clearInterval(t);
+  }, [open]);
+
+  useEffect(() => {
+    if (!open || details) return;
+    let active = true;
+    (async () => {
+      setLoading(true);
+      const [evRes, emRes] = await Promise.all([
+        supabase
+          .from("job_events")
+          .select("id, event_type, payload, created_at")
+          .eq("order_id", order.id)
+          .order("created_at", { ascending: false })
+          .limit(100),
+        order.buyer_email
+          ? supabase
+              .from("email_send_log")
+              .select("id, template_name, status, error_message, created_at")
+              .eq("recipient_email", order.buyer_email)
+              .order("created_at", { ascending: false })
+              .limit(20)
+          : Promise.resolve({ data: [] as any[] }),
+      ]);
+      if (!active) return;
+      setDetails({
+        events: evRes.data ?? [],
+        emails: (emRes as any).data ?? [],
+      });
+      setLoading(false);
+    })();
+    return () => { active = false; };
+  }, [open, details, order.id, order.buyer_email]);
+
+  const quiz = (order.quiz_payload ?? {}) as Record<string, any>;
+  const brief = order.brief as any;
+  const sched = order.scheduled_delivery_at ? new Date(order.scheduled_delivery_at).getTime() : null;
+  const etaMs = sched ? sched - now : null;
+  const etaLabel = etaMs == null
+    ? "—"
+    : etaMs <= 0
+      ? "due now"
+      : fmtCountdown(etaMs);
+  const ageMs = now - new Date(order.created_at).getTime();
+
+  return (
+    <div className="rounded-lg border border-border bg-background overflow-hidden">
+      {/* Compact header — always visible */}
+      <button
+        onClick={() => setOpen((v) => !v)}
+        className="w-full flex items-center gap-3 px-3 py-2 text-left hover:bg-muted/30"
+      >
+        {open ? <ChevronDown className="h-4 w-4 shrink-0" /> : <ChevronRight className="h-4 w-4 shrink-0" />}
+        <div className="flex-1 min-w-0 grid grid-cols-12 gap-2 items-center text-xs">
+          <div className="col-span-2 font-medium truncate">{order.dog_name}</div>
+          <div className="col-span-2 flex flex-wrap gap-1">
+            <Badge variant="outline" className="text-[10px]">{order.status}</Badge>
+            <Badge
+              variant={order.payment_status === "paid" ? "default" : order.payment_status === "failed" ? "destructive" : "outline"}
+              className="text-[10px]"
+            >
+              {order.payment_status}
+            </Badge>
+          </div>
+          <div className="col-span-1 font-medium">{fmtMoneyCcy(order.amount_paid_cents ?? 0, order.currency)}</div>
+          <div className="col-span-1 flex flex-wrap gap-1">
+            {order.has_3rd_verse && <Badge variant="outline" className="text-[10px]">verse</Badge>}
+            {order.is_rush && <Badge variant="outline" className="text-[10px]">rush</Badge>}
+            {order.has_unlimited_edits && <Badge variant="outline" className="text-[10px]">edits</Badge>}
+            {order.is_gift && <Badge variant="outline" className="text-[10px]">gift</Badge>}
+          </div>
+          <div className="col-span-2 text-muted-foreground whitespace-nowrap">
+            <div>created {fmtAgo(ageMs)} ago</div>
+            <div className="text-[10px]">{new Date(order.created_at).toLocaleString()}</div>
+          </div>
+          <div className="col-span-2 whitespace-nowrap">
+            {order.delivered_at ? (
+              <span className="text-emerald-600">delivered {new Date(order.delivered_at).toLocaleString()}</span>
+            ) : sched ? (
+              <>
+                <div className={etaMs && etaMs <= 0 ? "text-amber-600 font-medium" : "text-amber-600"}>ETA {etaLabel}</div>
+                <div className="text-[10px] text-muted-foreground">{new Date(sched).toLocaleString()}</div>
+              </>
+            ) : (
+              <span className="text-muted-foreground">no schedule</span>
+            )}
+          </div>
+          <div className="col-span-2 text-right text-[10px] text-muted-foreground truncate">
+            {order.kie_task_id ? `kie:${order.kie_task_id.slice(-8)}` : ""}
+            {order.regeneration_used_at ? " · regen used" : ""}
+          </div>
+        </div>
+      </button>
+
+      {open && (
+        <div className="border-t border-border/40 bg-muted/20 p-4 space-y-4">
+          {/* Action bar */}
+          <div className="flex flex-wrap gap-2">
+            <Button size="sm" variant="outline" className="h-7 text-[11px]" disabled={busy === `${order.id}:brief`} onClick={() => callFn("generate-brief", { orderId: order.id }, "brief", order.id)}>
+              Regen brief
+            </Button>
+            <Button size="sm" variant="outline" className="h-7 text-[11px]" disabled={busy === `${order.id}:music`} onClick={() => callFn("submit-to-kie", { orderId: order.id }, "music", order.id)}>
+              Submit music
+            </Button>
+            <Button size="sm" variant="outline" className="h-7 text-[11px]" disabled={busy === `${order.id}:regen`} onClick={() => {
+              const notes = window.prompt("Change notes for song regeneration (min 10 chars):");
+              if (notes && notes.trim().length >= 10) {
+                callFn("regenerate-song", { orderId: order.id, changeNotes: notes.trim() }, "regen", order.id);
+              }
+            }}>
+              Regen song
+            </Button>
+            <Button size="sm" variant="outline" className="h-7 text-[11px]" disabled={busy === `${order.id}:deliver`} onClick={() => callFn("deliver-song", { orderId: order.id }, "deliver", order.id)}>
+              Deliver now
+            </Button>
+            <Button size="sm" variant="default" className="h-7 text-[11px]" disabled={busy === `${order.id}:force`} onClick={() => callFn("deliver-song", { orderId: order.id, force: true }, "force", order.id)}>
+              Force deliver
+            </Button>
+            {onOpenDrawer && (
+              <Button size="sm" variant="ghost" className="h-7 text-[11px] ml-auto" onClick={() => onOpenDrawer(order.id)}>
+                Open full side panel →
+              </Button>
+            )}
+          </div>
+
+          {/* Pipeline strip */}
+          <div className="grid grid-cols-2 md:grid-cols-4 gap-2 text-[11px]">
+            <PipelineCell label="Order created" ts={order.created_at} />
+            <PipelineCell label="Brief ready" ts={brief ? order.updated_at : null} muted={!brief} />
+            <PipelineCell label="KIE submitted" ts={order.kie_submitted_at} />
+            <PipelineCell label="KIE callback" ts={order.kie_callback_received_at} />
+            <PipelineCell label="Confirmation email" ts={order.confirmation_email_sent_at} />
+            <PipelineCell label="Scheduled" ts={order.scheduled_delivery_at} />
+            <PipelineCell label="Delivered" ts={order.delivered_at} />
+            <PipelineCell label="Regen used" ts={order.regeneration_used_at} muted={!order.regeneration_used_at} />
+          </div>
+
+          {/* Two-column: quiz + brief */}
+          <div className="grid md:grid-cols-2 gap-4">
+            <div>
+              <h4 className="text-[11px] uppercase tracking-wider text-muted-foreground mb-1">Initial quiz responses</h4>
+              {Object.keys(quiz).length === 0 ? (
+                <p className="text-xs text-muted-foreground">No quiz payload.</p>
+              ) : (
+                <div className="rounded-md border border-border bg-background divide-y divide-border/60 max-h-72 overflow-y-auto">
+                  {Object.entries(quiz).map(([k, v]) => (
+                    <div key={k} className="px-2 py-1.5 grid grid-cols-3 gap-2 text-[11px]">
+                      <div className="font-mono text-muted-foreground truncate">{k}</div>
+                      <div className="col-span-2 whitespace-pre-wrap break-words">
+                        {v == null ? "—" : typeof v === "object" ? JSON.stringify(v) : String(v)}
+                      </div>
+                    </div>
+                  ))}
+                </div>
+              )}
+              {/* Free-form fields outside quiz_payload */}
+              {(order.dog_personality || order.dog_memory || order.letter_to_dog || order.personal_note) && (
+                <div className="mt-2 space-y-1 text-[11px]">
+                  {order.dog_personality && <div><b className="text-muted-foreground">Personality:</b> {order.dog_personality}</div>}
+                  {order.dog_memory && <div><b className="text-muted-foreground">Memory:</b> {order.dog_memory}</div>}
+                  {order.letter_to_dog && <div><b className="text-muted-foreground">Letter:</b> {order.letter_to_dog}</div>}
+                  {order.personal_note && <div><b className="text-muted-foreground">Note:</b> {order.personal_note}</div>}
+                </div>
+              )}
+            </div>
+
+            <div>
+              <h4 className="text-[11px] uppercase tracking-wider text-muted-foreground mb-1">AI brief</h4>
+              {brief ? (
+                <div className="rounded-md border border-border bg-background p-2 text-[11px] space-y-1 max-h-72 overflow-y-auto">
+                  {brief.title && <div><b>Title:</b> {brief.title}</div>}
+                  {brief.style_prompt && <div><b>Style:</b> {brief.style_prompt}</div>}
+                  {brief.emotional_tone && <div><b>Tone:</b> {brief.emotional_tone}</div>}
+                  {brief.lyrics && (
+                    <pre className="whitespace-pre-wrap font-sans text-[11px] leading-relaxed mt-1">{brief.lyrics}</pre>
+                  )}
+                </div>
+              ) : (
+                <p className="text-xs text-muted-foreground">No brief yet.</p>
+              )}
+            </div>
+          </div>
+
+          {/* Timeline + emails */}
+          <div className="grid md:grid-cols-2 gap-4">
+            <div>
+              <h4 className="text-[11px] uppercase tracking-wider text-muted-foreground mb-1">
+                Timeline {details ? `(${details.events.length})` : ""}
+              </h4>
+              {loading && <p className="text-xs text-muted-foreground">Loading…</p>}
+              {details && details.events.length === 0 && (
+                <p className="text-xs text-muted-foreground">No events yet.</p>
+              )}
+              {details && details.events.length > 0 && (
+                <div className="rounded-md border border-border bg-background divide-y divide-border/60 max-h-72 overflow-y-auto">
+                  {details.events.map((e) => (
+                    <details key={e.id} className="text-[11px]">
+                      <summary className="px-2 py-1 cursor-pointer hover:bg-muted/40 flex items-center justify-between list-none">
+                        <span className="font-medium">{e.event_type}</span>
+                        <span className="text-muted-foreground">{new Date(e.created_at).toLocaleString()}</span>
+                      </summary>
+                      {e.payload && (
+                        <pre className="px-2 pb-2 text-[10px] text-muted-foreground whitespace-pre-wrap break-all">{JSON.stringify(e.payload, null, 2)}</pre>
+                      )}
+                    </details>
+                  ))}
+                </div>
+              )}
+            </div>
+
+            <div>
+              <h4 className="text-[11px] uppercase tracking-wider text-muted-foreground mb-1">
+                Emails {details ? `(${details.emails.length})` : ""}
+              </h4>
+              {details && details.emails.length === 0 && (
+                <p className="text-xs text-muted-foreground">No emails sent.</p>
+              )}
+              {details && details.emails.length > 0 && (
+                <div className="rounded-md border border-border bg-background divide-y divide-border/60 max-h-72 overflow-y-auto">
+                  {details.emails.map((e) => (
+                    <div key={e.id} className="px-2 py-1.5 flex items-center justify-between text-[11px]">
+                      <div className="min-w-0">
+                        <div className="font-medium truncate">{e.template_name}</div>
+                        {e.error_message && <div className="text-destructive truncate">{e.error_message}</div>}
+                      </div>
+                      <div className="flex items-center gap-2 shrink-0">
+                        <Badge variant={e.status === "sent" ? "default" : e.status === "failed" || e.status === "bounced" ? "destructive" : "outline"} className="text-[10px]">
+                          {e.status}
+                        </Badge>
+                        <span className="text-muted-foreground text-[10px]">{new Date(e.created_at).toLocaleString()}</span>
+                      </div>
+                    </div>
+                  ))}
+                </div>
+              )}
+            </div>
+          </div>
+        </div>
+      )}
+    </div>
+  );
+}
+
+function PipelineCell({ label, ts, muted }: { label: string; ts: string | null | undefined; muted?: boolean }) {
+  const done = !!ts && !muted;
+  return (
+    <div className={`rounded-md border px-2 py-1 ${done ? "border-emerald-500/40 bg-emerald-500/5" : "border-border bg-background"}`}>
+      <div className="text-[10px] uppercase tracking-wider text-muted-foreground">{label}</div>
+      <div className={`text-[11px] ${done ? "text-emerald-600 font-medium" : "text-muted-foreground"}`}>
+        {ts ? new Date(ts).toLocaleString() : "—"}
+      </div>
+    </div>
+  );
+}
+
+function fmtCountdown(ms: number): string {
+  const s = Math.floor(ms / 1000);
+  const d = Math.floor(s / 86400);
+  const h = Math.floor((s % 86400) / 3600);
+  const m = Math.floor((s % 3600) / 60);
+  const sec = s % 60;
+  if (d > 0) return `${d}d ${h}h ${m}m`;
+  if (h > 0) return `${h}h ${m}m ${sec}s`;
+  if (m > 0) return `${m}m ${sec}s`;
+  return `${sec}s`;
+}
+
+function fmtAgo(ms: number): string {
+  const s = Math.floor(ms / 1000);
+  if (s < 60) return `${s}s`;
+  const m = Math.floor(s / 60);
+  if (m < 60) return `${m}m`;
+  const h = Math.floor(m / 60);
+  if (h < 48) return `${h}h`;
+  return `${Math.floor(h / 24)}d`;
+}
+
    ===================================================================== */
 
 function UpsellsPanel() {
