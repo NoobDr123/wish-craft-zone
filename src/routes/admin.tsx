@@ -586,7 +586,8 @@ function DashboardPanel() {
       aovCents,
       upsellCounts: {
         extra_verse: paid.filter((o) => o.has_3rd_verse).length,
-        rush_delivery: paid.filter((o) => o.is_rush).length,
+        rush_24h: paid.filter((o) => o.delivery_tier === "rush_24h").length,
+        priority_90min: paid.filter((o) => o.delivery_tier === "priority_90min").length,
         unlimited_edits: paid.filter((o) => o.has_unlimited_edits).length,
       },
       dailySales,
