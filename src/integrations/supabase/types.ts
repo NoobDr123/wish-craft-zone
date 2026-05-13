@@ -1378,6 +1378,9 @@ export type Database = {
         Row: {
           agentmail_inbox_id: string | null
           agentmail_thread_id: string | null
+          ai_classified_at: string | null
+          ai_suggested_reply: string | null
+          ai_summary: string | null
           assigned_to: string | null
           created_at: string
           id: string
@@ -1385,6 +1388,9 @@ export type Database = {
           order_id_text: string | null
           sender_email: string
           sender_name: string
+          spam_classification: string | null
+          spam_reason: string | null
+          spam_score: number | null
           status: string
           subject: string
           updated_at: string
@@ -1392,6 +1398,9 @@ export type Database = {
         Insert: {
           agentmail_inbox_id?: string | null
           agentmail_thread_id?: string | null
+          ai_classified_at?: string | null
+          ai_suggested_reply?: string | null
+          ai_summary?: string | null
           assigned_to?: string | null
           created_at?: string
           id?: string
@@ -1399,6 +1408,9 @@ export type Database = {
           order_id_text?: string | null
           sender_email: string
           sender_name: string
+          spam_classification?: string | null
+          spam_reason?: string | null
+          spam_score?: number | null
           status?: string
           subject: string
           updated_at?: string
@@ -1406,6 +1418,9 @@ export type Database = {
         Update: {
           agentmail_inbox_id?: string | null
           agentmail_thread_id?: string | null
+          ai_classified_at?: string | null
+          ai_suggested_reply?: string | null
+          ai_summary?: string | null
           assigned_to?: string | null
           created_at?: string
           id?: string
@@ -1413,6 +1428,9 @@ export type Database = {
           order_id_text?: string | null
           sender_email?: string
           sender_name?: string
+          spam_classification?: string | null
+          spam_reason?: string | null
+          spam_score?: number | null
           status?: string
           subject?: string
           updated_at?: string
