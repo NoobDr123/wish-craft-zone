@@ -93,9 +93,7 @@ type Tab =
 const NAV: Array<{ key: Tab; label: string; icon: any; group: string }> = [
   { key: "dashboard", label: "Dashboard", icon: LayoutDashboard, group: "Overview" },
   { key: "funnel", label: "Funnel", icon: TrendingUp, group: "Overview" },
-  { key: "crm", label: "CRM", icon: Users, group: "Overview" },
-  { key: "customers", label: "Customer explorer", icon: Search, group: "Overview" },
-  { key: "orders", label: "Orders", icon: ShoppingBag, group: "Operations" },
+  { key: "crm", label: "Mega CRM", icon: Users, group: "Overview" },
   { key: "upsells", label: "Upsells", icon: Sparkles, group: "Operations" },
   { key: "emails", label: "Emails", icon: Mail, group: "Operations" },
   { key: "samples", label: "Samples", icon: Music2, group: "Content" },
@@ -1191,6 +1189,8 @@ interface CrmCustomer {
   buyerName: string | null;
   orders: any[];
   emails: any[];
+  nextScheduledDeliveryAt: string | null;
+  pendingDeliveryCount: number;
 }
 
 function CrmPanel() {
@@ -1231,6 +1231,8 @@ function CrmPanel() {
           buyerName: o.buyer_name ?? o.customer_name ?? null,
           orders: [],
           emails: [],
+          nextScheduledDeliveryAt: null,
+          pendingDeliveryCount: 0,
         };
       }
       const c = map[email];
@@ -1250,6 +1252,12 @@ function CrmPanel() {
       if (o.created_at < c.firstOrderAt) c.firstOrderAt = o.created_at;
       if (!c.buyerName && (o.buyer_name || o.customer_name)) {
         c.buyerName = o.buyer_name ?? o.customer_name;
+      }
+      if (o.scheduled_delivery_at && !o.delivered_at && o.status !== "delivered") {
+        c.pendingDeliveryCount += 1;
+        if (!c.nextScheduledDeliveryAt || o.scheduled_delivery_at < c.nextScheduledDeliveryAt) {
+          c.nextScheduledDeliveryAt = o.scheduled_delivery_at;
+        }
       }
     }
 
@@ -1307,17 +1315,18 @@ function CrmPanel() {
   return (
     <>
       <div className="mb-6">
-        <h1 className="font-display text-3xl font-semibold">CRM</h1>
+        <h1 className="font-display text-3xl font-semibold">Mega CRM</h1>
         <p className="text-sm text-muted-foreground">
-          Every customer who's interacted. Click a row to see all their orders, emails, and quiz path.
+          Customers, orders, scheduled deliveries, emails, and quiz path — all in one place. Click a row for full detail.
         </p>
       </div>
 
-      <div className="grid grid-cols-2 gap-4 md:grid-cols-4 mb-6">
+      <div className="grid grid-cols-2 gap-4 md:grid-cols-5 mb-6">
         <StatCard label="Total customers" value={customers.length} />
         <StatCard label="Lifetime revenue" value={fmtMoney(totalLifetimeRevenue)} tone="success" />
         <StatCard label="With paid orders" value={customers.filter((c) => c.paidCount > 0).length} />
         <StatCard label="Repeat buyers" value={customers.filter((c) => c.paidCount > 1).length} />
+        <StatCard label="Pending deliveries" value={customers.reduce((s, c) => s + c.pendingDeliveryCount, 0)} tone="warn" />
       </div>
 
       <input
@@ -1336,6 +1345,7 @@ function CrmPanel() {
               <th className="p-3 text-right">Orders</th>
               <th className="p-3 text-right">Spent</th>
               <th className="p-3">Status</th>
+              <th className="p-3">Next delivery</th>
               <th className="p-3">Last order</th>
             </tr>
           </thead>
@@ -1368,13 +1378,25 @@ function CrmPanel() {
                       {c.paidCount > 1 && <Badge variant="outline" className="text-[10px]">repeat</Badge>}
                     </div>
                   </td>
+                  <td className="p-3 text-xs whitespace-nowrap">
+                    {c.nextScheduledDeliveryAt ? (
+                      <>
+                        <div className="font-medium text-amber-600">{new Date(c.nextScheduledDeliveryAt).toLocaleString()}</div>
+                        {c.pendingDeliveryCount > 1 && (
+                          <div className="text-[10px] text-muted-foreground">+{c.pendingDeliveryCount - 1} more pending</div>
+                        )}
+                      </>
+                    ) : (
+                      <span className="text-muted-foreground">—</span>
+                    )}
+                  </td>
                   <td className="p-3 text-xs text-muted-foreground">
                     {new Date(c.lastOrderAt).toLocaleDateString()}
                   </td>
                 </tr>
                 {expanded === c.email && (
                   <tr className="border-t border-border/40 bg-muted/20">
-                    <td colSpan={6} className="p-6">
+                    <td colSpan={7} className="p-6">
                       <CustomerDetail
                         customer={c}
                         emails={emailLogs[c.email] ?? []}
@@ -1389,7 +1411,7 @@ function CrmPanel() {
             ))}
             {filtered.length === 0 && (
               <tr>
-                <td colSpan={6} className="p-8 text-center text-muted-foreground">
+                <td colSpan={7} className="p-8 text-center text-muted-foreground">
                   No customers.
                 </td>
               </tr>
