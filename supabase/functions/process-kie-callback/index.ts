@@ -154,6 +154,15 @@ serve(async (req) => {
       delay_hours: delayHours,
     });
 
+    // Mirror "song generated" onto the Stripe PaymentIntent so the merchant
+    // dashboard reflects fulfillment progress before the scheduled delivery
+    // actually fires. Best-effort — never block the order pipeline on it.
+    try {
+      await syncSongGeneratedToStripe(finalOrderId, order, chosen.audio_url, slug);
+    } catch (e) {
+      console.error("syncSongGeneratedToStripe failed:", e);
+    }
+
     // If scheduled is now or past, enqueue immediately via the public RPC
     // (pgmq schema is not reachable through PostgREST directly).
     if (scheduled <= now) {
