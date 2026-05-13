@@ -336,7 +336,7 @@ async function handleFreeSongRedemption(orderId: string, code: string, req: Requ
       source_kind: "free_reward",
       source_reward_code_id: reward.id,
       status: "upsells_complete",
-      delivery_tier: "express_48h",
+      delivery_tier: "standard",
       scheduled_delivery_at: tomorrow.toISOString(),
     })
     .eq("id", orderId);

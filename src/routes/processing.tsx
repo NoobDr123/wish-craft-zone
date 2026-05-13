@@ -55,7 +55,7 @@ interface OrderRow {
   product_config: Record<string, boolean> | null;
 }
 
-type DeliverySpeed = "24h" | "48h" | "standard";
+type DeliverySpeed = "90min" | "24h" | "standard";
 
 function formatMoney(cents: number, currency: string) {
   return new Intl.NumberFormat("en-US", {
@@ -66,13 +66,13 @@ function formatMoney(cents: number, currency: string) {
 
 /**
  * Compute the delivery speed the user actually purchased.
- * `delivery_48h` and `rush_delivery` both flip `is_rush`, so we look at
- * `product_config` to disambiguate. Falls back to standard 5-day delivery.
+ * `express_90min` is top priority. `rush_delivery` is the 24-hour rush.
+ * Falls back to standard 5-day delivery.
  */
 function getDeliverySpeed(order: OrderRow): DeliverySpeed {
   const cfg = order.product_config || {};
+  if (cfg.express_90min) return "90min";
   if (cfg.rush_delivery) return "24h";
-  if (cfg.delivery_48h) return "48h";
   // Legacy orders may only have is_rush set — treat as 24h for compatibility.
   if (order.is_rush) return "24h";
   return "standard";
@@ -80,10 +80,10 @@ function getDeliverySpeed(order: OrderRow): DeliverySpeed {
 
 function deliveryDaysFor(speed: DeliverySpeed): number {
   switch (speed) {
+    case "90min":
+      return 0;
     case "24h":
       return 1;
-    case "48h":
-      return 2;
     case "standard":
     default:
       return 5;
@@ -92,10 +92,10 @@ function deliveryDaysFor(speed: DeliverySpeed): number {
 
 function deliveryLabelFor(speed: DeliverySpeed): string {
   switch (speed) {
+    case "90min":
+      return "Within 90 minutes";
     case "24h":
       return "Within 24 hours";
-    case "48h":
-      return "Within 48 hours";
     case "standard":
     default:
       return "Within 5 days";
@@ -233,10 +233,10 @@ function ThankYouPage() {
   const orderRef = order ? order.id.slice(0, 8).toUpperCase() : null;
 
   const deliveryAddOnLabel: string | false =
-    deliverySpeed === "24h"
-      ? "24-hour delivery"
-      : deliverySpeed === "48h"
-        ? "48-hour delivery"
+    deliverySpeed === "90min"
+      ? "90-minute priority delivery"
+      : deliverySpeed === "24h"
+        ? "24-hour delivery"
         : false;
 
   const upgrades = order

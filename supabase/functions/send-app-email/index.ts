@@ -339,15 +339,15 @@ function orderConfirmation(d: Record<string, any>) {
 
   const speed = d.delivery_speed ?? "standard";
   const speedLabel =
-    speed === "24h"
-      ? "Within 24 hours"
-      : speed === "48h"
-        ? "Within 48 hours"
+    speed === "90min"
+      ? "Within 90 minutes"
+      : speed === "24h"
+        ? "Within 24 hours"
         : "Within 5 days";
 
   // Compute expected delivery date.
   const created = d.created_at ? new Date(String(d.created_at)) : new Date();
-  const days = speed === "24h" ? 1 : speed === "48h" ? 2 : 5;
+  const days = speed === "90min" ? 0 : speed === "24h" ? 1 : 5;
   const expected = new Date(created);
   expected.setDate(expected.getDate() + days);
   const expectedLabel = expected.toLocaleDateString("en-US", {
@@ -365,8 +365,8 @@ function orderConfirmation(d: Record<string, any>) {
 
   const addons: string[] = [];
   if (d.has_3rd_verse) addons.push("Extra verse");
-  if (speed === "24h") addons.push("24 hour delivery");
-  else if (speed === "48h") addons.push("48 hour delivery");
+  if (speed === "90min") addons.push("90 minute priority delivery");
+  else if (speed === "24h") addons.push("24 hour delivery");
   if (d.has_unlimited_edits) addons.push("Unlimited edits");
 
   const subject = `Order confirmed${orderRef ? ` · #${orderRef}` : ""} · We're starting on ${recipient}'s song`;

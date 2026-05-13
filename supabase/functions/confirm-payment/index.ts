@@ -274,10 +274,10 @@ async function sendOrderConfirmation(orderId: string) {
   if (!order.buyer_email) return;
 
   const cfg = (order.product_config as Record<string, boolean>) || {};
-  const deliverySpeed = cfg.rush_delivery
-    ? "24h"
-    : cfg.delivery_48h
-      ? "48h"
+  const deliverySpeed = cfg.express_90min
+    ? "90min"
+    : cfg.rush_delivery
+      ? "24h"
       : order.is_rush
         ? "24h"
         : "standard";

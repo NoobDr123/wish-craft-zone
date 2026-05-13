@@ -134,8 +134,8 @@ function TermsPage() {
               business days.
             </li>
             <li>
-              <strong>48h Priority Delivery:</strong> Estimated delivery within
-              48 hours (available as an optional upgrade).
+              <strong>90-Minute Priority Delivery:</strong> Estimated delivery
+              within 90 minutes (available as an optional upgrade).
             </li>
             <li>
               <strong>24h Rush Delivery:</strong> Estimated delivery within 24

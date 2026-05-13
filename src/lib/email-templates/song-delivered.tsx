@@ -20,23 +20,23 @@ interface SongDeliveredEmailProps {
   listen_url?: string
   personal_note?: string | null
   role?: 'buyer' | 'recipient'
-  delivery_tier?: 'standard' | 'express_48h' | 'rush_24h'
+  delivery_tier?: 'standard' | 'rush_24h' | 'priority_90min'
   unsubscribe_url?: string
 }
 
 const TIER_HEADLINE: Record<string, string> = {
   standard: 'finished ahead of schedule',
-  express_48h: 'ready early',
   rush_24h: 'ready — we put you at the front of the line',
+  priority_90min: 'ready — top of the queue, ahead of schedule',
 }
 
 const TIER_BODY: Record<string, string> = {
   standard:
     'We told you 5 days. Our team had a slot open up, so we moved your song to the front of the queue and finished it early. No extra charge — just our way of saying thanks for trusting us.',
-  express_48h:
-    'You paid for 48-hour delivery and we got it done in less. The studio had room and we used it.',
   rush_24h:
-    'You paid for the rush. We delivered ahead of the 24-hour mark.',
+    'You paid for the 24-hour rush. We delivered well ahead of the mark.',
+  priority_90min:
+    'You paid for top-priority 90-minute delivery. We jumped you straight to the front of the entire queue and got it done.',
 }
 
 const SongDeliveredEmail = ({

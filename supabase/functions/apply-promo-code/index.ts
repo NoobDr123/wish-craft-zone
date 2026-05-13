@@ -119,7 +119,6 @@ serve(async (req) => {
         extra_verse: true,
         rush_delivery: true,
         unlimited_edits: true,
-        delivery_48h: true,
       };
       updatePayload.product_config = fullProductConfig;
       updatePayload.has_3rd_verse = true;
