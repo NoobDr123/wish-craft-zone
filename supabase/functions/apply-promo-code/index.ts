@@ -49,7 +49,7 @@ serve(async (req) => {
     // Load the order to get the base amount + buyer email + PI id
     const { data: order, error: orderErr } = await supabase
       .from("orders")
-      .select("id, amount_cents, buyer_email, payment_status, status, stripe_payment_intent_id")
+      .select("id, amount_cents, buyer_email, payment_status, status, stripe_payment_intent_id, currency")
       .eq("id", orderId)
       .maybeSingle();
 
@@ -61,6 +61,7 @@ serve(async (req) => {
       return json({ ok: false, error: "order_already_paid" }, 400);
     }
 
+    const orderCurrency = normalizeCurrency(order.currency);
     const baseAmount = order.amount_cents ?? 2999;
 
     // Atomic redeem via DB function (handles race conditions + max_uses)
