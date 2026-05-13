@@ -545,7 +545,7 @@ function CheckoutPage() {
               <StripeCustomCheckout
                 orderId={orderId}
                 amountVersion={amountVersion}
-                returnUrl={`${window.location.origin}/checkout/return`}
+                returnUrl={`${window.location.origin}/v2/checkout/return`}
                 email={email}
                 name={name}
                 country={country}
