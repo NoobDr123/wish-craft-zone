@@ -1,6 +1,6 @@
 import { serve } from "https://deno.land/std@0.168.0/http/server.ts";
 import { createClient } from "npm:@supabase/supabase-js@2";
-import { type StripeEnv, verifyWebhook } from "../_shared/stripe.ts";
+import { type StripeEnv, createStripeClient, getSettledUsdCents, verifyWebhook } from "../_shared/stripe.ts";
 
 const supabase = createClient(
   Deno.env.get("SUPABASE_URL")!,
@@ -101,16 +101,22 @@ async function handleCheckoutSessionCompleted(session: any, env: StripeEnv) {
     isT3st = (promo?.code || "").toUpperCase() === "T3ST";
   }
 
+  const sessionPiId = typeof session.payment_intent === "string" ? session.payment_intent : null;
+  let usdCents: number | null = null;
+  if (sessionPiId) {
+    usdCents = await getSettledUsdCents(createStripeClient(env), sessionPiId);
+  }
+
   await supabase
     .from("orders")
     .update({
       stripe_customer_id: session.customer ?? undefined,
-      stripe_payment_intent_id:
-        typeof session.payment_intent === "string" ? session.payment_intent : undefined,
+      stripe_payment_intent_id: sessionPiId ?? undefined,
       stripe_checkout_session_id: session.id,
       stripe_env: env,
       payment_status: "paid",
       amount_paid_cents: session.amount_total ?? 0,
+      ...(usdCents != null ? { amount_paid_usd_cents: usdCents } : {}),
       status: isT3st ? "upsells_complete" : "awaiting_upsells",
     })
     .eq("id", orderId);
@@ -172,6 +178,8 @@ async function handlePaymentSucceeded(pi: any, env: StripeEnv) {
       isT3st = (promo?.code || "").toUpperCase() === "T3ST";
     }
 
+    const baseUsd = await getSettledUsdCents(createStripeClient(env), pi.id);
+
     await supabase
       .from("orders")
       .update({
@@ -181,6 +189,7 @@ async function handlePaymentSucceeded(pi: any, env: StripeEnv) {
         stripe_env: env,
         payment_status: "paid",
         amount_paid_cents: pi.amount_received ?? pi.amount ?? 0,
+        ...(baseUsd != null ? { amount_paid_usd_cents: baseUsd } : {}),
         // T3ST: skip upsell pages — fires the brief-generation trigger immediately.
         status: isT3st ? "upsells_complete" : "awaiting_upsells",
       })
@@ -236,7 +245,7 @@ async function handlePaymentSucceeded(pi: any, env: StripeEnv) {
 
     const { data: order } = await supabase
       .from("orders")
-      .select("product_config, amount_paid_cents, delivery_tier")
+      .select("product_config, amount_paid_cents, amount_paid_usd_cents, delivery_tier")
       .eq("id", orderId)
       .single();
 
@@ -255,11 +264,16 @@ async function handlePaymentSucceeded(pi: any, env: StripeEnv) {
 
     productConfig[upsellType] = true;
 
+    const upsellUsd = await getSettledUsdCents(createStripeClient(env), pi.id);
+
     const updates: Record<string, unknown> = {
       [flagColumn]: true,
       product_config: productConfig,
       amount_paid_cents:
         (order?.amount_paid_cents ?? 0) + (pi.amount_received ?? pi.amount ?? 0),
+      ...(upsellUsd != null
+        ? { amount_paid_usd_cents: (order?.amount_paid_usd_cents ?? 0) + upsellUsd }
+        : {}),
     };
 
     const newTier = tierMap[upsellType];

@@ -71,3 +71,6 @@ verify_jwt = false
 
 [functions.reply-support-message]
 verify_jwt = true
+
+[functions.backfill-stripe-usd]
+verify_jwt = true

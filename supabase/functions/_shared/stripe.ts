@@ -79,6 +79,32 @@ export async function verifyWebhook(
   return JSON.parse(body);
 }
 
+/**
+ * Resolve the actual settled USD (account-currency) cents for a Stripe
+ * PaymentIntent by reading its latest charge's balance_transaction. Returns
+ * null when no balance transaction is available yet (async settlement).
+ */
+export async function getSettledUsdCents(
+  stripe: Stripe,
+  paymentIntentId: string,
+): Promise<number | null> {
+  try {
+    const pi = await stripe.paymentIntents.retrieve(paymentIntentId, {
+      expand: ["latest_charge.balance_transaction"],
+    });
+    const charge: any = (pi as any).latest_charge;
+    const bt = charge && typeof charge === "object" ? charge.balance_transaction : null;
+    if (bt && typeof bt === "object" && typeof bt.amount === "number") {
+      // bt.amount is in the account's settlement currency (USD for US accounts), in cents.
+      return bt.amount;
+    }
+    return null;
+  } catch (e) {
+    console.error("getSettledUsdCents failed for", paymentIntentId, e);
+    return null;
+  }
+}
+
 export const corsHeaders = {
   "Access-Control-Allow-Origin": "*",
   "Access-Control-Allow-Headers": "authorization, x-client-info, apikey, content-type",

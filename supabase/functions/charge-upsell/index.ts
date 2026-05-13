@@ -1,6 +1,6 @@
 import { serve } from "https://deno.land/std@0.168.0/http/server.ts";
 import { createClient } from "npm:@supabase/supabase-js@2";
-import { corsHeaders, createStripeClient, type StripeEnv } from "../_shared/stripe.ts";
+import { corsHeaders, createStripeClient, getSettledUsdCents, type StripeEnv } from "../_shared/stripe.ts";
 import { getProductPrice, normalizeCurrency } from "../_shared/pricing.ts";
 
 const supabase = createClient(
@@ -58,7 +58,7 @@ serve(async (req) => {
     const { data: order, error } = await supabase
       .from("orders")
       .select(
-        "user_id, buyer_email, status, stripe_customer_id, stripe_payment_method_id, stripe_checkout_session_id, stripe_payment_intent_id, product_config, delivery_tier, promo_code_id, amount_paid_cents, currency",
+        "user_id, buyer_email, status, stripe_customer_id, stripe_payment_method_id, stripe_checkout_session_id, stripe_payment_intent_id, product_config, delivery_tier, promo_code_id, amount_paid_cents, amount_paid_usd_cents, currency",
       )
       .eq("id", orderId)
       .single();
@@ -134,11 +134,15 @@ serve(async (req) => {
       if (pi.status === "succeeded") {
         productConfig[upsellType] = true;
         const chargedAmount = pi.amount_received ?? pi.amount ?? chargeAmount;
+        const upsellUsd = await getSettledUsdCents(stripe, pi.id);
         const updates: Record<string, unknown> = {
           product_config: productConfig,
           // Increment optimistically so /processing + the order-confirmation
           // email show the real total even if the Stripe webhook is delayed.
           amount_paid_cents: (order.amount_paid_cents ?? 0) + chargedAmount,
+          ...(upsellUsd != null
+            ? { amount_paid_usd_cents: ((order as any).amount_paid_usd_cents ?? 0) + upsellUsd }
+            : {}),
         };
         if (upsell.flagColumn) updates[upsell.flagColumn] = true;
 

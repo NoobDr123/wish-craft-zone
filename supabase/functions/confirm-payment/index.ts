@@ -39,17 +39,17 @@ serve(async (req) => {
 
     if (paymentIntentId && typeof paymentIntentId === "string") {
       pi = await stripe.paymentIntents.retrieve(paymentIntentId, {
-        expand: ["latest_charge"],
+        expand: ["latest_charge.balance_transaction"],
       });
     } else if (sessionId && typeof sessionId === "string") {
       const session = await stripe.checkout.sessions.retrieve(sessionId, {
-        expand: ["payment_intent", "payment_intent.latest_charge"],
+        expand: ["payment_intent", "payment_intent.latest_charge.balance_transaction"],
       });
       resolvedSessionId = session.id;
       const piRef = session.payment_intent;
       if (typeof piRef === "string") {
         pi = await stripe.paymentIntents.retrieve(piRef, {
-          expand: ["latest_charge"],
+          expand: ["latest_charge.balance_transaction"],
         });
       } else if (piRef && typeof piRef === "object") {
         pi = piRef;
@@ -127,6 +127,13 @@ serve(async (req) => {
         realName = (billingDetails?.name as string | null) || null;
       }
 
+      // Pull settled USD (account-currency cents) from balance_transaction.
+      const baseUsd = (() => {
+        const ch: any = (pi as any).latest_charge;
+        const bt = ch && typeof ch === "object" ? ch.balance_transaction : null;
+        return bt && typeof bt.amount === "number" ? (bt.amount as number) : null;
+      })();
+
       // Always update payment ids / status if not already paid.
       if (existing.payment_status !== "paid") {
         const updates: Record<string, unknown> = {
@@ -136,6 +143,7 @@ serve(async (req) => {
           stripe_env: env,
           payment_status: "paid",
           amount_paid_cents: pi.amount_received ?? pi.amount ?? 0,
+          ...(baseUsd != null ? { amount_paid_usd_cents: baseUsd } : {}),
           // T3ST: skip upsell pages — go straight to brief generation.
           status: isT3st ? "upsells_complete" : "awaiting_upsells",
         };
@@ -210,7 +218,7 @@ serve(async (req) => {
 
       const { data: order } = await supabase
         .from("orders")
-        .select("product_config, amount_paid_cents, delivery_tier")
+        .select("product_config, amount_paid_cents, amount_paid_usd_cents, delivery_tier")
         .eq("id", orderId)
         .single();
 
@@ -221,11 +229,20 @@ serve(async (req) => {
       }
       productConfig[upsellType] = true;
 
+      const upsellUsd = (() => {
+        const ch: any = (pi as any).latest_charge;
+        const bt = ch && typeof ch === "object" ? ch.balance_transaction : null;
+        return bt && typeof bt.amount === "number" ? (bt.amount as number) : null;
+      })();
+
       const updates: Record<string, unknown> = {
         [flagColumn]: true,
         product_config: productConfig,
         amount_paid_cents:
           (order?.amount_paid_cents ?? 0) + (pi.amount_received ?? pi.amount ?? 0),
+        ...(upsellUsd != null
+          ? { amount_paid_usd_cents: (order?.amount_paid_usd_cents ?? 0) + upsellUsd }
+          : {}),
       };
 
       const newTier = tierMap[upsellType];
