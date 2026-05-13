@@ -2903,7 +2903,10 @@ function CustomerDetailDrawer({ orderId, onClose }: { orderId: string; onClose: 
               } />
               <DetailField label="Amount paid" value={fmtMoneyCcy(order.amount_paid_cents || 0, order.currency)} />
               <DetailField label="Order amount" value={fmtMoneyCcy(order.amount_cents || 0, order.currency)} />
-              <DetailField label="Amount paid (USD)" value={fmtMoney(toUsdCents(order.amount_paid_cents || 0, order.currency))} />
+              <DetailField label="Amount paid (USD)" value={fmtMoney(rowUsdCents(order))} />
+              {order.amount_paid_usd_cents != null && (
+                <DetailField label="USD source" value="Stripe settled" />
+              )}
               <DetailField label="Tier" value={order.delivery_tier} />
               <DetailField label="Priority" value={order.priority} />
               <DetailField label="Source" value={order.source_kind} />
