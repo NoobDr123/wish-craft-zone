@@ -2271,7 +2271,7 @@ function EmailsPanel() {
       .order("created_at", { ascending: false })
       .limit(500);
     if (signal && !signal.active) return;
-    setRows((data ?? []) as EmailRow[]);
+    setRows(dedupeEmailLogs((data ?? []) as EmailRow[]));
     setSuppressed((sup ?? []) as any);
     setLoading(false);
   };
