@@ -549,7 +549,7 @@ function DashboardPanel() {
     const failed = orders.filter((o) => o.payment_status === "failed");
     const pending = orders.filter((o) => o.payment_status === "pending");
     // Normalize to USD for cross-currency aggregates.
-    const revenueCents = paid.reduce((s, o) => s + toUsdCents(o.amount_paid_cents, o.currency), 0);
+    const revenueCents = paid.reduce((s, o) => s + rowUsdCents(o), 0);
     const aovCents = paid.length > 0 ? Math.round(revenueCents / paid.length) : 0;
 
     // Daily sales grouped by EST date (USD-normalized)
@@ -557,7 +557,7 @@ function DashboardPanel() {
     for (const o of paid) {
       const d = estDateKey(o.created_at);
       if (!byDay[d]) byDay[d] = { cents: 0, orders: 0 };
-      byDay[d].cents += toUsdCents(o.amount_paid_cents, o.currency);
+      byDay[d].cents += rowUsdCents(o);
       byDay[d].orders += 1;
     }
     const dailySales = Object.entries(byDay)
@@ -591,7 +591,7 @@ function DashboardPanel() {
       const email = (o.buyer_email ?? "").toLowerCase();
       if (!email) continue;
       if (!ltvByEmail[email]) ltvByEmail[email] = { cents: 0, orders: 0 };
-      ltvByEmail[email].cents += toUsdCents(o.amount_paid_cents, o.currency);
+      ltvByEmail[email].cents += rowUsdCents(o);
       ltvByEmail[email].orders += 1;
     }
     const lifetimeCustomerCount = Object.keys(ltvByEmail).length;
@@ -1202,7 +1202,7 @@ function CrmPanel() {
       c.orderCount += 1;
       if (o.payment_status === "paid" || o.payment_status === "succeeded") {
         c.paidCount += 1;
-        c.totalSpentCents += toUsdCents(o.amount_paid_cents, o.currency);
+        c.totalSpentCents += rowUsdCents(o);
       } else if (o.payment_status === "failed") {
         c.failedCount += 1;
       } else {
@@ -2708,7 +2708,7 @@ function CustomerExplorerPanel() {
   const stats = {
     total: filtered.length,
     paid: filtered.filter((r) => r.payment_status === "paid").length,
-    revenue: filtered.reduce((s, r) => s + toUsdCents(r.amount_paid_cents, r.currency), 0),
+    revenue: filtered.reduce((s, r) => s + rowUsdCents(r), 0),
   };
 
   return (
