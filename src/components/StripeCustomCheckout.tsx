@@ -267,37 +267,11 @@ interface FormProps {
   currency: string;
   email: string;
   name: string;
+  country: SupportedCountry;
+  onCountryChange: (next: SupportedCountry) => void;
   returnUrl: string;
   paymentIntentId: string;
 }
-
-// Country list — short, common-first. Full ISO codes accepted by Stripe.
-const COUNTRIES: Array<{ code: string; label: string }> = [
-  { code: "US", label: "United States" },
-  { code: "PL", label: "Poland" },
-  { code: "GB", label: "United Kingdom" },
-  { code: "CA", label: "Canada" },
-  { code: "AU", label: "Australia" },
-  { code: "DE", label: "Germany" },
-  { code: "FR", label: "France" },
-  { code: "IT", label: "Italy" },
-  { code: "ES", label: "Spain" },
-  { code: "NL", label: "Netherlands" },
-  { code: "IE", label: "Ireland" },
-  { code: "SE", label: "Sweden" },
-  { code: "NO", label: "Norway" },
-  { code: "DK", label: "Denmark" },
-  { code: "FI", label: "Finland" },
-  { code: "BE", label: "Belgium" },
-  { code: "AT", label: "Austria" },
-  { code: "CH", label: "Switzerland" },
-  { code: "PT", label: "Portugal" },
-  { code: "CZ", label: "Czechia" },
-  { code: "MX", label: "Mexico" },
-  { code: "BR", label: "Brazil" },
-  { code: "JP", label: "Japan" },
-  { code: "NZ", label: "New Zealand" },
-];
 
 const ELEMENT_BASE_STYLE = {
   base: {
