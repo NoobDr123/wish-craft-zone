@@ -1218,7 +1218,7 @@ function CrmPanel() {
   const [customers, setCustomers] = useState<CrmCustomer[]>([]);
   const [loading, setLoading] = useState(true);
   const [search, setSearch] = useState("");
-  const [view, setView] = useState<"all" | "paying" | "partials">("all");
+  const [view, setView] = useState<"all" | "paying" | "partials" | "reached_checkout">("all");
   const [expanded, setExpanded] = useState<string | null>(null);
   const [emailLogs, setEmailLogs] = useState<Record<string, any[]>>({});
   const [quizEvents, setQuizEvents] = useState<Record<string, any[]>>({});
@@ -1337,11 +1337,17 @@ function CrmPanel() {
   const partialsCount = customers.filter(
     (c) => c.paidCount === 0 && (c.reachedCheckoutAt || c.cardStartedAt),
   ).length;
+  const reachedCheckoutCount = customers.filter(
+    (c) => c.reachedCheckoutAt || c.cardStartedAt,
+  ).length;
 
   const filtered = customers.filter((c) => {
     if (view === "paying" && c.paidCount === 0) return false;
     if (view === "partials") {
       if (c.paidCount > 0) return false;
+      if (!c.reachedCheckoutAt && !c.cardStartedAt) return false;
+    }
+    if (view === "reached_checkout") {
       if (!c.reachedCheckoutAt && !c.cardStartedAt) return false;
     }
     if (!search) return true;
@@ -1401,6 +1407,7 @@ function CrmPanel() {
           ["all", `All (${customers.length})`],
           ["paying", `Paying (${customers.filter((c) => c.paidCount > 0).length})`],
           ["partials", `Partials (${partialsCount})`],
+          ["reached_checkout", `Reached checkout (${reachedCheckoutCount})`],
         ] as const).map(([key, label]) => (
           <button
             key={key}
@@ -1417,6 +1424,11 @@ function CrmPanel() {
         {view === "partials" && (
           <span className="text-xs text-muted-foreground ml-2">
             Reached checkout but never paid
+          </span>
+        )}
+        {view === "reached_checkout" && (
+          <span className="text-xs text-muted-foreground ml-2">
+            Everyone who landed on checkout (paid + unpaid)
           </span>
         )}
       </div>
@@ -1437,7 +1449,7 @@ function CrmPanel() {
               <th className="p-3 text-right">Orders</th>
               <th className="p-3 text-right">Spent</th>
               <th className="p-3">Status</th>
-              <th className="p-3">{view === "partials" ? "Reached checkout" : "Next delivery"}</th>
+              <th className="p-3">{view === "partials" || view === "reached_checkout" ? "Reached checkout" : "Next delivery"}</th>
               <th className="p-3">Last activity</th>
             </tr>
           </thead>
@@ -1471,14 +1483,18 @@ function CrmPanel() {
                     </div>
                   </td>
                   <td className="p-3 text-xs whitespace-nowrap">
-                    {view === "partials" ? (
+                    {view === "partials" || view === "reached_checkout" ? (
                       c.cardStartedAt || c.reachedCheckoutAt ? (
                         <>
-                          <div className="font-medium text-rose-600">
+                          <div className={`font-medium ${c.paidCount > 0 ? "text-emerald-600" : "text-rose-600"}`}>
                             {new Date((c.cardStartedAt ?? c.reachedCheckoutAt)!).toLocaleString()}
                           </div>
                           <div className="text-[10px] text-muted-foreground">
-                            {c.cardStartedAt ? "started card entry" : "viewed checkout"}
+                            {c.paidCount > 0
+                              ? "paid ✓"
+                              : c.cardStartedAt
+                              ? "started card entry"
+                              : "viewed checkout"}
                           </div>
                         </>
                       ) : (
