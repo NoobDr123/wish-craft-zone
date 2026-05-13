@@ -258,6 +258,23 @@ const RANGE_LABELS: Record<Range, string> = {
 };
 
 /** Get the Y/M/D parts for `now` as observed in the admin (EST) timezone. */
+// Email logs are append-only: each send produces a `pending` row and then a
+// `sent`/`failed`/`dlq` row sharing the same `message_id`. Keep only the
+// latest row per message_id (rows assumed ordered by created_at DESC).
+// Rows without a message_id (legacy) are kept as-is.
+function dedupeEmailLogs<T extends { message_id?: string | null }>(rows: T[]): T[] {
+  const seen = new Set<string>();
+  const out: T[] = [];
+  for (const r of rows) {
+    const id = r.message_id ?? null;
+    if (!id) { out.push(r); continue; }
+    if (seen.has(id)) continue;
+    seen.add(id);
+    out.push(r);
+  }
+  return out;
+}
+
 function estParts(now: Date = new Date()) {
   const fmt = new Intl.DateTimeFormat("en-US", {
     timeZone: ADMIN_TZ,
