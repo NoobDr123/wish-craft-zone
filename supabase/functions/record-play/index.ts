@@ -48,6 +48,7 @@ serve(async (req) => {
     const variantId = typeof body.variantId === "string" ? body.variantId : null;
     const durationMs = typeof body.durationMs === "number" ? body.durationMs : null;
     const source = typeof body.source === "string" ? body.source.slice(0, 50) : "listen_page";
+    const kind = body.kind === "view" || body.kind === "share" ? body.kind : "play";
 
     if (!orderId || !/^[0-9a-f-]{36}$/i.test(orderId)) {
       return json({ error: "Invalid orderId" }, 400);
@@ -58,6 +59,31 @@ serve(async (req) => {
       ?? req.headers.get("cf-connecting-ip")
       ?? null;
     const ipHash = await hashIp(ip);
+
+    // "view" / "share" events go to job_events (cheap, lightweight) and bump
+    // a counter on the Stripe PI at threshold milestones. "play" events
+    // additionally insert into play_events as chargeback evidence.
+    if (kind === "view" || kind === "share") {
+      await supabase.from("job_events").insert({
+        order_id: orderId,
+        event_type: kind === "view" ? "share_page_viewed" : "share_link_shared",
+        payload: { source, ip_hash: ipHash, user_agent: userAgent?.slice(0, 200) },
+      });
+
+      const { count } = await supabase
+        .from("job_events")
+        .select("*", { count: "exact", head: true })
+        .eq("order_id", orderId)
+        .eq("event_type", kind === "view" ? "share_page_viewed" : "share_link_shared");
+
+      const total = count ?? 1;
+      if (STRIPE_SYNC_THRESHOLDS.has(total)) {
+        syncShareEventToStripe(orderId, kind, total).catch((e) =>
+          console.error("syncShareEventToStripe failed:", e),
+        );
+      }
+      return json({ ok: true, count: total, kind });
+    }
 
     // Insert the play event
     const { error: insertErr } = await supabase
