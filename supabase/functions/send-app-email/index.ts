@@ -28,6 +28,12 @@ serve(async (req) => {
     const rendered = render(template, data ?? {});
     if (!rendered) return json({ error: `Unknown template: ${template}` }, 400);
 
+    // Tracking: rewrite links + inject open pixel. Done before suppression so
+    // we don't waste a messageId; messageId generated below is used here too.
+    const trackingMessageId = crypto.randomUUID();
+    const TRACK_BASE = `${Deno.env.get("SUPABASE_URL")!}/functions/v1/email-track`;
+    rendered.html = injectTracking(rendered.html, trackingMessageId, TRACK_BASE);
+
     // Suppression check
     const { data: suppressed } = await supabase
       .from("suppressed_emails")
