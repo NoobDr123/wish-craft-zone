@@ -16,7 +16,7 @@ import type {
 import { Loader2, Lock, ShieldCheck } from "lucide-react";
 import { getStripe, stripeEnvironment } from "@/lib/stripe";
 import { supabase } from "@/integrations/supabase/client";
-import { detectCountry, SUPPORTED_COUNTRIES, type SupportedCountry } from "@/lib/currency";
+import { detectCountry, SUPPORTED_COUNTRIES, isSupportedCountry } from "@/lib/currency";
 
 interface Props {
   orderId: string;
@@ -28,10 +28,10 @@ interface Props {
   email: string;
   /** Buyer name — included in billing details. */
   name: string;
-  /** Buyer's billing country (controls currency + which fields render). */
-  country: SupportedCountry;
+  /** Buyer's billing country (ISO-3166 alpha-2). Non-supported = USD-locked. */
+  country: string;
   /** Called when the buyer changes their country in the card form. */
-  onCountryChange: (next: SupportedCountry) => void;
+  onCountryChange: (next: string) => void;
   quizPatch?: Record<string, unknown>;
   quizSnapshot?: Record<string, unknown>;
   onError?: (msg: string) => void;
@@ -267,8 +267,8 @@ interface FormProps {
   currency: string;
   email: string;
   name: string;
-  country: SupportedCountry;
-  onCountryChange: (next: SupportedCountry) => void;
+  country: string;
+  onCountryChange: (next: string) => void;
   returnUrl: string;
   paymentIntentId: string;
 }
@@ -578,18 +578,22 @@ function PaymentForm({ amount, currency, email, name, country, onCountryChange, 
 /**
  * Compact country picker that lives inline with the postal label.
  * Collapsed by default — shows just the current flag + country code as a
- * subtle "change" trigger. Expands into a native <select> on click so we
- * don't ship yet another popover for one field.
+ * subtle "change" trigger. Expands into a native <select> on click. The
+ * 5 currency-supported markets charge in their local currency; everything
+ * else is grouped under "Other (USD)" and locks pricing to USD.
  */
 function CountryPicker({
   country,
   onCountryChange,
 }: {
-  country: SupportedCountry;
-  onCountryChange: (next: SupportedCountry) => void;
+  country: string;
+  onCountryChange: (next: string) => void;
 }) {
   const [open, setOpen] = useState(false);
+  const supported = isSupportedCountry(country);
   const current = SUPPORTED_COUNTRIES.find((c) => c.code === country);
+  const displayLabel = supported ? current?.code ?? country : `${country} · USD`;
+  const displayFlag = current?.flag ?? "🌍";
 
   if (!open) {
     return (
@@ -599,8 +603,8 @@ function CountryPicker({
         className="flex items-center gap-1 text-[12.5px] font-medium text-muted-foreground transition-colors hover:text-primary"
         aria-label="Change billing country"
       >
-        <span>{current?.flag ?? "🌐"}</span>
-        <span>{current?.code ?? country}</span>
+        <span>{displayFlag}</span>
+        <span>{displayLabel}</span>
         <span className="underline decoration-dotted underline-offset-2">change</span>
       </button>
     );
@@ -609,9 +613,15 @@ function CountryPicker({
   return (
     <select
       autoFocus
-      value={country}
+      value={supported ? country : "__OTHER__"}
       onChange={(e) => {
-        onCountryChange(e.target.value as SupportedCountry);
+        const v = e.target.value;
+        if (v === "__OTHER__") {
+          // Keep detected country (or fall to "ZZ" sentinel) — pricing locks to USD.
+          onCountryChange(supported ? country : country || "ZZ");
+        } else {
+          onCountryChange(v);
+        }
         setOpen(false);
       }}
       onBlur={() => setOpen(false)}
@@ -622,6 +632,7 @@ function CountryPicker({
           {c.flag} {c.label}
         </option>
       ))}
+      <option value="__OTHER__">🌍 Other country (USD)</option>
     </select>
   );
 }

@@ -4,7 +4,15 @@
 // If you change a number here, change it there too.
 
 export type SupportedCurrency = "USD" | "GBP" | "CAD" | "AUD" | "NZD";
+/** ISO-3166-1 alpha-2 country code where we charge in the local currency. */
 export type SupportedCountry = "US" | "GB" | "CA" | "AU" | "NZ";
+/** Any 2-letter ISO country code. Non-supported codes fall back to USD pricing. */
+export type BillingCountry = string;
+
+const SUPPORTED_COUNTRY_SET = new Set<SupportedCountry>(["US", "GB", "CA", "AU", "NZ"]);
+export function isSupportedCountry(code: string | null | undefined): code is SupportedCountry {
+  return !!code && SUPPORTED_COUNTRY_SET.has(code.toUpperCase() as SupportedCountry);
+}
 
 export const COUNTRY_TO_CURRENCY: Record<SupportedCountry, SupportedCurrency> = {
   US: "USD",
@@ -87,24 +95,23 @@ export const SUPPORTED_COUNTRIES: { code: SupportedCountry; label: string; flag:
   { code: "NZ", label: "New Zealand", flag: "🇳🇿" },
 ];
 
-/** User-selected country wins over edge detection. */
-export function setCountryOverride(country: SupportedCountry): void {
+/** User-selected country wins over edge detection. Accepts any ISO-3166 alpha-2 code. */
+export function setCountryOverride(country: string): void {
   if (typeof window === "undefined") return;
+  const cc = country.toUpperCase();
   try {
-    window.localStorage.setItem(OVERRIDE_KEY, country);
-    window.dispatchEvent(new CustomEvent(COUNTRY_CHANGED_EVENT, { detail: country }));
+    window.localStorage.setItem(OVERRIDE_KEY, cc);
+    window.dispatchEvent(new CustomEvent(COUNTRY_CHANGED_EVENT, { detail: cc }));
   } catch {
     /* ignore */
   }
 }
 
-export function getCountryOverride(): SupportedCountry | null {
+export function getCountryOverride(): string | null {
   if (typeof window === "undefined") return null;
   try {
     const raw = window.localStorage.getItem(OVERRIDE_KEY);
-    if (raw && (raw === "US" || raw === "GB" || raw === "CA" || raw === "AU" || raw === "NZ")) {
-      return raw;
-    }
+    if (raw && /^[A-Z]{2}$/.test(raw)) return raw;
   } catch {
     /* ignore */
   }
