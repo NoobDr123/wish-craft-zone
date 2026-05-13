@@ -75,7 +75,30 @@ serve(async (req) => {
     }));
 
     const validVariants = variants.filter((v) => !!v.audio_url);
+
+    // Kie sends multiple callbacks per task: first a "text" callback (lyrics
+    // only, no audio), then a "complete"/"first"/audio callback with the
+    // actual track. Only the audio callback should advance the order — the
+    // text-only callback is informational and must NOT flag the order.
+    const stage = (cb.stage ?? "").toString().toLowerCase();
+    const callbackType = (cb.payload?.data?.callbackType ?? cb.payload?.callbackType ?? "")
+      .toString()
+      .toLowerCase();
+    const isTextOnlyCallback =
+      callbackType === "text" || stage === "text" || stage === "lyrics";
+
     if (validVariants.length === 0) {
+      // Mark this specific callback processed so we don't loop on it, but
+      // leave the order untouched — the audio callback will arrive next.
+      await supabase.from("kie_callbacks").update({ processed: true }).eq("id", cb.id);
+      if (isTextOnlyCallback) {
+        await logEvent(finalOrderId, "kie_callback_text_only", {
+          callbackType,
+          stage,
+        });
+        return json({ ok: true, skipped: "text_only_callback" });
+      }
+      // Genuinely no audio after a non-text callback — flag for review.
       await logEvent(finalOrderId, "kie_callback_no_audio", { payload: cb.payload });
       await supabase
         .from("orders")
@@ -84,7 +107,6 @@ serve(async (req) => {
           flag_reason: "KIE returned no audio URL",
         })
         .eq("id", finalOrderId);
-      await supabase.from("kie_callbacks").update({ processed: true }).eq("id", cb.id);
       return json({ error: "no audio in callback" }, 400);
     }
 
@@ -116,6 +138,9 @@ serve(async (req) => {
         share_page_slug: slug,
         status: "ready_to_deliver",
         scheduled_delivery_at: scheduled.toISOString(),
+        // Clear any stale "no audio URL" flag set by an earlier text-only callback.
+        flagged_for_review: false,
+        flag_reason: null,
       })
       .eq("id", finalOrderId);
 
