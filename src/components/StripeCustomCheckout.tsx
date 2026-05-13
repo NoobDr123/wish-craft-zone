@@ -349,6 +349,7 @@ function PaymentForm({ amount, currency, email, name, country, onCountryChange, 
   async function handleExpressConfirm() {
     if (!stripe || !elements) return;
     setError(null);
+    firePixelAddPaymentInfo("wallet");
     setSubmitting(true);
     const { error: submitError } = await elements.submit();
     if (submitError) {
