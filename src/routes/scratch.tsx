@@ -344,6 +344,22 @@ function ScratchPage() {
                 </button>
               </div>
             )}
+
+            {/* CTA appears immediately once revealed — don't wait on stage transition */}
+            {revealed && (
+              <a
+                href="/checkout"
+                onPointerDown={warmCheckout}
+                onClick={warmCheckout}
+                onMouseEnter={warmCheckout}
+                onFocus={warmCheckout}
+                className="mx-auto mt-6 flex w-full max-w-md items-center justify-center gap-2 rounded-full bg-primary px-8 py-5 text-base font-bold text-primary-foreground shadow-glow transition-all hover:bg-primary-hover active:scale-[0.99]"
+              >
+                <Gift className="h-5 w-5" />
+                {copy.ctaLabel}
+                <ArrowRight className="h-5 w-5" />
+              </a>
+            )}
           </div>
 
           <p className="mt-6 text-center text-sm text-muted-foreground">
