@@ -419,6 +419,13 @@ function toUsdCents(cents: number | null | undefined, currency: string | null | 
   return Math.round(c * rate);
 }
 
+// Prefer Stripe's actual settled USD (account-currency) cents when present;
+// fall back to static FX conversion for orders not yet backfilled.
+function rowUsdCents(row: { amount_paid_usd_cents?: number | null; amount_paid_cents?: number | null; currency?: string | null }): number {
+  if (row.amount_paid_usd_cents != null) return row.amount_paid_usd_cents;
+  return toUsdCents(row.amount_paid_cents, row.currency);
+}
+
 function fmtMoney(cents: number) {
   return `$${(cents / 100).toFixed(2)}`;
 }
