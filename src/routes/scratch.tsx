@@ -294,23 +294,18 @@ function ScratchPage() {
           {/* Scratch card */}
           <div className="mt-8 select-none">
             <div className="relative mx-auto aspect-[5/3] w-full max-w-md overflow-hidden rounded-3xl border-2 border-[#c9914a]/40 bg-card shadow-card">
-              {/* Reveal layer — personalized, offer-driven */}
+              {/* Reveal layer — 50% off, no price */}
               <div className="absolute inset-0 flex flex-col items-center justify-center bg-peach/40 p-6 text-center">
                 {firstName && (
                   <span className="text-xs font-semibold uppercase tracking-[0.2em] text-primary/80">
-                    🐾 For {firstName} · 50% OFF
+                    🐾 For {firstName}
                   </span>
                 )}
-                <div className="mt-1 flex items-baseline justify-center gap-3">
-                  <span className="font-display text-2xl font-medium text-muted-foreground line-through md:text-3xl">
-                    $59.99
-                  </span>
-                  <span className="font-display text-6xl font-extrabold text-primary md:text-7xl">
-                    $29.99
-                  </span>
+                <div className="mt-2 font-display text-6xl font-extrabold leading-none text-primary md:text-7xl">
+                  50% OFF
                 </div>
-                <span className="mt-2 inline-flex items-center gap-1 rounded-full bg-primary/10 px-3 py-1 text-xs font-bold uppercase tracking-wider text-primary">
-                  You save $30 today
+                <span className="mt-3 inline-flex items-center gap-1 rounded-full bg-primary/10 px-3 py-1 text-xs font-bold uppercase tracking-wider text-primary">
+                  Half off {firstName ? `${firstName}'s` : "their"} song
                 </span>
               </div>
               {/* Scratchable canvas overlay */}
