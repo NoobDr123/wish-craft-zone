@@ -625,10 +625,12 @@ function DashboardPanel() {
       ltvByEmail[email].cents += rowUsdCents(o);
       ltvByEmail[email].orders += 1;
     }
-    const lifetimeCustomerCount = Object.keys(ltvByEmail).length;
-    const lifetimeRevenueCents = Object.values(ltvByEmail).reduce((s, v) => s + v.cents, 0);
+    // Only count customers who actually paid money (excludes $0 comp/test orders).
+    const payingEntries = Object.entries(ltvByEmail).filter(([, v]) => v.cents > 0);
+    const lifetimeCustomerCount = payingEntries.length;
+    const lifetimeRevenueCents = payingEntries.reduce((s, [, v]) => s + v.cents, 0);
     const lifetimeLtvCents = lifetimeCustomerCount > 0 ? Math.round(lifetimeRevenueCents / lifetimeCustomerCount) : 0;
-    const repeatBuyers = Object.values(ltvByEmail).filter((v) => v.orders > 1).length;
+    const repeatBuyers = payingEntries.filter(([, v]) => v.orders > 1).length;
     const lifetimeRepeatPct = lifetimeCustomerCount > 0 ? (repeatBuyers / lifetimeCustomerCount) * 100 : 0;
 
     const recentOrders = paid.slice(0, 10).map((o) => ({
