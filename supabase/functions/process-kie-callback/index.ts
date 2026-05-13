@@ -138,6 +138,9 @@ serve(async (req) => {
         share_page_slug: slug,
         status: "ready_to_deliver",
         scheduled_delivery_at: scheduled.toISOString(),
+        // Clear any stale "no audio URL" flag set by an earlier text-only callback.
+        flagged_for_review: false,
+        flag_reason: null,
       })
       .eq("id", finalOrderId);
 
