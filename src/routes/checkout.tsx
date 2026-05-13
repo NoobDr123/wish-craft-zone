@@ -69,6 +69,27 @@ function CheckoutPage() {
   const [error, setError] = useState<string | null>(null);
   const [reviewOpen, setReviewOpen] = useState(false);
 
+  // Country picker — initialized from override (if any), then upgraded to
+  // edge-detected country. Changing it bumps amountVersion so Stripe
+  // re-issues the Payment Intent in the new currency.
+  const [country, setCountry] = useState<SupportedCountry>(
+    () => (getCountryOverride() as SupportedCountry | null) ?? "US",
+  );
+  useEffect(() => {
+    if (getCountryOverride()) return; // user already chose
+    void detectCountry().then((c) => {
+      if (c === "US" || c === "GB" || c === "CA" || c === "AU" || c === "NZ") {
+        setCountry(c);
+      }
+    });
+  }, []);
+  function handleCountryChange(next: SupportedCountry) {
+    setCountry(next);
+    setCountryOverride(next);
+    setAmountVersion((v) => v + 1); // re-fetch PI in new currency
+    setPromoApplied(null); // promo amount was scoped to old currency
+  }
+
   // Promo code state
   const [promoCode, setPromoCode] = useState("");
   const [promoApplying, setPromoApplying] = useState(false);
