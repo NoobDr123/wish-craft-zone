@@ -8,7 +8,15 @@ import { useQuizStore } from "@/stores/quizStore";
 import { supabase } from "@/integrations/supabase/client";
 import { buildOrderPatchForQuiz, ensureOrderForQuiz } from "@/lib/checkoutPrefetch";
 import { useBuyerCurrency } from "@/hooks/useBuyerCurrency";
-import { formatMoney, formatProduct } from "@/lib/currency";
+import {
+  formatMoney,
+  formatProduct,
+  setCountryOverride,
+  SUPPORTED_COUNTRIES,
+  getCountryOverride,
+  detectCountry,
+  type SupportedCountry,
+} from "@/lib/currency";
 import {
   ArrowLeft,
   CheckCircle2,
@@ -60,6 +68,27 @@ function CheckoutPage() {
   const [amountVersion, setAmountVersion] = useState(0);
   const [error, setError] = useState<string | null>(null);
   const [reviewOpen, setReviewOpen] = useState(false);
+
+  // Country picker — initialized from override (if any), then upgraded to
+  // edge-detected country. Changing it bumps amountVersion so Stripe
+  // re-issues the Payment Intent in the new currency.
+  const [country, setCountry] = useState<SupportedCountry>(
+    () => (getCountryOverride() as SupportedCountry | null) ?? "US",
+  );
+  useEffect(() => {
+    if (getCountryOverride()) return; // user already chose
+    void detectCountry().then((c) => {
+      if (c === "US" || c === "GB" || c === "CA" || c === "AU" || c === "NZ") {
+        setCountry(c);
+      }
+    });
+  }, []);
+  function handleCountryChange(next: SupportedCountry) {
+    setCountry(next);
+    setCountryOverride(next);
+    setAmountVersion((v) => v + 1); // re-fetch PI in new currency
+    setPromoApplied(null); // promo amount was scoped to old currency
+  }
 
   // Promo code state
   const [promoCode, setPromoCode] = useState("");
@@ -395,6 +424,25 @@ function CheckoutPage() {
               <dd className="font-semibold text-foreground">{deliveryDate}</dd>
             </div>
           </dl>
+
+          {/* Country / currency selector */}
+          <div className="mt-5 flex items-center justify-between gap-3 rounded-2xl border border-peach/70 bg-background/60 px-3 py-2.5">
+            <label htmlFor="checkout-country" className="text-[13px] font-semibold text-muted-foreground">
+              Billing country
+            </label>
+            <select
+              id="checkout-country"
+              value={country}
+              onChange={(e) => handleCountryChange(e.target.value as SupportedCountry)}
+              className="rounded-lg border border-peach bg-card px-2.5 py-1.5 text-sm font-semibold text-foreground focus:border-primary focus:outline-none focus:ring-2 focus:ring-primary/30"
+            >
+              {SUPPORTED_COUNTRIES.map((c) => (
+                <option key={c.code} value={c.code}>
+                  {c.flag} {c.label}
+                </option>
+              ))}
+            </select>
+          </div>
 
           <div className="my-5 border-t border-dashed border-peach" />
 
