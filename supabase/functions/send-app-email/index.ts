@@ -135,6 +135,8 @@ function render(template: string, d: Record<string, any>) {
   switch (template) {
     case "song-delivered":
       return songDelivered(d);
+    case "song-delivered-personal":
+      return songDeliveredPersonal(d);
     case "order_confirmation":
       return orderConfirmation(d);
     case "reaction-approved":
