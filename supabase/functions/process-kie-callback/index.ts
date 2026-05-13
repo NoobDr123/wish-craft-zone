@@ -92,15 +92,15 @@ serve(async (req) => {
     const chosen = validVariants[0];
 
     // Compute scheduled delivery based on tier (under-promise / over-deliver):
-    //   standard    promised 5 days  → actually delivered ~3 days  (72h)
-    //   express_48h promised 48 hours → actually delivered ~24 hours (24h)
-    //   rush_24h    promised 24 hours → actually delivered ~12 hours (12h)
+    //   standard       promised 5 days   → actually delivered ~3 days  (72h)
+    //   rush_24h       promised 24 hours → actually delivered ~12 hours (12h)
+    //   priority_90min promised 90 min   → actually delivered ~60 min  (1h)
     // (Gift delivery_date branching removed for now — will revisit later.)
     const now = new Date();
     const tierDelayHours: Record<string, number> = {
       standard: 72,
-      express_48h: 24,
       rush_24h: 12,
+      priority_90min: 1,
     };
     const tier = (order.delivery_tier as string) || (order.is_rush ? "rush_24h" : "standard");
     const delayHours = tierDelayHours[tier] ?? 72;
