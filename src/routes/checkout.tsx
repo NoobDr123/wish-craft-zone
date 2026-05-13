@@ -51,6 +51,7 @@ function CheckoutPage() {
 
   const navigate = useNavigate();
   const q = useQuizStore();
+  const currency = useBuyerCurrency();
   const [hydrated, setHydrated] = useState(() => useQuizStore.persist.hasHydrated());
   const [email, setEmail] = useState(q.buyer_email || "");
   const [name, setName] = useState(q.buyer_name || "");
