@@ -63,10 +63,15 @@ serve(async (req) => {
     // "view" / "share" events go to job_events (cheap, lightweight) and bump
     // a counter on the Stripe PI at threshold milestones. "play" events
     // additionally insert into play_events as chargeback evidence.
-    if (kind === "view" || kind === "share") {
+    if (kind === "view" || kind === "share" || kind === "download") {
+      const eventType = kind === "view"
+        ? "share_page_viewed"
+        : kind === "share"
+          ? "share_link_shared"
+          : "song_downloaded";
       await supabase.from("job_events").insert({
         order_id: orderId,
-        event_type: kind === "view" ? "share_page_viewed" : "share_link_shared",
+        event_type: eventType,
         payload: { source, ip_hash: ipHash, user_agent: userAgent?.slice(0, 200) },
       });
 
@@ -74,7 +79,7 @@ serve(async (req) => {
         .from("job_events")
         .select("*", { count: "exact", head: true })
         .eq("order_id", orderId)
-        .eq("event_type", kind === "view" ? "share_page_viewed" : "share_link_shared");
+        .eq("event_type", eventType);
 
       const total = count ?? 1;
       if (STRIPE_SYNC_THRESHOLDS.has(total)) {
