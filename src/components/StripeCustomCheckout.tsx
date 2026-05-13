@@ -19,6 +19,22 @@ import { supabase } from "@/integrations/supabase/client";
 // (no currency helper imports needed here — country comes from props)
 import { COUNTRIES, findCountry, postalRequiredFor } from "@/lib/countries";
 
+// Fire Meta Pixel `AddPaymentInfo` exactly once per page load (covers both
+// wallet (Apple/Google Pay/Link) and card submit paths). Lazy-imported so the
+// pixel module isn't pulled into the critical checkout bundle.
+let pixelAddPaymentInfoFired = false;
+function firePixelAddPaymentInfo(method: "card" | "wallet") {
+  if (pixelAddPaymentInfoFired) return;
+  pixelAddPaymentInfoFired = true;
+  void import("@/lib/metaPixel").then(({ pixelTrack }) => {
+    pixelTrack("AddPaymentInfo", {
+      content_category: "personalized_song",
+      currency: "USD",
+      payment_method: method,
+    });
+  });
+}
+
 interface Props {
   orderId: string;
   /** Bumped whenever the order amount changes (promo applied) so we re-fetch a PI. */
@@ -349,6 +365,7 @@ function PaymentForm({ amount, currency, email, name, country, onCountryChange, 
   async function handleExpressConfirm() {
     if (!stripe || !elements) return;
     setError(null);
+    firePixelAddPaymentInfo("wallet");
     setSubmitting(true);
     const { error: submitError } = await elements.submit();
     if (submitError) {
@@ -391,6 +408,7 @@ function PaymentForm({ amount, currency, email, name, country, onCountryChange, 
     e.preventDefault();
     if (!stripe || !elements) return;
     setError(null);
+    firePixelAddPaymentInfo("card");
     setSubmitting(true);
 
     if (postalRequired && !postalCode.trim()) {
