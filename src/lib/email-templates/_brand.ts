@@ -155,6 +155,27 @@ export const EmailFooter = ({ unsubscribeUrl }: EmailFooterProps) =>
       { style: footerLine },
       `Sent with care from ${BRAND.name} — turning love into songs.`
     ),
+    React.createElement(
+      "p",
+      { style: footerLine },
+      React.createElement(
+        "a",
+        { href: `${BRAND.rootUrl}/terms`, style: footerLink },
+        "Terms of Service"
+      ),
+      "  ·  ",
+      React.createElement(
+        "a",
+        { href: `${BRAND.rootUrl}/terms#refunds`, style: footerLink },
+        "Refund Policy"
+      ),
+      "  ·  ",
+      React.createElement(
+        "a",
+        { href: `${BRAND.rootUrl}/privacy`, style: footerLink },
+        "Privacy"
+      )
+    ),
     unsubscribeUrl
       ? React.createElement(
           "p",
