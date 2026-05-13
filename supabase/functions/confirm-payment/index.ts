@@ -218,7 +218,7 @@ serve(async (req) => {
 
       const { data: order } = await supabase
         .from("orders")
-        .select("product_config, amount_paid_cents, delivery_tier")
+        .select("product_config, amount_paid_cents, amount_paid_usd_cents, delivery_tier")
         .eq("id", orderId)
         .single();
 
@@ -229,11 +229,20 @@ serve(async (req) => {
       }
       productConfig[upsellType] = true;
 
+      const upsellUsd = (() => {
+        const ch: any = (pi as any).latest_charge;
+        const bt = ch && typeof ch === "object" ? ch.balance_transaction : null;
+        return bt && typeof bt.amount === "number" ? (bt.amount as number) : null;
+      })();
+
       const updates: Record<string, unknown> = {
         [flagColumn]: true,
         product_config: productConfig,
         amount_paid_cents:
           (order?.amount_paid_cents ?? 0) + (pi.amount_received ?? pi.amount ?? 0),
+        ...(upsellUsd != null
+          ? { amount_paid_usd_cents: (order?.amount_paid_usd_cents ?? 0) + upsellUsd }
+          : {}),
       };
 
       const newTier = tierMap[upsellType];
