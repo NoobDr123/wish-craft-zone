@@ -190,6 +190,35 @@ async function logEvent(orderId: string, type: string, payload: any) {
   await supabase.from("job_events").insert({ order_id: orderId, event_type: type, payload });
 }
 
+async function syncSongGeneratedToStripe(
+  orderId: string,
+  order: any,
+  audioUrl: string | undefined,
+  shareSlug: string,
+) {
+  if (!order.stripe_payment_intent_id) return;
+  if (order.stripe_env !== "live" && order.stripe_env !== "sandbox") return;
+
+  const env: StripeEnv = order.stripe_env;
+  const stripe = createStripeClient(env);
+
+  await stripe.paymentIntents.update(order.stripe_payment_intent_id, {
+    metadata: {
+      song_generated: "true",
+      song_generated_at: new Date().toISOString(),
+      song_audio_url: (audioUrl ?? "").slice(0, 500),
+      share_slug: shareSlug,
+      order_id: orderId,
+    },
+  });
+
+  await supabase.from("job_events").insert({
+    order_id: orderId,
+    event_type: "stripe_song_generated_synced",
+    payload: { stripe_env: env, payment_intent_id: order.stripe_payment_intent_id },
+  });
+}
+
 function json(body: unknown, status = 200) {
   return new Response(JSON.stringify(body), {
     status,
