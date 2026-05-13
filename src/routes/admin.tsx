@@ -2411,6 +2411,33 @@ function SupportPanel() {
                     </p>
                   </div>
                   <div className="flex shrink-0 gap-2">
+                    <Button
+                      size="sm"
+                      variant="outline"
+                      disabled={reclassifying}
+                      onClick={async () => {
+                        setReclassifying(true);
+                        try {
+                          await supabase.functions.invoke("classify-support-message", {
+                            body: { threadId: selectedId },
+                          });
+                          await loadThreads();
+                        } finally {
+                          setReclassifying(false);
+                        }
+                      }}
+                    >
+                      {reclassifying ? "AI…" : "Re-classify"}
+                    </Button>
+                    {selected.status === "spam" ? (
+                      <Button size="sm" variant="outline" onClick={() => setStatus("open")}>
+                        Not spam
+                      </Button>
+                    ) : (
+                      <Button size="sm" variant="outline" onClick={() => setStatus("spam")}>
+                        Mark spam
+                      </Button>
+                    )}
                     {selected.status !== "closed" ? (
                       <Button size="sm" variant="outline" onClick={() => setStatus("closed")}>
                         Mark closed
@@ -2422,6 +2449,23 @@ function SupportPanel() {
                     )}
                   </div>
                 </div>
+
+                {selected.ai_classified_at && (
+                  <div className={`mt-4 rounded-lg border px-3 py-2 text-xs ${
+                    selected.spam_classification === "spam"
+                      ? "border-destructive/40 bg-destructive/10 text-destructive"
+                      : selected.spam_classification === "unsure"
+                      ? "border-yellow-500/40 bg-yellow-500/10 text-yellow-700"
+                      : "border-emerald-500/40 bg-emerald-500/10 text-emerald-700"
+                  }`}>
+                    <div className="font-semibold uppercase tracking-wider text-[10px]">
+                      AI: {selected.spam_classification}
+                      {typeof selected.spam_score === "number" ? ` · ${Math.round(selected.spam_score * 100)}%` : ""}
+                    </div>
+                    {selected.spam_reason && <div className="mt-0.5">{selected.spam_reason}</div>}
+                    {selected.ai_summary && <div className="mt-0.5 italic">"{selected.ai_summary}"</div>}
+                  </div>
+                )}
               </div>
 
               <div className="flex-1 overflow-y-auto p-5 space-y-3">
