@@ -103,7 +103,7 @@ serve(async (req) => {
     let { data: order, error: orderErr } = await supabase
       .from("orders")
       .select(
-        "id, buyer_email, buyer_name, dog_name, amount_cents, currency, stripe_customer_id, stripe_env, stripe_payment_intent_id, payment_status",
+        "id, buyer_email, buyer_name, dog_name, amount_cents, currency, stripe_customer_id, stripe_env, stripe_payment_intent_id, payment_status, promo_code_id",
       )
       .eq("id", orderId)
       .maybeSingle();
