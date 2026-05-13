@@ -1378,13 +1378,25 @@ function CrmPanel() {
                       {c.paidCount > 1 && <Badge variant="outline" className="text-[10px]">repeat</Badge>}
                     </div>
                   </td>
+                  <td className="p-3 text-xs whitespace-nowrap">
+                    {c.nextScheduledDeliveryAt ? (
+                      <>
+                        <div className="font-medium text-amber-600">{new Date(c.nextScheduledDeliveryAt).toLocaleString()}</div>
+                        {c.pendingDeliveryCount > 1 && (
+                          <div className="text-[10px] text-muted-foreground">+{c.pendingDeliveryCount - 1} more pending</div>
+                        )}
+                      </>
+                    ) : (
+                      <span className="text-muted-foreground">—</span>
+                    )}
+                  </td>
                   <td className="p-3 text-xs text-muted-foreground">
                     {new Date(c.lastOrderAt).toLocaleDateString()}
                   </td>
                 </tr>
                 {expanded === c.email && (
                   <tr className="border-t border-border/40 bg-muted/20">
-                    <td colSpan={6} className="p-6">
+                    <td colSpan={7} className="p-6">
                       <CustomerDetail
                         customer={c}
                         emails={emailLogs[c.email] ?? []}
@@ -1399,7 +1411,7 @@ function CrmPanel() {
             ))}
             {filtered.length === 0 && (
               <tr>
-                <td colSpan={6} className="p-8 text-center text-muted-foreground">
+                <td colSpan={7} className="p-8 text-center text-muted-foreground">
                   No customers.
                 </td>
               </tr>
