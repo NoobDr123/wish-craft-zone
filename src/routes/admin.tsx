@@ -1684,6 +1684,7 @@ interface OrderRow {
   is_gift: boolean;
   brief_score: any;
   amount_paid_cents: number;
+  currency: string;
   payment_status: string;
 }
 
