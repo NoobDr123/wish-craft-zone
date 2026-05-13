@@ -196,13 +196,13 @@ serve(async (req) => {
         extra_verse: "has_3rd_verse",
         rush_delivery: "is_rush",
         unlimited_edits: "has_unlimited_edits",
-        delivery_48h: "is_rush",
+        express_90min: "is_rush",
       };
-      const tierMap: Record<string, "rush_24h" | "express_48h" | undefined> = {
+      const tierMap: Record<string, "rush_24h" | "priority_90min" | undefined> = {
         rush_delivery: "rush_24h",
-        delivery_48h: "express_48h",
+        express_90min: "priority_90min",
       };
-      const tierRank: Record<string, number> = { standard: 0, express_48h: 1, rush_24h: 2 };
+      const tierRank: Record<string, number> = { standard: 0, rush_24h: 1, priority_90min: 2 };
       const flagColumn = flagMap[upsellType];
       if (!flagColumn) {
         return json({ error: `Unknown upsellType: ${upsellType}` }, 400);

@@ -33,7 +33,7 @@ function Upsell1() {
       upsellType: "express_90min",
       orderId: q.orderId,
       buyerEmail: q.buyer_email || undefined,
-      amountCents: 4999,
+      amountCents: 5999,
     });
     if (!q.orderId) {
       navigate({ to: "/upsell-2" });
@@ -75,7 +75,7 @@ function Upsell1() {
       upsellType: "rush_delivery",
       orderId: q.orderId,
       buyerEmail: q.buyer_email || undefined,
-      amountCents: 2999,
+      amountCents: 3999,
     });
     if (!q.orderId) {
       setShowDownsell(false);
@@ -128,7 +128,7 @@ function Upsell1() {
           "We start producing the moment you accept, around the clock",
           "Hand-checked by a real human before it lands in your inbox",
         ]}
-        priceLabel="$49.99"
+        priceLabel="$59.99"
         declineLabel="No thanks, I can wait"
         onAccept={accept}
         onDecline={decline}

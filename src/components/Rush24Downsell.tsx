@@ -10,7 +10,7 @@ interface Rush24DownsellProps {
 
 /**
  * Slim "last chance" downsell shown when a user declines the 90-minute
- * priority delivery upsell. Offers the 24-hour rush at $29.99 — slower than
+ * priority delivery upsell. Offers the 24-hour rush at $39.99 — slower than
  * priority but still much faster than the 5-day standard turnaround.
  */
 export function Rush24Downsell({
@@ -65,7 +65,7 @@ export function Rush24Downsell({
             className="font-display text-xl font-semibold leading-tight text-foreground sm:text-2xl"
           >
             Get the song in 24 hours for{" "}
-            <span className="text-primary">$29.99</span>
+            <span className="text-primary">$39.99</span>
           </h2>
 
           <p className="mt-2.5 text-sm leading-relaxed text-muted-foreground">
@@ -94,7 +94,7 @@ export function Rush24Downsell({
               24-hour delivery
             </span>
             <span className="font-display text-2xl font-semibold text-foreground">
-              $29.99
+              $39.99
             </span>
           </div>
 
