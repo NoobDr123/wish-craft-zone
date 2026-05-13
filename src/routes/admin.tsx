@@ -510,7 +510,7 @@ function DashboardPanel() {
     // ---- Orders in range
     let ordersQ = supabase
       .from("orders")
-      .select("id, buyer_email, buyer_name, customer_name, amount_paid_cents, amount_cents, currency, payment_status, status, has_3rd_verse, is_rush, has_unlimited_edits, delivery_tier, created_at")
+      .select("id, buyer_email, buyer_name, customer_name, amount_paid_cents, amount_paid_usd_cents, amount_cents, currency, payment_status, status, has_3rd_verse, is_rush, has_unlimited_edits, delivery_tier, created_at")
       .not("buyer_email", "like", "pending+%@getpawprintsong.com")
       .order("created_at", { ascending: false })
       .limit(2000);
@@ -530,7 +530,7 @@ function DashboardPanel() {
     // ---- Lifetime customer rollup (all-time, paid orders only)
     const lifetimeQ = supabase
       .from("orders")
-      .select("buyer_email, amount_paid_cents, currency, payment_status")
+      .select("buyer_email, amount_paid_cents, amount_paid_usd_cents, currency, payment_status")
       .not("buyer_email", "like", "pending+%@getpawprintsong.com")
       .in("payment_status", ["paid", "succeeded"])
       .limit(20000);
@@ -1706,7 +1706,7 @@ function OrdersPanel() {
   const load = async () => {
     let q = supabase
       .from("orders")
-      .select("id, dog_name, buyer_email, status, priority, flagged_for_review, flag_reason, created_at, scheduled_delivery_at, delivered_at, is_gift, brief_score, amount_paid_cents, currency, payment_status")
+      .select("id, dog_name, buyer_email, status, priority, flagged_for_review, flag_reason, created_at, scheduled_delivery_at, delivered_at, is_gift, brief_score, amount_paid_cents, amount_paid_usd_cents, currency, payment_status")
       .not("buyer_email", "like", "pending+%@getpawprintsong.com")
       .order("created_at", { ascending: false })
       .limit(200);
@@ -2676,7 +2676,7 @@ function CustomerExplorerPanel() {
     setLoading(true);
     let q = supabase
       .from("orders")
-      .select("id, buyer_email, buyer_name, dog_name, dog_breed, status, payment_status, amount_cents, amount_paid_cents, currency, delivery_tier, is_gift, flagged_for_review, created_at, delivered_at, user_id")
+      .select("id, buyer_email, buyer_name, dog_name, dog_breed, status, payment_status, amount_cents, amount_paid_cents, amount_paid_usd_cents, currency, delivery_tier, is_gift, flagged_for_review, created_at, delivered_at, user_id")
       .order("created_at", { ascending: false })
       .limit(500);
 
@@ -2843,7 +2843,7 @@ function CustomerDetailDrawer({ orderId, onClose }: { orderId: string; onClose: 
       const [evRes, emRes, otherRes, refRes, revRes, reactRes, sessRes] = await Promise.all([
         supabase.from("job_events").select("id, event_type, payload, created_at").eq("order_id", orderId).order("created_at", { ascending: false }).limit(200),
         email ? supabase.from("email_send_log").select("id, template_name, status, created_at, error_message").eq("recipient_email", email).order("created_at", { ascending: false }).limit(50) : Promise.resolve({ data: [] }),
-        email ? supabase.from("orders").select("id, dog_name, status, payment_status, amount_paid_cents, currency, created_at").eq("buyer_email", email).neq("id", orderId).order("created_at", { ascending: false }).limit(20) : Promise.resolve({ data: [] }),
+        email ? supabase.from("orders").select("id, dog_name, status, payment_status, amount_paid_cents, amount_paid_usd_cents, currency, created_at").eq("buyer_email", email).neq("id", orderId).order("created_at", { ascending: false }).limit(20) : Promise.resolve({ data: [] }),
         supabase.from("refund_requests").select("id, request_type, reason, status, amount_cents, created_at").eq("order_id", orderId).order("created_at", { ascending: false }),
         supabase.from("revision_requests").select("id, notes, status, is_free, created_at").eq("order_id", orderId).order("created_at", { ascending: false }),
         supabase.from("reaction_videos").select("id, status, is_public, caption, created_at").eq("order_id", orderId).order("created_at", { ascending: false }),
