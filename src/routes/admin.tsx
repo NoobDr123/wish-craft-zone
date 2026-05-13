@@ -405,8 +405,32 @@ function StatCard({
   );
 }
 
+// Static FX rates → USD. Update when material currencies are added.
+// Used to normalize multi-currency totals (revenue, AOV, LTV, daily sales).
+const FX_TO_USD: Record<string, number> = {
+  USD: 1, EUR: 1.08, GBP: 1.27, CAD: 0.73, AUD: 0.66,
+  PLN: 0.25, CHF: 1.13, SEK: 0.094, NOK: 0.092, DKK: 0.145,
+};
+
+function toUsdCents(cents: number | null | undefined, currency: string | null | undefined): number {
+  const c = (cents ?? 0);
+  const code = (currency ?? "USD").toUpperCase();
+  const rate = FX_TO_USD[code] ?? 1;
+  return Math.round(c * rate);
+}
+
 function fmtMoney(cents: number) {
   return `$${(cents / 100).toFixed(2)}`;
+}
+
+// Per-row money formatter that respects the original currency.
+function fmtMoneyCcy(cents: number | null | undefined, currency: string | null | undefined) {
+  const code = (currency ?? "USD").toUpperCase();
+  try {
+    return new Intl.NumberFormat("en-US", { style: "currency", currency: code }).format((cents ?? 0) / 100);
+  } catch {
+    return `${code} ${((cents ?? 0) / 100).toFixed(2)}`;
+  }
 }
 
 function fmtPct(num: number, denom: number) {
@@ -458,6 +482,7 @@ interface DashboardData {
     buyer_email: string;
     buyer_name: string | null;
     amount_paid_cents: number;
+    currency: string;
     payment_status: string;
     status: string;
   }>;
@@ -478,7 +503,7 @@ function DashboardPanel() {
     // ---- Orders in range
     let ordersQ = supabase
       .from("orders")
-      .select("id, buyer_email, buyer_name, customer_name, amount_paid_cents, amount_cents, payment_status, status, has_3rd_verse, is_rush, has_unlimited_edits, delivery_tier, created_at")
+      .select("id, buyer_email, buyer_name, customer_name, amount_paid_cents, amount_cents, currency, payment_status, status, has_3rd_verse, is_rush, has_unlimited_edits, delivery_tier, created_at")
       .not("buyer_email", "like", "pending+%@getpawprintsong.com")
       .order("created_at", { ascending: false })
       .limit(2000);
@@ -498,7 +523,7 @@ function DashboardPanel() {
     // ---- Lifetime customer rollup (all-time, paid orders only)
     const lifetimeQ = supabase
       .from("orders")
-      .select("buyer_email, amount_paid_cents, payment_status")
+      .select("buyer_email, amount_paid_cents, currency, payment_status")
       .not("buyer_email", "like", "pending+%@getpawprintsong.com")
       .in("payment_status", ["paid", "succeeded"])
       .limit(20000);
@@ -516,15 +541,16 @@ function DashboardPanel() {
     const paid = orders.filter((o) => o.payment_status === "paid" || o.payment_status === "succeeded");
     const failed = orders.filter((o) => o.payment_status === "failed");
     const pending = orders.filter((o) => o.payment_status === "pending");
-    const revenueCents = paid.reduce((s, o) => s + (o.amount_paid_cents ?? 0), 0);
+    // Normalize to USD for cross-currency aggregates.
+    const revenueCents = paid.reduce((s, o) => s + toUsdCents(o.amount_paid_cents, o.currency), 0);
     const aovCents = paid.length > 0 ? Math.round(revenueCents / paid.length) : 0;
 
-    // Daily sales grouped by EST date
+    // Daily sales grouped by EST date (USD-normalized)
     const byDay: Record<string, { cents: number; orders: number }> = {};
     for (const o of paid) {
       const d = estDateKey(o.created_at);
       if (!byDay[d]) byDay[d] = { cents: 0, orders: 0 };
-      byDay[d].cents += o.amount_paid_cents ?? 0;
+      byDay[d].cents += toUsdCents(o.amount_paid_cents, o.currency);
       byDay[d].orders += 1;
     }
     const dailySales = Object.entries(byDay)
@@ -552,13 +578,13 @@ function DashboardPanel() {
     const conversionPct = uniqueVisitors > 0 ? (paid.length / uniqueVisitors) * 100 : 0;
     const checkoutToPaidPct = cardStarteds.size > 0 ? (paid.length / cardStarteds.size) * 100 : 0;
 
-    // Lifetime customer/LTV (all-time)
+    // Lifetime customer/LTV (all-time, USD-normalized)
     const ltvByEmail: Record<string, { cents: number; orders: number }> = {};
     for (const o of lifetimeRows ?? []) {
       const email = (o.buyer_email ?? "").toLowerCase();
       if (!email) continue;
       if (!ltvByEmail[email]) ltvByEmail[email] = { cents: 0, orders: 0 };
-      ltvByEmail[email].cents += o.amount_paid_cents ?? 0;
+      ltvByEmail[email].cents += toUsdCents(o.amount_paid_cents, o.currency);
       ltvByEmail[email].orders += 1;
     }
     const lifetimeCustomerCount = Object.keys(ltvByEmail).length;
@@ -573,6 +599,7 @@ function DashboardPanel() {
       buyer_email: o.buyer_email,
       buyer_name: o.buyer_name ?? o.customer_name ?? null,
       amount_paid_cents: o.amount_paid_cents ?? 0,
+      currency: o.currency ?? "USD",
       payment_status: o.payment_status,
       status: o.status,
     }));
@@ -828,7 +855,7 @@ function DashboardPanel() {
                     </Badge>
                   </td>
                   <td className="p-3 text-right font-medium text-emerald-600">
-                    {fmtMoney(o.amount_paid_cents)}
+                    {fmtMoneyCcy(o.amount_paid_cents, o.currency)}
                   </td>
                 </tr>
               ))}
@@ -1168,7 +1195,7 @@ function CrmPanel() {
       c.orderCount += 1;
       if (o.payment_status === "paid" || o.payment_status === "succeeded") {
         c.paidCount += 1;
-        c.totalSpentCents += o.amount_paid_cents ?? 0;
+        c.totalSpentCents += toUsdCents(o.amount_paid_cents, o.currency);
       } else if (o.payment_status === "failed") {
         c.failedCount += 1;
       } else {
@@ -1395,7 +1422,7 @@ function CustomerDetail({
                   <td className="p-2">{o.dog_name}</td>
                   <td className="p-2"><Badge variant="outline" className="text-[10px]">{o.status}</Badge></td>
                   <td className="p-2"><Badge variant={o.payment_status === "paid" ? "default" : o.payment_status === "failed" ? "destructive" : "outline"} className="text-[10px]">{o.payment_status}</Badge></td>
-                  <td className="p-2 font-medium">{fmtMoney(o.amount_paid_cents ?? 0)}</td>
+                  <td className="p-2 font-medium">{fmtMoneyCcy(o.amount_paid_cents ?? 0, o.currency)}</td>
                   <td className="p-2">
                     <div className="flex gap-1">
                       {o.has_3rd_verse && <Badge variant="outline" className="text-[10px]">verse</Badge>}
@@ -1657,6 +1684,7 @@ interface OrderRow {
   is_gift: boolean;
   brief_score: any;
   amount_paid_cents: number;
+  currency: string;
   payment_status: string;
 }
 
@@ -1671,7 +1699,7 @@ function OrdersPanel() {
   const load = async () => {
     let q = supabase
       .from("orders")
-      .select("id, dog_name, buyer_email, status, priority, flagged_for_review, flag_reason, created_at, scheduled_delivery_at, delivered_at, is_gift, brief_score, amount_paid_cents, payment_status")
+      .select("id, dog_name, buyer_email, status, priority, flagged_for_review, flag_reason, created_at, scheduled_delivery_at, delivered_at, is_gift, brief_score, amount_paid_cents, currency, payment_status")
       .not("buyer_email", "like", "pending+%@getpawprintsong.com")
       .order("created_at", { ascending: false })
       .limit(200);
@@ -1747,7 +1775,7 @@ function OrdersPanel() {
                 <td className="p-3 text-xs text-muted-foreground">{o.buyer_email}</td>
                 <td className="p-3"><Badge variant="outline">{o.status}</Badge></td>
                 <td className="p-3"><Badge variant={o.payment_status === "paid" ? "default" : o.payment_status === "failed" ? "destructive" : "outline"}>{o.payment_status}</Badge></td>
-                <td className="p-3 text-xs">{fmtMoney(o.amount_paid_cents ?? 0)}</td>
+                <td className="p-3 text-xs">{fmtMoneyCcy(o.amount_paid_cents ?? 0, o.currency)}</td>
                 <td className="p-3 text-xs">{new Date(o.created_at).toLocaleString()}</td>
                 <td className="p-3">
                   <div className="flex flex-col gap-1">
@@ -2621,6 +2649,7 @@ interface ExplorerOrderRow {
   payment_status: string;
   amount_cents: number;
   amount_paid_cents: number;
+  currency: string;
   delivery_tier: string;
   is_gift: boolean;
   flagged_for_review: boolean;
@@ -2640,7 +2669,7 @@ function CustomerExplorerPanel() {
     setLoading(true);
     let q = supabase
       .from("orders")
-      .select("id, buyer_email, buyer_name, dog_name, dog_breed, status, payment_status, amount_cents, amount_paid_cents, delivery_tier, is_gift, flagged_for_review, created_at, delivered_at, user_id")
+      .select("id, buyer_email, buyer_name, dog_name, dog_breed, status, payment_status, amount_cents, amount_paid_cents, currency, delivery_tier, is_gift, flagged_for_review, created_at, delivered_at, user_id")
       .order("created_at", { ascending: false })
       .limit(500);
 
@@ -2672,7 +2701,7 @@ function CustomerExplorerPanel() {
   const stats = {
     total: filtered.length,
     paid: filtered.filter((r) => r.payment_status === "paid").length,
-    revenue: filtered.reduce((s, r) => s + (r.amount_paid_cents ?? 0), 0),
+    revenue: filtered.reduce((s, r) => s + toUsdCents(r.amount_paid_cents, r.currency), 0),
   };
 
   return (
@@ -2767,7 +2796,7 @@ function CustomerExplorerPanel() {
                 </td>
                 <td className="p-3 text-xs">{r.delivery_tier}</td>
                 <td className="p-3 text-xs">
-                  {fmtMoney(r.amount_paid_cents || r.amount_cents)}
+                  {fmtMoneyCcy(r.amount_paid_cents || r.amount_cents, r.currency)}
                 </td>
                 <td className="p-3 text-xs whitespace-nowrap">{new Date(r.created_at).toLocaleString()}</td>
               </tr>
@@ -2807,7 +2836,7 @@ function CustomerDetailDrawer({ orderId, onClose }: { orderId: string; onClose: 
       const [evRes, emRes, otherRes, refRes, revRes, reactRes, sessRes] = await Promise.all([
         supabase.from("job_events").select("id, event_type, payload, created_at").eq("order_id", orderId).order("created_at", { ascending: false }).limit(200),
         email ? supabase.from("email_send_log").select("id, template_name, status, created_at, error_message").eq("recipient_email", email).order("created_at", { ascending: false }).limit(50) : Promise.resolve({ data: [] }),
-        email ? supabase.from("orders").select("id, dog_name, status, payment_status, amount_paid_cents, created_at").eq("buyer_email", email).neq("id", orderId).order("created_at", { ascending: false }).limit(20) : Promise.resolve({ data: [] }),
+        email ? supabase.from("orders").select("id, dog_name, status, payment_status, amount_paid_cents, currency, created_at").eq("buyer_email", email).neq("id", orderId).order("created_at", { ascending: false }).limit(20) : Promise.resolve({ data: [] }),
         supabase.from("refund_requests").select("id, request_type, reason, status, amount_cents, created_at").eq("order_id", orderId).order("created_at", { ascending: false }),
         supabase.from("revision_requests").select("id, notes, status, is_free, created_at").eq("order_id", orderId).order("created_at", { ascending: false }),
         supabase.from("reaction_videos").select("id, status, is_public, caption, created_at").eq("order_id", orderId).order("created_at", { ascending: false }),
@@ -2865,8 +2894,9 @@ function CustomerDetailDrawer({ orderId, onClose }: { orderId: string; onClose: 
                   {order.payment_status}
                 </Badge>
               } />
-              <DetailField label="Amount paid" value={fmtMoney(order.amount_paid_cents || 0)} />
-              <DetailField label="Order amount" value={fmtMoney(order.amount_cents || 0)} />
+              <DetailField label="Amount paid" value={fmtMoneyCcy(order.amount_paid_cents || 0, order.currency)} />
+              <DetailField label="Order amount" value={fmtMoneyCcy(order.amount_cents || 0, order.currency)} />
+              <DetailField label="Amount paid (USD)" value={fmtMoney(toUsdCents(order.amount_paid_cents || 0, order.currency))} />
               <DetailField label="Tier" value={order.delivery_tier} />
               <DetailField label="Priority" value={order.priority} />
               <DetailField label="Source" value={order.source_kind} />
@@ -2968,7 +2998,7 @@ function CustomerDetailDrawer({ orderId, onClose }: { orderId: string; onClose: 
                       <div className="flex items-center gap-2 text-xs">
                         <Badge variant="outline">{o.status}</Badge>
                         <Badge variant={o.payment_status === "paid" ? "default" : "outline"}>{o.payment_status}</Badge>
-                        <span>{fmtMoney(o.amount_paid_cents || 0)}</span>
+                        <span>{fmtMoneyCcy(o.amount_paid_cents || 0, o.currency)}</span>
                       </div>
                     </div>
                   ))}
