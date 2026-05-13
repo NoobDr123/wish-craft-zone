@@ -523,7 +523,7 @@ function DashboardPanel() {
     // ---- Lifetime customer rollup (all-time, paid orders only)
     const lifetimeQ = supabase
       .from("orders")
-      .select("buyer_email, amount_paid_cents, payment_status")
+      .select("buyer_email, amount_paid_cents, currency, payment_status")
       .not("buyer_email", "like", "pending+%@getpawprintsong.com")
       .in("payment_status", ["paid", "succeeded"])
       .limit(20000);
