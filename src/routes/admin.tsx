@@ -1130,6 +1130,7 @@ function CrmPanel() {
   const [expanded, setExpanded] = useState<string | null>(null);
   const [emailLogs, setEmailLogs] = useState<Record<string, any[]>>({});
   const [quizEvents, setQuizEvents] = useState<Record<string, any[]>>({});
+  const [drawerOrderId, setDrawerOrderId] = useState<string | null>(null);
 
   const load = async (signal?: { active: boolean }) => {
     setLoading(true);
@@ -1308,6 +1309,8 @@ function CrmPanel() {
                         customer={c}
                         emails={emailLogs[c.email] ?? []}
                         events={quizEvents[c.email] ?? []}
+                        onOpenOrder={(id) => setDrawerOrderId(id)}
+                        onActed={() => load()}
                       />
                     </td>
                   </tr>
@@ -1324,6 +1327,10 @@ function CrmPanel() {
           </tbody>
         </table>
       </div>
+
+      {drawerOrderId && (
+        <CustomerDetailDrawer orderId={drawerOrderId} onClose={() => setDrawerOrderId(null)} />
+      )}
     </>
   );
 }
@@ -1332,11 +1339,36 @@ function CustomerDetail({
   customer,
   emails,
   events,
+  onOpenOrder,
+  onActed,
 }: {
   customer: CrmCustomer;
   emails: any[];
   events: any[];
+  onOpenOrder?: (orderId: string) => void;
+  onActed?: () => void;
 }) {
+  const [busy, setBusy] = useState<string | null>(null);
+
+  const callFn = async (fn: string, body: any, label: string, orderId: string) => {
+    setBusy(`${orderId}:${label}`);
+    try {
+      const { data: { session } } = await supabase.auth.getSession();
+      const res = await fetch(`${import.meta.env.VITE_SUPABASE_URL}/functions/v1/${fn}`, {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+          Authorization: `Bearer ${session?.access_token ?? import.meta.env.VITE_SUPABASE_PUBLISHABLE_KEY}`,
+        },
+        body: JSON.stringify(body),
+      });
+      console.log(label, await res.json());
+      onActed?.();
+    } finally {
+      setBusy(null);
+    }
+  };
+
   return (
     <div className="space-y-6">
       {/* Orders */}
@@ -1352,11 +1384,14 @@ function CustomerDetail({
                 <th className="p-2">Amount</th>
                 <th className="p-2">Upsells</th>
                 <th className="p-2">Created</th>
+                <th className="p-2">Scheduled delivery</th>
+                <th className="p-2">Delivered</th>
+                <th className="p-2 text-right">Actions</th>
               </tr>
             </thead>
             <tbody>
               {customer.orders.map((o: any) => (
-                <tr key={o.id} className="border-t border-border/40">
+                <tr key={o.id} className="border-t border-border/40 align-top">
                   <td className="p-2">{o.dog_name}</td>
                   <td className="p-2"><Badge variant="outline" className="text-[10px]">{o.status}</Badge></td>
                   <td className="p-2"><Badge variant={o.payment_status === "paid" ? "default" : o.payment_status === "failed" ? "destructive" : "outline"} className="text-[10px]">{o.payment_status}</Badge></td>
@@ -1368,7 +1403,34 @@ function CustomerDetail({
                       {o.has_unlimited_edits && <Badge variant="outline" className="text-[10px]">edits</Badge>}
                     </div>
                   </td>
-                  <td className="p-2 text-muted-foreground">{new Date(o.created_at).toLocaleString()}</td>
+                  <td className="p-2 text-muted-foreground whitespace-nowrap">{new Date(o.created_at).toLocaleString()}</td>
+                  <td className="p-2 text-muted-foreground whitespace-nowrap">
+                    {o.scheduled_delivery_at ? new Date(o.scheduled_delivery_at).toLocaleString() : "—"}
+                  </td>
+                  <td className="p-2 text-muted-foreground whitespace-nowrap">
+                    {o.delivered_at ? new Date(o.delivered_at).toLocaleString() : "—"}
+                  </td>
+                  <td className="p-2">
+                    <div className="flex flex-col gap-1 items-end">
+                      {onOpenOrder && (
+                        <Button size="sm" variant="ghost" className="h-6 text-[10px] px-2" onClick={() => onOpenOrder(o.id)}>
+                          View details
+                        </Button>
+                      )}
+                      <Button size="sm" variant="outline" className="h-6 text-[10px] px-2" disabled={busy === `${o.id}:brief`} onClick={() => callFn("generate-brief", { orderId: o.id }, "brief", o.id)}>
+                        Regen brief
+                      </Button>
+                      <Button size="sm" variant="outline" className="h-6 text-[10px] px-2" disabled={busy === `${o.id}:music`} onClick={() => callFn("submit-to-kie", { orderId: o.id }, "music", o.id)}>
+                        Submit music
+                      </Button>
+                      <Button size="sm" variant="outline" className="h-6 text-[10px] px-2" disabled={busy === `${o.id}:deliver`} onClick={() => callFn("deliver-song", { orderId: o.id }, "deliver", o.id)}>
+                        Deliver now
+                      </Button>
+                      <Button size="sm" variant="default" className="h-6 text-[10px] px-2" disabled={busy === `${o.id}:force`} onClick={() => callFn("deliver-song", { orderId: o.id, force: true }, "force", o.id)}>
+                        Force deliver
+                      </Button>
+                    </div>
+                  </td>
                 </tr>
               ))}
             </tbody>
