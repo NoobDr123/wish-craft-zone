@@ -36,7 +36,7 @@ function Upsell1() {
       upsellType: "express_90min",
       orderId: q.orderId,
       buyerEmail: q.buyer_email || undefined,
-      amountCents: 5999,
+      amountCents: getProductPrice(currency, "express_90min"),
     });
     if (!q.orderId) {
       navigate({ to: "/upsell-2" });
