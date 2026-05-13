@@ -104,7 +104,7 @@ serve(async (req) => {
             Authorization: `Bearer ${Deno.env.get("SUPABASE_SERVICE_ROLE_KEY")!}`,
           },
           body: JSON.stringify({
-            template: "song-delivered",
+            template: personal && t.role === "buyer" ? "song-delivered-personal" : "song-delivered",
             to: t.email,
             data: {
               recipient_name: order.dog_name,
