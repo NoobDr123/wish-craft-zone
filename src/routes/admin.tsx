@@ -2488,6 +2488,20 @@ function SupportPanel() {
               </div>
 
               <div className="border-t border-border p-4 space-y-3">
+                {selected.ai_suggested_reply && !reply && (
+                  <button
+                    type="button"
+                    onClick={() => setReply(selected.ai_suggested_reply)}
+                    className="w-full rounded-lg border border-primary/40 bg-primary/5 px-3 py-2 text-left text-xs hover:bg-primary/10 transition-colors"
+                  >
+                    <div className="font-semibold uppercase tracking-wider text-[10px] text-primary mb-1">
+                      ✨ AI suggested reply — click to use
+                    </div>
+                    <div className="text-foreground/80 line-clamp-3 whitespace-pre-wrap">
+                      {selected.ai_suggested_reply}
+                    </div>
+                  </button>
+                )}
                 <Textarea
                   rows={4}
                   placeholder={`Reply to ${selected.sender_name}…`}
