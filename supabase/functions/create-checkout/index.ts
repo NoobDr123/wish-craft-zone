@@ -333,7 +333,7 @@ async function handleFreeSongRedemption(orderId: string, code: string, req: Requ
       payment_status: "paid",
       amount_cents: 0,
       amount_paid_cents: 0,
-      source_kind: "free_reward",
+      source_kind: "customer_initiated",
       source_reward_code_id: reward.id,
       status: "upsells_complete",
       delivery_tier: "standard",

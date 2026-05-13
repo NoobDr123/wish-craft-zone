@@ -69,8 +69,8 @@ serve(async (req) => {
         .maybeSingle();
       if (existing?.code) {
         returningPromoCode = existing.code;
-      } else if (order.source_kind === "paid") {
-        // Only issue for paid orders, not free reward orders.
+      } else if (!order.source_reward_code_id) {
+        // Only issue for paid customer orders, not free reward redemptions.
         const { data: newPromo } = await supabase.rpc("issue_personal_promo_code", {
           _kind: "returning_10pct",
           _discount_pct: 10,
