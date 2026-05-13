@@ -520,22 +520,25 @@ function PaymentForm({ amount, currency, email, name, country, onCountryChange, 
         </div>
       </div>
 
-      {/* Postal / ZIP code (country auto-detected from IP) */}
-      {postalRequired && (
-        <div className="space-y-2">
+      {/* Country + Postal / ZIP. Country auto-detected from IP; collapsed to a
+          subtle "change" link for US (the vast majority of buyers) and shown
+          inline next to the postal field for everyone else. */}
+      <div className="space-y-2">
+        <div className="flex items-end justify-between gap-2">
           <label className="block text-[15px] font-semibold text-foreground">{postalLabel}</label>
-          <input
-            type="text"
-            inputMode={country === "US" ? "numeric" : "text"}
-            autoComplete="postal-code"
-            value={postalCode}
-            onChange={(e) => setPostalCode(e.target.value)}
-            placeholder={postalPlaceholder}
-            maxLength={country === "US" ? 10 : 12}
-            className="w-full rounded-2xl border border-[#E5D9C8] bg-[#FBF6EC] px-4 py-[14px] text-[16px] text-foreground placeholder:text-[#A89E8F] transition-colors focus:border-primary focus:outline-none focus:ring-[3px] focus:ring-primary/15"
-          />
+          <CountryPicker country={country} onCountryChange={onCountryChange} />
         </div>
-      )}
+        <input
+          type="text"
+          inputMode={country === "US" ? "numeric" : "text"}
+          autoComplete="postal-code"
+          value={postalCode}
+          onChange={(e) => setPostalCode(e.target.value)}
+          placeholder={postalPlaceholder}
+          maxLength={country === "US" ? 10 : 12}
+          className="w-full rounded-2xl border border-[#E5D9C8] bg-[#FBF6EC] px-4 py-[14px] text-[16px] text-foreground placeholder:text-[#A89E8F] transition-colors focus:border-primary focus:outline-none focus:ring-[3px] focus:ring-primary/15"
+        />
+      </div>
 
       <p className="text-[12.5px] leading-snug text-muted-foreground">
         By providing your card information, you authorize PawPrint Song to charge your card for this
