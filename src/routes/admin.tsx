@@ -1321,11 +1321,19 @@ function CrmPanel() {
         </p>
       </div>
 
-      <div className="grid grid-cols-2 gap-4 md:grid-cols-4 mb-6">
+      <div className="mb-6">
+        <h1 className="font-display text-3xl font-semibold">Mega CRM</h1>
+        <p className="text-sm text-muted-foreground">
+          Customers, orders, scheduled deliveries, emails, and quiz path — all in one place. Click a row for full detail.
+        </p>
+      </div>
+
+      <div className="grid grid-cols-2 gap-4 md:grid-cols-5 mb-6">
         <StatCard label="Total customers" value={customers.length} />
         <StatCard label="Lifetime revenue" value={fmtMoney(totalLifetimeRevenue)} tone="success" />
         <StatCard label="With paid orders" value={customers.filter((c) => c.paidCount > 0).length} />
         <StatCard label="Repeat buyers" value={customers.filter((c) => c.paidCount > 1).length} />
+        <StatCard label="Pending deliveries" value={customers.reduce((s, c) => s + c.pendingDeliveryCount, 0)} tone="warning" />
       </div>
 
       <input
