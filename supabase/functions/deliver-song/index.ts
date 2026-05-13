@@ -28,7 +28,7 @@ serve(async (req) => {
   if (unauthorized) return unauthorized;
 
   try {
-    const { orderId, force } = await req.json();
+    const { orderId, force, personal } = await req.json();
     if (!orderId) return json({ error: "Missing orderId" }, 400);
 
     const { data: order } = await supabase
