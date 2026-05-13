@@ -52,7 +52,7 @@ interface SessionState {
  *     and country dropdown ourselves. PCI scope stays SAQ A.
  */
 export function StripeCustomCheckout(props: Props) {
-  const { orderId, amountVersion, email, name, quizPatch, quizSnapshot, onError } = props;
+  const { orderId, amountVersion, email, name, country, onCountryChange, quizPatch, quizSnapshot, onError } = props;
   const [session, setSession] = useState<SessionState | null>(null);
   const [loading, setLoading] = useState(true);
   const [fetchError, setFetchError] = useState<string | null>(null);
