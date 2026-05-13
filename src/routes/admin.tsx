@@ -913,16 +913,12 @@ interface FunnelData {
 }
 
 const QUESTION_LABELS = [
-  "1. Relationship + name",
-  "2. Journey stage",
-  "3. Their fight",
-  "4. Their qualities",
-  "5. Shared memory",
-  "6. Theme",
-  "7. Personal letter",
-  "8. Sound",
-  "9. Email/name",
-  "10. Gift toggle",
+  "1. Basics (name + gender)",
+  "2. Breed",
+  "3. Personality",
+  "4. Memory",
+  "5. Sound (genre + voice)",
+  "6. Delivery (email + name)",
 ];
 
 function FunnelPanel() {
