@@ -3207,7 +3207,7 @@ function SupportPanel() {
                       {selected.order_id_text ? ` · Order ${selected.order_id_text}` : ""}
                     </p>
                   </div>
-                  <div className="flex shrink-0 gap-2">
+                  <div className="flex shrink-0 gap-2" hidden={!!selected.__synthetic}>
                     <Button
                       size="sm"
                       variant="outline"
