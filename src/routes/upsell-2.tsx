@@ -96,7 +96,7 @@ function Upsell2() {
         "Try a different genre, voice, or tempo as many times as you like",
         "14 days from delivery, no rush, no catches",
       ]}
-      priceLabel="$32.99"
+      priceLabel={formatProduct(currency, "unlimited_edits")}
       declineLabel="No thanks, I trust the first version"
       onAccept={accept}
       onDecline={decline}
