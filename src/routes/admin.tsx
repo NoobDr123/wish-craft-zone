@@ -1465,68 +1465,20 @@ function CustomerDetail({
     <div className="space-y-6">
       {/* Orders */}
       <div>
-        <h3 className="font-semibold text-sm mb-2">Orders ({customer.orders.length})</h3>
-        <div className="rounded-lg border border-border bg-background overflow-hidden">
-          <table className="w-full text-xs">
-            <thead className="bg-muted/30 text-left">
-              <tr>
-                <th className="p-2">Recipient</th>
-                <th className="p-2">Status</th>
-                <th className="p-2">Payment</th>
-                <th className="p-2">Amount</th>
-                <th className="p-2">Upsells</th>
-                <th className="p-2">Created</th>
-                <th className="p-2">Scheduled delivery</th>
-                <th className="p-2">Delivered</th>
-                <th className="p-2 text-right">Actions</th>
-              </tr>
-            </thead>
-            <tbody>
-              {customer.orders.map((o: any) => (
-                <tr key={o.id} className="border-t border-border/40 align-top">
-                  <td className="p-2">{o.dog_name}</td>
-                  <td className="p-2"><Badge variant="outline" className="text-[10px]">{o.status}</Badge></td>
-                  <td className="p-2"><Badge variant={o.payment_status === "paid" ? "default" : o.payment_status === "failed" ? "destructive" : "outline"} className="text-[10px]">{o.payment_status}</Badge></td>
-                  <td className="p-2 font-medium">{fmtMoneyCcy(o.amount_paid_cents ?? 0, o.currency)}</td>
-                  <td className="p-2">
-                    <div className="flex gap-1">
-                      {o.has_3rd_verse && <Badge variant="outline" className="text-[10px]">verse</Badge>}
-                      {o.is_rush && <Badge variant="outline" className="text-[10px]">rush</Badge>}
-                      {o.has_unlimited_edits && <Badge variant="outline" className="text-[10px]">edits</Badge>}
-                    </div>
-                  </td>
-                  <td className="p-2 text-muted-foreground whitespace-nowrap">{new Date(o.created_at).toLocaleString()}</td>
-                  <td className="p-2 text-muted-foreground whitespace-nowrap">
-                    {o.scheduled_delivery_at ? new Date(o.scheduled_delivery_at).toLocaleString() : "—"}
-                  </td>
-                  <td className="p-2 text-muted-foreground whitespace-nowrap">
-                    {o.delivered_at ? new Date(o.delivered_at).toLocaleString() : "—"}
-                  </td>
-                  <td className="p-2">
-                    <div className="flex flex-col gap-1 items-end">
-                      {onOpenOrder && (
-                        <Button size="sm" variant="ghost" className="h-6 text-[10px] px-2" onClick={() => onOpenOrder(o.id)}>
-                          View details
-                        </Button>
-                      )}
-                      <Button size="sm" variant="outline" className="h-6 text-[10px] px-2" disabled={busy === `${o.id}:brief`} onClick={() => callFn("generate-brief", { orderId: o.id }, "brief", o.id)}>
-                        Regen brief
-                      </Button>
-                      <Button size="sm" variant="outline" className="h-6 text-[10px] px-2" disabled={busy === `${o.id}:music`} onClick={() => callFn("submit-to-kie", { orderId: o.id }, "music", o.id)}>
-                        Submit music
-                      </Button>
-                      <Button size="sm" variant="outline" className="h-6 text-[10px] px-2" disabled={busy === `${o.id}:deliver`} onClick={() => callFn("deliver-song", { orderId: o.id }, "deliver", o.id)}>
-                        Deliver now
-                      </Button>
-                      <Button size="sm" variant="default" className="h-6 text-[10px] px-2" disabled={busy === `${o.id}:force`} onClick={() => callFn("deliver-song", { orderId: o.id, force: true }, "force", o.id)}>
-                        Force deliver
-                      </Button>
-                    </div>
-                  </td>
-                </tr>
-              ))}
-            </tbody>
-          </table>
+        <div className="flex items-center justify-between mb-2">
+          <h3 className="font-semibold text-sm">Orders ({customer.orders.length})</h3>
+          <span className="text-[10px] text-muted-foreground">Click an order to see quiz, brief, ETA, timeline, emails & actions</span>
+        </div>
+        <div className="space-y-2">
+          {customer.orders.map((o: any) => (
+            <OrderRow
+              key={o.id}
+              order={o}
+              busy={busy}
+              callFn={callFn}
+              onOpenDrawer={onOpenOrder}
+            />
+          ))}
         </div>
       </div>
 
