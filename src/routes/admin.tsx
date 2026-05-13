@@ -3021,7 +3021,7 @@ function SupportPanel() {
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [threads.length]);
 
-  useRealtimeRefresh(["support_threads", "support_messages"], () => {
+  useRealtimeRefresh(["support_threads", "support_messages", "email_send_log"], () => {
     loadThreads();
     if (selectedId) loadMessages(selectedId);
   }, { debounceMs: 500 });
