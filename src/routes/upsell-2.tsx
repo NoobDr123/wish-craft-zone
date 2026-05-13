@@ -15,6 +15,7 @@ export const Route = createFileRoute("/upsell-2")({
 function Upsell2() {
   const navigate = useNavigate();
   const q = useQuizStore();
+  const currency = useBuyerCurrency();
   const [processing, setProcessing] = useState(false);
 
   useEffect(() => {
