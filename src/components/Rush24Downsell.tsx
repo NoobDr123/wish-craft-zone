@@ -94,7 +94,7 @@ export function Rush24Downsell({
               24-hour delivery
             </span>
             <span className="font-display text-2xl font-semibold text-foreground">
-              $29.99
+              $39.99
             </span>
           </div>
 
