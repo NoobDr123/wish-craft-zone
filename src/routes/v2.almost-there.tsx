@@ -4,7 +4,7 @@ import { Logo } from "@/components/Logo";
 import { useQuizStore } from "@/stores/quizStore";
 import { ArrowRight, ShieldCheck, Star } from "lucide-react";
 
-export const Route = createFileRoute("/almost-there")({
+export const Route = createFileRoute("/v2/almost-there")({
   component: AlmostTherePage,
   head: () => ({
     meta: [{ title: "Almost there · PawPrint Song" }],
@@ -54,7 +54,7 @@ function AlmostTherePage() {
 
   useEffect(() => {
     if (!hydrated) return;
-    if (!q.dog_name || !q.buyer_email) navigate({ to: "/create" });
+    if (!q.dog_name || !q.buyer_email) navigate({ to: "/v2/create" });
   }, [hydrated, q.dog_name, q.buyer_email, navigate]);
 
   return (
@@ -145,7 +145,7 @@ function AlmostTherePage() {
 
         {/* CTA */}
         <button
-          onClick={() => navigate({ to: "/scratch" })}
+          onClick={() => navigate({ to: "/v2/scratch" })}
           className="mt-8 flex w-full items-center justify-center gap-3 rounded-2xl bg-primary px-8 py-5 text-lg font-semibold text-primary-foreground shadow-glow transition-all hover:bg-primary-hover active:scale-[0.99]"
         >
           Continue to checkout <ArrowRight className="h-5 w-5" />

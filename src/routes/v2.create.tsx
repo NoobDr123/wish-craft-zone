@@ -33,7 +33,7 @@ import { Gift, AlertCircle } from "lucide-react";
 
 type CreateSearch = { reward?: string; promo?: string };
 
-export const Route = createFileRoute("/create")({
+export const Route = createFileRoute("/v2/create")({
   component: CreatePage,
   validateSearch: (search: Record<string, unknown>): CreateSearch => {
     const out: CreateSearch = {};
@@ -147,7 +147,7 @@ interface Step {
 function CreatePage() {
   const navigate = useNavigate();
   const q = useQuizStore();
-  const search = useSearch({ from: "/create" });
+  const search = useSearch({ from: "/v2/create" });
   const { user, loading: authLoading } = useAuth();
   const [index, setIndex] = useState(0);
   const stepEnteredAt = useRef<number>(Date.now());
@@ -461,7 +461,7 @@ function CreatePage() {
         },
         buyerEmail: q.buyer_email || undefined,
       });
-      navigate({ to: "/almost-there" });
+      navigate({ to: "/v2/almost-there" });
     }
   };
   const back = () => {

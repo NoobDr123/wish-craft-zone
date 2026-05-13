@@ -19,7 +19,7 @@ import whoParent from "@/assets/who-parent.png";
 import whoStrength from "@/assets/who-strength.png";
 import whoYourself from "@/assets/who-yourself.png";
 
-export const Route = createFileRoute("/")({
+export const Route = createFileRoute("/v2/")({
   component: LandingPage,
   loader: async () => {
     const [heroRes, featuredRes, testimonialRes] = await Promise.all([
@@ -594,7 +594,7 @@ function PrimaryBtn({
   children,
   large,
   fullWidth,
-  to = "/create",
+  to = "/v2/create",
 }: {
   children: React.ReactNode;
   large?: boolean;
@@ -1418,7 +1418,7 @@ function LandingPage() {
         aria-hidden={!showStickyCta}
       >
         <div className="pointer-events-auto">
-          <PrimaryBtn to="/create">Start Their Custom Song 🐾</PrimaryBtn>
+          <PrimaryBtn to="/v2/create">Start Their Custom Song 🐾</PrimaryBtn>
         </div>
       </div>
 

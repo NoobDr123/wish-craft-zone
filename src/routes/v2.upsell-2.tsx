@@ -8,7 +8,7 @@ import { track } from "@/lib/tracking";
 import { useBuyerCurrency } from "@/hooks/useBuyerCurrency";
 import { formatProduct, getProductPrice } from "@/lib/currency";
 
-export const Route = createFileRoute("/upsell-2")({
+export const Route = createFileRoute("/v2/upsell-2")({
   component: Upsell2,
 });
 
@@ -39,7 +39,7 @@ function Upsell2() {
         console.warn("mark-upsells-complete failed (non-fatal):", err);
       }
     }
-    navigate({ to: "/processing" });
+    navigate({ to: "/v2/processing" });
   };
 
   const accept = async () => {

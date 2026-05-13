@@ -27,7 +27,7 @@ import {
 // critical path. Mounted only when scrolled into view.
 const SamplesSection = lazy(() => import("@/components/CheckoutSamples"));
 
-export const Route = createFileRoute("/checkout")({
+export const Route = createFileRoute("/v2/checkout")({
   component: CheckoutPage,
   head: () => ({
     meta: [{ title: "Almost There · PawPrint Song" }],
@@ -50,7 +50,7 @@ function CheckoutPage() {
   // Render the child route via <Outlet /> instead and bail out of all the
   // checkout logic below.
   const matches = useMatches();
-  const isOnReturn = matches.some((m) => m.routeId === "/checkout/return");
+  const isOnReturn = matches.some((m) => m.routeId === "/v2/checkout/return");
   if (isOnReturn) {
     return <Outlet />;
   }
@@ -225,7 +225,7 @@ function CheckoutPage() {
         }
         // Clear the reward code from the store so it can't be reused after.
         q.set("reward_code", undefined);
-        navigate({ to: "/processing" });
+        navigate({ to: "/v2/processing" });
       } catch (e) {
         console.error("[free redemption] unexpected:", e);
         setError("Something went wrong. Please try again.");
@@ -345,7 +345,7 @@ function CheckoutPage() {
 
       if (data.free) {
         // Skip Stripe entirely — order is already marked paid + queued
-        navigate({ to: "/processing" });
+        navigate({ to: "/v2/processing" });
       }
     } catch (e) {
       console.error("apply promo failed:", e);
@@ -376,7 +376,7 @@ function CheckoutPage() {
         <div className="mx-auto max-w-2xl px-5 py-4">
           <div className="flex items-center justify-between gap-3">
             <Link
-              to="/almost-there"
+              to="/v2/almost-there"
               className="inline-flex items-center gap-1.5 text-sm text-muted-foreground transition-colors hover:text-foreground"
             >
               <ArrowLeft className="h-4 w-4" /> Back
@@ -587,7 +587,7 @@ function CheckoutPage() {
                     Tell us who the doggy song is for, then your secure payment form will load here.
                   </p>
                   <Link
-                    to="/create"
+                    to="/v2/create"
                     className="mt-4 inline-flex items-center justify-center rounded-xl bg-primary px-4 py-3 text-sm font-semibold text-primary-foreground transition-colors hover:bg-primary-hover"
                   >
                     Finish song details

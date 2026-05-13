@@ -6,7 +6,7 @@ import { supabase } from "@/integrations/supabase/client";
 import { useQuizStore } from "@/stores/quizStore";
 import { stripeEnvironment } from "@/lib/stripe";
 
-export const Route = createFileRoute("/checkout/return")({
+export const Route = createFileRoute("/v2/checkout/return")({
   component: CheckoutReturnPage,
   validateSearch: (search: Record<string, unknown>) => ({
     payment_intent_id:
@@ -82,7 +82,7 @@ function CheckoutReturnPage() {
             );
           }
           setStatus("ready");
-          const next = result.skipUpsells ? "/processing" : "/upsell-1";
+          const next = result.skipUpsells ? "/v2/processing" : "/v2/upsell-1";
           setTimeout(() => window.location.replace(next), 250);
           return true;
         }
@@ -153,7 +153,7 @@ function CheckoutReturnPage() {
         // status straight to upsells_complete, so skip the upsell pages and
         // jump straight to /processing where the song is being generated.
         const skipUpsells = order.status === "upsells_complete";
-        const nextRoute = skipUpsells ? "/processing" : "/upsell-1";
+        const nextRoute = skipUpsells ? "/v2/processing" : "/v2/upsell-1";
         setTimeout(() => window.location.replace(nextRoute), 250);
         return;
       }
@@ -171,7 +171,7 @@ function CheckoutReturnPage() {
           if (paymentIntentId) q.set("checkoutSessionId", paymentIntentId);
         }
         setStatus("ready");
-        setTimeout(() => window.location.replace("/upsell-1"), 250);
+        setTimeout(() => window.location.replace("/v2/upsell-1"), 250);
         return;
       }
 

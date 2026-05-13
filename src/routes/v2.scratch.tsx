@@ -6,7 +6,7 @@ import { journeyStageOf, useQuizStore } from "@/stores/quizStore";
 import { preloadStripe } from "@/lib/stripe";
 import { ArrowLeft, ArrowRight, Gift, Timer, AlertTriangle, Flame, Heart, Sparkles } from "lucide-react";
 
-export const Route = createFileRoute("/scratch")({
+export const Route = createFileRoute("/v2/scratch")({
   component: ScratchPage,
   head: () => ({
     meta: [
@@ -262,7 +262,7 @@ function ScratchPage() {
         <div className="mx-auto flex max-w-2xl items-center justify-between px-5 py-4">
           {stage === "scratch" ? (
             <Link
-              to="/almost-there"
+              to="/v2/almost-there"
               className="inline-flex items-center gap-1.5 text-sm text-muted-foreground transition-colors hover:text-foreground"
             >
               <ArrowLeft className="h-4 w-4" /> Back
@@ -348,7 +348,7 @@ function ScratchPage() {
             {/* CTA appears immediately once revealed — don't wait on stage transition */}
             {revealed && (
               <a
-                href="/checkout"
+                href="/v2/checkout"
                 onPointerDown={warmCheckout}
                 onClick={warmCheckout}
                 onMouseEnter={warmCheckout}
@@ -420,7 +420,7 @@ function ScratchPage() {
 
           {/* CTA */}
           <a
-            href="/checkout"
+            href="/v2/checkout"
             onPointerDown={warmCheckout}
             onClick={warmCheckout}
             onMouseEnter={warmCheckout}

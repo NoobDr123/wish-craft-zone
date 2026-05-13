@@ -9,7 +9,7 @@ import { track } from "@/lib/tracking";
 import { useBuyerCurrency } from "@/hooks/useBuyerCurrency";
 import { formatProduct, getProductPrice } from "@/lib/currency";
 
-export const Route = createFileRoute("/upsell-1")({
+export const Route = createFileRoute("/v2/upsell-1")({
   component: Upsell1,
 });
 
@@ -39,7 +39,7 @@ function Upsell1() {
       amountCents: getProductPrice(currency, "express_90min"),
     });
     if (!q.orderId) {
-      navigate({ to: "/upsell-2" });
+      navigate({ to: "/v2/upsell-2" });
       return;
     }
     setProcessing(true);
@@ -52,7 +52,7 @@ function Upsell1() {
       },
     });
     if (data?.success) q.set("is_rush", true);
-    navigate({ to: "/upsell-2" });
+    navigate({ to: "/v2/upsell-2" });
   };
 
   // Decline 90-min priority → open the 24h rush downsell.
@@ -82,7 +82,7 @@ function Upsell1() {
     });
     if (!q.orderId) {
       setShowDownsell(false);
-      navigate({ to: "/upsell-2" });
+      navigate({ to: "/v2/upsell-2" });
       return;
     }
     setDownsellProcessing(true);
@@ -97,7 +97,7 @@ function Upsell1() {
     if (data?.success) q.set("is_rush", true);
     setDownsellProcessing(false);
     setShowDownsell(false);
-    navigate({ to: "/upsell-2" });
+    navigate({ to: "/v2/upsell-2" });
   };
 
   const decline24 = () => {
@@ -108,7 +108,7 @@ function Upsell1() {
       buyerEmail: q.buyer_email || undefined,
     });
     setShowDownsell(false);
-    navigate({ to: "/upsell-2" });
+    navigate({ to: "/v2/upsell-2" });
   };
 
   return (
