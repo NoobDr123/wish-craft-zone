@@ -2881,25 +2881,125 @@ function SupportPanel() {
       .order("last_activity_at", { ascending: false })
       .limit(200);
     if (filter === "all") {
-      // hide spam (status or AI-classified) from "all" by default
       q = q.neq("status", "spam").neq("spam_classification", "spam");
     } else if (filter === "spam") {
       q = q.or("status.eq.spam,spam_classification.eq.spam");
     } else {
       q = q.eq("status", filter).neq("spam_classification", "spam");
     }
-    const { data } = await q;
-    setThreads(data ?? []);
-    if (!selectedId && data && data.length > 0) setSelectedId(data[0].id);
+    const { data: realThreads } = await q;
+
+    // Pull recent outbound transactional emails (skip auth emails) and
+    // group by recipient so we can (a) badge real threads with how many
+    // transactional emails that customer has received, and (b) surface a
+    // synthetic thread for customers who only got emails (no inbound replies).
+    const { data: emailLogs } = await supabase
+      .from("email_send_log")
+      .select("recipient_email, template_name, status, created_at, message_id")
+      .neq("template_name", "auth_emails")
+      .order("created_at", { ascending: false })
+      .limit(1000);
+
+    const byEmail = new Map<string, any[]>();
+    (emailLogs ?? []).forEach((e: any) => {
+      const k = (e.recipient_email || "").toLowerCase();
+      if (!k) return;
+      // dedupe by message_id (latest only)
+      const list = byEmail.get(k) ?? [];
+      if (e.message_id && list.some((x) => x.message_id === e.message_id)) return;
+      list.push(e);
+      byEmail.set(k, list);
+    });
+
+    const enriched = (realThreads ?? []).map((t: any) => ({
+      ...t,
+      __emailCount: (byEmail.get((t.sender_email || "").toLowerCase()) ?? []).length,
+    }));
+
+    const realEmails = new Set(
+      (realThreads ?? []).map((t: any) => (t.sender_email || "").toLowerCase()),
+    );
+
+    // Synthetic email-only threads — show on "all" and "closed" tabs only.
+    const showSynth = filter === "all" || filter === "closed";
+    const synthThreads = showSynth
+      ? Array.from(byEmail.entries())
+          .filter(([k]) => k && !realEmails.has(k))
+          .map(([k, list]) => ({
+            id: `email:${k}`,
+            sender_name: k,
+            sender_email: k,
+            subject: `${list.length} email${list.length === 1 ? "" : "s"} sent`,
+            status: "closed",
+            last_activity_at: list[0].created_at,
+            order_id_text: null,
+            spam_classification: null,
+            ai_summary: list[0].template_name,
+            __synthetic: true,
+            __emailCount: list.length,
+          }))
+      : [];
+
+    const all = [...enriched, ...synthThreads].sort(
+      (a: any, b: any) =>
+        new Date(b.last_activity_at).getTime() - new Date(a.last_activity_at).getTime(),
+    );
+    setThreads(all);
+    if (!selectedId && all.length > 0) setSelectedId(all[0].id);
   };
 
   const loadMessages = async (threadId: string) => {
-    const { data } = await supabase
-      .from("support_messages")
-      .select("id, direction, body, created_at, author_user_id")
-      .eq("thread_id", threadId)
-      .order("created_at", { ascending: true });
-    setMessages(data ?? []);
+    const isSynth = threadId.startsWith("email:");
+    let supportMsgs: any[] = [];
+    let recipient: string | null = null;
+
+    if (isSynth) {
+      recipient = threadId.slice("email:".length);
+    } else {
+      const { data } = await supabase
+        .from("support_messages")
+        .select("id, direction, body, created_at, author_user_id")
+        .eq("thread_id", threadId)
+        .order("created_at", { ascending: true });
+      supportMsgs = data ?? [];
+      // resolve recipient from current threads list
+      const t = threads.find((x) => x.id === threadId);
+      recipient = (t?.sender_email || "").toLowerCase() || null;
+    }
+
+    let emailMsgs: any[] = [];
+    if (recipient) {
+      const { data: logs } = await supabase
+        .from("email_send_log")
+        .select("id, message_id, template_name, status, error_message, created_at")
+        .eq("recipient_email", recipient)
+        .neq("template_name", "auth_emails")
+        .order("created_at", { ascending: false })
+        .limit(200);
+      // dedupe by message_id, keep latest
+      const seen = new Set<string>();
+      const deduped = (logs ?? []).filter((e: any) => {
+        const k = e.message_id || e.id;
+        if (seen.has(k)) return false;
+        seen.add(k);
+        return true;
+      });
+      emailMsgs = deduped.map((e: any) => ({
+        id: `email:${e.id}`,
+        direction: "outbound",
+        kind: "transactional",
+        template_name: e.template_name,
+        status: e.status,
+        error_message: e.error_message,
+        body: `📧 ${e.template_name}${e.status !== "sent" ? ` — ${e.status}` : ""}${e.error_message ? `\n${e.error_message}` : ""}`,
+        created_at: e.created_at,
+      }));
+    }
+
+    const merged = [...supportMsgs, ...emailMsgs].sort(
+      (a, b) => new Date(a.created_at).getTime() - new Date(b.created_at).getTime(),
+    );
+    setMessages(merged);
   };
 
   useEffect(() => {
@@ -2921,7 +3021,7 @@ function SupportPanel() {
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [threads.length]);
 
-  useRealtimeRefresh(["support_threads", "support_messages"], () => {
+  useRealtimeRefresh(["support_threads", "support_messages", "email_send_log"], () => {
     loadThreads();
     if (selectedId) loadMessages(selectedId);
   }, { debounceMs: 500 });
@@ -2929,8 +3029,10 @@ function SupportPanel() {
   useEffect(() => {
     if (selectedId) {
       loadMessages(selectedId);
-      // mark "new" -> "open" once admin opens it
-      supabase.from("support_threads").update({ status: "open" }).eq("id", selectedId).eq("status", "new").then(() => loadThreads());
+      // mark "new" -> "open" once admin opens it (skip synthetic email-only threads)
+      if (!selectedId.startsWith("email:")) {
+        supabase.from("support_threads").update({ status: "open" }).eq("id", selectedId).eq("status", "new").then(() => loadThreads());
+      }
     }
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [selectedId]);
@@ -3052,6 +3154,9 @@ function SupportPanel() {
                   >
                     <div className="flex items-center justify-between gap-2">
                       <span className="truncate text-sm font-medium">{t.sender_name}</span>
+                      {t.__synthetic && (
+                        <Badge variant="outline" className="shrink-0 text-[10px]">📧 emails only</Badge>
+                      )}
                       {t.spam_classification === "spam" && (
                         <Badge variant="destructive" className="shrink-0 text-[10px]">spam</Badge>
                       )}
@@ -3061,7 +3166,7 @@ function SupportPanel() {
                       {t.status === "new" && t.spam_classification !== "spam" && (
                         <Badge className="shrink-0 text-[10px]">new</Badge>
                       )}
-                      {t.status === "closed" && (
+                      {t.status === "closed" && !t.__synthetic && (
                         <Badge variant="outline" className="shrink-0 text-[10px]">
                           closed
                         </Badge>
@@ -3070,8 +3175,11 @@ function SupportPanel() {
                     <div className="mt-0.5 truncate text-xs text-muted-foreground">
                       {t.ai_summary || t.subject}
                     </div>
-                    <div className="mt-1 text-[11px] text-muted-foreground/70">
-                      {new Date(t.last_activity_at).toLocaleString()}
+                    <div className="mt-1 flex items-center gap-2 text-[11px] text-muted-foreground/70">
+                      <span>{new Date(t.last_activity_at).toLocaleString()}</span>
+                      {t.__emailCount > 0 && !t.__synthetic && (
+                        <span className="text-primary/70">· 📧 {t.__emailCount}</span>
+                      )}
                     </div>
                   </button>
                 </li>
@@ -3099,7 +3207,7 @@ function SupportPanel() {
                       {selected.order_id_text ? ` · Order ${selected.order_id_text}` : ""}
                     </p>
                   </div>
-                  <div className="flex shrink-0 gap-2">
+                  <div className="flex shrink-0 gap-2" hidden={!!selected.__synthetic}>
                     <Button
                       size="sm"
                       variant="outline"
@@ -3199,61 +3307,97 @@ function SupportPanel() {
               </div>
 
               <div className="flex-1 overflow-y-auto p-5 space-y-3">
-                {messages.map((m) => (
-                  <div
-                    key={m.id}
-                    className={`max-w-[85%] rounded-2xl px-4 py-3 text-sm whitespace-pre-wrap ${
-                      m.direction === "inbound"
-                        ? "bg-muted/50 text-foreground"
-                        : "ml-auto bg-primary/15 text-foreground"
-                    }`}
-                  >
-                    <div className="mb-1 text-[11px] font-medium uppercase tracking-wider text-muted-foreground">
-                      {m.direction === "inbound" ? selected.sender_name : "You"} ·{" "}
-                      {new Date(m.created_at).toLocaleString()}
+                {messages.map((m: any) => {
+                  if (m.kind === "transactional") {
+                    const failed = m.status && m.status !== "sent";
+                    return (
+                      <div
+                        key={m.id}
+                        className={`ml-auto max-w-[85%] rounded-2xl border px-4 py-2 text-xs ${
+                          failed
+                            ? "border-destructive/40 bg-destructive/5 text-destructive"
+                            : "border-border bg-muted/30 text-muted-foreground"
+                        }`}
+                      >
+                        <div className="font-medium uppercase tracking-wider text-[10px]">
+                          📧 {m.template_name} · {m.status}
+                        </div>
+                        <div className="mt-0.5 text-[11px] opacity-70">
+                          {new Date(m.created_at).toLocaleString()}
+                        </div>
+                        {m.error_message && (
+                          <div className="mt-1 text-[11px]">{m.error_message}</div>
+                        )}
+                      </div>
+                    );
+                  }
+                  return (
+                    <div
+                      key={m.id}
+                      className={`max-w-[85%] rounded-2xl px-4 py-3 text-sm whitespace-pre-wrap ${
+                        m.direction === "inbound"
+                          ? "bg-muted/50 text-foreground"
+                          : "ml-auto bg-primary/15 text-foreground"
+                      }`}
+                    >
+                      <div className="mb-1 text-[11px] font-medium uppercase tracking-wider text-muted-foreground">
+                        {m.direction === "inbound" ? selected.sender_name : "You"} ·{" "}
+                        {new Date(m.created_at).toLocaleString()}
+                      </div>
+                      {m.body}
                     </div>
-                    {m.body}
+                  );
+                })}
+                {messages.length === 0 && (
+                  <div className="text-center text-sm text-muted-foreground py-8">
+                    No messages yet.
                   </div>
-                ))}
+                )}
               </div>
 
-              <div className="border-t border-border p-4 space-y-3">
-                {selected.ai_suggested_reply && !reply && (
-                  <button
-                    type="button"
-                    onClick={() => setReply(selected.ai_suggested_reply)}
-                    className="w-full rounded-lg border border-primary/40 bg-primary/5 px-3 py-2 text-left text-xs hover:bg-primary/10 transition-colors"
-                  >
-                    <div className="font-semibold uppercase tracking-wider text-[10px] text-primary mb-1">
-                      ✨ AI suggested reply — click to use
-                    </div>
-                    <div className="text-foreground/80 line-clamp-3 whitespace-pre-wrap">
-                      {selected.ai_suggested_reply}
-                    </div>
-                  </button>
-                )}
-                <Textarea
-                  rows={4}
-                  placeholder={`Reply to ${selected.sender_name}…`}
-                  value={reply}
-                  onChange={(e) => setReply(e.target.value)}
-                  maxLength={10000}
-                  className="resize-none"
-                />
-                <div className="flex items-center justify-between gap-3">
-                  <label className="flex items-center gap-2 text-xs text-muted-foreground">
-                    <input
-                      type="checkbox"
-                      checked={closeAfter}
-                      onChange={(e) => setCloseAfter(e.target.checked)}
-                    />
-                    Close thread after sending
-                  </label>
-                  <Button onClick={sendReply} disabled={!reply.trim() || sending}>
-                    {sending ? "Sending…" : "Send reply"}
-                  </Button>
+              {selected.__synthetic ? (
+                <div className="border-t border-border p-4 text-xs text-muted-foreground text-center">
+                  No inbound replies from this customer. Transactional emails only.
                 </div>
-              </div>
+              ) : (
+                <div className="border-t border-border p-4 space-y-3">
+                  {selected.ai_suggested_reply && !reply && (
+                    <button
+                      type="button"
+                      onClick={() => setReply(selected.ai_suggested_reply)}
+                      className="w-full rounded-lg border border-primary/40 bg-primary/5 px-3 py-2 text-left text-xs hover:bg-primary/10 transition-colors"
+                    >
+                      <div className="font-semibold uppercase tracking-wider text-[10px] text-primary mb-1">
+                        ✨ AI suggested reply — click to use
+                      </div>
+                      <div className="text-foreground/80 line-clamp-3 whitespace-pre-wrap">
+                        {selected.ai_suggested_reply}
+                      </div>
+                    </button>
+                  )}
+                  <Textarea
+                    rows={4}
+                    placeholder={`Reply to ${selected.sender_name}…`}
+                    value={reply}
+                    onChange={(e) => setReply(e.target.value)}
+                    maxLength={10000}
+                    className="resize-none"
+                  />
+                  <div className="flex items-center justify-between gap-3">
+                    <label className="flex items-center gap-2 text-xs text-muted-foreground">
+                      <input
+                        type="checkbox"
+                        checked={closeAfter}
+                        onChange={(e) => setCloseAfter(e.target.checked)}
+                      />
+                      Close thread after sending
+                    </label>
+                    <Button onClick={sendReply} disabled={!reply.trim() || sending}>
+                      {sending ? "Sending…" : "Send reply"}
+                    </Button>
+                  </div>
+                </div>
+              )}
             </>
           )}
         </div>
