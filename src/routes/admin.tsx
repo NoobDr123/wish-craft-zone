@@ -405,8 +405,32 @@ function StatCard({
   );
 }
 
+// Static FX rates → USD. Update when material currencies are added.
+// Used to normalize multi-currency totals (revenue, AOV, LTV, daily sales).
+const FX_TO_USD: Record<string, number> = {
+  USD: 1, EUR: 1.08, GBP: 1.27, CAD: 0.73, AUD: 0.66,
+  PLN: 0.25, CHF: 1.13, SEK: 0.094, NOK: 0.092, DKK: 0.145,
+};
+
+function toUsdCents(cents: number | null | undefined, currency: string | null | undefined): number {
+  const c = (cents ?? 0);
+  const code = (currency ?? "USD").toUpperCase();
+  const rate = FX_TO_USD[code] ?? 1;
+  return Math.round(c * rate);
+}
+
 function fmtMoney(cents: number) {
   return `$${(cents / 100).toFixed(2)}`;
+}
+
+// Per-row money formatter that respects the original currency.
+function fmtMoneyCcy(cents: number | null | undefined, currency: string | null | undefined) {
+  const code = (currency ?? "USD").toUpperCase();
+  try {
+    return new Intl.NumberFormat("en-US", { style: "currency", currency: code }).format((cents ?? 0) / 100);
+  } catch {
+    return `${code} ${((cents ?? 0) / 100).toFixed(2)}`;
+  }
 }
 
 function fmtPct(num: number, denom: number) {
