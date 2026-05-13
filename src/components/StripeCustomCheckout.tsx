@@ -77,8 +77,9 @@ export function StripeCustomCheckout(props: Props) {
           amountVersion,
           attempt: attempt + 1,
         });
+        const country = await detectCountry();
         const { data, error } = await supabase.functions.invoke("create-payment-intent", {
-          body: { orderId, environment: stripeEnvironment, quizPatch, quizSnapshot, userId },
+          body: { orderId, environment: stripeEnvironment, quizPatch, quizSnapshot, userId, country },
         });
         if (myToken !== fetchTokenRef.current) return;
 
