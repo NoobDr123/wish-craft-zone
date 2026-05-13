@@ -598,7 +598,7 @@ function CheckoutPage() {
         </section>
       </main>
 
-      <CheckoutFooter />
+      <CheckoutFooter currency={currency} />
 
       <ReviewSurveyModal open={reviewOpen} onClose={() => setReviewOpen(false)} />
     </div>
