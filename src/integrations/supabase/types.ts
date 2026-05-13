@@ -1402,10 +1402,13 @@ export type Database = {
         Row: {
           agentmail_inbox_id: string | null
           agentmail_thread_id: string | null
+          ai_auto_reply_safe: boolean
+          ai_category: string | null
           ai_classified_at: string | null
           ai_suggested_reply: string | null
           ai_summary: string | null
           assigned_to: string | null
+          auto_replied_at: string | null
           created_at: string
           id: string
           last_activity_at: string
@@ -1422,10 +1425,13 @@ export type Database = {
         Insert: {
           agentmail_inbox_id?: string | null
           agentmail_thread_id?: string | null
+          ai_auto_reply_safe?: boolean
+          ai_category?: string | null
           ai_classified_at?: string | null
           ai_suggested_reply?: string | null
           ai_summary?: string | null
           assigned_to?: string | null
+          auto_replied_at?: string | null
           created_at?: string
           id?: string
           last_activity_at?: string
@@ -1442,10 +1448,13 @@ export type Database = {
         Update: {
           agentmail_inbox_id?: string | null
           agentmail_thread_id?: string | null
+          ai_auto_reply_safe?: boolean
+          ai_category?: string | null
           ai_classified_at?: string | null
           ai_suggested_reply?: string | null
           ai_summary?: string | null
           assigned_to?: string | null
+          auto_replied_at?: string | null
           created_at?: string
           id?: string
           last_activity_at?: string
