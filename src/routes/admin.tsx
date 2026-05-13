@@ -1379,6 +1379,31 @@ function CrmPanel() {
         <StatCard label="Pending deliveries" value={customers.reduce((s, c) => s + c.pendingDeliveryCount, 0)} tone="warn" />
       </div>
 
+      <div className="flex items-center gap-2 mb-3">
+        {([
+          ["all", `All (${customers.length})`],
+          ["paying", `Paying (${customers.filter((c) => c.paidCount > 0).length})`],
+          ["partials", `Partials (${partialsCount})`],
+        ] as const).map(([key, label]) => (
+          <button
+            key={key}
+            onClick={() => setView(key)}
+            className={`px-3 py-1.5 rounded-full text-xs font-medium border transition-colors ${
+              view === key
+                ? "bg-primary text-primary-foreground border-primary"
+                : "bg-card text-muted-foreground border-border hover:bg-muted/30"
+            }`}
+          >
+            {label}
+          </button>
+        ))}
+        {view === "partials" && (
+          <span className="text-xs text-muted-foreground ml-2">
+            Reached checkout but never paid
+          </span>
+        )}
+      </div>
+
       <input
         value={search}
         onChange={(e) => setSearch(e.target.value)}
@@ -1395,8 +1420,8 @@ function CrmPanel() {
               <th className="p-3 text-right">Orders</th>
               <th className="p-3 text-right">Spent</th>
               <th className="p-3">Status</th>
-              <th className="p-3">Next delivery</th>
-              <th className="p-3">Last order</th>
+              <th className="p-3">{view === "partials" ? "Reached checkout" : "Next delivery"}</th>
+              <th className="p-3">Last activity</th>
             </tr>
           </thead>
           <tbody>
