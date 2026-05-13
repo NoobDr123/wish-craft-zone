@@ -3153,7 +3153,49 @@ function SupportPanel() {
                     </div>
                     {selected.spam_reason && <div className="mt-0.5">{selected.spam_reason}</div>}
                     {selected.ai_summary && <div className="mt-0.5 italic">"{selected.ai_summary}"</div>}
+                    {selected.ai_category && (
+                      <div className="mt-1 text-[10px] uppercase tracking-wider opacity-70">
+                        category: {selected.ai_category}
+                      </div>
+                    )}
                   </div>
+                )}
+
+                {selected.auto_replied_at && (
+                  <div className="mt-3 rounded-lg border border-primary/40 bg-primary/10 px-3 py-2 text-xs text-primary">
+                    🤖 Auto-replied {new Date(selected.auto_replied_at).toLocaleString()} — thread closed.
+                  </div>
+                )}
+
+                {linkedOrder && (
+                  <Link
+                    to="/admin/orders/$orderId"
+                    params={{ orderId: linkedOrder.id }}
+                    className="mt-3 block rounded-lg border border-border bg-muted/30 px-3 py-2 text-xs hover:border-primary/40 hover:bg-muted/50 transition-colors"
+                  >
+                    <div className="font-semibold uppercase tracking-wider text-[10px] text-muted-foreground">
+                      Linked order
+                    </div>
+                    <div className="mt-1 flex items-center justify-between gap-2">
+                      <div className="min-w-0">
+                        <div className="truncate font-medium">
+                          {linkedOrder.dog_name} · {linkedOrder.buyer_name ?? linkedOrder.buyer_email}
+                        </div>
+                        <div className="truncate text-muted-foreground">
+                          {linkedOrder.buyer_email} · {new Date(linkedOrder.created_at).toLocaleDateString()}
+                        </div>
+                      </div>
+                      <div className="shrink-0 flex flex-col items-end gap-0.5">
+                        <Badge variant="outline" className="text-[10px]">{linkedOrder.status}</Badge>
+                        <span className="text-[10px] text-muted-foreground">
+                          {linkedOrder.payment_status}
+                          {linkedOrder.amount_paid_cents
+                            ? ` · ${(linkedOrder.amount_paid_cents / 100).toFixed(2)} ${linkedOrder.currency}`
+                            : ""}
+                        </span>
+                      </div>
+                    </div>
+                  </Link>
                 )}
               </div>
 
