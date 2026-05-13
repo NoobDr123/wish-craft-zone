@@ -1317,7 +1317,16 @@ function CrmPanel() {
 
   useRealtimeRefresh("orders", () => load());
 
+  const partialsCount = customers.filter(
+    (c) => c.paidCount === 0 && (c.reachedCheckoutAt || c.cardStartedAt),
+  ).length;
+
   const filtered = customers.filter((c) => {
+    if (view === "paying" && c.paidCount === 0) return false;
+    if (view === "partials") {
+      if (c.paidCount > 0) return false;
+      if (!c.reachedCheckoutAt && !c.cardStartedAt) return false;
+    }
     if (!search) return true;
     const s = search.toLowerCase();
     return c.email.includes(s) || (c.buyerName ?? "").toLowerCase().includes(s);
