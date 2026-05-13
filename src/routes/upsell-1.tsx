@@ -33,7 +33,7 @@ function Upsell1() {
       upsellType: "express_90min",
       orderId: q.orderId,
       buyerEmail: q.buyer_email || undefined,
-      amountCents: 4999,
+      amountCents: 5999,
     });
     if (!q.orderId) {
       navigate({ to: "/upsell-2" });
