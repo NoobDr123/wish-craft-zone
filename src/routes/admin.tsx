@@ -455,6 +455,38 @@ function fmtMs(ms: number | null | undefined) {
   return `${m}m ${rs}s`;
 }
 
+function BackfillUsdButton({ onDone }: { onDone: () => void }) {
+  const [busy, setBusy] = useState(false);
+  const [msg, setMsg] = useState<string | null>(null);
+  const run = async () => {
+    setBusy(true);
+    setMsg(null);
+    try {
+      const { data, error } = await supabase.functions.invoke("backfill-stripe-usd", { body: { limit: 200 } });
+      if (error) throw error;
+      const d: any = data ?? {};
+      setMsg(`Updated ${d.updated ?? 0} · Remaining ${d.remaining ?? 0}`);
+      onDone();
+    } catch (e: any) {
+      setMsg(`Error: ${e?.message ?? "failed"}`);
+    } finally {
+      setBusy(false);
+    }
+  };
+  return (
+    <div className="flex items-center gap-2">
+      {msg && <span className="text-xs text-muted-foreground">{msg}</span>}
+      <button
+        onClick={run}
+        disabled={busy}
+        className="rounded-md border px-3 py-1.5 text-xs hover:bg-muted disabled:opacity-50"
+      >
+        {busy ? "Backfilling…" : "Backfill USD from Stripe"}
+      </button>
+    </div>
+  );
+}
+
 /* =====================================================================
    Dashboard
    ===================================================================== */
@@ -704,7 +736,10 @@ function DashboardPanel() {
           <h1 className="font-display text-3xl font-semibold">Dashboard</h1>
           <p className="text-sm text-muted-foreground">Revenue, conversion, customers, and live activity. All times in Eastern Time (EST/EDT).</p>
         </div>
-        <RangeSelector value={range} onChange={setRange} />
+        <div className="flex items-center gap-2">
+          <BackfillUsdButton onDone={() => load()} />
+          <RangeSelector value={range} onChange={setRange} />
+        </div>
       </div>
 
       {/* Live + headline KPIs */}
