@@ -838,19 +838,22 @@ function RefundTab({ orderId, buyerEmail, refunds, reload }: any) {
   const submit = async () => {
     if (reason.trim().length < 20) return;
     setBusy(true);
-    const { error } = await supabase.from("refund_requests").insert({
-      order_id: orderId,
-      buyer_email: buyerEmail,
-      request_type: "refund",
-      reason: reason.trim(),
+    const { data, error } = await supabase.functions.invoke("submit-support-message", {
+      body: {
+        name: buyerEmail.split("@")[0] || "Customer",
+        email: buyerEmail,
+        orderId,
+        subject: `Support request for order ${orderId.slice(0, 8)}`,
+        message: reason.trim(),
+      },
     });
     setBusy(false);
-    if (error) {
-      toast.error(error.message);
+    if (error || (data && (data as any).error)) {
+      toast.error(error?.message ?? (data as any)?.error ?? "Could not send message");
       return;
     }
     setReason("");
-    toast.success("Message sent — our team will reply soon");
+    toast.success("Message sent — our team will reply by email soon");
     await reload();
   };
 
@@ -881,7 +884,7 @@ function RefundTab({ orderId, buyerEmail, refunds, reload }: any) {
       {refunds.length > 0 && (
         <div className="mt-6 space-y-2">
           <p className="text-xs uppercase tracking-wider text-[rgba(31,27,22,0.55)]">
-            Your messages
+            Your refund requests
           </p>
           {refunds.map((r: any) => (
             <div
