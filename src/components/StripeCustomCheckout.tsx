@@ -16,7 +16,8 @@ import type {
 import { Loader2, Lock, ShieldCheck } from "lucide-react";
 import { getStripe, stripeEnvironment } from "@/lib/stripe";
 import { supabase } from "@/integrations/supabase/client";
-import { detectCountry, SUPPORTED_COUNTRIES, isSupportedCountry } from "@/lib/currency";
+import { detectCountry, isSupportedCountry } from "@/lib/currency";
+import { COUNTRIES, findCountry, postalRequiredFor } from "@/lib/countries";
 
 interface Props {
   orderId: string;
