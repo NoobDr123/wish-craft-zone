@@ -541,15 +541,16 @@ function DashboardPanel() {
     const paid = orders.filter((o) => o.payment_status === "paid" || o.payment_status === "succeeded");
     const failed = orders.filter((o) => o.payment_status === "failed");
     const pending = orders.filter((o) => o.payment_status === "pending");
-    const revenueCents = paid.reduce((s, o) => s + (o.amount_paid_cents ?? 0), 0);
+    // Normalize to USD for cross-currency aggregates.
+    const revenueCents = paid.reduce((s, o) => s + toUsdCents(o.amount_paid_cents, o.currency), 0);
     const aovCents = paid.length > 0 ? Math.round(revenueCents / paid.length) : 0;
 
-    // Daily sales grouped by EST date
+    // Daily sales grouped by EST date (USD-normalized)
     const byDay: Record<string, { cents: number; orders: number }> = {};
     for (const o of paid) {
       const d = estDateKey(o.created_at);
       if (!byDay[d]) byDay[d] = { cents: 0, orders: 0 };
-      byDay[d].cents += o.amount_paid_cents ?? 0;
+      byDay[d].cents += toUsdCents(o.amount_paid_cents, o.currency);
       byDay[d].orders += 1;
     }
     const dailySales = Object.entries(byDay)
@@ -577,13 +578,13 @@ function DashboardPanel() {
     const conversionPct = uniqueVisitors > 0 ? (paid.length / uniqueVisitors) * 100 : 0;
     const checkoutToPaidPct = cardStarteds.size > 0 ? (paid.length / cardStarteds.size) * 100 : 0;
 
-    // Lifetime customer/LTV (all-time)
+    // Lifetime customer/LTV (all-time, USD-normalized)
     const ltvByEmail: Record<string, { cents: number; orders: number }> = {};
     for (const o of lifetimeRows ?? []) {
       const email = (o.buyer_email ?? "").toLowerCase();
       if (!email) continue;
       if (!ltvByEmail[email]) ltvByEmail[email] = { cents: 0, orders: 0 };
-      ltvByEmail[email].cents += o.amount_paid_cents ?? 0;
+      ltvByEmail[email].cents += toUsdCents(o.amount_paid_cents, o.currency);
       ltvByEmail[email].orders += 1;
     }
     const lifetimeCustomerCount = Object.keys(ltvByEmail).length;
@@ -598,6 +599,7 @@ function DashboardPanel() {
       buyer_email: o.buyer_email,
       buyer_name: o.buyer_name ?? o.customer_name ?? null,
       amount_paid_cents: o.amount_paid_cents ?? 0,
+      currency: o.currency ?? "USD",
       payment_status: o.payment_status,
       status: o.status,
     }));
