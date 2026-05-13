@@ -2669,7 +2669,7 @@ function CustomerExplorerPanel() {
     setLoading(true);
     let q = supabase
       .from("orders")
-      .select("id, buyer_email, buyer_name, dog_name, dog_breed, status, payment_status, amount_cents, amount_paid_cents, delivery_tier, is_gift, flagged_for_review, created_at, delivered_at, user_id")
+      .select("id, buyer_email, buyer_name, dog_name, dog_breed, status, payment_status, amount_cents, amount_paid_cents, currency, delivery_tier, is_gift, flagged_for_review, created_at, delivered_at, user_id")
       .order("created_at", { ascending: false })
       .limit(500);
 
