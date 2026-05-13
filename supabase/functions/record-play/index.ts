@@ -48,7 +48,7 @@ serve(async (req) => {
     const variantId = typeof body.variantId === "string" ? body.variantId : null;
     const durationMs = typeof body.durationMs === "number" ? body.durationMs : null;
     const source = typeof body.source === "string" ? body.source.slice(0, 50) : "listen_page";
-    const kind = body.kind === "view" || body.kind === "share" ? body.kind : "play";
+    const kind = body.kind === "view" || body.kind === "share" || body.kind === "download" ? body.kind : "play";
 
     if (!orderId || !/^[0-9a-f-]{36}$/i.test(orderId)) {
       return json({ error: "Invalid orderId" }, 400);
