@@ -2881,25 +2881,125 @@ function SupportPanel() {
       .order("last_activity_at", { ascending: false })
       .limit(200);
     if (filter === "all") {
-      // hide spam (status or AI-classified) from "all" by default
       q = q.neq("status", "spam").neq("spam_classification", "spam");
     } else if (filter === "spam") {
       q = q.or("status.eq.spam,spam_classification.eq.spam");
     } else {
       q = q.eq("status", filter).neq("spam_classification", "spam");
     }
-    const { data } = await q;
-    setThreads(data ?? []);
-    if (!selectedId && data && data.length > 0) setSelectedId(data[0].id);
+    const { data: realThreads } = await q;
+
+    // Pull recent outbound transactional emails (skip auth emails) and
+    // group by recipient so we can (a) badge real threads with how many
+    // transactional emails that customer has received, and (b) surface a
+    // synthetic thread for customers who only got emails (no inbound replies).
+    const { data: emailLogs } = await supabase
+      .from("email_send_log")
+      .select("recipient_email, template_name, status, created_at, message_id")
+      .neq("template_name", "auth_emails")
+      .order("created_at", { ascending: false })
+      .limit(1000);
+
+    const byEmail = new Map<string, any[]>();
+    (emailLogs ?? []).forEach((e: any) => {
+      const k = (e.recipient_email || "").toLowerCase();
+      if (!k) return;
+      // dedupe by message_id (latest only)
+      const list = byEmail.get(k) ?? [];
+      if (e.message_id && list.some((x) => x.message_id === e.message_id)) return;
+      list.push(e);
+      byEmail.set(k, list);
+    });
+
+    const enriched = (realThreads ?? []).map((t: any) => ({
+      ...t,
+      __emailCount: (byEmail.get((t.sender_email || "").toLowerCase()) ?? []).length,
+    }));
+
+    const realEmails = new Set(
+      (realThreads ?? []).map((t: any) => (t.sender_email || "").toLowerCase()),
+    );
+
+    // Synthetic email-only threads — show on "all" and "closed" tabs only.
+    const showSynth = filter === "all" || filter === "closed";
+    const synthThreads = showSynth
+      ? Array.from(byEmail.entries())
+          .filter(([k]) => k && !realEmails.has(k))
+          .map(([k, list]) => ({
+            id: `email:${k}`,
+            sender_name: k,
+            sender_email: k,
+            subject: `${list.length} email${list.length === 1 ? "" : "s"} sent`,
+            status: "closed",
+            last_activity_at: list[0].created_at,
+            order_id_text: null,
+            spam_classification: null,
+            ai_summary: list[0].template_name,
+            __synthetic: true,
+            __emailCount: list.length,
+          }))
+      : [];
+
+    const all = [...enriched, ...synthThreads].sort(
+      (a: any, b: any) =>
+        new Date(b.last_activity_at).getTime() - new Date(a.last_activity_at).getTime(),
+    );
+    setThreads(all);
+    if (!selectedId && all.length > 0) setSelectedId(all[0].id);
   };
 
   const loadMessages = async (threadId: string) => {
-    const { data } = await supabase
-      .from("support_messages")
-      .select("id, direction, body, created_at, author_user_id")
-      .eq("thread_id", threadId)
-      .order("created_at", { ascending: true });
-    setMessages(data ?? []);
+    const isSynth = threadId.startsWith("email:");
+    let supportMsgs: any[] = [];
+    let recipient: string | null = null;
+
+    if (isSynth) {
+      recipient = threadId.slice("email:".length);
+    } else {
+      const { data } = await supabase
+        .from("support_messages")
+        .select("id, direction, body, created_at, author_user_id")
+        .eq("thread_id", threadId)
+        .order("created_at", { ascending: true });
+      supportMsgs = data ?? [];
+      // resolve recipient from current threads list
+      const t = threads.find((x) => x.id === threadId);
+      recipient = (t?.sender_email || "").toLowerCase() || null;
+    }
+
+    let emailMsgs: any[] = [];
+    if (recipient) {
+      const { data: logs } = await supabase
+        .from("email_send_log")
+        .select("id, message_id, template_name, status, error_message, created_at")
+        .eq("recipient_email", recipient)
+        .neq("template_name", "auth_emails")
+        .order("created_at", { ascending: false })
+        .limit(200);
+      // dedupe by message_id, keep latest
+      const seen = new Set<string>();
+      const deduped = (logs ?? []).filter((e: any) => {
+        const k = e.message_id || e.id;
+        if (seen.has(k)) return false;
+        seen.add(k);
+        return true;
+      });
+      emailMsgs = deduped.map((e: any) => ({
+        id: `email:${e.id}`,
+        direction: "outbound",
+        kind: "transactional",
+        template_name: e.template_name,
+        status: e.status,
+        error_message: e.error_message,
+        body: `📧 ${e.template_name}${e.status !== "sent" ? ` — ${e.status}` : ""}${e.error_message ? `\n${e.error_message}` : ""}`,
+        created_at: e.created_at,
+      }));
+    }
+
+    const merged = [...supportMsgs, ...emailMsgs].sort(
+      (a, b) => new Date(a.created_at).getTime() - new Date(b.created_at).getTime(),
+    );
+    setMessages(merged);
   };
 
   useEffect(() => {
