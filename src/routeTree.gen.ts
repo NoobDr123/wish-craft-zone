@@ -24,12 +24,21 @@ import { Route as AlmostThereRouteImport } from './routes/almost-there'
 import { Route as AdminRouteImport } from './routes/admin'
 import { Route as AccountRouteImport } from './routes/account'
 import { Route as IndexRouteImport } from './routes/index'
+import { Route as V2IndexRouteImport } from './routes/v2.index'
+import { Route as V2Upsell2RouteImport } from './routes/v2.upsell-2'
+import { Route as V2Upsell1RouteImport } from './routes/v2.upsell-1'
+import { Route as V2ScratchRouteImport } from './routes/v2.scratch'
+import { Route as V2ProcessingRouteImport } from './routes/v2.processing'
+import { Route as V2CreateRouteImport } from './routes/v2.create'
+import { Route as V2CheckoutRouteImport } from './routes/v2.checkout'
+import { Route as V2AlmostThereRouteImport } from './routes/v2.almost-there'
 import { Route as PortalIdRouteImport } from './routes/portal.$id'
 import { Route as ListenIdRouteImport } from './routes/listen.$id'
 import { Route as EmailUnsubscribeRouteImport } from './routes/email/unsubscribe'
 import { Route as CheckoutReturnRouteImport } from './routes/checkout.return'
 import { Route as AuthCallbackRouteImport } from './routes/auth.callback'
 import { Route as AdminLoginRouteImport } from './routes/admin.login'
+import { Route as V2CheckoutReturnRouteImport } from './routes/v2.checkout.return'
 import { Route as LovableEmailSuppressionRouteImport } from './routes/lovable/email/suppression'
 import { Route as ApiPublicAgentmailWebhookRouteImport } from './routes/api/public/agentmail-webhook'
 import { Route as ApiEmailUnsubscribeRouteImport } from './routes/api/email/unsubscribe'
@@ -116,6 +125,46 @@ const IndexRoute = IndexRouteImport.update({
   path: '/',
   getParentRoute: () => rootRouteImport,
 } as any)
+const V2IndexRoute = V2IndexRouteImport.update({
+  id: '/v2/',
+  path: '/v2/',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const V2Upsell2Route = V2Upsell2RouteImport.update({
+  id: '/v2/upsell-2',
+  path: '/v2/upsell-2',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const V2Upsell1Route = V2Upsell1RouteImport.update({
+  id: '/v2/upsell-1',
+  path: '/v2/upsell-1',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const V2ScratchRoute = V2ScratchRouteImport.update({
+  id: '/v2/scratch',
+  path: '/v2/scratch',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const V2ProcessingRoute = V2ProcessingRouteImport.update({
+  id: '/v2/processing',
+  path: '/v2/processing',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const V2CreateRoute = V2CreateRouteImport.update({
+  id: '/v2/create',
+  path: '/v2/create',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const V2CheckoutRoute = V2CheckoutRouteImport.update({
+  id: '/v2/checkout',
+  path: '/v2/checkout',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const V2AlmostThereRoute = V2AlmostThereRouteImport.update({
+  id: '/v2/almost-there',
+  path: '/v2/almost-there',
+  getParentRoute: () => rootRouteImport,
+} as any)
 const PortalIdRoute = PortalIdRouteImport.update({
   id: '/portal/$id',
   path: '/portal/$id',
@@ -145,6 +194,11 @@ const AdminLoginRoute = AdminLoginRouteImport.update({
   id: '/login',
   path: '/login',
   getParentRoute: () => AdminRoute,
+} as any)
+const V2CheckoutReturnRoute = V2CheckoutReturnRouteImport.update({
+  id: '/return',
+  path: '/return',
+  getParentRoute: () => V2CheckoutRoute,
 } as any)
 const LovableEmailSuppressionRoute = LovableEmailSuppressionRouteImport.update({
   id: '/lovable/email/suppression',
@@ -223,9 +277,18 @@ export interface FileRoutesByFullPath {
   '/email/unsubscribe': typeof EmailUnsubscribeRoute
   '/listen/$id': typeof ListenIdRoute
   '/portal/$id': typeof PortalIdRoute
+  '/v2/almost-there': typeof V2AlmostThereRoute
+  '/v2/checkout': typeof V2CheckoutRouteWithChildren
+  '/v2/create': typeof V2CreateRoute
+  '/v2/processing': typeof V2ProcessingRoute
+  '/v2/scratch': typeof V2ScratchRoute
+  '/v2/upsell-1': typeof V2Upsell1Route
+  '/v2/upsell-2': typeof V2Upsell2Route
+  '/v2/': typeof V2IndexRoute
   '/api/email/unsubscribe': typeof ApiEmailUnsubscribeRoute
   '/api/public/agentmail-webhook': typeof ApiPublicAgentmailWebhookRoute
   '/lovable/email/suppression': typeof LovableEmailSuppressionRoute
+  '/v2/checkout/return': typeof V2CheckoutReturnRoute
   '/api/public/songs/generate': typeof ApiPublicSongsGenerateRoute
   '/api/public/songs/status': typeof ApiPublicSongsStatusRoute
   '/lovable/email/auth/preview': typeof LovableEmailAuthPreviewRoute
@@ -256,9 +319,18 @@ export interface FileRoutesByTo {
   '/email/unsubscribe': typeof EmailUnsubscribeRoute
   '/listen/$id': typeof ListenIdRoute
   '/portal/$id': typeof PortalIdRoute
+  '/v2/almost-there': typeof V2AlmostThereRoute
+  '/v2/checkout': typeof V2CheckoutRouteWithChildren
+  '/v2/create': typeof V2CreateRoute
+  '/v2/processing': typeof V2ProcessingRoute
+  '/v2/scratch': typeof V2ScratchRoute
+  '/v2/upsell-1': typeof V2Upsell1Route
+  '/v2/upsell-2': typeof V2Upsell2Route
+  '/v2': typeof V2IndexRoute
   '/api/email/unsubscribe': typeof ApiEmailUnsubscribeRoute
   '/api/public/agentmail-webhook': typeof ApiPublicAgentmailWebhookRoute
   '/lovable/email/suppression': typeof LovableEmailSuppressionRoute
+  '/v2/checkout/return': typeof V2CheckoutReturnRoute
   '/api/public/songs/generate': typeof ApiPublicSongsGenerateRoute
   '/api/public/songs/status': typeof ApiPublicSongsStatusRoute
   '/lovable/email/auth/preview': typeof LovableEmailAuthPreviewRoute
@@ -290,9 +362,18 @@ export interface FileRoutesById {
   '/email/unsubscribe': typeof EmailUnsubscribeRoute
   '/listen/$id': typeof ListenIdRoute
   '/portal/$id': typeof PortalIdRoute
+  '/v2/almost-there': typeof V2AlmostThereRoute
+  '/v2/checkout': typeof V2CheckoutRouteWithChildren
+  '/v2/create': typeof V2CreateRoute
+  '/v2/processing': typeof V2ProcessingRoute
+  '/v2/scratch': typeof V2ScratchRoute
+  '/v2/upsell-1': typeof V2Upsell1Route
+  '/v2/upsell-2': typeof V2Upsell2Route
+  '/v2/': typeof V2IndexRoute
   '/api/email/unsubscribe': typeof ApiEmailUnsubscribeRoute
   '/api/public/agentmail-webhook': typeof ApiPublicAgentmailWebhookRoute
   '/lovable/email/suppression': typeof LovableEmailSuppressionRoute
+  '/v2/checkout/return': typeof V2CheckoutReturnRoute
   '/api/public/songs/generate': typeof ApiPublicSongsGenerateRoute
   '/api/public/songs/status': typeof ApiPublicSongsStatusRoute
   '/lovable/email/auth/preview': typeof LovableEmailAuthPreviewRoute
@@ -325,9 +406,18 @@ export interface FileRouteTypes {
     | '/email/unsubscribe'
     | '/listen/$id'
     | '/portal/$id'
+    | '/v2/almost-there'
+    | '/v2/checkout'
+    | '/v2/create'
+    | '/v2/processing'
+    | '/v2/scratch'
+    | '/v2/upsell-1'
+    | '/v2/upsell-2'
+    | '/v2/'
     | '/api/email/unsubscribe'
     | '/api/public/agentmail-webhook'
     | '/lovable/email/suppression'
+    | '/v2/checkout/return'
     | '/api/public/songs/generate'
     | '/api/public/songs/status'
     | '/lovable/email/auth/preview'
@@ -358,9 +448,18 @@ export interface FileRouteTypes {
     | '/email/unsubscribe'
     | '/listen/$id'
     | '/portal/$id'
+    | '/v2/almost-there'
+    | '/v2/checkout'
+    | '/v2/create'
+    | '/v2/processing'
+    | '/v2/scratch'
+    | '/v2/upsell-1'
+    | '/v2/upsell-2'
+    | '/v2'
     | '/api/email/unsubscribe'
     | '/api/public/agentmail-webhook'
     | '/lovable/email/suppression'
+    | '/v2/checkout/return'
     | '/api/public/songs/generate'
     | '/api/public/songs/status'
     | '/lovable/email/auth/preview'
@@ -391,9 +490,18 @@ export interface FileRouteTypes {
     | '/email/unsubscribe'
     | '/listen/$id'
     | '/portal/$id'
+    | '/v2/almost-there'
+    | '/v2/checkout'
+    | '/v2/create'
+    | '/v2/processing'
+    | '/v2/scratch'
+    | '/v2/upsell-1'
+    | '/v2/upsell-2'
+    | '/v2/'
     | '/api/email/unsubscribe'
     | '/api/public/agentmail-webhook'
     | '/lovable/email/suppression'
+    | '/v2/checkout/return'
     | '/api/public/songs/generate'
     | '/api/public/songs/status'
     | '/lovable/email/auth/preview'
@@ -423,6 +531,14 @@ export interface RootRouteChildren {
   EmailUnsubscribeRoute: typeof EmailUnsubscribeRoute
   ListenIdRoute: typeof ListenIdRoute
   PortalIdRoute: typeof PortalIdRoute
+  V2AlmostThereRoute: typeof V2AlmostThereRoute
+  V2CheckoutRoute: typeof V2CheckoutRouteWithChildren
+  V2CreateRoute: typeof V2CreateRoute
+  V2ProcessingRoute: typeof V2ProcessingRoute
+  V2ScratchRoute: typeof V2ScratchRoute
+  V2Upsell1Route: typeof V2Upsell1Route
+  V2Upsell2Route: typeof V2Upsell2Route
+  V2IndexRoute: typeof V2IndexRoute
   ApiEmailUnsubscribeRoute: typeof ApiEmailUnsubscribeRoute
   ApiPublicAgentmailWebhookRoute: typeof ApiPublicAgentmailWebhookRoute
   LovableEmailSuppressionRoute: typeof LovableEmailSuppressionRoute
@@ -542,6 +658,62 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof IndexRouteImport
       parentRoute: typeof rootRouteImport
     }
+    '/v2/': {
+      id: '/v2/'
+      path: '/v2'
+      fullPath: '/v2/'
+      preLoaderRoute: typeof V2IndexRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/v2/upsell-2': {
+      id: '/v2/upsell-2'
+      path: '/v2/upsell-2'
+      fullPath: '/v2/upsell-2'
+      preLoaderRoute: typeof V2Upsell2RouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/v2/upsell-1': {
+      id: '/v2/upsell-1'
+      path: '/v2/upsell-1'
+      fullPath: '/v2/upsell-1'
+      preLoaderRoute: typeof V2Upsell1RouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/v2/scratch': {
+      id: '/v2/scratch'
+      path: '/v2/scratch'
+      fullPath: '/v2/scratch'
+      preLoaderRoute: typeof V2ScratchRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/v2/processing': {
+      id: '/v2/processing'
+      path: '/v2/processing'
+      fullPath: '/v2/processing'
+      preLoaderRoute: typeof V2ProcessingRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/v2/create': {
+      id: '/v2/create'
+      path: '/v2/create'
+      fullPath: '/v2/create'
+      preLoaderRoute: typeof V2CreateRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/v2/checkout': {
+      id: '/v2/checkout'
+      path: '/v2/checkout'
+      fullPath: '/v2/checkout'
+      preLoaderRoute: typeof V2CheckoutRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/v2/almost-there': {
+      id: '/v2/almost-there'
+      path: '/v2/almost-there'
+      fullPath: '/v2/almost-there'
+      preLoaderRoute: typeof V2AlmostThereRouteImport
+      parentRoute: typeof rootRouteImport
+    }
     '/portal/$id': {
       id: '/portal/$id'
       path: '/portal/$id'
@@ -583,6 +755,13 @@ declare module '@tanstack/react-router' {
       fullPath: '/admin/login'
       preLoaderRoute: typeof AdminLoginRouteImport
       parentRoute: typeof AdminRoute
+    }
+    '/v2/checkout/return': {
+      id: '/v2/checkout/return'
+      path: '/return'
+      fullPath: '/v2/checkout/return'
+      preLoaderRoute: typeof V2CheckoutReturnRouteImport
+      parentRoute: typeof V2CheckoutRoute
     }
     '/lovable/email/suppression': {
       id: '/lovable/email/suppression'
@@ -679,6 +858,18 @@ const CheckoutRouteWithChildren = CheckoutRoute._addFileChildren(
   CheckoutRouteChildren,
 )
 
+interface V2CheckoutRouteChildren {
+  V2CheckoutReturnRoute: typeof V2CheckoutReturnRoute
+}
+
+const V2CheckoutRouteChildren: V2CheckoutRouteChildren = {
+  V2CheckoutReturnRoute: V2CheckoutReturnRoute,
+}
+
+const V2CheckoutRouteWithChildren = V2CheckoutRoute._addFileChildren(
+  V2CheckoutRouteChildren,
+)
+
 const rootRouteChildren: RootRouteChildren = {
   IndexRoute: IndexRoute,
   AccountRoute: AccountRoute,
@@ -699,6 +890,14 @@ const rootRouteChildren: RootRouteChildren = {
   EmailUnsubscribeRoute: EmailUnsubscribeRoute,
   ListenIdRoute: ListenIdRoute,
   PortalIdRoute: PortalIdRoute,
+  V2AlmostThereRoute: V2AlmostThereRoute,
+  V2CheckoutRoute: V2CheckoutRouteWithChildren,
+  V2CreateRoute: V2CreateRoute,
+  V2ProcessingRoute: V2ProcessingRoute,
+  V2ScratchRoute: V2ScratchRoute,
+  V2Upsell1Route: V2Upsell1Route,
+  V2Upsell2Route: V2Upsell2Route,
+  V2IndexRoute: V2IndexRoute,
   ApiEmailUnsubscribeRoute: ApiEmailUnsubscribeRoute,
   ApiPublicAgentmailWebhookRoute: ApiPublicAgentmailWebhookRoute,
   LovableEmailSuppressionRoute: LovableEmailSuppressionRoute,
