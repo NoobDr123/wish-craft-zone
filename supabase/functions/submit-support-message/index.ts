@@ -1,6 +1,6 @@
 // Public endpoint — receives a contact-form submission, creates a support
-// thread + first message, sends an acknowledgment to the customer and a
-// notification to the support inbox. JWT verification is OFF (anon visitors).
+// thread + first message in the admin inbox, and sends an acknowledgment to
+// the customer. JWT verification is OFF (anon visitors).
 
 import { serve } from "https://deno.land/std@0.168.0/http/server.ts";
 import { createClient } from "npm:@supabase/supabase-js@2";
@@ -9,9 +9,6 @@ const supabase = createClient(
   Deno.env.get("SUPABASE_URL")!,
   Deno.env.get("SUPABASE_SERVICE_ROLE_KEY")!,
 );
-
-const SUPPORT_INBOX = "hello@getpawprintsong.com";
-const ADMIN_INBOX_URL = "https://getpawprintsong.com/admin";
 
 const corsHeaders = {
   "Access-Control-Allow-Origin": "*",
@@ -84,14 +81,6 @@ serve(async (req) => {
     await Promise.allSettled([
       sendEmail("support-acknowledgment", email, {
         sender_name: name,
-      }),
-      sendEmail("support-notification", SUPPORT_INBOX, {
-        sender_name: name,
-        sender_email: email,
-        subject,
-        body: message,
-        order_id_text: orderId,
-        inbox_url: ADMIN_INBOX_URL,
       }),
     ]);
 
