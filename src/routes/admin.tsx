@@ -1189,6 +1189,8 @@ interface CrmCustomer {
   buyerName: string | null;
   orders: any[];
   emails: any[];
+  nextScheduledDeliveryAt: string | null;
+  pendingDeliveryCount: number;
 }
 
 function CrmPanel() {
