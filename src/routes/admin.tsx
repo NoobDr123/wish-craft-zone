@@ -1193,12 +1193,15 @@ interface CrmCustomer {
   emails: any[];
   nextScheduledDeliveryAt: string | null;
   pendingDeliveryCount: number;
+  reachedCheckoutAt: string | null;
+  cardStartedAt: string | null;
 }
 
 function CrmPanel() {
   const [customers, setCustomers] = useState<CrmCustomer[]>([]);
   const [loading, setLoading] = useState(true);
   const [search, setSearch] = useState("");
+  const [view, setView] = useState<"all" | "paying" | "partials">("all");
   const [expanded, setExpanded] = useState<string | null>(null);
   const [emailLogs, setEmailLogs] = useState<Record<string, any[]>>({});
   const [quizEvents, setQuizEvents] = useState<Record<string, any[]>>({});
@@ -1206,38 +1209,53 @@ function CrmPanel() {
 
   const load = async (signal?: { active: boolean }) => {
     setLoading(true);
-    const { data: orders } = await supabase
-      .from("orders")
-      .select("*")
-      .not("buyer_email", "like", "pending+%@getpawprintsong.com")
-      .order("created_at", { ascending: false })
-      .limit(2000);
+    const [{ data: orders }, { data: checkoutEvents }] = await Promise.all([
+      supabase
+        .from("orders")
+        .select("*")
+        .not("buyer_email", "like", "pending+%@getpawprintsong.com")
+        .order("created_at", { ascending: false })
+        .limit(2000),
+      supabase
+        .from("quiz_events")
+        .select("buyer_email, event_type, created_at")
+        .in("event_type", ["checkout_view", "checkout_card_started"])
+        .not("buyer_email", "is", null)
+        .order("created_at", { ascending: false })
+        .limit(5000),
+    ]);
     if (signal && !signal.active) return;
 
     const map: Record<string, CrmCustomer> = {};
-    for (const o of orders ?? []) {
-      const email = (o.buyer_email ?? "").toLowerCase();
-      if (!email) continue;
+    const ensure = (email: string, seedFromOrder?: any): CrmCustomer => {
       if (!map[email]) {
         map[email] = {
           email,
           totalSpentCents: 0,
           orderCount: 0,
-          lastOrderAt: o.created_at,
-          firstOrderAt: o.created_at,
+          lastOrderAt: seedFromOrder?.created_at ?? "",
+          firstOrderAt: seedFromOrder?.created_at ?? "9999",
           paidCount: 0,
           pendingCount: 0,
           failedCount: 0,
           hasUpsells: false,
           isGift: false,
-          buyerName: o.buyer_name ?? o.customer_name ?? null,
+          buyerName: seedFromOrder?.buyer_name ?? seedFromOrder?.customer_name ?? null,
           orders: [],
           emails: [],
           nextScheduledDeliveryAt: null,
           pendingDeliveryCount: 0,
+          reachedCheckoutAt: null,
+          cardStartedAt: null,
         };
       }
-      const c = map[email];
+      return map[email];
+    };
+
+    for (const o of orders ?? []) {
+      const email = (o.buyer_email ?? "").toLowerCase();
+      if (!email) continue;
+      const c = ensure(email, o);
       c.orders.push(o);
       c.orderCount += 1;
       if (o.payment_status === "paid" || o.payment_status === "succeeded") {
@@ -1250,8 +1268,8 @@ function CrmPanel() {
       }
       if (o.has_3rd_verse || o.is_rush || o.has_unlimited_edits) c.hasUpsells = true;
       if (o.is_gift) c.isGift = true;
-      if (o.created_at > c.lastOrderAt) c.lastOrderAt = o.created_at;
-      if (o.created_at < c.firstOrderAt) c.firstOrderAt = o.created_at;
+      if (!c.lastOrderAt || o.created_at > c.lastOrderAt) c.lastOrderAt = o.created_at;
+      if (!c.firstOrderAt || o.created_at < c.firstOrderAt) c.firstOrderAt = o.created_at;
       if (!c.buyerName && (o.buyer_name || o.customer_name)) {
         c.buyerName = o.buyer_name ?? o.customer_name;
       }
@@ -1263,8 +1281,29 @@ function CrmPanel() {
       }
     }
 
+    for (const e of checkoutEvents ?? []) {
+      const email = (e.buyer_email ?? "").toLowerCase();
+      if (!email) continue;
+      if (email.startsWith("pending+")) continue;
+      const c = ensure(email);
+      if (e.event_type === "checkout_view") {
+        if (!c.reachedCheckoutAt || e.created_at > c.reachedCheckoutAt) {
+          c.reachedCheckoutAt = e.created_at;
+        }
+      }
+      if (e.event_type === "checkout_card_started") {
+        if (!c.cardStartedAt || e.created_at > c.cardStartedAt) {
+          c.cardStartedAt = e.created_at;
+        }
+      }
+      if (!c.lastOrderAt || e.created_at > c.lastOrderAt) c.lastOrderAt = e.created_at;
+    }
+
     setCustomers(
-      Object.values(map).sort((a, b) => b.totalSpentCents - a.totalSpentCents),
+      Object.values(map).sort((a, b) => {
+        if (b.totalSpentCents !== a.totalSpentCents) return b.totalSpentCents - a.totalSpentCents;
+        return (b.lastOrderAt ?? "").localeCompare(a.lastOrderAt ?? "");
+      }),
     );
     setLoading(false);
   };
@@ -1278,7 +1317,16 @@ function CrmPanel() {
 
   useRealtimeRefresh("orders", () => load());
 
+  const partialsCount = customers.filter(
+    (c) => c.paidCount === 0 && (c.reachedCheckoutAt || c.cardStartedAt),
+  ).length;
+
   const filtered = customers.filter((c) => {
+    if (view === "paying" && c.paidCount === 0) return false;
+    if (view === "partials") {
+      if (c.paidCount > 0) return false;
+      if (!c.reachedCheckoutAt && !c.cardStartedAt) return false;
+    }
     if (!search) return true;
     const s = search.toLowerCase();
     return c.email.includes(s) || (c.buyerName ?? "").toLowerCase().includes(s);
@@ -1331,6 +1379,31 @@ function CrmPanel() {
         <StatCard label="Pending deliveries" value={customers.reduce((s, c) => s + c.pendingDeliveryCount, 0)} tone="warn" />
       </div>
 
+      <div className="flex items-center gap-2 mb-3">
+        {([
+          ["all", `All (${customers.length})`],
+          ["paying", `Paying (${customers.filter((c) => c.paidCount > 0).length})`],
+          ["partials", `Partials (${partialsCount})`],
+        ] as const).map(([key, label]) => (
+          <button
+            key={key}
+            onClick={() => setView(key)}
+            className={`px-3 py-1.5 rounded-full text-xs font-medium border transition-colors ${
+              view === key
+                ? "bg-primary text-primary-foreground border-primary"
+                : "bg-card text-muted-foreground border-border hover:bg-muted/30"
+            }`}
+          >
+            {label}
+          </button>
+        ))}
+        {view === "partials" && (
+          <span className="text-xs text-muted-foreground ml-2">
+            Reached checkout but never paid
+          </span>
+        )}
+      </div>
+
       <input
         value={search}
         onChange={(e) => setSearch(e.target.value)}
@@ -1347,8 +1420,8 @@ function CrmPanel() {
               <th className="p-3 text-right">Orders</th>
               <th className="p-3 text-right">Spent</th>
               <th className="p-3">Status</th>
-              <th className="p-3">Next delivery</th>
-              <th className="p-3">Last order</th>
+              <th className="p-3">{view === "partials" ? "Reached checkout" : "Next delivery"}</th>
+              <th className="p-3">Last activity</th>
             </tr>
           </thead>
           <tbody>
@@ -1381,7 +1454,20 @@ function CrmPanel() {
                     </div>
                   </td>
                   <td className="p-3 text-xs whitespace-nowrap">
-                    {c.nextScheduledDeliveryAt ? (
+                    {view === "partials" ? (
+                      c.cardStartedAt || c.reachedCheckoutAt ? (
+                        <>
+                          <div className="font-medium text-rose-600">
+                            {new Date((c.cardStartedAt ?? c.reachedCheckoutAt)!).toLocaleString()}
+                          </div>
+                          <div className="text-[10px] text-muted-foreground">
+                            {c.cardStartedAt ? "started card entry" : "viewed checkout"}
+                          </div>
+                        </>
+                      ) : (
+                        <span className="text-muted-foreground">—</span>
+                      )
+                    ) : c.nextScheduledDeliveryAt ? (
                       <>
                         <div className="font-medium text-amber-600">{new Date(c.nextScheduledDeliveryAt).toLocaleString()}</div>
                         {c.pendingDeliveryCount > 1 && (
@@ -1393,7 +1479,7 @@ function CrmPanel() {
                     )}
                   </td>
                   <td className="p-3 text-xs text-muted-foreground">
-                    {new Date(c.lastOrderAt).toLocaleDateString()}
+                    {c.lastOrderAt ? new Date(c.lastOrderAt).toLocaleDateString() : "—"}
                   </td>
                 </tr>
                 {expanded === c.email && (

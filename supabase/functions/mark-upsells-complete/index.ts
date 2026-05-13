@@ -79,16 +79,19 @@ serve(async (req) => {
 
 async function sendOrderConfirmationIfNeeded(orderId: string) {
   try {
-    const { data: order } = await supabase
+    // Atomic claim — only one of the racing callers wins.
+    const { data: claimed } = await supabase
       .from("orders")
-      .select("confirmation_email_sent_at, buyer_email")
+      .update({ confirmation_email_sent_at: new Date().toISOString() })
       .eq("id", orderId)
+      .is("confirmation_email_sent_at", null)
+      .select("id, buyer_email")
       .maybeSingle();
-    if (!order || order.confirmation_email_sent_at || !order.buyer_email) return;
+    if (!claimed || !claimed.buyer_email) return;
 
     const supabaseUrl = Deno.env.get("SUPABASE_URL")!;
     const serviceKey = Deno.env.get("SUPABASE_SERVICE_ROLE_KEY")!;
-    await fetch(`${supabaseUrl}/functions/v1/send-app-email`, {
+    const res = await fetch(`${supabaseUrl}/functions/v1/send-app-email`, {
       method: "POST",
       headers: {
         "Content-Type": "application/json",
@@ -96,14 +99,16 @@ async function sendOrderConfirmationIfNeeded(orderId: string) {
       },
       body: JSON.stringify({
         template: "order_confirmation",
-        to: order.buyer_email,
+        to: claimed.buyer_email,
         data: { orderId },
       }),
     });
-    await supabase
-      .from("orders")
-      .update({ confirmation_email_sent_at: new Date().toISOString() })
-      .eq("id", orderId);
+    if (!res.ok) {
+      await supabase
+        .from("orders")
+        .update({ confirmation_email_sent_at: null })
+        .eq("id", orderId);
+    }
   } catch (e) {
     console.error("sendOrderConfirmationIfNeeded failed:", e);
   }
