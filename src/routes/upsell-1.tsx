@@ -131,7 +131,7 @@ function Upsell1() {
           "We start producing the moment you accept, around the clock",
           "Hand-checked by a real human before it lands in your inbox",
         ]}
-        priceLabel="$59.99"
+        priceLabel={formatProduct(currency, "express_90min")}
         declineLabel="No thanks, I can wait"
         onAccept={accept}
         onDecline={decline}
