@@ -31,6 +31,7 @@ import { Route as CheckoutReturnRouteImport } from './routes/checkout.return'
 import { Route as AuthCallbackRouteImport } from './routes/auth.callback'
 import { Route as AdminLoginRouteImport } from './routes/admin.login'
 import { Route as LovableEmailSuppressionRouteImport } from './routes/lovable/email/suppression'
+import { Route as ApiPublicAgentmailWebhookRouteImport } from './routes/api/public/agentmail-webhook'
 import { Route as ApiEmailUnsubscribeRouteImport } from './routes/api/email/unsubscribe'
 import { Route as LovableEmailTransactionalSendRouteImport } from './routes/lovable/email/transactional/send'
 import { Route as LovableEmailTransactionalPreviewRouteImport } from './routes/lovable/email/transactional/preview'
@@ -150,6 +151,12 @@ const LovableEmailSuppressionRoute = LovableEmailSuppressionRouteImport.update({
   path: '/lovable/email/suppression',
   getParentRoute: () => rootRouteImport,
 } as any)
+const ApiPublicAgentmailWebhookRoute =
+  ApiPublicAgentmailWebhookRouteImport.update({
+    id: '/api/public/agentmail-webhook',
+    path: '/api/public/agentmail-webhook',
+    getParentRoute: () => rootRouteImport,
+  } as any)
 const ApiEmailUnsubscribeRoute = ApiEmailUnsubscribeRouteImport.update({
   id: '/api/email/unsubscribe',
   path: '/api/email/unsubscribe',
@@ -217,6 +224,7 @@ export interface FileRoutesByFullPath {
   '/listen/$id': typeof ListenIdRoute
   '/portal/$id': typeof PortalIdRoute
   '/api/email/unsubscribe': typeof ApiEmailUnsubscribeRoute
+  '/api/public/agentmail-webhook': typeof ApiPublicAgentmailWebhookRoute
   '/lovable/email/suppression': typeof LovableEmailSuppressionRoute
   '/api/public/songs/generate': typeof ApiPublicSongsGenerateRoute
   '/api/public/songs/status': typeof ApiPublicSongsStatusRoute
@@ -249,6 +257,7 @@ export interface FileRoutesByTo {
   '/listen/$id': typeof ListenIdRoute
   '/portal/$id': typeof PortalIdRoute
   '/api/email/unsubscribe': typeof ApiEmailUnsubscribeRoute
+  '/api/public/agentmail-webhook': typeof ApiPublicAgentmailWebhookRoute
   '/lovable/email/suppression': typeof LovableEmailSuppressionRoute
   '/api/public/songs/generate': typeof ApiPublicSongsGenerateRoute
   '/api/public/songs/status': typeof ApiPublicSongsStatusRoute
@@ -282,6 +291,7 @@ export interface FileRoutesById {
   '/listen/$id': typeof ListenIdRoute
   '/portal/$id': typeof PortalIdRoute
   '/api/email/unsubscribe': typeof ApiEmailUnsubscribeRoute
+  '/api/public/agentmail-webhook': typeof ApiPublicAgentmailWebhookRoute
   '/lovable/email/suppression': typeof LovableEmailSuppressionRoute
   '/api/public/songs/generate': typeof ApiPublicSongsGenerateRoute
   '/api/public/songs/status': typeof ApiPublicSongsStatusRoute
@@ -316,6 +326,7 @@ export interface FileRouteTypes {
     | '/listen/$id'
     | '/portal/$id'
     | '/api/email/unsubscribe'
+    | '/api/public/agentmail-webhook'
     | '/lovable/email/suppression'
     | '/api/public/songs/generate'
     | '/api/public/songs/status'
@@ -348,6 +359,7 @@ export interface FileRouteTypes {
     | '/listen/$id'
     | '/portal/$id'
     | '/api/email/unsubscribe'
+    | '/api/public/agentmail-webhook'
     | '/lovable/email/suppression'
     | '/api/public/songs/generate'
     | '/api/public/songs/status'
@@ -380,6 +392,7 @@ export interface FileRouteTypes {
     | '/listen/$id'
     | '/portal/$id'
     | '/api/email/unsubscribe'
+    | '/api/public/agentmail-webhook'
     | '/lovable/email/suppression'
     | '/api/public/songs/generate'
     | '/api/public/songs/status'
@@ -411,6 +424,7 @@ export interface RootRouteChildren {
   ListenIdRoute: typeof ListenIdRoute
   PortalIdRoute: typeof PortalIdRoute
   ApiEmailUnsubscribeRoute: typeof ApiEmailUnsubscribeRoute
+  ApiPublicAgentmailWebhookRoute: typeof ApiPublicAgentmailWebhookRoute
   LovableEmailSuppressionRoute: typeof LovableEmailSuppressionRoute
   ApiPublicSongsGenerateRoute: typeof ApiPublicSongsGenerateRoute
   ApiPublicSongsStatusRoute: typeof ApiPublicSongsStatusRoute
@@ -577,6 +591,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof LovableEmailSuppressionRouteImport
       parentRoute: typeof rootRouteImport
     }
+    '/api/public/agentmail-webhook': {
+      id: '/api/public/agentmail-webhook'
+      path: '/api/public/agentmail-webhook'
+      fullPath: '/api/public/agentmail-webhook'
+      preLoaderRoute: typeof ApiPublicAgentmailWebhookRouteImport
+      parentRoute: typeof rootRouteImport
+    }
     '/api/email/unsubscribe': {
       id: '/api/email/unsubscribe'
       path: '/api/email/unsubscribe'
@@ -679,6 +700,7 @@ const rootRouteChildren: RootRouteChildren = {
   ListenIdRoute: ListenIdRoute,
   PortalIdRoute: PortalIdRoute,
   ApiEmailUnsubscribeRoute: ApiEmailUnsubscribeRoute,
+  ApiPublicAgentmailWebhookRoute: ApiPublicAgentmailWebhookRoute,
   LovableEmailSuppressionRoute: LovableEmailSuppressionRoute,
   ApiPublicSongsGenerateRoute: ApiPublicSongsGenerateRoute,
   ApiPublicSongsStatusRoute: ApiPublicSongsStatusRoute,
@@ -691,3 +713,12 @@ const rootRouteChildren: RootRouteChildren = {
 export const routeTree = rootRouteImport
   ._addFileChildren(rootRouteChildren)
   ._addFileTypes<FileRouteTypes>()
+
+import type { getRouter } from './router.tsx'
+import type { createStart } from '@tanstack/react-start'
+declare module '@tanstack/react-start' {
+  interface Register {
+    ssr: true
+    router: Awaited<ReturnType<typeof getRouter>>
+  }
+}
