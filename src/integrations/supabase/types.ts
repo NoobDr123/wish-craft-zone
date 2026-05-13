@@ -1338,6 +1338,7 @@ export type Database = {
       }
       support_messages: {
         Row: {
+          agentmail_message_id: string | null
           author_user_id: string | null
           body: string
           created_at: string
@@ -1346,6 +1347,7 @@ export type Database = {
           thread_id: string
         }
         Insert: {
+          agentmail_message_id?: string | null
           author_user_id?: string | null
           body: string
           created_at?: string
@@ -1354,6 +1356,7 @@ export type Database = {
           thread_id: string
         }
         Update: {
+          agentmail_message_id?: string | null
           author_user_id?: string | null
           body?: string
           created_at?: string
@@ -1373,6 +1376,8 @@ export type Database = {
       }
       support_threads: {
         Row: {
+          agentmail_inbox_id: string | null
+          agentmail_thread_id: string | null
           assigned_to: string | null
           created_at: string
           id: string
@@ -1385,6 +1390,8 @@ export type Database = {
           updated_at: string
         }
         Insert: {
+          agentmail_inbox_id?: string | null
+          agentmail_thread_id?: string | null
           assigned_to?: string | null
           created_at?: string
           id?: string
@@ -1397,6 +1404,8 @@ export type Database = {
           updated_at?: string
         }
         Update: {
+          agentmail_inbox_id?: string | null
+          agentmail_thread_id?: string | null
           assigned_to?: string | null
           created_at?: string
           id?: string
