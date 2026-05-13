@@ -403,17 +403,17 @@ function CheckoutPage() {
               {promoApplied ? `${promoApplied.discount_pct}% OFF` : "50% OFF · TODAY ONLY"}
             </span>
             <p className="flex items-baseline gap-2">
-              {/* Compare-at is 2× our price so the deal reads cleanly: $59.99 → $29.99. */}
+              {/* Compare-at is 2× our price so the deal reads cleanly. */}
               <span className="text-base font-medium text-muted-foreground line-through">
-                $59.99
+                {formatProduct(currency, "compare_at")}
               </span>
               <span className="font-display text-3xl font-bold text-primary">
                 {promoApplied
-                  ? `$${(promoApplied.final_amount_cents / 100).toFixed(2)}`
-                  : "$29.99"}
+                  ? formatMoney(promoApplied.final_amount_cents, currency)
+                  : formatProduct(currency, "base")}
               </span>
               <span className="text-sm font-semibold text-muted-foreground">
-                USD
+                {currency}
               </span>
             </p>
           </div>
