@@ -58,15 +58,20 @@ serve(async (req) => {
     const { data: order, error } = await supabase
       .from("orders")
       .select(
-        "user_id, buyer_email, status, stripe_customer_id, stripe_payment_method_id, stripe_checkout_session_id, stripe_payment_intent_id, product_config, delivery_tier, promo_code_id, amount_paid_cents",
+        "user_id, buyer_email, status, stripe_customer_id, stripe_payment_method_id, stripe_checkout_session_id, stripe_payment_intent_id, product_config, delivery_tier, promo_code_id, amount_paid_cents, currency",
       )
       .eq("id", orderId)
       .single();
 
     if (error || !order) return json({ success: false, reason: "order_not_found" }, 404);
 
+    // Look up the upsell price in the order's currency. Server-side catalog
+    // is the source of truth — never trust client amounts.
+    const orderCurrency = normalizeCurrency(order.currency);
+    const baseUpsellAmount = getProductPrice(orderCurrency, upsell.priceKey);
+
     // ---- T3ST2 special case: 99% off any upsell taken ----
-    let chargeAmount = upsell.amount;
+    let chargeAmount = baseUpsellAmount;
     if (order.promo_code_id) {
       const { data: promo } = await supabase
         .from("promo_codes")
@@ -75,7 +80,7 @@ serve(async (req) => {
         .maybeSingle();
       if (promo?.code?.toUpperCase() === "T3ST2") {
         // 99% off, with a 50¢ Stripe minimum.
-        chargeAmount = Math.max(50, Math.round(upsell.amount * 0.01));
+        chargeAmount = Math.max(50, Math.round(baseUpsellAmount * 0.01));
       }
     }
 
