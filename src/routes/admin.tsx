@@ -527,7 +527,7 @@ interface DashboardData {
 }
 
 function DashboardPanel() {
-  const [range, setRange] = useState<Range>("7d");
+  const [range, setRange] = useState<Range>("today");
   const [data, setData] = useState<DashboardData | null>(null);
   const [loading, setLoading] = useState(true);
   const [liveVisitors, setLiveVisitors] = useState<number>(0);
