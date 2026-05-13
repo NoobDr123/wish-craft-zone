@@ -7,6 +7,8 @@ import { ReviewSurveyModal } from "@/components/ReviewSurveyModal";
 import { useQuizStore } from "@/stores/quizStore";
 import { supabase } from "@/integrations/supabase/client";
 import { buildOrderPatchForQuiz, ensureOrderForQuiz } from "@/lib/checkoutPrefetch";
+import { useBuyerCurrency } from "@/hooks/useBuyerCurrency";
+import { formatMoney, formatProduct } from "@/lib/currency";
 import {
   ArrowLeft,
   CheckCircle2,
