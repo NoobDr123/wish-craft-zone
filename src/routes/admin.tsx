@@ -2363,7 +2363,13 @@ function SupportPanel() {
                   >
                     <div className="flex items-center justify-between gap-2">
                       <span className="truncate text-sm font-medium">{t.sender_name}</span>
-                      {t.status === "new" && (
+                      {t.spam_classification === "spam" && (
+                        <Badge variant="destructive" className="shrink-0 text-[10px]">spam</Badge>
+                      )}
+                      {t.spam_classification === "unsure" && (
+                        <Badge variant="outline" className="shrink-0 text-[10px] border-yellow-500/50 text-yellow-600">?</Badge>
+                      )}
+                      {t.status === "new" && t.spam_classification !== "spam" && (
                         <Badge className="shrink-0 text-[10px]">new</Badge>
                       )}
                       {t.status === "closed" && (
@@ -2373,7 +2379,7 @@ function SupportPanel() {
                       )}
                     </div>
                     <div className="mt-0.5 truncate text-xs text-muted-foreground">
-                      {t.subject}
+                      {t.ai_summary || t.subject}
                     </div>
                     <div className="mt-1 text-[11px] text-muted-foreground/70">
                       {new Date(t.last_activity_at).toLocaleString()}
