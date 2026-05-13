@@ -2224,20 +2224,26 @@ function SamplesPanel() {
 
 function SupportPanel() {
   const [threads, setThreads] = useState<any[]>([]);
-  const [filter, setFilter] = useState<"all" | "new" | "open" | "closed">("all");
+  const [filter, setFilter] = useState<"all" | "new" | "open" | "closed" | "spam">("all");
   const [selectedId, setSelectedId] = useState<string | null>(null);
   const [messages, setMessages] = useState<any[]>([]);
   const [reply, setReply] = useState("");
   const [sending, setSending] = useState(false);
   const [closeAfter, setCloseAfter] = useState(false);
+  const [reclassifying, setReclassifying] = useState(false);
 
   const loadThreads = async () => {
     let q = supabase
       .from("support_threads")
-      .select("id, sender_name, sender_email, subject, status, last_activity_at, order_id_text")
+      .select("id, sender_name, sender_email, subject, status, last_activity_at, order_id_text, spam_classification, spam_score, spam_reason, ai_summary, ai_suggested_reply, ai_classified_at")
       .order("last_activity_at", { ascending: false })
       .limit(200);
-    if (filter !== "all") q = q.eq("status", filter);
+    if (filter === "all") {
+      // hide spam from "all" by default
+      q = q.neq("status", "spam");
+    } else {
+      q = q.eq("status", filter);
+    }
     const { data } = await q;
     setThreads(data ?? []);
     if (!selectedId && data && data.length > 0) setSelectedId(data[0].id);
