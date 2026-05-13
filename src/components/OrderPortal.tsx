@@ -436,6 +436,7 @@ function ShareSection({
           text: `${recipientName}'s PawPrint Song is ready.`,
           url: shareUrl,
         });
+        pingShare();
         return;
       } catch {
         return;
