@@ -58,7 +58,7 @@ const contactSchema = z.object({
 const FAQS = [
   {
     q: "How long does it take to get my song?",
-    a: "Standard delivery is up to 5 days. If you chose Priority (48 hours) or Rush (24 hours) at checkout, we'll honor that faster timing. You'll get an email the moment it's ready, plus a link to your private listening page.",
+    a: "Standard delivery is up to 5 days. If you chose 24-hour Rush or 90-minute Priority at checkout, we'll honor that faster timing. You'll get an email the moment it's ready, plus a link to your private listening page.",
   },
   {
     q: "Can I request changes after I hear it?",
