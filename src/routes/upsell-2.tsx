@@ -5,6 +5,8 @@ import { useQuizStore } from "@/stores/quizStore";
 import { supabase } from "@/integrations/supabase/client";
 import { stripeEnvironment } from "@/lib/stripe";
 import { track } from "@/lib/tracking";
+import { useBuyerCurrency } from "@/hooks/useBuyerCurrency";
+import { formatProduct, getProductPrice } from "@/lib/currency";
 
 export const Route = createFileRoute("/upsell-2")({
   component: Upsell2,
@@ -13,6 +15,7 @@ export const Route = createFileRoute("/upsell-2")({
 function Upsell2() {
   const navigate = useNavigate();
   const q = useQuizStore();
+  const currency = useBuyerCurrency();
   const [processing, setProcessing] = useState(false);
 
   useEffect(() => {
@@ -45,7 +48,7 @@ function Upsell2() {
       upsellType: "unlimited_edits",
       orderId: q.orderId,
       buyerEmail: q.buyer_email || undefined,
-      amountCents: 3299,
+      amountCents: getProductPrice(currency, "unlimited_edits"),
     });
     if (!q.orderId) {
       await finishAndAdvance();
@@ -93,7 +96,7 @@ function Upsell2() {
         "Try a different genre, voice, or tempo as many times as you like",
         "14 days from delivery, no rush, no catches",
       ]}
-      priceLabel="$32.99"
+      priceLabel={formatProduct(currency, "unlimited_edits")}
       declineLabel="No thanks, I trust the first version"
       onAccept={accept}
       onDecline={decline}

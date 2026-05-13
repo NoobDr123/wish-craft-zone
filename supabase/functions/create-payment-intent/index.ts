@@ -13,6 +13,12 @@
 import { serve } from "https://deno.land/std@0.168.0/http/server.ts";
 import { createClient } from "npm:@supabase/supabase-js@2";
 import { corsHeaders, createStripeClient, type StripeEnv } from "../_shared/stripe.ts";
+import {
+  currencyForCountry,
+  getProductPrice,
+  normalizeCurrency,
+  type SupportedCurrency,
+} from "../_shared/pricing.ts";
 
 const supabase = createClient(
   Deno.env.get("SUPABASE_URL")!,
@@ -78,13 +84,17 @@ serve(async (req) => {
     return json({ error: "invalid_json" }, 400);
   }
 
-  const { orderId, environment, quizPatch, quizSnapshot, userId } = body;
+  const { orderId, environment, quizPatch, quizSnapshot, userId, country, currency: bodyCurrency } = body;
   if (!orderId || typeof orderId !== "string") {
     return json({ error: "missing_order_id" }, 400);
   }
 
   const env = (environment === "live" ? "live" : "sandbox") as StripeEnv;
-  console.log(`[create-payment-intent] start order=${orderId} env=${env}`);
+  // Buyer currency: prefer explicit currency, otherwise derive from detected country.
+  const requestedCurrency: SupportedCurrency = bodyCurrency
+    ? normalizeCurrency(bodyCurrency)
+    : currencyForCountry(country);
+  console.log(`[create-payment-intent] start order=${orderId} env=${env} currency=${requestedCurrency} country=${country ?? "?"}`);
 
   try {
     const stripe = createStripeClient(env);
@@ -93,7 +103,7 @@ serve(async (req) => {
     let { data: order, error: orderErr } = await supabase
       .from("orders")
       .select(
-        "id, buyer_email, buyer_name, dog_name, amount_cents, currency, stripe_customer_id, stripe_env, stripe_payment_intent_id, payment_status",
+        "id, buyer_email, buyer_name, dog_name, amount_cents, currency, stripe_customer_id, stripe_env, stripe_payment_intent_id, payment_status, promo_code_id",
       )
       .eq("id", orderId)
       .maybeSingle();
@@ -115,8 +125,8 @@ serve(async (req) => {
         user_id: typeof userId === "string" ? userId : null,
         ...snap,
         buyer_email: buyerEmail,
-        amount_cents: 2999,
-        currency: "USD",
+        amount_cents: getProductPrice(requestedCurrency, "base"),
+        currency: requestedCurrency,
         status: "pending_payment",
         payment_status: "pending",
       };
@@ -124,7 +134,7 @@ serve(async (req) => {
         .from("orders")
         .insert(insertRow)
         .select(
-          "id, buyer_email, buyer_name, dog_name, amount_cents, currency, stripe_customer_id, stripe_env, stripe_payment_intent_id, payment_status",
+          "id, buyer_email, buyer_name, dog_name, amount_cents, currency, stripe_customer_id, stripe_env, stripe_payment_intent_id, payment_status, promo_code_id",
         )
         .maybeSingle();
       if (insErr || !inserted) {
@@ -154,12 +164,34 @@ serve(async (req) => {
           const { data: refreshed } = await supabase
             .from("orders")
             .select(
-              "id, buyer_email, buyer_name, dog_name, amount_cents, currency, stripe_customer_id, stripe_env, stripe_payment_intent_id, payment_status",
+              "id, buyer_email, buyer_name, dog_name, amount_cents, currency, stripe_customer_id, stripe_env, stripe_payment_intent_id, payment_status, promo_code_id",
             )
             .eq("id", orderId)
             .maybeSingle();
           if (refreshed) order = refreshed;
         }
+      }
+
+      // If buyer's currency changed (e.g. they detected GB on a fresh
+      // session) and no promo has been applied yet, switch the order to
+      // the new currency and refresh the amount from the server catalog.
+      if (
+        order.currency &&
+        order.currency.toUpperCase() !== requestedCurrency &&
+        !order.promo_code_id &&
+        order.payment_status !== "paid"
+      ) {
+        const newAmount = getProductPrice(requestedCurrency, "base");
+        const { data: switched } = await supabase
+          .from("orders")
+          .update({ currency: requestedCurrency, amount_cents: newAmount })
+          .eq("id", orderId)
+          .neq("payment_status", "paid")
+          .select(
+            "id, buyer_email, buyer_name, dog_name, amount_cents, currency, stripe_customer_id, stripe_env, stripe_payment_intent_id, payment_status, promo_code_id",
+          )
+          .maybeSingle();
+        if (switched) order = switched;
       }
     }
 
@@ -201,15 +233,19 @@ serve(async (req) => {
       customerId = customer.id;
     }
 
-    // Try to reuse existing PI if it's still mutable
+    // Try to reuse existing PI if it's still mutable AND in the same currency.
+    // Stripe doesn't allow changing PI currency on update — if buyer's locale
+    // changed, we must create a fresh PI in the new currency.
     let pi: any = null;
     if (order.stripe_payment_intent_id) {
       try {
         const existing = await stripe.paymentIntents.retrieve(order.stripe_payment_intent_id);
+        const sameCurrency = existing.currency?.toLowerCase() === currency;
         if (
-          existing.status === "requires_payment_method" ||
-          existing.status === "requires_confirmation" ||
-          existing.status === "requires_action"
+          sameCurrency &&
+          (existing.status === "requires_payment_method" ||
+            existing.status === "requires_confirmation" ||
+            existing.status === "requires_action")
         ) {
           // Update amount in case promo changed it
           if (existing.amount !== amountCents || existing.customer !== customerId) {
@@ -220,6 +256,8 @@ serve(async (req) => {
           } else {
             pi = existing;
           }
+        } else if (!sameCurrency) {
+          console.log(`[create-payment-intent] currency switched ${existing.currency} -> ${currency}, creating fresh PI`);
         }
       } catch (e: any) {
         console.warn("[create-payment-intent] could not reuse PI:", e?.message);

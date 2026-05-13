@@ -6,6 +6,7 @@
 import { serve } from "https://deno.land/std@0.168.0/http/server.ts";
 import { createClient } from "npm:@supabase/supabase-js@2";
 import { createStripeClient, type StripeEnv } from "../_shared/stripe.ts";
+import { TEST_PROMO_FLAT, normalizeCurrency } from "../_shared/pricing.ts";
 
 const corsHeaders = {
   "Access-Control-Allow-Origin": "*",
@@ -48,7 +49,7 @@ serve(async (req) => {
     // Load the order to get the base amount + buyer email + PI id
     const { data: order, error: orderErr } = await supabase
       .from("orders")
-      .select("id, amount_cents, buyer_email, payment_status, status, stripe_payment_intent_id")
+      .select("id, amount_cents, buyer_email, payment_status, status, stripe_payment_intent_id, currency")
       .eq("id", orderId)
       .maybeSingle();
 
@@ -60,6 +61,7 @@ serve(async (req) => {
       return json({ ok: false, error: "order_already_paid" }, 400);
     }
 
+    const orderCurrency = normalizeCurrency(order.currency);
     const baseAmount = order.amount_cents ?? 2999;
 
     // Atomic redeem via DB function (handles race conditions + max_uses)
@@ -95,13 +97,13 @@ serve(async (req) => {
     const isT3st2 = upperCode === "T3ST2";
     const isT3st1 = upperCode === "T3ST1";
     if (isT3st) {
-      finalAmount = 500; // $5.00 flat
+      finalAmount = TEST_PROMO_FLAT[orderCurrency].T3ST;
       discountCents = Math.max(0, baseAmount - finalAmount);
     } else if (isT3st2) {
-      finalAmount = 200; // $2.00 flat
+      finalAmount = TEST_PROMO_FLAT[orderCurrency].T3ST2;
       discountCents = Math.max(0, baseAmount - finalAmount);
     } else if (isT3st1) {
-      finalAmount = 100; // $1.00 flat
+      finalAmount = TEST_PROMO_FLAT[orderCurrency].T3ST1;
       discountCents = Math.max(0, baseAmount - finalAmount);
     }
 

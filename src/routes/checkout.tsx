@@ -7,6 +7,8 @@ import { ReviewSurveyModal } from "@/components/ReviewSurveyModal";
 import { useQuizStore } from "@/stores/quizStore";
 import { supabase } from "@/integrations/supabase/client";
 import { buildOrderPatchForQuiz, ensureOrderForQuiz } from "@/lib/checkoutPrefetch";
+import { useBuyerCurrency } from "@/hooks/useBuyerCurrency";
+import { formatMoney, formatProduct } from "@/lib/currency";
 import {
   ArrowLeft,
   CheckCircle2,
@@ -49,6 +51,7 @@ function CheckoutPage() {
 
   const navigate = useNavigate();
   const q = useQuizStore();
+  const currency = useBuyerCurrency();
   const [hydrated, setHydrated] = useState(() => useQuizStore.persist.hasHydrated());
   const [email, setEmail] = useState(q.buyer_email || "");
   const [name, setName] = useState(q.buyer_name || "");
@@ -400,17 +403,17 @@ function CheckoutPage() {
               {promoApplied ? `${promoApplied.discount_pct}% OFF` : "50% OFF · TODAY ONLY"}
             </span>
             <p className="flex items-baseline gap-2">
-              {/* Compare-at is 2× our price so the deal reads cleanly: $59.99 → $29.99. */}
+              {/* Compare-at is 2× our price so the deal reads cleanly. */}
               <span className="text-base font-medium text-muted-foreground line-through">
-                $59.99
+                {formatProduct(currency, "compare_at")}
               </span>
               <span className="font-display text-3xl font-bold text-primary">
                 {promoApplied
-                  ? `$${(promoApplied.final_amount_cents / 100).toFixed(2)}`
-                  : "$29.99"}
+                  ? formatMoney(promoApplied.final_amount_cents, currency)
+                  : formatProduct(currency, "base")}
               </span>
               <span className="text-sm font-semibold text-muted-foreground">
-                USD
+                {currency}
               </span>
             </p>
           </div>
@@ -426,7 +429,7 @@ function CheckoutPage() {
                   <p className="text-muted-foreground">
                     {promoApplied.free
                       ? "Your order is free. Redirecting…"
-                      : `You saved $${(promoApplied.discount_cents / 100).toFixed(2)}.`}
+                      : `You saved ${formatMoney(promoApplied.discount_cents, currency)}.`}
                   </p>
                 </div>
                 <CheckCircle2 className="h-5 w-5 shrink-0 text-success" />
@@ -595,14 +598,14 @@ function CheckoutPage() {
         </section>
       </main>
 
-      <CheckoutFooter />
+      <CheckoutFooter currency={currency} />
 
       <ReviewSurveyModal open={reviewOpen} onClose={() => setReviewOpen(false)} />
     </div>
   );
 }
 
-function CheckoutFooter() {
+function CheckoutFooter({ currency }: { currency: ReturnType<typeof useBuyerCurrency> }) {
   const year = new Date().getFullYear();
   return (
     <footer className="mt-10 border-t border-peach/70 bg-background/60 backdrop-blur">
@@ -622,12 +625,15 @@ function CheckoutFooter() {
             <Link to="/terms" className="underline hover:text-foreground">Terms of Service</Link>{" "}
             and{" "}
             <Link to="/privacy" className="underline hover:text-foreground">Privacy Policy</Link>.
-            Your card will be charged <span className="font-semibold text-foreground">$29.99 USD</span>{" "}
+            Your card will be charged{" "}
+            <span className="font-semibold text-foreground">
+              {formatProduct(currency, "base")} {currency}
+            </span>{" "}
             today as a one-time payment to PawPrint Song. No subscription, no recurring charges.
           </p>
           <p>
             Your payment information is encrypted and processed securely by Stripe.
-            PawPrint Song never stores your card details. All transactions are billed in U.S. Dollars.
+            PawPrint Song never stores your card details. All transactions are billed in {currency}.
           </p>
           <p>
             Need help? Email{" "}

@@ -1,6 +1,7 @@
 import { serve } from "https://deno.land/std@0.168.0/http/server.ts";
 import { createClient } from "npm:@supabase/supabase-js@2";
 import { corsHeaders, createStripeClient, type StripeEnv } from "../_shared/stripe.ts";
+import { getProductPrice, normalizeCurrency } from "../_shared/pricing.ts";
 
 const supabase = createClient(
   Deno.env.get("SUPABASE_URL")!,
@@ -10,17 +11,18 @@ const supabase = createClient(
 // Upsell catalog. Server is the source of truth — never trust client amounts.
 // `tier` (when present) upgrades the order's delivery_tier. priority_90min
 // beats rush_24h beats standard; we never downgrade.
-const UPSELL_PRICES: Record<
+// Amounts are looked up from _shared/pricing.ts in the order's currency.
+const UPSELL_META: Record<
   string,
-  { amount: number; flagColumn: string | null; tier?: "rush_24h" | "priority_90min" }
+  { priceKey: "extra_verse" | "rush_delivery" | "express_90min" | "unlimited_edits"; flagColumn: string | null; tier?: "rush_24h" | "priority_90min" }
 > = {
-  extra_verse: { amount: 1999, flagColumn: "has_3rd_verse" },
+  extra_verse: { priceKey: "extra_verse", flagColumn: "has_3rd_verse" },
   // 24-hour rush downsell — promised 24h, actually delivered ~12h.
-  rush_delivery: { amount: 3999, flagColumn: "is_rush", tier: "rush_24h" },
-  unlimited_edits: { amount: 3299, flagColumn: "has_unlimited_edits" },
+  rush_delivery: { priceKey: "rush_delivery", flagColumn: "is_rush", tier: "rush_24h" },
+  unlimited_edits: { priceKey: "unlimited_edits", flagColumn: "has_unlimited_edits" },
   // Top-priority 90-minute express delivery — front of the entire queue.
   // Promised 90min, actually delivered ~60min.
-  express_90min: { amount: 5999, flagColumn: "is_rush", tier: "priority_90min" },
+  express_90min: { priceKey: "express_90min", flagColumn: "is_rush", tier: "priority_90min" },
 };
 
 const TIER_RANK: Record<string, number> = {
@@ -36,7 +38,7 @@ serve(async (req) => {
     const { orderId, upsellType, environment, sessionId } = await req.json();
     if (!orderId || !upsellType) return json({ success: false, reason: "missing_params" }, 400);
 
-    const upsell = UPSELL_PRICES[upsellType];
+    const upsell = UPSELL_META[upsellType];
     if (!upsell) return json({ success: false, reason: "unknown_upsell" }, 400);
 
     // ---- AuthZ: prove caller owns this order ----
@@ -56,15 +58,20 @@ serve(async (req) => {
     const { data: order, error } = await supabase
       .from("orders")
       .select(
-        "user_id, buyer_email, status, stripe_customer_id, stripe_payment_method_id, stripe_checkout_session_id, stripe_payment_intent_id, product_config, delivery_tier, promo_code_id, amount_paid_cents",
+        "user_id, buyer_email, status, stripe_customer_id, stripe_payment_method_id, stripe_checkout_session_id, stripe_payment_intent_id, product_config, delivery_tier, promo_code_id, amount_paid_cents, currency",
       )
       .eq("id", orderId)
       .single();
 
     if (error || !order) return json({ success: false, reason: "order_not_found" }, 404);
 
+    // Look up the upsell price in the order's currency. Server-side catalog
+    // is the source of truth — never trust client amounts.
+    const orderCurrency = normalizeCurrency(order.currency);
+    const baseUpsellAmount = getProductPrice(orderCurrency, upsell.priceKey);
+
     // ---- T3ST2 special case: 99% off any upsell taken ----
-    let chargeAmount = upsell.amount;
+    let chargeAmount = baseUpsellAmount;
     if (order.promo_code_id) {
       const { data: promo } = await supabase
         .from("promo_codes")
@@ -73,7 +80,7 @@ serve(async (req) => {
         .maybeSingle();
       if (promo?.code?.toUpperCase() === "T3ST2") {
         // 99% off, with a 50¢ Stripe minimum.
-        chargeAmount = Math.max(50, Math.round(upsell.amount * 0.01));
+        chargeAmount = Math.max(50, Math.round(baseUpsellAmount * 0.01));
       }
     }
 
@@ -113,12 +120,12 @@ serve(async (req) => {
     try {
       const pi = await stripe.paymentIntents.create({
         amount: chargeAmount,
-        currency: "usd",
+        currency: orderCurrency.toLowerCase(),
         customer: order.stripe_customer_id,
         payment_method: order.stripe_payment_method_id,
         off_session: true,
         confirm: true,
-        metadata: { orderId, upsellType, originalAmount: String(upsell.amount) },
+        metadata: { orderId, upsellType, originalAmount: String(baseUpsellAmount), currency: orderCurrency },
         description: `PawPrint Song upsell: ${upsellType}`,
       });
 

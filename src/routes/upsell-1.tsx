@@ -6,6 +6,8 @@ import { useQuizStore } from "@/stores/quizStore";
 import { supabase } from "@/integrations/supabase/client";
 import { stripeEnvironment } from "@/lib/stripe";
 import { track } from "@/lib/tracking";
+import { useBuyerCurrency } from "@/hooks/useBuyerCurrency";
+import { formatProduct, getProductPrice } from "@/lib/currency";
 
 export const Route = createFileRoute("/upsell-1")({
   component: Upsell1,
@@ -14,6 +16,7 @@ export const Route = createFileRoute("/upsell-1")({
 function Upsell1() {
   const navigate = useNavigate();
   const q = useQuizStore();
+  const currency = useBuyerCurrency();
   const [processing, setProcessing] = useState(false);
   const [showDownsell, setShowDownsell] = useState(false);
   const [downsellProcessing, setDownsellProcessing] = useState(false);
@@ -33,7 +36,7 @@ function Upsell1() {
       upsellType: "express_90min",
       orderId: q.orderId,
       buyerEmail: q.buyer_email || undefined,
-      amountCents: 5999,
+      amountCents: getProductPrice(currency, "express_90min"),
     });
     if (!q.orderId) {
       navigate({ to: "/upsell-2" });
@@ -128,7 +131,7 @@ function Upsell1() {
           "We start producing the moment you accept, around the clock",
           "Hand-checked by a real human before it lands in your inbox",
         ]}
-        priceLabel="$59.99"
+        priceLabel={formatProduct(currency, "express_90min")}
         declineLabel="No thanks, I can wait"
         onAccept={accept}
         onDecline={decline}
@@ -138,6 +141,7 @@ function Upsell1() {
       <Rush24Downsell
         open={showDownsell}
         processing={downsellProcessing}
+        currency={currency}
         onAccept={accept24}
         onDecline={decline24}
       />
