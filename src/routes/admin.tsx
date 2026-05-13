@@ -38,6 +38,8 @@ import { AdminMfaChallenge } from "@/components/admin/AdminMfaChallenge";
 import { WebhookDebugPanel } from "@/components/admin/WebhookDebugPanel";
 import { supabase } from "@/integrations/supabase/client";
 import { useRealtimeRefresh } from "@/hooks/useRealtimeRefresh";
+import { useServerFn } from "@tanstack/react-start";
+import { replySupportMessage } from "@/lib/support.functions";
 
 // Hosts that count as "real" production traffic for admin analytics.
 // Sessions from preview/lovable.app domains are excluded so the admin
@@ -2271,22 +2273,22 @@ function SupportPanel() {
 
   const selected = threads.find((t) => t.id === selectedId);
 
+  const replyFn = useServerFn(replySupportMessage);
+
   const sendReply = async () => {
     if (!selectedId || !reply.trim() || sending) return;
     setSending(true);
     try {
-      const { data, error } = await supabase.functions.invoke("reply-support-message", {
-        body: { threadId: selectedId, body: reply.trim(), closeThread: closeAfter },
+      await replyFn({
+        data: { threadId: selectedId, body: reply.trim(), closeThread: closeAfter },
       });
-      if (error || (data && (data as any).error)) {
-        throw new Error(error?.message ?? (data as any)?.error ?? "Send failed");
-      }
       setReply("");
       setCloseAfter(false);
       await loadMessages(selectedId);
       await loadThreads();
     } catch (e: any) {
-      alert(`Reply failed: ${e?.message ?? "unknown error"}`);
+      const msg = e instanceof Response ? await e.text().catch(() => e.statusText) : e?.message;
+      alert(`Reply failed: ${msg ?? "unknown error"}`);
     } finally {
       setSending(false);
     }
