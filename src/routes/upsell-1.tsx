@@ -141,6 +141,7 @@ function Upsell1() {
       <Rush24Downsell
         open={showDownsell}
         processing={downsellProcessing}
+        currency={currency}
         onAccept={accept24}
         onDecline={decline24}
       />
