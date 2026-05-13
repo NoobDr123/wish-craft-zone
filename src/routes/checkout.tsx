@@ -605,7 +605,7 @@ function CheckoutPage() {
   );
 }
 
-function CheckoutFooter() {
+function CheckoutFooter({ currency }: { currency: ReturnType<typeof useBuyerCurrency> }) {
   const year = new Date().getFullYear();
   return (
     <footer className="mt-10 border-t border-peach/70 bg-background/60 backdrop-blur">
