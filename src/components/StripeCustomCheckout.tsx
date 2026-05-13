@@ -16,7 +16,7 @@ import type {
 import { Loader2, Lock, ShieldCheck } from "lucide-react";
 import { getStripe, stripeEnvironment } from "@/lib/stripe";
 import { supabase } from "@/integrations/supabase/client";
-import { detectCountry } from "@/lib/currency";
+import { detectCountry, SUPPORTED_COUNTRIES, type SupportedCountry } from "@/lib/currency";
 
 interface Props {
   orderId: string;
@@ -28,6 +28,10 @@ interface Props {
   email: string;
   /** Buyer name — included in billing details. */
   name: string;
+  /** Buyer's billing country (controls currency + which fields render). */
+  country: SupportedCountry;
+  /** Called when the buyer changes their country in the card form. */
+  onCountryChange: (next: SupportedCountry) => void;
   quizPatch?: Record<string, unknown>;
   quizSnapshot?: Record<string, unknown>;
   onError?: (msg: string) => void;
@@ -48,7 +52,7 @@ interface SessionState {
  *     and country dropdown ourselves. PCI scope stays SAQ A.
  */
 export function StripeCustomCheckout(props: Props) {
-  const { orderId, amountVersion, email, name, quizPatch, quizSnapshot, onError } = props;
+  const { orderId, amountVersion, email, name, country, onCountryChange, quizPatch, quizSnapshot, onError } = props;
   const [session, setSession] = useState<SessionState | null>(null);
   const [loading, setLoading] = useState(true);
   const [fetchError, setFetchError] = useState<string | null>(null);
@@ -77,7 +81,6 @@ export function StripeCustomCheckout(props: Props) {
           amountVersion,
           attempt: attempt + 1,
         });
-        const country = await detectCountry();
         const { data, error } = await supabase.functions.invoke("create-payment-intent", {
           body: { orderId, environment: stripeEnvironment, quizPatch, quizSnapshot, userId, country },
         });
@@ -247,6 +250,8 @@ export function StripeCustomCheckout(props: Props) {
           currency={session.currency}
           email={email}
           name={name}
+          country={country}
+          onCountryChange={onCountryChange}
           returnUrl={props.returnUrl}
           paymentIntentId={session.paymentIntentId}
         />
@@ -262,37 +267,11 @@ interface FormProps {
   currency: string;
   email: string;
   name: string;
+  country: SupportedCountry;
+  onCountryChange: (next: SupportedCountry) => void;
   returnUrl: string;
   paymentIntentId: string;
 }
-
-// Country list — short, common-first. Full ISO codes accepted by Stripe.
-const COUNTRIES: Array<{ code: string; label: string }> = [
-  { code: "US", label: "United States" },
-  { code: "PL", label: "Poland" },
-  { code: "GB", label: "United Kingdom" },
-  { code: "CA", label: "Canada" },
-  { code: "AU", label: "Australia" },
-  { code: "DE", label: "Germany" },
-  { code: "FR", label: "France" },
-  { code: "IT", label: "Italy" },
-  { code: "ES", label: "Spain" },
-  { code: "NL", label: "Netherlands" },
-  { code: "IE", label: "Ireland" },
-  { code: "SE", label: "Sweden" },
-  { code: "NO", label: "Norway" },
-  { code: "DK", label: "Denmark" },
-  { code: "FI", label: "Finland" },
-  { code: "BE", label: "Belgium" },
-  { code: "AT", label: "Austria" },
-  { code: "CH", label: "Switzerland" },
-  { code: "PT", label: "Portugal" },
-  { code: "CZ", label: "Czechia" },
-  { code: "MX", label: "Mexico" },
-  { code: "BR", label: "Brazil" },
-  { code: "JP", label: "Japan" },
-  { code: "NZ", label: "New Zealand" },
-];
 
 const ELEMENT_BASE_STYLE = {
   base: {
@@ -309,40 +288,18 @@ const ELEMENT_BASE_STYLE = {
   },
 } as const;
 
-function PaymentForm({ amount, currency, email, name, returnUrl, paymentIntentId, clientSecret }: FormProps) {
+function PaymentForm({ amount, currency, email, name, country, onCountryChange, returnUrl, paymentIntentId, clientSecret }: FormProps) {
   const stripe = useStripe();
   const elements = useElements();
   const [submitting, setSubmitting] = useState(false);
   const [error, setError] = useState<string | null>(null);
-  // Country is auto-detected from buyer IP (Cloudflare trace). Defaults to US.
-  const [country, setCountry] = useState<string>("US");
   const [postalCode, setPostalCode] = useState<string>("");
   // Track whether any wallet (Apple Pay / Google Pay / Link) actually rendered
   // so we can hide the "Or pay with card" divider when nothing is shown above.
   const [hasWallet, setHasWallet] = useState(false);
 
-  useEffect(() => {
-    let cancelled = false;
-    (async () => {
-      try {
-        const res = await fetch("https://www.cloudflare.com/cdn-cgi/trace", { cache: "no-store" });
-        const text = await res.text();
-        const match = text.match(/^loc=([A-Z]{2})/m);
-        if (!cancelled && match && match[1]) setCountry(match[1]);
-      } catch {
-        // ignore, keep US default
-      }
-    })();
-    return () => {
-      cancelled = true;
-    };
-  }, []);
-
-  // Countries where Stripe / card networks expect a postal code with the billing address.
-  const postalRequired = useMemo(
-    () => ["US", "CA", "GB", "AU", "DE", "FR", "IT", "ES", "NL", "IE", "PL", "PT", "CZ", "MX", "BR", "JP", "NZ", "BE", "AT", "CH", "SE", "NO", "DK", "FI"].includes(country),
-    [country],
-  );
+  // Postal code is always required for our 5 supported markets.
+  const postalRequired = true;
 
   const postalLabel = country === "US" ? "ZIP code" : "Postal code";
   const postalPlaceholder = country === "US" ? "90210" : "Postal code";
@@ -563,22 +520,25 @@ function PaymentForm({ amount, currency, email, name, returnUrl, paymentIntentId
         </div>
       </div>
 
-      {/* Postal / ZIP code (country auto-detected from IP) */}
-      {postalRequired && (
-        <div className="space-y-2">
+      {/* Country + Postal / ZIP. Country auto-detected from IP; collapsed to a
+          subtle "change" link for US (the vast majority of buyers) and shown
+          inline next to the postal field for everyone else. */}
+      <div className="space-y-2">
+        <div className="flex items-end justify-between gap-2">
           <label className="block text-[15px] font-semibold text-foreground">{postalLabel}</label>
-          <input
-            type="text"
-            inputMode={country === "US" ? "numeric" : "text"}
-            autoComplete="postal-code"
-            value={postalCode}
-            onChange={(e) => setPostalCode(e.target.value)}
-            placeholder={postalPlaceholder}
-            maxLength={country === "US" ? 10 : 12}
-            className="w-full rounded-2xl border border-[#E5D9C8] bg-[#FBF6EC] px-4 py-[14px] text-[16px] text-foreground placeholder:text-[#A89E8F] transition-colors focus:border-primary focus:outline-none focus:ring-[3px] focus:ring-primary/15"
-          />
+          <CountryPicker country={country} onCountryChange={onCountryChange} />
         </div>
-      )}
+        <input
+          type="text"
+          inputMode={country === "US" ? "numeric" : "text"}
+          autoComplete="postal-code"
+          value={postalCode}
+          onChange={(e) => setPostalCode(e.target.value)}
+          placeholder={postalPlaceholder}
+          maxLength={country === "US" ? 10 : 12}
+          className="w-full rounded-2xl border border-[#E5D9C8] bg-[#FBF6EC] px-4 py-[14px] text-[16px] text-foreground placeholder:text-[#A89E8F] transition-colors focus:border-primary focus:outline-none focus:ring-[3px] focus:ring-primary/15"
+        />
+      </div>
 
       <p className="text-[12.5px] leading-snug text-muted-foreground">
         By providing your card information, you authorize PawPrint Song to charge your card for this
@@ -612,5 +572,56 @@ function PaymentForm({ amount, currency, email, name, returnUrl, paymentIntentId
         Encrypted &amp; processed by Stripe. We never see your card details.
       </p>
     </form>
+  );
+}
+
+/**
+ * Compact country picker that lives inline with the postal label.
+ * Collapsed by default — shows just the current flag + country code as a
+ * subtle "change" trigger. Expands into a native <select> on click so we
+ * don't ship yet another popover for one field.
+ */
+function CountryPicker({
+  country,
+  onCountryChange,
+}: {
+  country: SupportedCountry;
+  onCountryChange: (next: SupportedCountry) => void;
+}) {
+  const [open, setOpen] = useState(false);
+  const current = SUPPORTED_COUNTRIES.find((c) => c.code === country);
+
+  if (!open) {
+    return (
+      <button
+        type="button"
+        onClick={() => setOpen(true)}
+        className="flex items-center gap-1 text-[12.5px] font-medium text-muted-foreground transition-colors hover:text-primary"
+        aria-label="Change billing country"
+      >
+        <span>{current?.flag ?? "🌐"}</span>
+        <span>{current?.code ?? country}</span>
+        <span className="underline decoration-dotted underline-offset-2">change</span>
+      </button>
+    );
+  }
+
+  return (
+    <select
+      autoFocus
+      value={country}
+      onChange={(e) => {
+        onCountryChange(e.target.value as SupportedCountry);
+        setOpen(false);
+      }}
+      onBlur={() => setOpen(false)}
+      className="rounded-lg border border-[#E5D9C8] bg-[#FBF6EC] px-2 py-1 text-[12.5px] font-medium text-foreground focus:border-primary focus:outline-none focus:ring-2 focus:ring-primary/20"
+    >
+      {SUPPORTED_COUNTRIES.map((c) => (
+        <option key={c.code} value={c.code}>
+          {c.flag} {c.label}
+        </option>
+      ))}
+    </select>
   );
 }
