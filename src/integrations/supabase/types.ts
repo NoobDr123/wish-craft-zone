@@ -179,31 +179,52 @@ export type Database = {
       }
       email_send_log: {
         Row: {
+          click_count: number
+          clicked_at: string | null
           created_at: string
+          delivered_at: string | null
           error_message: string | null
           id: string
+          last_clicked_at: string | null
+          last_opened_at: string | null
           message_id: string | null
           metadata: Json | null
+          open_count: number
+          opened_at: string | null
           recipient_email: string
           status: string
           template_name: string
         }
         Insert: {
+          click_count?: number
+          clicked_at?: string | null
           created_at?: string
+          delivered_at?: string | null
           error_message?: string | null
           id?: string
+          last_clicked_at?: string | null
+          last_opened_at?: string | null
           message_id?: string | null
           metadata?: Json | null
+          open_count?: number
+          opened_at?: string | null
           recipient_email: string
           status: string
           template_name: string
         }
         Update: {
+          click_count?: number
+          clicked_at?: string | null
           created_at?: string
+          delivered_at?: string | null
           error_message?: string | null
           id?: string
+          last_clicked_at?: string | null
+          last_opened_at?: string | null
           message_id?: string | null
           metadata?: Json | null
+          open_count?: number
+          opened_at?: string | null
           recipient_email?: string
           status?: string
           template_name?: string
@@ -1675,6 +1696,10 @@ export type Database = {
           msg_id: number
           read_ct: number
         }[]
+      }
+      record_email_event: {
+        Args: { _event: string; _message_id: string }
+        Returns: undefined
       }
       redeem_promo_code: {
         Args: { _base_amount_cents: number; _code: string; _order_id: string }
