@@ -2121,13 +2121,23 @@ interface OrderRow {
   payment_status: string;
 }
 
+type EngagementStats = {
+  views: number;
+  plays: number;
+  playMs: number;
+  shares: number;
+  downloads: number;
+};
+
 function OrdersPanel() {
   const [orders, setOrders] = useState<OrderRow[]>([]);
+  const [engagement, setEngagement] = useState<Record<string, EngagementStats>>({});
   const [busy, setBusy] = useState<string | null>(null);
   const [filter, setFilter] = useState<"all" | "flagged" | "in_progress" | "paid" | "failed">("all");
 
   useEffect(() => { load(); }, [filter]);
   useRealtimeRefresh("orders", () => load());
+  useRealtimeRefresh(["play_events", "job_events"], () => loadEngagement(orders.map((o) => o.id)), { debounceMs: 1500 });
 
   const load = async () => {
     let q = supabase
@@ -2141,7 +2151,38 @@ function OrdersPanel() {
     if (filter === "paid") q = q.eq("payment_status", "paid");
     if (filter === "failed") q = q.eq("payment_status", "failed");
     const { data } = await q;
-    setOrders((data as OrderRow[]) ?? []);
+    const list = (data as OrderRow[]) ?? [];
+    setOrders(list);
+    void loadEngagement(list.map((o) => o.id));
+  };
+
+  const loadEngagement = async (orderIds: string[]) => {
+    if (!orderIds.length) { setEngagement({}); return; }
+    const [{ data: plays }, { data: events }] = await Promise.all([
+      supabase
+        .from("play_events")
+        .select("order_id, duration_ms")
+        .in("order_id", orderIds),
+      supabase
+        .from("job_events")
+        .select("order_id, event_type")
+        .in("order_id", orderIds)
+        .in("event_type", ["share_page_viewed", "share_link_shared", "song_downloaded"]),
+    ]);
+    const stats: Record<string, EngagementStats> = {};
+    for (const id of orderIds) stats[id] = { views: 0, plays: 0, playMs: 0, shares: 0, downloads: 0 };
+    for (const p of plays ?? []) {
+      const s = stats[p.order_id as string]; if (!s) continue;
+      s.plays++;
+      s.playMs += (p.duration_ms as number) ?? 0;
+    }
+    for (const e of events ?? []) {
+      const s = stats[e.order_id as string]; if (!s) continue;
+      if (e.event_type === "share_page_viewed") s.views++;
+      else if (e.event_type === "share_link_shared") s.shares++;
+      else if (e.event_type === "song_downloaded") s.downloads++;
+    }
+    setEngagement(stats);
   };
 
   const callFn = async (fn: string, body: any, label: string, orderId: string) => {
@@ -2194,11 +2235,15 @@ function OrdersPanel() {
               <th className="p-3">Payment</th>
               <th className="p-3">Amount</th>
               <th className="p-3">Created</th>
+              <th className="p-3">Engagement</th>
               <th className="p-3">Actions</th>
             </tr>
           </thead>
           <tbody>
-            {orders.map((o) => (
+            {orders.map((o) => {
+              const e = engagement[o.id];
+              const mins = e ? Math.round(e.playMs / 60000) : 0;
+              return (
               <tr key={o.id} className="border-b border-border/40 align-top">
                 <td className="p-3">
                   <div className="font-medium">{o.dog_name}</div>
@@ -2210,6 +2255,20 @@ function OrdersPanel() {
                 <td className="p-3"><Badge variant={o.payment_status === "paid" ? "default" : o.payment_status === "failed" ? "destructive" : "outline"}>{o.payment_status}</Badge></td>
                 <td className="p-3 text-xs">{fmtMoneyCcy(o.amount_paid_cents ?? 0, o.currency)}</td>
                 <td className="p-3 text-xs">{new Date(o.created_at).toLocaleString()}</td>
+                <td className="p-3">
+                  {!e ? (
+                    <span className="text-xs text-muted-foreground">—</span>
+                  ) : (e.views + e.plays + e.shares + e.downloads === 0) ? (
+                    <span className="text-xs text-muted-foreground">no activity</span>
+                  ) : (
+                    <div className="flex flex-wrap gap-1 text-xs">
+                      {e.views > 0 && <Badge variant="secondary" title="Portal/listen page opens">👁 {e.views}</Badge>}
+                      {e.plays > 0 && <Badge variant="secondary" title={`${mins}m total listen time`}>▶️ {e.plays}{mins > 0 ? ` · ${mins}m` : ""}</Badge>}
+                      {e.downloads > 0 && <Badge variant="default" title="Downloaded">⬇️ {e.downloads}</Badge>}
+                      {e.shares > 0 && <Badge variant="outline" title="Share link copied">🔗 {e.shares}</Badge>}
+                    </div>
+                  )}
+                </td>
                 <td className="p-3">
                   <div className="flex flex-col gap-1">
                     <Button size="sm" variant="outline" disabled={busy === `${o.id}:brief`} onClick={() => callFn("generate-brief", { orderId: o.id }, "brief", o.id)}>
@@ -2227,10 +2286,11 @@ function OrdersPanel() {
                   </div>
                 </td>
               </tr>
-            ))}
+              );
+            })}
             {orders.length === 0 && (
               <tr>
-                <td colSpan={7} className="p-8 text-center text-muted-foreground">No orders.</td>
+                <td colSpan={8} className="p-8 text-center text-muted-foreground">No orders.</td>
               </tr>
             )}
           </tbody>
