@@ -8,7 +8,15 @@ import { useQuizStore } from "@/stores/quizStore";
 import { supabase } from "@/integrations/supabase/client";
 import { buildOrderPatchForQuiz, ensureOrderForQuiz } from "@/lib/checkoutPrefetch";
 import { useBuyerCurrency } from "@/hooks/useBuyerCurrency";
-import { formatMoney, formatProduct } from "@/lib/currency";
+import {
+  formatMoney,
+  formatProduct,
+  setCountryOverride,
+  SUPPORTED_COUNTRIES,
+  getCountryOverride,
+  detectCountry,
+  type SupportedCountry,
+} from "@/lib/currency";
 import {
   ArrowLeft,
   CheckCircle2,
