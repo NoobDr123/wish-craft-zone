@@ -3029,8 +3029,10 @@ function SupportPanel() {
   useEffect(() => {
     if (selectedId) {
       loadMessages(selectedId);
-      // mark "new" -> "open" once admin opens it
-      supabase.from("support_threads").update({ status: "open" }).eq("id", selectedId).eq("status", "new").then(() => loadThreads());
+      // mark "new" -> "open" once admin opens it (skip synthetic email-only threads)
+      if (!selectedId.startsWith("email:")) {
+        supabase.from("support_threads").update({ status: "open" }).eq("id", selectedId).eq("status", "new").then(() => loadThreads());
+      }
     }
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [selectedId]);
