@@ -58,7 +58,7 @@ serve(async (req) => {
     const { data: order, error } = await supabase
       .from("orders")
       .select(
-        "user_id, buyer_email, status, stripe_customer_id, stripe_payment_method_id, stripe_checkout_session_id, stripe_payment_intent_id, product_config, delivery_tier, promo_code_id, amount_paid_cents, currency",
+        "user_id, buyer_email, status, stripe_customer_id, stripe_payment_method_id, stripe_checkout_session_id, stripe_payment_intent_id, product_config, delivery_tier, promo_code_id, amount_paid_cents, amount_paid_usd_cents, currency",
       )
       .eq("id", orderId)
       .single();
