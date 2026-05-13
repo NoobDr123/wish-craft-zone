@@ -2998,7 +2998,7 @@ function CustomerDetailDrawer({ orderId, onClose }: { orderId: string; onClose: 
                       <div className="flex items-center gap-2 text-xs">
                         <Badge variant="outline">{o.status}</Badge>
                         <Badge variant={o.payment_status === "paid" ? "default" : "outline"}>{o.payment_status}</Badge>
-                        <span>{fmtMoney(o.amount_paid_cents || 0)}</span>
+                        <span>{fmtMoneyCcy(o.amount_paid_cents || 0, o.currency)}</span>
                       </div>
                     </div>
                   ))}
