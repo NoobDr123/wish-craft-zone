@@ -839,7 +839,7 @@ function DashboardPanel() {
         <h2 className="font-display text-xl font-semibold mb-4">Upsell take rates</h2>
         <div className="grid grid-cols-1 gap-4 md:grid-cols-3">
           <UpsellCard label="Extra verse" count={data.upsellCounts.extra_verse} total={data.paidCount} priceCents={1999} />
-          <UpsellCard label="Rush delivery (24h or 48h)" count={data.upsellCounts.rush_delivery} total={data.paidCount} priceCents={2999} />
+          <UpsellCard label="Rush delivery (24h or 90min)" count={data.upsellCounts.rush_delivery} total={data.paidCount} priceCents={3999} />
           <UpsellCard label="Unlimited edits" count={data.upsellCounts.unlimited_edits} total={data.paidCount} priceCents={3299} />
         </div>
       </div>
