@@ -447,6 +447,12 @@ function ShareSection({
 
   const downloadSong = async () => {
     if (!audioUrl) return;
+    // Fire-and-forget chargeback evidence ping (download).
+    void supabase.functions
+      .invoke("record-play", {
+        body: { orderId, kind: "download", source: "order_portal" },
+      })
+      .catch(() => {});
     try {
       const res = await fetch(audioUrl);
       const blob = await res.blob();
