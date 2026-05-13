@@ -1347,9 +1347,6 @@ function CrmPanel() {
               <th className="p-3">Status</th>
               <th className="p-3">Next delivery</th>
               <th className="p-3">Last order</th>
-              <th className="p-3 text-right">Spent</th>
-              <th className="p-3">Status</th>
-              <th className="p-3">Last order</th>
             </tr>
           </thead>
           <tbody>
