@@ -1689,16 +1689,16 @@ function OrderRow({
         order.buyer_email
           ? supabase
               .from("email_send_log")
-              .select("id, template_name, status, error_message, created_at")
+              .select("id, message_id, template_name, status, error_message, created_at")
               .eq("recipient_email", order.buyer_email)
               .order("created_at", { ascending: false })
-              .limit(20)
+              .limit(40)
           : Promise.resolve({ data: [] as any[] }),
       ]);
       if (!active) return;
       setDetails({
         events: evRes.data ?? [],
-        emails: (emRes as any).data ?? [],
+        emails: dedupeEmailLogs(((emRes as any).data ?? []) as any[]),
       });
       setLoading(false);
     })();
