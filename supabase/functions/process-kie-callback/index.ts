@@ -67,7 +67,7 @@ serve(async (req) => {
     const items = data?.data ?? data?.tracks ?? data?.items ?? [];
     const variants = (Array.isArray(items) ? items : [items]).filter(Boolean).map((it: any) => ({
       id: it.id ?? it.audio_id ?? crypto.randomUUID(),
-      audio_url: it.audio_url ?? it.audioUrl ?? it.stream_audio_url ?? it.source_audio_url,
+      audio_url: it.audio_url ?? it.audioUrl ?? it.stream_audio_url ?? it.source_audio_url ?? it.source_stream_audio_url ?? it.sourceStreamAudioUrl ?? it.sourceAudioUrl,
       image_url: it.image_url ?? it.imageUrl,
       title: it.title,
       duration: it.duration,
