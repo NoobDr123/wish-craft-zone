@@ -3154,6 +3154,9 @@ function SupportPanel() {
                   >
                     <div className="flex items-center justify-between gap-2">
                       <span className="truncate text-sm font-medium">{t.sender_name}</span>
+                      {t.__synthetic && (
+                        <Badge variant="outline" className="shrink-0 text-[10px]">📧 emails only</Badge>
+                      )}
                       {t.spam_classification === "spam" && (
                         <Badge variant="destructive" className="shrink-0 text-[10px]">spam</Badge>
                       )}
@@ -3163,7 +3166,7 @@ function SupportPanel() {
                       {t.status === "new" && t.spam_classification !== "spam" && (
                         <Badge className="shrink-0 text-[10px]">new</Badge>
                       )}
-                      {t.status === "closed" && (
+                      {t.status === "closed" && !t.__synthetic && (
                         <Badge variant="outline" className="shrink-0 text-[10px]">
                           closed
                         </Badge>
@@ -3172,8 +3175,11 @@ function SupportPanel() {
                     <div className="mt-0.5 truncate text-xs text-muted-foreground">
                       {t.ai_summary || t.subject}
                     </div>
-                    <div className="mt-1 text-[11px] text-muted-foreground/70">
-                      {new Date(t.last_activity_at).toLocaleString()}
+                    <div className="mt-1 flex items-center gap-2 text-[11px] text-muted-foreground/70">
+                      <span>{new Date(t.last_activity_at).toLocaleString()}</span>
+                      {t.__emailCount > 0 && !t.__synthetic && (
+                        <span className="text-primary/70">· 📧 {t.__emailCount}</span>
+                      )}
                     </div>
                   </button>
                 </li>
