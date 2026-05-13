@@ -4,6 +4,7 @@
 import { serve } from "https://deno.land/std@0.168.0/http/server.ts";
 import { createClient } from "npm:@supabase/supabase-js@2";
 import { guardInternal } from "../_shared/auth.ts";
+import { type StripeEnv, createStripeClient } from "../_shared/stripe.ts";
 
 const supabase = createClient(
   Deno.env.get("SUPABASE_URL")!,
@@ -153,6 +154,15 @@ serve(async (req) => {
       delay_hours: delayHours,
     });
 
+    // Mirror "song generated" onto the Stripe PaymentIntent so the merchant
+    // dashboard reflects fulfillment progress before the scheduled delivery
+    // actually fires. Best-effort — never block the order pipeline on it.
+    try {
+      await syncSongGeneratedToStripe(finalOrderId, order, chosen.audio_url, slug);
+    } catch (e) {
+      console.error("syncSongGeneratedToStripe failed:", e);
+    }
+
     // If scheduled is now or past, enqueue immediately via the public RPC
     // (pgmq schema is not reachable through PostgREST directly).
     if (scheduled <= now) {
@@ -178,6 +188,35 @@ serve(async (req) => {
 
 async function logEvent(orderId: string, type: string, payload: any) {
   await supabase.from("job_events").insert({ order_id: orderId, event_type: type, payload });
+}
+
+async function syncSongGeneratedToStripe(
+  orderId: string,
+  order: any,
+  audioUrl: string | undefined,
+  shareSlug: string,
+) {
+  if (!order.stripe_payment_intent_id) return;
+  if (order.stripe_env !== "live" && order.stripe_env !== "sandbox") return;
+
+  const env: StripeEnv = order.stripe_env;
+  const stripe = createStripeClient(env);
+
+  await stripe.paymentIntents.update(order.stripe_payment_intent_id, {
+    metadata: {
+      song_generated: "true",
+      song_generated_at: new Date().toISOString(),
+      song_audio_url: (audioUrl ?? "").slice(0, 500),
+      share_slug: shareSlug,
+      order_id: orderId,
+    },
+  });
+
+  await supabase.from("job_events").insert({
+    order_id: orderId,
+    event_type: "stripe_song_generated_synced",
+    payload: { stripe_env: env, payment_intent_id: order.stripe_payment_intent_id },
+  });
 }
 
 function json(body: unknown, status = 200) {

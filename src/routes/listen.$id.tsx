@@ -60,6 +60,7 @@ function ListenPage() {
   const { order, title } = Route.useLoaderData();
   const [variant, setVariant] = useState<any>(null);
   const playRecorded = useRef(false);
+  const viewRecorded = useRef(false);
 
   useEffect(() => {
     const variants = (order.audio_variants as any[]) ?? [];
@@ -67,6 +68,31 @@ function ListenPage() {
       variants.find((v) => v.id === order.selected_variant_id) ?? variants[0];
     setVariant(chosen);
   }, [order]);
+
+  // Fire once per browser session — tells Stripe the recipient actually opened
+  // the share page. Dedupe key includes order id so each shared song counts
+  // independently for the buyer.
+  useEffect(() => {
+    if (viewRecorded.current) return;
+    const sessionKey = `rs_share_view_${order.id}`;
+    try {
+      if (typeof window !== "undefined" && sessionStorage.getItem(sessionKey)) {
+        viewRecorded.current = true;
+        return;
+      }
+      sessionStorage.setItem(sessionKey, "1");
+    } catch {
+      /* sessionStorage unavailable (private mode) — still ping */
+    }
+    viewRecorded.current = true;
+    void supabase.functions
+      .invoke("record-play", {
+        body: { orderId: order.id, kind: "view", source: "listen_page" },
+      })
+      .catch(() => {
+        /* silent — analytics is best-effort */
+      });
+  }, [order.id]);
 
   const lyrics = (order.brief as any)?.lyrics ?? "";
 

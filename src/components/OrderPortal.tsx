@@ -202,6 +202,7 @@ export function OrderPortal({ orderId, userId }: { orderId: string; userId: stri
           </div>
 
           <ShareSection
+            orderId={order.id}
             audioUrl={selectedVariant?.audio_url}
             title={title}
             recipientName={order.recipient_name}
@@ -378,11 +379,13 @@ function VariantSwitcher({
 /* ----------------------------------------------------------------------- */
 
 function ShareSection({
+  orderId,
   audioUrl,
   title,
   recipientName,
   sharePath,
 }: {
+  orderId: string;
   audioUrl: string | undefined;
   title: string;
   recipientName: string;
@@ -393,11 +396,21 @@ function ShareSection({
   const encodedShareText = encodeURIComponent(shareText);
   const encodedShareUrl = encodeURIComponent(shareUrl);
 
+  // Tells Stripe + analytics the buyer actively shared their song. Best-effort.
+  const pingShare = () => {
+    void supabase.functions
+      .invoke("record-play", {
+        body: { orderId, kind: "share", source: "order_portal" },
+      })
+      .catch(() => {});
+  };
+
   const copyShare = async () => {
     if (!shareUrl) return;
     try {
       await navigator.clipboard.writeText(shareUrl);
       toast.success("Share link copied");
+      pingShare();
     } catch {
       toast.error("Could not copy");
     }
@@ -408,6 +421,7 @@ function ShareSection({
     try {
       await navigator.clipboard.writeText(shareText);
       toast.success("Share message copied");
+      pingShare();
     } catch {
       toast.error("Could not copy");
     }
@@ -422,6 +436,7 @@ function ShareSection({
           text: `${recipientName}'s PawPrint Song is ready.`,
           url: shareUrl,
         });
+        pingShare();
         return;
       } catch {
         return;
