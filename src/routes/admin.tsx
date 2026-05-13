@@ -2647,10 +2647,12 @@ function SupportPanel() {
       .order("last_activity_at", { ascending: false })
       .limit(200);
     if (filter === "all") {
-      // hide spam from "all" by default
-      q = q.neq("status", "spam");
+      // hide spam (status or AI-classified) from "all" by default
+      q = q.neq("status", "spam").neq("spam_classification", "spam");
+    } else if (filter === "spam") {
+      q = q.or("status.eq.spam,spam_classification.eq.spam");
     } else {
-      q = q.eq("status", filter);
+      q = q.eq("status", filter).neq("spam_classification", "spam");
     }
     const { data } = await q;
     setThreads(data ?? []);
