@@ -2894,8 +2894,9 @@ function CustomerDetailDrawer({ orderId, onClose }: { orderId: string; onClose: 
                   {order.payment_status}
                 </Badge>
               } />
-              <DetailField label="Amount paid" value={fmtMoney(order.amount_paid_cents || 0)} />
-              <DetailField label="Order amount" value={fmtMoney(order.amount_cents || 0)} />
+              <DetailField label="Amount paid" value={fmtMoneyCcy(order.amount_paid_cents || 0, order.currency)} />
+              <DetailField label="Order amount" value={fmtMoneyCcy(order.amount_cents || 0, order.currency)} />
+              <DetailField label="Amount paid (USD)" value={fmtMoney(toUsdCents(order.amount_paid_cents || 0, order.currency))} />
               <DetailField label="Tier" value={order.delivery_tier} />
               <DetailField label="Priority" value={order.priority} />
               <DetailField label="Source" value={order.source_kind} />
