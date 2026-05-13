@@ -1775,7 +1775,7 @@ function OrdersPanel() {
                 <td className="p-3 text-xs text-muted-foreground">{o.buyer_email}</td>
                 <td className="p-3"><Badge variant="outline">{o.status}</Badge></td>
                 <td className="p-3"><Badge variant={o.payment_status === "paid" ? "default" : o.payment_status === "failed" ? "destructive" : "outline"}>{o.payment_status}</Badge></td>
-                <td className="p-3 text-xs">{fmtMoney(o.amount_paid_cents ?? 0)}</td>
+                <td className="p-3 text-xs">{fmtMoneyCcy(o.amount_paid_cents ?? 0, o.currency)}</td>
                 <td className="p-3 text-xs">{new Date(o.created_at).toLocaleString()}</td>
                 <td className="p-3">
                   <div className="flex flex-col gap-1">
