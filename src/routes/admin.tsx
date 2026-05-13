@@ -2263,6 +2263,20 @@ function SupportPanel() {
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [filter]);
 
+  // Auto-classify any threads that haven't been classified yet (backfill)
+  useEffect(() => {
+    const unclassified = threads.filter((t) => !t.ai_classified_at).slice(0, 5);
+    if (unclassified.length === 0) return;
+    Promise.all(
+      unclassified.map((t) =>
+        supabase.functions
+          .invoke("classify-support-message", { body: { threadId: t.id } })
+          .catch(() => null),
+      ),
+    ).then(() => loadThreads());
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [threads.length]);
+
   useRealtimeRefresh(["support_threads", "support_messages"], () => {
     loadThreads();
     if (selectedId) loadMessages(selectedId);
