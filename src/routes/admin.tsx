@@ -258,6 +258,23 @@ const RANGE_LABELS: Record<Range, string> = {
 };
 
 /** Get the Y/M/D parts for `now` as observed in the admin (EST) timezone. */
+// Email logs are append-only: each send produces a `pending` row and then a
+// `sent`/`failed`/`dlq` row sharing the same `message_id`. Keep only the
+// latest row per message_id (rows assumed ordered by created_at DESC).
+// Rows without a message_id (legacy) are kept as-is.
+function dedupeEmailLogs<T extends { message_id?: string | null }>(rows: T[]): T[] {
+  const seen = new Set<string>();
+  const out: T[] = [];
+  for (const r of rows) {
+    const id = r.message_id ?? null;
+    if (!id) { out.push(r); continue; }
+    if (seen.has(id)) continue;
+    seen.add(id);
+    out.push(r);
+  }
+  return out;
+}
+
 function estParts(now: Date = new Date()) {
   const fmt = new Intl.DateTimeFormat("en-US", {
     timeZone: ADMIN_TZ,
@@ -1345,7 +1362,7 @@ function CrmPanel() {
         .eq("recipient_email", email)
         .order("created_at", { ascending: false })
         .limit(50);
-      setEmailLogs((m) => ({ ...m, [email]: logs ?? [] }));
+      setEmailLogs((m) => ({ ...m, [email]: dedupeEmailLogs(logs ?? []) }));
     }
     if (!quizEvents[email]) {
       const { data: evts } = await supabase
@@ -1672,16 +1689,16 @@ function OrderRow({
         order.buyer_email
           ? supabase
               .from("email_send_log")
-              .select("id, template_name, status, error_message, created_at")
+              .select("id, message_id, template_name, status, error_message, created_at")
               .eq("recipient_email", order.buyer_email)
               .order("created_at", { ascending: false })
-              .limit(20)
+              .limit(40)
           : Promise.resolve({ data: [] as any[] }),
       ]);
       if (!active) return;
       setDetails({
         events: evRes.data ?? [],
-        emails: (emRes as any).data ?? [],
+        emails: dedupeEmailLogs(((emRes as any).data ?? []) as any[]),
       });
       setLoading(false);
     })();
@@ -2254,7 +2271,7 @@ function EmailsPanel() {
       .order("created_at", { ascending: false })
       .limit(500);
     if (signal && !signal.active) return;
-    setRows((data ?? []) as EmailRow[]);
+    setRows(dedupeEmailLogs((data ?? []) as EmailRow[]));
     setSuppressed((sup ?? []) as any);
     setLoading(false);
   };
@@ -3244,7 +3261,7 @@ function CustomerDetailDrawer({ orderId, onClose }: { orderId: string; onClose: 
 
       const [evRes, emRes, otherRes, refRes, revRes, reactRes, sessRes] = await Promise.all([
         supabase.from("job_events").select("id, event_type, payload, created_at").eq("order_id", orderId).order("created_at", { ascending: false }).limit(200),
-        email ? supabase.from("email_send_log").select("id, template_name, status, created_at, error_message").eq("recipient_email", email).order("created_at", { ascending: false }).limit(50) : Promise.resolve({ data: [] }),
+        email ? supabase.from("email_send_log").select("id, message_id, template_name, status, created_at, error_message").eq("recipient_email", email).order("created_at", { ascending: false }).limit(50) : Promise.resolve({ data: [] }),
         email ? supabase.from("orders").select("id, dog_name, status, payment_status, amount_paid_cents, amount_paid_usd_cents, currency, created_at").eq("buyer_email", email).neq("id", orderId).order("created_at", { ascending: false }).limit(20) : Promise.resolve({ data: [] }),
         supabase.from("refund_requests").select("id, request_type, reason, status, amount_cents, created_at").eq("order_id", orderId).order("created_at", { ascending: false }),
         supabase.from("revision_requests").select("id, notes, status, is_free, created_at").eq("order_id", orderId).order("created_at", { ascending: false }),
@@ -3254,7 +3271,7 @@ function CustomerDetailDrawer({ orderId, onClose }: { orderId: string; onClose: 
 
       if (!active) return;
       setEvents(evRes.data ?? []);
-      setEmails((emRes as any).data ?? []);
+      setEmails(dedupeEmailLogs(((emRes as any).data ?? []) as any[]));
       setOtherOrders((otherRes as any).data ?? []);
       setRefunds(refRes.data ?? []);
       setRevisions(revRes.data ?? []);
