@@ -267,8 +267,8 @@ interface FormProps {
   currency: string;
   email: string;
   name: string;
-  country: SupportedCountry;
-  onCountryChange: (next: SupportedCountry) => void;
+  country: string;
+  onCountryChange: (next: string) => void;
   returnUrl: string;
   paymentIntentId: string;
 }
