@@ -3271,7 +3271,7 @@ function CustomerDetailDrawer({ orderId, onClose }: { orderId: string; onClose: 
 
       if (!active) return;
       setEvents(evRes.data ?? []);
-      setEmails((emRes as any).data ?? []);
+      setEmails(dedupeEmailLogs(((emRes as any).data ?? []) as any[]));
       setOtherOrders((otherRes as any).data ?? []);
       setRefunds(refRes.data ?? []);
       setRevisions(revRes.data ?? []);
