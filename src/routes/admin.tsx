@@ -435,7 +435,7 @@ interface DashboardData {
   pendingCount: number;
   failedCount: number;
   aovCents: number;
-  upsellCounts: { extra_verse: number; rush_delivery: number; unlimited_edits: number };
+  upsellCounts: { extra_verse: number; rush_24h: number; priority_90min: number; unlimited_edits: number };
   dailySales: { date: string; cents: number; orders: number }[];
   // Funnel/conversion (within selected range, production hosts only)
   uniqueVisitors: number;
@@ -478,7 +478,7 @@ function DashboardPanel() {
     // ---- Orders in range
     let ordersQ = supabase
       .from("orders")
-      .select("id, buyer_email, buyer_name, customer_name, amount_paid_cents, amount_cents, payment_status, status, has_3rd_verse, is_rush, has_unlimited_edits, created_at")
+      .select("id, buyer_email, buyer_name, customer_name, amount_paid_cents, amount_cents, payment_status, status, has_3rd_verse, is_rush, has_unlimited_edits, delivery_tier, created_at")
       .not("buyer_email", "like", "pending+%@getpawprintsong.com")
       .order("created_at", { ascending: false })
       .limit(2000);
@@ -586,7 +586,8 @@ function DashboardPanel() {
       aovCents,
       upsellCounts: {
         extra_verse: paid.filter((o) => o.has_3rd_verse).length,
-        rush_delivery: paid.filter((o) => o.is_rush).length,
+        rush_24h: paid.filter((o) => o.delivery_tier === "rush_24h").length,
+        priority_90min: paid.filter((o) => o.delivery_tier === "priority_90min").length,
         unlimited_edits: paid.filter((o) => o.has_unlimited_edits).length,
       },
       dailySales,
@@ -839,9 +840,10 @@ function DashboardPanel() {
       {/* Upsell take rates */}
       <div className="mt-8">
         <h2 className="font-display text-xl font-semibold mb-4">Upsell take rates</h2>
-        <div className="grid grid-cols-1 gap-4 md:grid-cols-3">
+        <div className="grid grid-cols-1 gap-4 md:grid-cols-2 xl:grid-cols-4">
+          <UpsellCard label="90-min priority" count={data.upsellCounts.priority_90min} total={data.paidCount} priceCents={5999} />
+          <UpsellCard label="24h rush delivery" count={data.upsellCounts.rush_24h} total={data.paidCount} priceCents={3999} />
           <UpsellCard label="Extra verse" count={data.upsellCounts.extra_verse} total={data.paidCount} priceCents={1999} />
-          <UpsellCard label="Rush delivery (24h or 90min)" count={data.upsellCounts.rush_delivery} total={data.paidCount} priceCents={3999} />
           <UpsellCard label="Unlimited edits" count={data.upsellCounts.unlimited_edits} total={data.paidCount} priceCents={3299} />
         </div>
       </div>
