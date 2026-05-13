@@ -1,24 +1,29 @@
 import { Gift, ShieldCheck, X, Clock } from "lucide-react";
 import { useEffect } from "react";
+import { formatProduct, type SupportedCurrency } from "@/lib/currency";
 
 interface Rush24DownsellProps {
   open: boolean;
   processing?: boolean;
+  /** Buyer's currency — defaults to USD if not provided. */
+  currency?: SupportedCurrency;
   onAccept: () => void;
   onDecline: () => void;
 }
 
 /**
  * Slim "last chance" downsell shown when a user declines the 90-minute
- * priority delivery upsell. Offers the 24-hour rush at $39.99 — slower than
+ * priority delivery upsell. Offers the 24-hour rush — slower than
  * priority but still much faster than the 5-day standard turnaround.
  */
 export function Rush24Downsell({
   open,
   processing,
+  currency = "USD",
   onAccept,
   onDecline,
 }: Rush24DownsellProps) {
+  const priceLabel = formatProduct(currency, "rush_delivery");
   useEffect(() => {
     if (!open) return;
     const prev = document.body.style.overflow;
