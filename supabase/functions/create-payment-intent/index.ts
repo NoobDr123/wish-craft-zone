@@ -84,13 +84,17 @@ serve(async (req) => {
     return json({ error: "invalid_json" }, 400);
   }
 
-  const { orderId, environment, quizPatch, quizSnapshot, userId } = body;
+  const { orderId, environment, quizPatch, quizSnapshot, userId, country, currency: bodyCurrency } = body;
   if (!orderId || typeof orderId !== "string") {
     return json({ error: "missing_order_id" }, 400);
   }
 
   const env = (environment === "live" ? "live" : "sandbox") as StripeEnv;
-  console.log(`[create-payment-intent] start order=${orderId} env=${env}`);
+  // Buyer currency: prefer explicit currency, otherwise derive from detected country.
+  const requestedCurrency: SupportedCurrency = bodyCurrency
+    ? normalizeCurrency(bodyCurrency)
+    : currencyForCountry(country);
+  console.log(`[create-payment-intent] start order=${orderId} env=${env} currency=${requestedCurrency} country=${country ?? "?"}`);
 
   try {
     const stripe = createStripeClient(env);
