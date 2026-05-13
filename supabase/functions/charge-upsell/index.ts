@@ -134,11 +134,15 @@ serve(async (req) => {
       if (pi.status === "succeeded") {
         productConfig[upsellType] = true;
         const chargedAmount = pi.amount_received ?? pi.amount ?? chargeAmount;
+        const upsellUsd = await getSettledUsdCents(stripe, pi.id);
         const updates: Record<string, unknown> = {
           product_config: productConfig,
           // Increment optimistically so /processing + the order-confirmation
           // email show the real total even if the Stripe webhook is delayed.
           amount_paid_cents: (order.amount_paid_cents ?? 0) + chargedAmount,
+          ...(upsellUsd != null
+            ? { amount_paid_usd_cents: ((order as any).amount_paid_usd_cents ?? 0) + upsellUsd }
+            : {}),
         };
         if (upsell.flagColumn) updates[upsell.flagColumn] = true;
 
