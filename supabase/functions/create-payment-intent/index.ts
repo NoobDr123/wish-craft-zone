@@ -13,6 +13,12 @@
 import { serve } from "https://deno.land/std@0.168.0/http/server.ts";
 import { createClient } from "npm:@supabase/supabase-js@2";
 import { corsHeaders, createStripeClient, type StripeEnv } from "../_shared/stripe.ts";
+import {
+  currencyForCountry,
+  getProductPrice,
+  normalizeCurrency,
+  type SupportedCurrency,
+} from "../_shared/pricing.ts";
 
 const supabase = createClient(
   Deno.env.get("SUPABASE_URL")!,
