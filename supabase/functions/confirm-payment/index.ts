@@ -278,17 +278,25 @@ function json(body: unknown, status = 200) {
 }
 
 async function sendOrderConfirmation(orderId: string) {
+  // Atomic claim — only one of the racing callers wins and actually sends.
+  const { data: claimed } = await supabase
+    .from("orders")
+    .update({ confirmation_email_sent_at: new Date().toISOString() })
+    .eq("id", orderId)
+    .is("confirmation_email_sent_at", null)
+    .select("id")
+    .maybeSingle();
+  if (!claimed) return;
+
   const { data: order } = await supabase
     .from("orders")
     .select(
-      "id, buyer_email, buyer_name, dog_name, dog_breed, genre, tempo, voice, song_title_idea, amount_cents, amount_paid_cents, currency, has_3rd_verse, is_rush, has_unlimited_edits, delivery_date, is_gift, recipient_email, created_at, product_config, confirmation_email_sent_at",
+      "id, buyer_email, buyer_name, dog_name, dog_breed, genre, tempo, voice, song_title_idea, amount_cents, amount_paid_cents, currency, has_3rd_verse, is_rush, has_unlimited_edits, delivery_date, is_gift, recipient_email, created_at, product_config",
     )
     .eq("id", orderId)
     .maybeSingle();
 
-  if (!order) return;
-  if (order.confirmation_email_sent_at) return;
-  if (!order.buyer_email) return;
+  if (!order || !order.buyer_email) return;
 
   const cfg = (order.product_config as Record<string, boolean>) || {};
   const deliverySpeed = cfg.express_90min
@@ -338,11 +346,9 @@ async function sendOrderConfirmation(orderId: string) {
 
   if (!res.ok) {
     console.error("send-app-email returned", res.status, await res.text());
-    return;
+    await supabase
+      .from("orders")
+      .update({ confirmation_email_sent_at: null })
+      .eq("id", orderId);
   }
-
-  await supabase
-    .from("orders")
-    .update({ confirmation_email_sent_at: new Date().toISOString() })
-    .eq("id", orderId);
 }
