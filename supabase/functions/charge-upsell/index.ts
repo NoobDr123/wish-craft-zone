@@ -8,26 +8,25 @@ const supabase = createClient(
 );
 
 // Upsell catalog. Server is the source of truth — never trust client amounts.
-// `tier` (when present) upgrades the order's delivery_tier. rush_24h beats
-// express_48h; we never downgrade.
+// `tier` (when present) upgrades the order's delivery_tier. priority_90min
+// beats rush_24h beats standard; we never downgrade.
 const UPSELL_PRICES: Record<
   string,
-  { amount: number; flagColumn: string | null; tier?: "rush_24h" | "express_48h" | "priority_90min" }
+  { amount: number; flagColumn: string | null; tier?: "rush_24h" | "priority_90min" }
 > = {
   extra_verse: { amount: 1999, flagColumn: "has_3rd_verse" },
-  rush_delivery: { amount: 2999, flagColumn: "is_rush", tier: "rush_24h" },
+  // 24-hour rush downsell — promised 24h, actually delivered ~12h.
+  rush_delivery: { amount: 3999, flagColumn: "is_rush", tier: "rush_24h" },
   unlimited_edits: { amount: 3299, flagColumn: "has_unlimited_edits" },
-  // Downsell after declining the 24h rush — 48h delivery for $19.99.
-  delivery_48h: { amount: 1999, flagColumn: "is_rush", tier: "express_48h" },
   // Top-priority 90-minute express delivery — front of the entire queue.
-  express_90min: { amount: 4999, flagColumn: "is_rush", tier: "priority_90min" },
+  // Promised 90min, actually delivered ~60min.
+  express_90min: { amount: 5999, flagColumn: "is_rush", tier: "priority_90min" },
 };
 
 const TIER_RANK: Record<string, number> = {
   standard: 0,
-  express_48h: 1,
-  rush_24h: 2,
-  priority_90min: 3,
+  rush_24h: 1,
+  priority_90min: 2,
 };
 
 serve(async (req) => {
