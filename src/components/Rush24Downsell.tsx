@@ -10,7 +10,7 @@ interface Rush24DownsellProps {
 
 /**
  * Slim "last chance" downsell shown when a user declines the 90-minute
- * priority delivery upsell. Offers the 24-hour rush at $29.99 — slower than
+ * priority delivery upsell. Offers the 24-hour rush at $39.99 — slower than
  * priority but still much faster than the 5-day standard turnaround.
  */
 export function Rush24Downsell({
