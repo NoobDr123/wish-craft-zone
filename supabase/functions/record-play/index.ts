@@ -48,7 +48,7 @@ serve(async (req) => {
     const variantId = typeof body.variantId === "string" ? body.variantId : null;
     const durationMs = typeof body.durationMs === "number" ? body.durationMs : null;
     const source = typeof body.source === "string" ? body.source.slice(0, 50) : "listen_page";
-    const kind = body.kind === "view" || body.kind === "share" ? body.kind : "play";
+    const kind = body.kind === "view" || body.kind === "share" || body.kind === "download" ? body.kind : "play";
 
     if (!orderId || !/^[0-9a-f-]{36}$/i.test(orderId)) {
       return json({ error: "Invalid orderId" }, 400);
@@ -63,10 +63,15 @@ serve(async (req) => {
     // "view" / "share" events go to job_events (cheap, lightweight) and bump
     // a counter on the Stripe PI at threshold milestones. "play" events
     // additionally insert into play_events as chargeback evidence.
-    if (kind === "view" || kind === "share") {
+    if (kind === "view" || kind === "share" || kind === "download") {
+      const eventType = kind === "view"
+        ? "share_page_viewed"
+        : kind === "share"
+          ? "share_link_shared"
+          : "song_downloaded";
       await supabase.from("job_events").insert({
         order_id: orderId,
-        event_type: kind === "view" ? "share_page_viewed" : "share_link_shared",
+        event_type: eventType,
         payload: { source, ip_hash: ipHash, user_agent: userAgent?.slice(0, 200) },
       });
 
@@ -74,7 +79,7 @@ serve(async (req) => {
         .from("job_events")
         .select("*", { count: "exact", head: true })
         .eq("order_id", orderId)
-        .eq("event_type", kind === "view" ? "share_page_viewed" : "share_link_shared");
+        .eq("event_type", eventType);
 
       const total = count ?? 1;
       if (STRIPE_SYNC_THRESHOLDS.has(total)) {
@@ -145,7 +150,7 @@ async function syncPlayCountToStripe(orderId: string, playCount: number) {
   });
 }
 
-async function syncShareEventToStripe(orderId: string, kind: "view" | "share", count: number) {
+async function syncShareEventToStripe(orderId: string, kind: "view" | "share" | "download", count: number) {
   const { data: order } = await supabase
     .from("orders")
     .select("stripe_payment_intent_id, stripe_env")
@@ -159,11 +164,12 @@ async function syncShareEventToStripe(orderId: string, kind: "view" | "share", c
   const stripe = createStripeClient(env);
 
   const now = new Date().toISOString();
-  await stripe.paymentIntents.update(order.stripe_payment_intent_id, {
-    metadata: kind === "view"
-      ? { share_view_count: String(count), last_share_view_at: now }
-      : { share_link_shared_count: String(count), last_share_link_shared_at: now },
-  });
+  const metadata = kind === "view"
+    ? { share_view_count: String(count), last_share_view_at: now }
+    : kind === "share"
+      ? { share_link_shared_count: String(count), last_share_link_shared_at: now }
+      : { download_count: String(count), last_downloaded_at: now };
+  await stripe.paymentIntents.update(order.stripe_payment_intent_id, { metadata });
 }
 
 function json(body: unknown, status = 200) {
