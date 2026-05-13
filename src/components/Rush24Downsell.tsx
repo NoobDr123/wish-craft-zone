@@ -99,7 +99,7 @@ export function Rush24Downsell({
               24-hour delivery
             </span>
             <span className="font-display text-2xl font-semibold text-foreground">
-              $39.99
+              {priceLabel}
             </span>
           </div>
 
