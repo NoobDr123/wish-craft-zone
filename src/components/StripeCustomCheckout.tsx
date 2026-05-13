@@ -577,11 +577,9 @@ function PaymentForm({ amount, currency, email, name, country, onCountryChange, 
 }
 
 /**
- * Compact country picker that lives inline with the postal label.
- * Collapsed by default — shows just the current flag + country code as a
- * subtle "change" trigger. Expands into a native <select> on click. The
- * 5 currency-supported markets charge in their local currency; everything
- * else is grouped under "Other (USD)" and locks pricing to USD.
+ * Always-visible country picker — full-width native <select>. The 5
+ * currency-supported markets are pinned at the top with a "(local
+ * currency)" hint; everything else charges in USD.
  */
 function CountryPicker({
   country,
@@ -590,50 +588,48 @@ function CountryPicker({
   country: string;
   onCountryChange: (next: string) => void;
 }) {
-  const [open, setOpen] = useState(false);
-  const supported = isSupportedCountry(country);
-  const current = SUPPORTED_COUNTRIES.find((c) => c.code === country);
-  const displayLabel = supported ? current?.code ?? country : `${country} · USD`;
-  const displayFlag = current?.flag ?? "🌍";
-
-  if (!open) {
-    return (
-      <button
-        type="button"
-        onClick={() => setOpen(true)}
-        className="flex items-center gap-1 text-[12.5px] font-medium text-muted-foreground transition-colors hover:text-primary"
-        aria-label="Change billing country"
-      >
-        <span>{displayFlag}</span>
-        <span>{displayLabel}</span>
-        <span className="underline decoration-dotted underline-offset-2">change</span>
-      </button>
-    );
-  }
+  const current = findCountry(country);
+  const local = COUNTRIES.filter((c) => c.local);
+  const others = COUNTRIES.filter((c) => !c.local);
+  // If detection returned a country that's not in our list, surface it as
+  // a temporary entry so the value stays valid and the user sees their
+  // detected location immediately.
+  const detectedFallback =
+    !current && country && /^[A-Z]{2}$/.test(country)
+      ? { code: country, name: country, flag: "🌍" }
+      : null;
 
   return (
-    <select
-      autoFocus
-      value={supported ? country : "__OTHER__"}
-      onChange={(e) => {
-        const v = e.target.value;
-        if (v === "__OTHER__") {
-          // Keep detected country (or fall to "ZZ" sentinel) — pricing locks to USD.
-          onCountryChange(supported ? country : country || "ZZ");
-        } else {
-          onCountryChange(v);
-        }
-        setOpen(false);
-      }}
-      onBlur={() => setOpen(false)}
-      className="rounded-lg border border-[#E5D9C8] bg-[#FBF6EC] px-2 py-1 text-[12.5px] font-medium text-foreground focus:border-primary focus:outline-none focus:ring-2 focus:ring-primary/20"
-    >
-      {SUPPORTED_COUNTRIES.map((c) => (
-        <option key={c.code} value={c.code}>
-          {c.flag} {c.label}
-        </option>
-      ))}
-      <option value="__OTHER__">🌍 Other country (USD)</option>
-    </select>
+    <div className="relative">
+      <select
+        value={country}
+        onChange={(e) => onCountryChange(e.target.value)}
+        className="w-full appearance-none rounded-2xl border border-[#E5D9C8] bg-[#FBF6EC] px-4 py-[14px] pr-10 text-[16px] text-foreground focus:border-primary focus:outline-none focus:ring-[3px] focus:ring-primary/15"
+      >
+        {detectedFallback && (
+          <option value={detectedFallback.code}>
+            {detectedFallback.flag} {detectedFallback.name} · USD
+          </option>
+        )}
+        <optgroup label="Charged in local currency">
+          {local.map((c) => (
+            <option key={c.code} value={c.code}>
+              {c.flag} {c.name}
+            </option>
+          ))}
+        </optgroup>
+        <optgroup label="Charged in USD">
+          {others.map((c) => (
+            <option key={c.code} value={c.code}>
+              {c.flag} {c.name}
+            </option>
+          ))}
+        </optgroup>
+      </select>
+      <span className="pointer-events-none absolute right-4 top-1/2 -translate-y-1/2 text-foreground/50">
+        ▾
+      </span>
+    </div>
   );
 }
+
