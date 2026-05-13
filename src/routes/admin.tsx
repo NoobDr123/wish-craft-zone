@@ -855,7 +855,7 @@ function DashboardPanel() {
                     </Badge>
                   </td>
                   <td className="p-3 text-right font-medium text-emerald-600">
-                    {fmtMoney(o.amount_paid_cents)}
+                    {fmtMoneyCcy(o.amount_paid_cents, o.currency)}
                   </td>
                 </tr>
               ))}
