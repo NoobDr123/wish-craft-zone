@@ -2318,7 +2318,7 @@ function SupportPanel() {
           </p>
         </div>
         <div className="flex gap-2">
-          {(["all", "new", "open", "closed"] as const).map((f) => (
+          {(["all", "new", "open", "closed", "spam"] as const).map((f) => (
             <button
               key={f}
               onClick={() => {
