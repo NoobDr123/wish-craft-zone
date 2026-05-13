@@ -38,6 +38,8 @@ import { AdminMfaChallenge } from "@/components/admin/AdminMfaChallenge";
 import { WebhookDebugPanel } from "@/components/admin/WebhookDebugPanel";
 import { supabase } from "@/integrations/supabase/client";
 import { useRealtimeRefresh } from "@/hooks/useRealtimeRefresh";
+import { useServerFn } from "@tanstack/react-start";
+import { replySupportMessage } from "@/lib/support.functions";
 
 // Hosts that count as "real" production traffic for admin analytics.
 // Sessions from preview/lovable.app domains are excluded so the admin
