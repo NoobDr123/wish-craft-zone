@@ -1523,7 +1523,7 @@ function UpsellsPanel() {
           const declines = data.events.filter((e) => e.event_type === "upsell_decline" && e.upsell_type === t).length;
           const field = orderField[t];
           // For upsells with a dedicated order flag, count actual paid orders.
-          // For delivery_48h (no flag), fall back to tracked accept events.
+          // For express_90min (no flag), fall back to tracked accept events.
           const taken = field
             ? paidOrders.filter((o) => o[field as keyof typeof o]).length
             : accepts;
