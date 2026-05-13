@@ -3168,11 +3168,7 @@ function SupportPanel() {
                 )}
 
                 {linkedOrder && (
-                  <Link
-                    to="/admin/orders/$orderId"
-                    params={{ orderId: linkedOrder.id }}
-                    className="mt-3 block rounded-lg border border-border bg-muted/30 px-3 py-2 text-xs hover:border-primary/40 hover:bg-muted/50 transition-colors"
-                  >
+                  <div className="mt-3 block rounded-lg border border-border bg-muted/30 px-3 py-2 text-xs">
                     <div className="font-semibold uppercase tracking-wider text-[10px] text-muted-foreground">
                       Linked order
                     </div>
@@ -3183,6 +3179,9 @@ function SupportPanel() {
                         </div>
                         <div className="truncate text-muted-foreground">
                           {linkedOrder.buyer_email} · {new Date(linkedOrder.created_at).toLocaleDateString()}
+                        </div>
+                        <div className="truncate text-muted-foreground/70 font-mono text-[10px] mt-0.5">
+                          {linkedOrder.id}
                         </div>
                       </div>
                       <div className="shrink-0 flex flex-col items-end gap-0.5">
@@ -3195,7 +3194,7 @@ function SupportPanel() {
                         </span>
                       </div>
                     </div>
-                  </Link>
+                  </div>
                 )}
               </div>
 
