@@ -120,12 +120,12 @@ serve(async (req) => {
     try {
       const pi = await stripe.paymentIntents.create({
         amount: chargeAmount,
-        currency: "usd",
+        currency: orderCurrency.toLowerCase(),
         customer: order.stripe_customer_id,
         payment_method: order.stripe_payment_method_id,
         off_session: true,
         confirm: true,
-        metadata: { orderId, upsellType, originalAmount: String(upsell.amount) },
+        metadata: { orderId, upsellType, originalAmount: String(baseUpsellAmount), currency: orderCurrency },
         description: `PawPrint Song upsell: ${upsellType}`,
       });
 
