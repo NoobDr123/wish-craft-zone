@@ -12,10 +12,8 @@ import {
   formatMoney,
   formatProduct,
   setCountryOverride,
-  
   getCountryOverride,
   detectCountry,
-  type SupportedCountry,
 } from "@/lib/currency";
 import {
   ArrowLeft,
