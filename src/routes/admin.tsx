@@ -607,6 +607,7 @@ function DashboardPanel() {
       buyer_email: o.buyer_email,
       buyer_name: o.buyer_name ?? o.customer_name ?? null,
       amount_paid_cents: o.amount_paid_cents ?? 0,
+      amount_paid_usd_cents: (o as any).amount_paid_usd_cents ?? null,
       currency: o.currency ?? "USD",
       payment_status: o.payment_status,
       status: o.status,
