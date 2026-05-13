@@ -2649,6 +2649,7 @@ interface ExplorerOrderRow {
   payment_status: string;
   amount_cents: number;
   amount_paid_cents: number;
+  currency: string;
   delivery_tier: string;
   is_gift: boolean;
   flagged_for_review: boolean;
