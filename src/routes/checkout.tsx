@@ -68,22 +68,22 @@ function CheckoutPage() {
   const [reviewOpen, setReviewOpen] = useState(false);
 
   // Country picker — initialized from override (if any), then upgraded to
-  // edge-detected country. Changing it bumps amountVersion so Stripe
-  // re-issues the Payment Intent in the new currency.
-  const [country, setCountry] = useState<SupportedCountry>(
-    () => (getCountryOverride() as SupportedCountry | null) ?? "US",
+  // edge-detected country. Any country is allowed; non-supported ones lock
+  // pricing to USD via currencyForCountry. Changing it bumps amountVersion
+  // so Stripe re-issues the Payment Intent in the new currency.
+  const [country, setCountry] = useState<string>(
+    () => getCountryOverride() ?? "US",
   );
   useEffect(() => {
     if (getCountryOverride()) return; // user already chose
     void detectCountry().then((c) => {
-      if (c === "US" || c === "GB" || c === "CA" || c === "AU" || c === "NZ") {
-        setCountry(c);
-      }
+      if (c && /^[A-Z]{2}$/.test(c)) setCountry(c);
     });
   }, []);
-  function handleCountryChange(next: SupportedCountry) {
-    setCountry(next);
-    setCountryOverride(next);
+  function handleCountryChange(next: string) {
+    const cc = next.toUpperCase();
+    setCountry(cc);
+    setCountryOverride(cc);
     setAmountVersion((v) => v + 1); // re-fetch PI in new currency
     setPromoApplied(null); // promo amount was scoped to old currency
   }
