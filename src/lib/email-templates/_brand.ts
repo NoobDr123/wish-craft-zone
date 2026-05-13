@@ -12,17 +12,18 @@ export const BRAND = {
   // Synced with src/styles.css landing-page tokens (light theme)
   colors: {
     cream: "#F6F0E6",        // --background
-    backgroundCard: "#FBF6EC", // --background-card
-    backgroundWarm: "#ECE2D0", // --background-warm / --muted / --peach
-    foreground: "#1F1B16",    // --foreground
+    backgroundCard: "#FDF7E9", // --background-card
+    backgroundWarm: "#ECE2D0", // --background-warm / --muted
+    foreground: "#1F1A17",    // --foreground
     foregroundSoft: "#5A5148",// --foreground-soft / --muted-foreground
     muted: "#8A8175",         // --foreground-faint
-    primary: "#8D6FAF",       // --primary (warm purple)
-    primaryHover: "#6B4F8A",  // --primary-hover
+    primary: "#B5532A",       // --primary (terracotta)
+    primaryHover: "#94411F",  // --primary-hover
     primaryForeground: "#FFF7EE", // --primary-foreground
-    accent: "#E5D9EF",        // --accent
+    accent: "#D4A29A",        // --peach (warm accent)
     border: "#D9CEB9",        // --border
-    peach: "#ECE2D0",         // --peach
+    peach: "#D4A29A",         // --peach
+    ribbon: "#7B8C6B",        // --ribbon (sage)
   },
 } as const;
 
