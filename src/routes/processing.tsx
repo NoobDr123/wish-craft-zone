@@ -233,10 +233,10 @@ function ThankYouPage() {
   const orderRef = order ? order.id.slice(0, 8).toUpperCase() : null;
 
   const deliveryAddOnLabel: string | false =
-    deliverySpeed === "24h"
-      ? "24-hour delivery"
-      : deliverySpeed === "48h"
-        ? "48-hour delivery"
+    deliverySpeed === "90min"
+      ? "90-minute priority delivery"
+      : deliverySpeed === "24h"
+        ? "24-hour delivery"
         : false;
 
   const upgrades = order
