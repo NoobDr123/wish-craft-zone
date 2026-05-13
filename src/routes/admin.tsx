@@ -1454,7 +1454,20 @@ function CrmPanel() {
                     </div>
                   </td>
                   <td className="p-3 text-xs whitespace-nowrap">
-                    {c.nextScheduledDeliveryAt ? (
+                    {view === "partials" ? (
+                      c.cardStartedAt || c.reachedCheckoutAt ? (
+                        <>
+                          <div className="font-medium text-rose-600">
+                            {new Date((c.cardStartedAt ?? c.reachedCheckoutAt)!).toLocaleString()}
+                          </div>
+                          <div className="text-[10px] text-muted-foreground">
+                            {c.cardStartedAt ? "started card entry" : "viewed checkout"}
+                          </div>
+                        </>
+                      ) : (
+                        <span className="text-muted-foreground">—</span>
+                      )
+                    ) : c.nextScheduledDeliveryAt ? (
                       <>
                         <div className="font-medium text-amber-600">{new Date(c.nextScheduledDeliveryAt).toLocaleString()}</div>
                         {c.pendingDeliveryCount > 1 && (
@@ -1466,7 +1479,7 @@ function CrmPanel() {
                     )}
                   </td>
                   <td className="p-3 text-xs text-muted-foreground">
-                    {new Date(c.lastOrderAt).toLocaleDateString()}
+                    {c.lastOrderAt ? new Date(c.lastOrderAt).toLocaleDateString() : "—"}
                   </td>
                 </tr>
                 {expanded === c.email && (
