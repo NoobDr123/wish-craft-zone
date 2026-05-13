@@ -1231,6 +1231,8 @@ function CrmPanel() {
           buyerName: o.buyer_name ?? o.customer_name ?? null,
           orders: [],
           emails: [],
+          nextScheduledDeliveryAt: null,
+          pendingDeliveryCount: 0,
         };
       }
       const c = map[email];
