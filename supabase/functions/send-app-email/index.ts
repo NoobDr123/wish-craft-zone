@@ -521,7 +521,68 @@ function songDelivered(d: Record<string, any>) {
   return { subject, html, text };
 }
 
-function escape(s: string) {
+// Personal text-forward email signed by Emily. Used for forced deliveries —
+// pushes buyer to portal + refund-video ask. Buyer-facing only.
+function songDeliveredPersonal(d: Record<string, any>) {
+  const buyerFirst = escape(String(d.buyer_name ?? "").split(/\s+/)[0] || "there");
+  const recipient = escape(d.recipient_name ?? "your dog");
+  const listen = String(d.listen_url ?? "");
+  const portal = String(d.portal_url ?? "");
+
+  const subject = `Your song is ready, ${buyerFirst} 💛`;
+
+  const paragraphs = [
+    `Hi ${buyerFirst},`,
+    `It's Emily from PawPrint Song. I just wanted to write you personally to say thank you so much for trusting us with ${recipient}'s song. It honestly means the world to our little team that you chose us.`,
+    `I have wonderful news. Today was a quieter day in the studio than usual, so we were able to move your song right to the front of the queue and finish it much faster than we promised. It's ready for you right now.`,
+  ];
+
+  const closing = [
+    `If there is anything at all we can do to make this more special for you, please just reply to this email. It comes straight to me. Truly, anything. A different lyric, a small change, a question, I'm here.`,
+    `One last little thing, and only if you love it. We are a small team trying to reach more families who could use a song like this, and the kindest thing you could ever do for us is record a short reaction video when you (or ${recipient}) hear it for the first time. If you share it with us, we will send you a full refund as a thank you. No pressure at all, only if it feels right.`,
+    `Thank you again, ${buyerFirst}. Genuinely. People like you are the reason we get to do this work.`,
+  ];
+
+  const pHtml = (s: string) =>
+    `<p style="font-size:16px;line-height:1.7;color:#1F1B16;margin:0 0 18px;">${s}</p>`;
+
+  const html = `<!doctype html>
+<html><body style="margin:0;padding:0;background:#ffffff;font-family:'Instrument Sans',Inter,Arial,sans-serif;">
+  <table width="100%" cellpadding="0" cellspacing="0"><tr><td align="center" style="padding:40px 20px;">
+    <table width="560" cellpadding="0" cellspacing="0" style="background:#ffffff;max-width:560px;">
+      <tr><td>
+        ${paragraphs.map(pHtml).join("\n        ")}
+        <p style="margin:26px 0 12px;">
+          <a href="${listen}" style="background:#B5532A;color:#ffffff;font-size:15px;font-weight:600;border-radius:999px;padding:14px 28px;text-decoration:none;display:inline-block;">Listen to your song</a>
+        </p>
+        ${portal ? `<p style="margin:0 0 26px;">
+          <a href="${portal}" style="background:#ffffff;color:#B5532A;border:1.5px solid #B5532A;font-size:15px;font-weight:600;border-radius:999px;padding:12px 26px;text-decoration:none;display:inline-block;">Open your portal</a>
+        </p>
+        <p style="font-size:14px;line-height:1.6;color:#5A5148;margin:0 0 22px;">In your portal you can replay the track anytime, share the link with ${recipient}, download it, or ask for tweaks, all in one place.</p>` : ""}
+        ${closing.map(pHtml).join("\n        ")}
+        <p style="font-size:16px;line-height:1.7;color:#1F1B16;margin:24px 0 4px;">With so much gratitude,</p>
+        <p style="font-size:16px;line-height:1.4;color:#1F1B16;margin:0 0 4px;">Emily 🎵</p>
+        <p style="font-size:14px;line-height:1.4;color:#5A5148;margin:0;">PawPrint Song</p>
+      </td></tr>
+    </table>
+  </td></tr></table>
+</body></html>`;
+
+  const text = [
+    ...paragraphs,
+    ``,
+    `Listen to your song: ${listen}`,
+    portal ? `Open your portal: ${portal}` : ``,
+    ``,
+    ...closing,
+    ``,
+    `With so much gratitude,`,
+    `Emily`,
+    `PawPrint Song`,
+  ].filter(Boolean).join("\n\n");
+
+  return { subject, html, text };
+}
   return String(s)
     .replace(/&/g, "&amp;")
     .replace(/</g, "&lt;")
