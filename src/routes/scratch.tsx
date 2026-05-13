@@ -31,46 +31,22 @@ function ScratchPage() {
   const [countdown, setCountdown] = useState(COUNTDOWN_SECONDS);
   const [hydrated, setHydrated] = useState(() => useQuizStore.persist.hasHydrated());
 
-  const recipientName = (q.recipient_name || "").trim();
-  const firstName = recipientName.split(/\s+/)[0] || "";
-  const journey = useMemo(() => journeyStageOf(q.stage), [q.stage]);
-  const relationship = q.relationship_other?.trim() || q.relationship || "";
+  const dogName = (q.dog_name || q.recipient_name || "").trim();
+  const firstName = dogName.split(/\s+/)[0] || "";
 
-  // Stage-aware copy
+  // Copy — always dog-focused, no journey/stage variants
   const copy = useMemo(() => {
     const dog = firstName || "they";
-    if (journey === "memory") {
-      return {
-        eyebrow: "You made it this far",
-        scratchHeadline: `${firstName || "They"} would be proud of you.`,
-        scratchSub: `You told us who ${dog} really ${firstName ? "was" : "were"}. That takes guts. So we put something aside for you. Scratch to find out what.`,
-        cardLabel: `A gift toward ${firstName || "their"} song`,
-        claimHeadline: `${firstName || "Their"} tribute song — half off 💛`,
-        claimSub: `Use this within 10 minutes to lock in 50% off ${firstName ? `${firstName}'s` : "their"} memorial song.`,
-        ctaLabel: `Claim 50% off ${firstName ? `${firstName}'s` : "their"} song`,
-      };
-    }
-    if (journey === "hospice") {
-      return {
-        eyebrow: "You made it this far",
-        scratchHeadline: `${firstName || "They"} would be proud of you.`,
-        scratchSub: `You told us who ${dog} really is. That takes guts. So we put something aside for you. Scratch to find out what.`,
-        cardLabel: `A gift toward ${firstName || "their"} song`,
-        claimHeadline: `${firstName || "Their"} song — half off, priority queue 💛`,
-        claimSub: `This 50% offer holds your priority slot for the next 10 minutes.`,
-        ctaLabel: `Claim 50% & prioritize ${firstName || "them"}`,
-      };
-    }
     return {
       eyebrow: "You made it this far",
       scratchHeadline: `${firstName || "They"} would be proud of you.`,
       scratchSub: `You told us who ${dog} really ${firstName ? "is" : "are"}. That takes guts. So we put something aside for you. Scratch to find out what.`,
       cardLabel: `A gift toward ${firstName || "their"} song`,
-      claimHeadline: `${firstName ? `${firstName}'s` : "Their"} song is 50% off 🎉`,
-      claimSub: `Lock it in within 10 minutes — this offer only lives on this page.`,
+      claimHeadline: `Half off ${firstName ? `${firstName}'s` : "their"} song.`,
+      claimSub: `You have 10 minutes to claim 50% off ${firstName ? `${firstName}'s` : "their"} custom song.`,
       ctaLabel: `Claim ${firstName ? `${firstName}'s` : "your"} 50% off`,
     };
-  }, [journey, firstName]);
+  }, [firstName]);
 
 
   useEffect(() => {
