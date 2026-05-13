@@ -2235,11 +2235,15 @@ function OrdersPanel() {
               <th className="p-3">Payment</th>
               <th className="p-3">Amount</th>
               <th className="p-3">Created</th>
+              <th className="p-3">Engagement</th>
               <th className="p-3">Actions</th>
             </tr>
           </thead>
           <tbody>
-            {orders.map((o) => (
+            {orders.map((o) => {
+              const e = engagement[o.id];
+              const mins = e ? Math.round(e.playMs / 60000) : 0;
+              return (
               <tr key={o.id} className="border-b border-border/40 align-top">
                 <td className="p-3">
                   <div className="font-medium">{o.dog_name}</div>
@@ -2251,6 +2255,20 @@ function OrdersPanel() {
                 <td className="p-3"><Badge variant={o.payment_status === "paid" ? "default" : o.payment_status === "failed" ? "destructive" : "outline"}>{o.payment_status}</Badge></td>
                 <td className="p-3 text-xs">{fmtMoneyCcy(o.amount_paid_cents ?? 0, o.currency)}</td>
                 <td className="p-3 text-xs">{new Date(o.created_at).toLocaleString()}</td>
+                <td className="p-3">
+                  {!e ? (
+                    <span className="text-xs text-muted-foreground">—</span>
+                  ) : (e.views + e.plays + e.shares + e.downloads === 0) ? (
+                    <span className="text-xs text-muted-foreground">no activity</span>
+                  ) : (
+                    <div className="flex flex-wrap gap-1 text-xs">
+                      {e.views > 0 && <Badge variant="secondary" title="Portal/listen page opens">👁 {e.views}</Badge>}
+                      {e.plays > 0 && <Badge variant="secondary" title={`${mins}m total listen time`}>▶️ {e.plays}{mins > 0 ? ` · ${mins}m` : ""}</Badge>}
+                      {e.downloads > 0 && <Badge variant="default" title="Downloaded">⬇️ {e.downloads}</Badge>}
+                      {e.shares > 0 && <Badge variant="outline" title="Share link copied">🔗 {e.shares}</Badge>}
+                    </div>
+                  )}
+                </td>
                 <td className="p-3">
                   <div className="flex flex-col gap-1">
                     <Button size="sm" variant="outline" disabled={busy === `${o.id}:brief`} onClick={() => callFn("generate-brief", { orderId: o.id }, "brief", o.id)}>
@@ -2268,10 +2286,11 @@ function OrdersPanel() {
                   </div>
                 </td>
               </tr>
-            ))}
+              );
+            })}
             {orders.length === 0 && (
               <tr>
-                <td colSpan={7} className="p-8 text-center text-muted-foreground">No orders.</td>
+                <td colSpan={8} className="p-8 text-center text-muted-foreground">No orders.</td>
               </tr>
             )}
           </tbody>
