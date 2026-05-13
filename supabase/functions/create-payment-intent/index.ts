@@ -164,12 +164,34 @@ serve(async (req) => {
           const { data: refreshed } = await supabase
             .from("orders")
             .select(
-              "id, buyer_email, buyer_name, dog_name, amount_cents, currency, stripe_customer_id, stripe_env, stripe_payment_intent_id, payment_status",
+              "id, buyer_email, buyer_name, dog_name, amount_cents, currency, stripe_customer_id, stripe_env, stripe_payment_intent_id, payment_status, promo_code_id",
             )
             .eq("id", orderId)
             .maybeSingle();
           if (refreshed) order = refreshed;
         }
+      }
+
+      // If buyer's currency changed (e.g. they detected GB on a fresh
+      // session) and no promo has been applied yet, switch the order to
+      // the new currency and refresh the amount from the server catalog.
+      if (
+        order.currency &&
+        order.currency.toUpperCase() !== requestedCurrency &&
+        !order.promo_code_id &&
+        order.payment_status !== "paid"
+      ) {
+        const newAmount = getProductPrice(requestedCurrency, "base");
+        const { data: switched } = await supabase
+          .from("orders")
+          .update({ currency: requestedCurrency, amount_cents: newAmount })
+          .eq("id", orderId)
+          .neq("payment_status", "paid")
+          .select(
+            "id, buyer_email, buyer_name, dog_name, amount_cents, currency, stripe_customer_id, stripe_env, stripe_payment_intent_id, payment_status, promo_code_id",
+          )
+          .maybeSingle();
+        if (switched) order = switched;
       }
     }
 
