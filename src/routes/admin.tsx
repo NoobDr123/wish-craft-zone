@@ -2796,7 +2796,7 @@ function CustomerExplorerPanel() {
                 </td>
                 <td className="p-3 text-xs">{r.delivery_tier}</td>
                 <td className="p-3 text-xs">
-                  {fmtMoney(r.amount_paid_cents || r.amount_cents)}
+                  {fmtMoneyCcy(r.amount_paid_cents || r.amount_cents, r.currency)}
                 </td>
                 <td className="p-3 text-xs whitespace-nowrap">{new Date(r.created_at).toLocaleString()}</td>
               </tr>
