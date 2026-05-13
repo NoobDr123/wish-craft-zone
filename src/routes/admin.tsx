@@ -215,7 +215,12 @@ function StaffPage() {
                   }`}
                 >
                   <Icon className="h-4 w-4 shrink-0" />
-                  {label}
+                  <span className="flex-1 text-left">{label}</span>
+                  {key === "support" && supportUnread > 0 && (
+                    <span className="rounded-full bg-destructive px-1.5 py-0.5 text-[10px] font-bold text-destructive-foreground min-w-[18px] text-center">
+                      {supportUnread}
+                    </span>
+                  )}
                 </button>
               ))}
             </div>
