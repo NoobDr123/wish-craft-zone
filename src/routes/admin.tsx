@@ -1689,10 +1689,10 @@ function OrderRow({
         order.buyer_email
           ? supabase
               .from("email_send_log")
-              .select("id, message_id, template_name, status, error_message, created_at")
+              .select("id, message_id, template_name, status, error_message, created_at, opened_at, open_count, clicked_at, click_count")
               .eq("recipient_email", order.buyer_email)
               .order("created_at", { ascending: false })
-              .limit(40)
+              .limit(80)
           : Promise.resolve({ data: [] as any[] }),
       ]);
       if (!active) return;
