@@ -505,22 +505,6 @@ function PaymentForm({ amount, currency, email, name, country, onCountryChange, 
         </div>
       </div>
 
-      {/* Expiry + CVC side by side */}
-      <div className="grid grid-cols-2 gap-3">
-        <div className="space-y-2">
-          <label className="block text-[15px] font-semibold text-foreground">Expiration date</label>
-          <div className="rounded-2xl border border-[#E5D9C8] bg-[#FBF6EC] px-4 py-[14px] transition-colors focus-within:border-primary focus-within:ring-[3px] focus-within:ring-primary/15">
-            <CardExpiryElement options={cardExpiryOptions} />
-          </div>
-        </div>
-        <div className="space-y-2">
-          <label className="block text-[15px] font-semibold text-foreground">Security code</label>
-          <div className="rounded-2xl border border-[#E5D9C8] bg-[#FBF6EC] px-4 py-[14px] transition-colors focus-within:border-primary focus-within:ring-[3px] focus-within:ring-primary/15">
-            <CardCvcElement options={cardCvcOptions} />
-          </div>
-        </div>
-      </div>
-
       {/* Billing country — auto-detected from IP, always visible & changeable.
           Pricing is in local currency for the 5 supported markets, USD elsewhere. */}
       <div className="space-y-2">
@@ -551,6 +535,22 @@ function PaymentForm({ amount, currency, email, name, country, onCountryChange, 
           />
         </div>
       )}
+
+      {/* Expiry + CVC side by side */}
+      <div className="grid grid-cols-2 gap-3">
+        <div className="space-y-2">
+          <label className="block text-[15px] font-semibold text-foreground">Expiration date</label>
+          <div className="rounded-2xl border border-[#E5D9C8] bg-[#FBF6EC] px-4 py-[14px] transition-colors focus-within:border-primary focus-within:ring-[3px] focus-within:ring-primary/15">
+            <CardExpiryElement options={cardExpiryOptions} />
+          </div>
+        </div>
+        <div className="space-y-2">
+          <label className="block text-[15px] font-semibold text-foreground">Security code</label>
+          <div className="rounded-2xl border border-[#E5D9C8] bg-[#FBF6EC] px-4 py-[14px] transition-colors focus-within:border-primary focus-within:ring-[3px] focus-within:ring-primary/15">
+            <CardCvcElement options={cardCvcOptions} />
+          </div>
+        </div>
+      </div>
 
       <p className="text-[12.5px] leading-snug text-muted-foreground">
         By providing your card information, you authorize PawPrint Song to charge your card for this
