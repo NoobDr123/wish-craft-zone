@@ -1193,6 +1193,8 @@ interface CrmCustomer {
   emails: any[];
   nextScheduledDeliveryAt: string | null;
   pendingDeliveryCount: number;
+  reachedCheckoutAt: string | null;
+  cardStartedAt: string | null;
 }
 
 function CrmPanel() {
