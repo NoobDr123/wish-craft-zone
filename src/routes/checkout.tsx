@@ -425,25 +425,6 @@ function CheckoutPage() {
             </div>
           </dl>
 
-          {/* Country / currency selector */}
-          <div className="mt-5 flex items-center justify-between gap-3 rounded-2xl border border-peach/70 bg-background/60 px-3 py-2.5">
-            <label htmlFor="checkout-country" className="text-[13px] font-semibold text-muted-foreground">
-              Billing country
-            </label>
-            <select
-              id="checkout-country"
-              value={country}
-              onChange={(e) => handleCountryChange(e.target.value as SupportedCountry)}
-              className="rounded-lg border border-peach bg-card px-2.5 py-1.5 text-sm font-semibold text-foreground focus:border-primary focus:outline-none focus:ring-2 focus:ring-primary/30"
-            >
-              {SUPPORTED_COUNTRIES.map((c) => (
-                <option key={c.code} value={c.code}>
-                  {c.flag} {c.label}
-                </option>
-              ))}
-            </select>
-          </div>
-
           <div className="my-5 border-t border-dashed border-peach" />
 
           <div className="flex flex-wrap items-center justify-between gap-3">
