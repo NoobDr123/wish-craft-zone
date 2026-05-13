@@ -145,6 +145,27 @@ async function syncPlayCountToStripe(orderId: string, playCount: number) {
   });
 }
 
+async function syncShareEventToStripe(orderId: string, kind: "view" | "share", count: number) {
+  const { data: order } = await supabase
+    .from("orders")
+    .select("stripe_payment_intent_id, stripe_env")
+    .eq("id", orderId)
+    .maybeSingle();
+
+  if (!order?.stripe_payment_intent_id) return;
+  if (order.stripe_env !== "live" && order.stripe_env !== "sandbox") return;
+
+  const env: StripeEnv = order.stripe_env;
+  const stripe = createStripeClient(env);
+
+  const now = new Date().toISOString();
+  await stripe.paymentIntents.update(order.stripe_payment_intent_id, {
+    metadata: kind === "view"
+      ? { share_view_count: String(count), last_share_view_at: now }
+      : { share_link_shared_count: String(count), last_share_link_shared_at: now },
+  });
+}
+
 function json(body: unknown, status = 200) {
   return new Response(JSON.stringify(body), {
     status,
