@@ -1201,6 +1201,7 @@ function CrmPanel() {
   const [customers, setCustomers] = useState<CrmCustomer[]>([]);
   const [loading, setLoading] = useState(true);
   const [search, setSearch] = useState("");
+  const [view, setView] = useState<"all" | "paying" | "partials">("all");
   const [expanded, setExpanded] = useState<string | null>(null);
   const [emailLogs, setEmailLogs] = useState<Record<string, any[]>>({});
   const [quizEvents, setQuizEvents] = useState<Record<string, any[]>>({});
