@@ -2656,6 +2656,7 @@ interface ExplorerOrderRow {
   payment_status: string;
   amount_cents: number;
   amount_paid_cents: number;
+  amount_paid_usd_cents: number | null;
   currency: string;
   delivery_tier: string;
   is_gift: boolean;
