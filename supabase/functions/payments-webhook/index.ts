@@ -245,7 +245,7 @@ async function handlePaymentSucceeded(pi: any, env: StripeEnv) {
 
     const { data: order } = await supabase
       .from("orders")
-      .select("product_config, amount_paid_cents, delivery_tier")
+      .select("product_config, amount_paid_cents, amount_paid_usd_cents, delivery_tier")
       .eq("id", orderId)
       .single();
 
@@ -264,11 +264,16 @@ async function handlePaymentSucceeded(pi: any, env: StripeEnv) {
 
     productConfig[upsellType] = true;
 
+    const upsellUsd = await getSettledUsdCents(createStripeClient(env), pi.id);
+
     const updates: Record<string, unknown> = {
       [flagColumn]: true,
       product_config: productConfig,
       amount_paid_cents:
         (order?.amount_paid_cents ?? 0) + (pi.amount_received ?? pi.amount ?? 0),
+      ...(upsellUsd != null
+        ? { amount_paid_usd_cents: (order?.amount_paid_usd_cents ?? 0) + upsellUsd }
+        : {}),
     };
 
     const newTier = tierMap[upsellType];
