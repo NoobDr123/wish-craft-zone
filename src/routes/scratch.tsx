@@ -360,10 +360,10 @@ function ScratchPage() {
         <main className="mx-auto max-w-xl px-5 py-12">
           <div className="text-center">
             <span className="inline-flex items-center gap-1.5 rounded-full border border-primary/30 bg-primary/5 px-3 py-1 text-xs font-semibold uppercase tracking-wide text-primary">
-              <Heart className="h-3.5 w-3.5" />
-              Reserved for {firstName || "you"}
+              <Heart className="h-3.5 w-3.5 fill-primary" />
+              Reserved for you
             </span>
-            <div className="mt-5 text-5xl">🎉</div>
+            <div className="mt-5 text-5xl">🐾</div>
             <h1 className="mt-4 text-balance font-display text-3xl font-bold leading-tight text-foreground md:text-4xl">
               {copy.claimHeadline}
             </h1>
@@ -372,28 +372,21 @@ function ScratchPage() {
             </p>
           </div>
 
-          {/* Discount badge — personalized, offer-driven */}
+          {/* Discount badge — 50% off, no price (price shown at checkout) */}
           <div className="mt-8 flex flex-col items-center justify-center rounded-3xl border-2 border-primary/30 bg-peach/40 p-8 text-center shadow-card">
             {firstName && (
               <span className="text-xs font-semibold uppercase tracking-[0.2em] text-primary/80">
-                🐾 {journey === "memory"
-                  ? `In honor of ${firstName}`
-                  : `${firstName}'s personalized song`}
+                🐾 {firstName}'s personalized song
               </span>
             )}
-            <div className="mt-2 flex items-baseline justify-center gap-3">
-              <span className="font-display text-3xl font-medium text-muted-foreground line-through md:text-4xl">
-                $59.99
-              </span>
-              <span className="font-display text-6xl font-extrabold text-primary md:text-7xl">
-                $29.99
-              </span>
+            <div className="mt-3 font-display text-6xl font-extrabold leading-none text-primary md:text-7xl">
+              50% OFF
             </div>
-            <span className="mt-3 inline-flex items-center gap-1.5 rounded-full bg-primary px-4 py-1.5 text-xs font-bold uppercase tracking-wider text-primary-foreground">
-              50% OFF · You save $30
+            <span className="mt-4 inline-flex items-center gap-1.5 rounded-full bg-primary px-4 py-1.5 text-xs font-bold uppercase tracking-wider text-primary-foreground">
+              Half off {firstName ? `${firstName}'s` : "their"} custom song
             </span>
             <p className="mt-3 text-sm text-foreground/70">
-              One-time payment · Delivered as MP3 + lyric video
+              Final price unlocks at checkout
             </p>
           </div>
 
