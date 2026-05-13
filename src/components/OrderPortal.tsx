@@ -202,6 +202,7 @@ export function OrderPortal({ orderId, userId }: { orderId: string; userId: stri
           </div>
 
           <ShareSection
+            orderId={order.id}
             audioUrl={selectedVariant?.audio_url}
             title={title}
             recipientName={order.recipient_name}
