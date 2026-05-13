@@ -1337,9 +1337,9 @@ function CrmPanel() {
   const partialsCount = customers.filter(
     (c) => c.paidCount === 0 && (c.reachedCheckoutAt || c.cardStartedAt),
   ).length;
-  const reachedCheckoutCount = customers.filter(
-    (c) => c.reachedCheckoutAt || c.cardStartedAt,
-  ).length;
+  // Match the Stripe funnel's "Reached checkout" metric: customers who
+  // started entering card details (checkout_card_started event).
+  const reachedCheckoutCount = customers.filter((c) => c.cardStartedAt).length;
 
   const filtered = customers.filter((c) => {
     if (view === "paying" && c.paidCount === 0) return false;
@@ -1348,7 +1348,7 @@ function CrmPanel() {
       if (!c.reachedCheckoutAt && !c.cardStartedAt) return false;
     }
     if (view === "reached_checkout") {
-      if (!c.reachedCheckoutAt && !c.cardStartedAt) return false;
+      if (!c.cardStartedAt) return false;
     }
     if (!search) return true;
     const s = search.toLowerCase();
