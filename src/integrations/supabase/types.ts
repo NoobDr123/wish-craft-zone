@@ -488,6 +488,7 @@ export type Database = {
         Row: {
           amount_cents: number
           amount_paid_cents: number
+          amount_paid_usd_cents: number | null
           audio_variants: Json | null
           auto_qc_results: Json | null
           auto_user_provisioned_at: string | null
@@ -557,6 +558,7 @@ export type Database = {
         Insert: {
           amount_cents?: number
           amount_paid_cents?: number
+          amount_paid_usd_cents?: number | null
           audio_variants?: Json | null
           auto_qc_results?: Json | null
           auto_user_provisioned_at?: string | null
@@ -626,6 +628,7 @@ export type Database = {
         Update: {
           amount_cents?: number
           amount_paid_cents?: number
+          amount_paid_usd_cents?: number | null
           audio_variants?: Json | null
           auto_qc_results?: Json | null
           auto_user_provisioned_at?: string | null

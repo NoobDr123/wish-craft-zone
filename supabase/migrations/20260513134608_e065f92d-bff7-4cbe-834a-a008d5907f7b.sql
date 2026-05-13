@@ -1,0 +1,2 @@
+ALTER TABLE public.orders ADD COLUMN IF NOT EXISTS amount_paid_usd_cents integer;
+COMMENT ON COLUMN public.orders.amount_paid_usd_cents IS 'Actual settled USD cents from Stripe balance_transaction (account currency). Sum across base+upsells.';
