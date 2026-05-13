@@ -1209,38 +1209,53 @@ function CrmPanel() {
 
   const load = async (signal?: { active: boolean }) => {
     setLoading(true);
-    const { data: orders } = await supabase
-      .from("orders")
-      .select("*")
-      .not("buyer_email", "like", "pending+%@getpawprintsong.com")
-      .order("created_at", { ascending: false })
-      .limit(2000);
+    const [{ data: orders }, { data: checkoutEvents }] = await Promise.all([
+      supabase
+        .from("orders")
+        .select("*")
+        .not("buyer_email", "like", "pending+%@getpawprintsong.com")
+        .order("created_at", { ascending: false })
+        .limit(2000),
+      supabase
+        .from("quiz_events")
+        .select("buyer_email, event_type, created_at")
+        .in("event_type", ["checkout_view", "checkout_card_started"])
+        .not("buyer_email", "is", null)
+        .order("created_at", { ascending: false })
+        .limit(5000),
+    ]);
     if (signal && !signal.active) return;
 
     const map: Record<string, CrmCustomer> = {};
-    for (const o of orders ?? []) {
-      const email = (o.buyer_email ?? "").toLowerCase();
-      if (!email) continue;
+    const ensure = (email: string, seedFromOrder?: any): CrmCustomer => {
       if (!map[email]) {
         map[email] = {
           email,
           totalSpentCents: 0,
           orderCount: 0,
-          lastOrderAt: o.created_at,
-          firstOrderAt: o.created_at,
+          lastOrderAt: seedFromOrder?.created_at ?? "",
+          firstOrderAt: seedFromOrder?.created_at ?? "9999",
           paidCount: 0,
           pendingCount: 0,
           failedCount: 0,
           hasUpsells: false,
           isGift: false,
-          buyerName: o.buyer_name ?? o.customer_name ?? null,
+          buyerName: seedFromOrder?.buyer_name ?? seedFromOrder?.customer_name ?? null,
           orders: [],
           emails: [],
           nextScheduledDeliveryAt: null,
           pendingDeliveryCount: 0,
+          reachedCheckoutAt: null,
+          cardStartedAt: null,
         };
       }
-      const c = map[email];
+      return map[email];
+    };
+
+    for (const o of orders ?? []) {
+      const email = (o.buyer_email ?? "").toLowerCase();
+      if (!email) continue;
+      const c = ensure(email, o);
       c.orders.push(o);
       c.orderCount += 1;
       if (o.payment_status === "paid" || o.payment_status === "succeeded") {
@@ -1253,8 +1268,8 @@ function CrmPanel() {
       }
       if (o.has_3rd_verse || o.is_rush || o.has_unlimited_edits) c.hasUpsells = true;
       if (o.is_gift) c.isGift = true;
-      if (o.created_at > c.lastOrderAt) c.lastOrderAt = o.created_at;
-      if (o.created_at < c.firstOrderAt) c.firstOrderAt = o.created_at;
+      if (!c.lastOrderAt || o.created_at > c.lastOrderAt) c.lastOrderAt = o.created_at;
+      if (!c.firstOrderAt || o.created_at < c.firstOrderAt) c.firstOrderAt = o.created_at;
       if (!c.buyerName && (o.buyer_name || o.customer_name)) {
         c.buyerName = o.buyer_name ?? o.customer_name;
       }
@@ -1266,8 +1281,29 @@ function CrmPanel() {
       }
     }
 
+    for (const e of checkoutEvents ?? []) {
+      const email = (e.buyer_email ?? "").toLowerCase();
+      if (!email) continue;
+      if (email.startsWith("pending+")) continue;
+      const c = ensure(email);
+      if (e.event_type === "checkout_view") {
+        if (!c.reachedCheckoutAt || e.created_at > c.reachedCheckoutAt) {
+          c.reachedCheckoutAt = e.created_at;
+        }
+      }
+      if (e.event_type === "checkout_card_started") {
+        if (!c.cardStartedAt || e.created_at > c.cardStartedAt) {
+          c.cardStartedAt = e.created_at;
+        }
+      }
+      if (!c.lastOrderAt || e.created_at > c.lastOrderAt) c.lastOrderAt = e.created_at;
+    }
+
     setCustomers(
-      Object.values(map).sort((a, b) => b.totalSpentCents - a.totalSpentCents),
+      Object.values(map).sort((a, b) => {
+        if (b.totalSpentCents !== a.totalSpentCents) return b.totalSpentCents - a.totalSpentCents;
+        return (b.lastOrderAt ?? "").localeCompare(a.lastOrderAt ?? "");
+      }),
     );
     setLoading(false);
   };
