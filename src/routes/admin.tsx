@@ -466,7 +466,7 @@ interface DashboardData {
   pendingCount: number;
   failedCount: number;
   aovCents: number;
-  upsellCounts: { extra_verse: number; rush_24h: number; priority_90min: number; unlimited_edits: number };
+  upsellCounts: { rush_24h: number; priority_90min: number; unlimited_edits: number };
   dailySales: { date: string; cents: number; orders: number }[];
   // Funnel/conversion (within selected range, production hosts only)
   uniqueVisitors: number;
@@ -621,7 +621,6 @@ function DashboardPanel() {
       failedCount: failed.length,
       aovCents,
       upsellCounts: {
-        extra_verse: paid.filter((o) => o.has_3rd_verse).length,
         rush_24h: paid.filter((o) => o.delivery_tier === "rush_24h").length,
         priority_90min: paid.filter((o) => o.delivery_tier === "priority_90min").length,
         unlimited_edits: paid.filter((o) => o.has_unlimited_edits).length,
@@ -879,7 +878,7 @@ function DashboardPanel() {
         <div className="grid grid-cols-1 gap-4 md:grid-cols-2 xl:grid-cols-4">
           <UpsellCard label="90-min priority" count={data.upsellCounts.priority_90min} total={data.paidCount} priceCents={5999} />
           <UpsellCard label="24h rush delivery" count={data.upsellCounts.rush_24h} total={data.paidCount} priceCents={3999} />
-          <UpsellCard label="Extra verse" count={data.upsellCounts.extra_verse} total={data.paidCount} priceCents={1999} />
+          
           <UpsellCard label="Unlimited edits" count={data.upsellCounts.unlimited_edits} total={data.paidCount} priceCents={3299} />
         </div>
       </div>
@@ -1577,18 +1576,16 @@ function UpsellsPanel() {
 
   if (!data) return <div className="text-muted-foreground">Loading…</div>;
 
-  // Order matches the live funnel: Upsell 1 (90min priority) + 24h downsell → Upsell 2 (extra verse) → Upsell 3 (unlimited edits).
-  const types = ["express_90min", "rush_delivery", "extra_verse", "unlimited_edits"];
+  // Order matches the live funnel: Upsell 1 (90min priority) + 24h downsell → Upsell 2 (unlimited edits).
+  const types = ["express_90min", "rush_delivery", "unlimited_edits"];
   const labels: Record<string, string> = {
     express_90min: "Upsell 1 — 90-min priority delivery ($59.99)",
     rush_delivery: "Upsell 1 downsell — 24h rush delivery ($39.99)",
-    extra_verse: "Upsell 2 — Extra verse ($19.99)",
-    unlimited_edits: "Upsell 3 — Unlimited edits ($32.99)",
+    unlimited_edits: "Upsell 2 — Unlimited edits ($32.99)",
   };
   const prices: Record<string, number> = {
     express_90min: 5999,
     rush_delivery: 3999,
-    extra_verse: 1999,
     unlimited_edits: 3299,
   };
   // Maps a tracked upsell to the order column we use to confirm it was actually
@@ -1596,7 +1593,6 @@ function UpsellsPanel() {
   // product_config to disambiguate the 90min path; rush_delivery falls back
   // to is_rush on legacy orders.
   const orderField: Record<string, string | null> = {
-    extra_verse: "has_3rd_verse",
     express_90min: null,
     rush_delivery: "is_rush",
     unlimited_edits: "has_unlimited_edits",
