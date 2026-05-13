@@ -1422,7 +1422,7 @@ function CustomerDetail({
                   <td className="p-2">{o.dog_name}</td>
                   <td className="p-2"><Badge variant="outline" className="text-[10px]">{o.status}</Badge></td>
                   <td className="p-2"><Badge variant={o.payment_status === "paid" ? "default" : o.payment_status === "failed" ? "destructive" : "outline"} className="text-[10px]">{o.payment_status}</Badge></td>
-                  <td className="p-2 font-medium">{fmtMoney(o.amount_paid_cents ?? 0)}</td>
+                  <td className="p-2 font-medium">{fmtMoneyCcy(o.amount_paid_cents ?? 0, o.currency)}</td>
                   <td className="p-2">
                     <div className="flex gap-1">
                       {o.has_3rd_verse && <Badge variant="outline" className="text-[10px]">verse</Badge>}
