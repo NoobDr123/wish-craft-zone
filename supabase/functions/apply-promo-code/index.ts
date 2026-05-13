@@ -97,13 +97,13 @@ serve(async (req) => {
     const isT3st2 = upperCode === "T3ST2";
     const isT3st1 = upperCode === "T3ST1";
     if (isT3st) {
-      finalAmount = 500; // $5.00 flat
+      finalAmount = TEST_PROMO_FLAT[orderCurrency].T3ST;
       discountCents = Math.max(0, baseAmount - finalAmount);
     } else if (isT3st2) {
-      finalAmount = 200; // $2.00 flat
+      finalAmount = TEST_PROMO_FLAT[orderCurrency].T3ST2;
       discountCents = Math.max(0, baseAmount - finalAmount);
     } else if (isT3st1) {
-      finalAmount = 100; // $1.00 flat
+      finalAmount = TEST_PROMO_FLAT[orderCurrency].T3ST1;
       discountCents = Math.max(0, baseAmount - finalAmount);
     }
 
