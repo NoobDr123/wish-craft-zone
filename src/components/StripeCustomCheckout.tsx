@@ -250,6 +250,8 @@ export function StripeCustomCheckout(props: Props) {
           currency={session.currency}
           email={email}
           name={name}
+          country={country}
+          onCountryChange={onCountryChange}
           returnUrl={props.returnUrl}
           paymentIntentId={session.paymentIntentId}
         />
