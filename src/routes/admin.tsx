@@ -131,11 +131,7 @@ function StaffPage() {
     load();
     const ch = supabase
       .channel("admin-support-unread")
-      .on(
-        "postgres_changes",
-        { event: "*", schema: "public", table: "support_threads" },
-        () => load(),
-      )
+      .on("postgres_changes", { event: "*", schema: "public", table: "support_threads" }, () => load())
       .subscribe();
     return () => {
       supabase.removeChannel(ch);
