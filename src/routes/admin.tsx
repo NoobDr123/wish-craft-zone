@@ -1699,7 +1699,7 @@ function OrdersPanel() {
   const load = async () => {
     let q = supabase
       .from("orders")
-      .select("id, dog_name, buyer_email, status, priority, flagged_for_review, flag_reason, created_at, scheduled_delivery_at, delivered_at, is_gift, brief_score, amount_paid_cents, payment_status")
+      .select("id, dog_name, buyer_email, status, priority, flagged_for_review, flag_reason, created_at, scheduled_delivery_at, delivered_at, is_gift, brief_score, amount_paid_cents, currency, payment_status")
       .not("buyer_email", "like", "pending+%@getpawprintsong.com")
       .order("created_at", { ascending: false })
       .limit(200);
