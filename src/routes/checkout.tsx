@@ -625,12 +625,15 @@ function CheckoutFooter({ currency }: { currency: ReturnType<typeof useBuyerCurr
             <Link to="/terms" className="underline hover:text-foreground">Terms of Service</Link>{" "}
             and{" "}
             <Link to="/privacy" className="underline hover:text-foreground">Privacy Policy</Link>.
-            Your card will be charged <span className="font-semibold text-foreground">$29.99 USD</span>{" "}
+            Your card will be charged{" "}
+            <span className="font-semibold text-foreground">
+              {formatProduct(currency, "base")} {currency}
+            </span>{" "}
             today as a one-time payment to PawPrint Song. No subscription, no recurring charges.
           </p>
           <p>
             Your payment information is encrypted and processed securely by Stripe.
-            PawPrint Song never stores your card details. All transactions are billed in U.S. Dollars.
+            PawPrint Song never stores your card details. All transactions are billed in {currency}.
           </p>
           <p>
             Need help? Email{" "}
