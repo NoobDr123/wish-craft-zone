@@ -168,13 +168,13 @@ function AccountPage() {
             {/* Help footer */}
             <section className="mt-12 rounded-2xl border border-[rgba(31,27,22,0.1)] bg-[#FBF6EC] p-5 text-center">
               <p className="text-sm text-[rgba(31,27,22,0.65)]">
-                Need anything else? Email us at{" "}
-                <a
-                  href="mailto:hello@getpawprintsong.com"
+                Need anything else? Send us a note through the{" "}
+                <Link
+                  to="/contact"
                   className="font-medium text-[#8D6FAF] underline-offset-4 hover:underline"
                 >
-                  hello@getpawprintsong.com
-                </a>
+                  contact form
+                </Link>
               </p>
             </section>
           </>
