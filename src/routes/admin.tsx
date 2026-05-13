@@ -1195,7 +1195,7 @@ function CrmPanel() {
       c.orderCount += 1;
       if (o.payment_status === "paid" || o.payment_status === "succeeded") {
         c.paidCount += 1;
-        c.totalSpentCents += o.amount_paid_cents ?? 0;
+        c.totalSpentCents += toUsdCents(o.amount_paid_cents, o.currency);
       } else if (o.payment_status === "failed") {
         c.failedCount += 1;
       } else {
