@@ -93,9 +93,7 @@ type Tab =
 const NAV: Array<{ key: Tab; label: string; icon: any; group: string }> = [
   { key: "dashboard", label: "Dashboard", icon: LayoutDashboard, group: "Overview" },
   { key: "funnel", label: "Funnel", icon: TrendingUp, group: "Overview" },
-  { key: "crm", label: "CRM", icon: Users, group: "Overview" },
-  { key: "customers", label: "Customer explorer", icon: Search, group: "Overview" },
-  { key: "orders", label: "Orders", icon: ShoppingBag, group: "Operations" },
+  { key: "crm", label: "Mega CRM", icon: Users, group: "Overview" },
   { key: "upsells", label: "Upsells", icon: Sparkles, group: "Operations" },
   { key: "emails", label: "Emails", icon: Mail, group: "Operations" },
   { key: "samples", label: "Samples", icon: Music2, group: "Content" },
