@@ -288,40 +288,18 @@ const ELEMENT_BASE_STYLE = {
   },
 } as const;
 
-function PaymentForm({ amount, currency, email, name, returnUrl, paymentIntentId, clientSecret }: FormProps) {
+function PaymentForm({ amount, currency, email, name, country, onCountryChange, returnUrl, paymentIntentId, clientSecret }: FormProps) {
   const stripe = useStripe();
   const elements = useElements();
   const [submitting, setSubmitting] = useState(false);
   const [error, setError] = useState<string | null>(null);
-  // Country is auto-detected from buyer IP (Cloudflare trace). Defaults to US.
-  const [country, setCountry] = useState<string>("US");
   const [postalCode, setPostalCode] = useState<string>("");
   // Track whether any wallet (Apple Pay / Google Pay / Link) actually rendered
   // so we can hide the "Or pay with card" divider when nothing is shown above.
   const [hasWallet, setHasWallet] = useState(false);
 
-  useEffect(() => {
-    let cancelled = false;
-    (async () => {
-      try {
-        const res = await fetch("https://www.cloudflare.com/cdn-cgi/trace", { cache: "no-store" });
-        const text = await res.text();
-        const match = text.match(/^loc=([A-Z]{2})/m);
-        if (!cancelled && match && match[1]) setCountry(match[1]);
-      } catch {
-        // ignore, keep US default
-      }
-    })();
-    return () => {
-      cancelled = true;
-    };
-  }, []);
-
-  // Countries where Stripe / card networks expect a postal code with the billing address.
-  const postalRequired = useMemo(
-    () => ["US", "CA", "GB", "AU", "DE", "FR", "IT", "ES", "NL", "IE", "PL", "PT", "CZ", "MX", "BR", "JP", "NZ", "BE", "AT", "CH", "SE", "NO", "DK", "FI"].includes(country),
-    [country],
-  );
+  // Postal code is always required for our 5 supported markets.
+  const postalRequired = true;
 
   const postalLabel = country === "US" ? "ZIP code" : "Postal code";
   const postalPlaceholder = country === "US" ? "90210" : "Postal code";
