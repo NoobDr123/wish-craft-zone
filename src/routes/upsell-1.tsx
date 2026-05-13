@@ -16,6 +16,7 @@ export const Route = createFileRoute("/upsell-1")({
 function Upsell1() {
   const navigate = useNavigate();
   const q = useQuizStore();
+  const currency = useBuyerCurrency();
   const [processing, setProcessing] = useState(false);
   const [showDownsell, setShowDownsell] = useState(false);
   const [downsellProcessing, setDownsellProcessing] = useState(false);
