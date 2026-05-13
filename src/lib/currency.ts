@@ -73,12 +73,48 @@ export function formatProduct(currency: SupportedCurrency, key: ProductKey): str
 // Country detection via Cloudflare's edge — works from any origin and is
 // cached in localStorage so we don't hit it on every page.
 const STORAGE_KEY = "pps:buyer_country";
+const OVERRIDE_KEY = "pps:buyer_country_override";
+export const COUNTRY_CHANGED_EVENT = "pps:country-changed";
 const STORAGE_TTL_MS = 1000 * 60 * 60 * 24 * 7; // 7d
 
 type Cached = { country: string; ts: number };
 
+export const SUPPORTED_COUNTRIES: { code: SupportedCountry; label: string; flag: string }[] = [
+  { code: "US", label: "United States", flag: "🇺🇸" },
+  { code: "GB", label: "United Kingdom", flag: "🇬🇧" },
+  { code: "CA", label: "Canada", flag: "🇨🇦" },
+  { code: "AU", label: "Australia", flag: "🇦🇺" },
+  { code: "NZ", label: "New Zealand", flag: "🇳🇿" },
+];
+
+/** User-selected country wins over edge detection. */
+export function setCountryOverride(country: SupportedCountry): void {
+  if (typeof window === "undefined") return;
+  try {
+    window.localStorage.setItem(OVERRIDE_KEY, country);
+    window.dispatchEvent(new CustomEvent(COUNTRY_CHANGED_EVENT, { detail: country }));
+  } catch {
+    /* ignore */
+  }
+}
+
+export function getCountryOverride(): SupportedCountry | null {
+  if (typeof window === "undefined") return null;
+  try {
+    const raw = window.localStorage.getItem(OVERRIDE_KEY);
+    if (raw && (raw === "US" || raw === "GB" || raw === "CA" || raw === "AU" || raw === "NZ")) {
+      return raw;
+    }
+  } catch {
+    /* ignore */
+  }
+  return null;
+}
+
 export async function detectCountry(): Promise<string> {
   if (typeof window === "undefined") return "US";
+  const override = getCountryOverride();
+  if (override) return override;
   try {
     const raw = window.localStorage.getItem(STORAGE_KEY);
     if (raw) {
