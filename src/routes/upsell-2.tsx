@@ -48,7 +48,7 @@ function Upsell2() {
       upsellType: "unlimited_edits",
       orderId: q.orderId,
       buyerEmail: q.buyer_email || undefined,
-      amountCents: 3299,
+      amountCents: getProductPrice(currency, "unlimited_edits"),
     });
     if (!q.orderId) {
       await finishAndAdvance();
