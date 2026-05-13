@@ -101,16 +101,22 @@ async function handleCheckoutSessionCompleted(session: any, env: StripeEnv) {
     isT3st = (promo?.code || "").toUpperCase() === "T3ST";
   }
 
+  const sessionPiId = typeof session.payment_intent === "string" ? session.payment_intent : null;
+  let usdCents: number | null = null;
+  if (sessionPiId) {
+    usdCents = await getSettledUsdCents(createStripeClient(env), sessionPiId);
+  }
+
   await supabase
     .from("orders")
     .update({
       stripe_customer_id: session.customer ?? undefined,
-      stripe_payment_intent_id:
-        typeof session.payment_intent === "string" ? session.payment_intent : undefined,
+      stripe_payment_intent_id: sessionPiId ?? undefined,
       stripe_checkout_session_id: session.id,
       stripe_env: env,
       payment_status: "paid",
       amount_paid_cents: session.amount_total ?? 0,
+      ...(usdCents != null ? { amount_paid_usd_cents: usdCents } : {}),
       status: isT3st ? "upsells_complete" : "awaiting_upsells",
     })
     .eq("id", orderId);
