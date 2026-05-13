@@ -1315,13 +1315,6 @@ function CrmPanel() {
   return (
     <>
       <div className="mb-6">
-        <h1 className="font-display text-3xl font-semibold">CRM</h1>
-        <p className="text-sm text-muted-foreground">
-          Every customer who's interacted. Click a row to see all their orders, emails, and quiz path.
-        </p>
-      </div>
-
-      <div className="mb-6">
         <h1 className="font-display text-3xl font-semibold">Mega CRM</h1>
         <p className="text-sm text-muted-foreground">
           Customers, orders, scheduled deliveries, emails, and quiz path — all in one place. Click a row for full detail.
@@ -1333,7 +1326,7 @@ function CrmPanel() {
         <StatCard label="Lifetime revenue" value={fmtMoney(totalLifetimeRevenue)} tone="success" />
         <StatCard label="With paid orders" value={customers.filter((c) => c.paidCount > 0).length} />
         <StatCard label="Repeat buyers" value={customers.filter((c) => c.paidCount > 1).length} />
-        <StatCard label="Pending deliveries" value={customers.reduce((s, c) => s + c.pendingDeliveryCount, 0)} tone="warning" />
+        <StatCard label="Pending deliveries" value={customers.reduce((s, c) => s + c.pendingDeliveryCount, 0)} tone="warn" />
       </div>
 
       <input
