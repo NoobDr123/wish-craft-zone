@@ -550,6 +550,8 @@ function CheckoutPage() {
                 returnUrl={`${window.location.origin}/checkout/return`}
                 email={email}
                 name={name}
+                country={country}
+                onCountryChange={handleCountryChange}
                 quizPatch={quizPatch}
                 quizSnapshot={quizPatch}
                 onError={(msg: string) => setError(msg)}
