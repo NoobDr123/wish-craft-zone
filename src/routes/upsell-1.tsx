@@ -75,7 +75,7 @@ function Upsell1() {
       upsellType: "rush_delivery",
       orderId: q.orderId,
       buyerEmail: q.buyer_email || undefined,
-      amountCents: 2999,
+      amountCents: 3999,
     });
     if (!q.orderId) {
       setShowDownsell(false);
