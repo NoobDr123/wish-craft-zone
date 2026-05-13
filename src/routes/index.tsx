@@ -721,6 +721,16 @@ function LandingPage() {
       void ensureSession();
       void track({ type: "lander_view", stepKey: "index" });
     });
+    // Meta Pixel — ViewContent on the landing page so Meta has a top-of-funnel
+    // signal to optimize against (in addition to the auto-fired PageView).
+    void import("@/lib/metaPixel").then(({ pixelTrack }) => {
+      pixelTrack("ViewContent", {
+        content_name: "PawPrint Song Landing",
+        content_category: "personalized_song",
+        content_type: "product",
+        currency: "USD",
+      });
+    });
   }, []);
 
   // Inline sample playback. one audio at a time, no modal
