@@ -40,6 +40,10 @@ import { supabase } from "@/integrations/supabase/client";
 import { useRealtimeRefresh } from "@/hooks/useRealtimeRefresh";
 import { useServerFn } from "@tanstack/react-start";
 import { replySupportMessage } from "@/lib/support.functions";
+import {
+  getSupportAutoReplyEnabled,
+  setSupportAutoReplyEnabled,
+} from "@/lib/support-settings.functions";
 
 // Hosts that count as "real" production traffic for admin analytics.
 // Sessions from preview/lovable.app domains are excluded so the admin
@@ -151,6 +155,31 @@ function StaffPage() {
     groups[item.group].push(item);
   }
 
+  // Live unread support count (new + non-spam) for sidebar badge.
+  const [supportUnread, setSupportUnread] = useState(0);
+  useEffect(() => {
+    const load = async () => {
+      const { count } = await supabase
+        .from("support_threads")
+        .select("id", { count: "exact", head: true })
+        .eq("status", "new")
+        .neq("spam_classification", "spam");
+      setSupportUnread(count ?? 0);
+    };
+    load();
+    const ch = supabase
+      .channel("admin-support-unread")
+      .on(
+        "postgres_changes",
+        { event: "*", schema: "public", table: "support_threads" },
+        () => load(),
+      )
+      .subscribe();
+    return () => {
+      supabase.removeChannel(ch);
+    };
+  }, []);
+
   return (
     <div className="min-h-screen bg-background flex">
       {/* Sidebar */}
@@ -186,7 +215,12 @@ function StaffPage() {
                   }`}
                 >
                   <Icon className="h-4 w-4 shrink-0" />
-                  {label}
+                  <span className="flex-1 text-left">{label}</span>
+                  {key === "support" && supportUnread > 0 && (
+                    <span className="rounded-full bg-destructive px-1.5 py-0.5 text-[10px] font-bold text-destructive-foreground min-w-[18px] text-center">
+                      {supportUnread}
+                    </span>
+                  )}
                 </button>
               ))}
             </div>
@@ -2828,11 +2862,22 @@ function SupportPanel() {
   const [sending, setSending] = useState(false);
   const [closeAfter, setCloseAfter] = useState(false);
   const [reclassifying, setReclassifying] = useState(false);
+  const [autoReplyOn, setAutoReplyOn] = useState(false);
+  const [linkedOrder, setLinkedOrder] = useState<any>(null);
+
+  const getAutoReplyFn = useServerFn(getSupportAutoReplyEnabled);
+  const setAutoReplyFn = useServerFn(setSupportAutoReplyEnabled);
+
+  useEffect(() => {
+    getAutoReplyFn({})
+      .then((r: any) => setAutoReplyOn(!!r?.enabled))
+      .catch(() => {});
+  }, [getAutoReplyFn]);
 
   const loadThreads = async () => {
     let q = supabase
       .from("support_threads")
-      .select("id, sender_name, sender_email, subject, status, last_activity_at, order_id_text, spam_classification, spam_score, spam_reason, ai_summary, ai_suggested_reply, ai_classified_at")
+      .select("id, sender_name, sender_email, subject, status, last_activity_at, order_id_text, spam_classification, spam_score, spam_reason, ai_summary, ai_suggested_reply, ai_classified_at, ai_category, auto_replied_at")
       .order("last_activity_at", { ascending: false })
       .limit(200);
     if (filter === "all") {
@@ -2892,6 +2937,21 @@ function SupportPanel() {
 
   const selected = threads.find((t) => t.id === selectedId);
 
+  // Resolve linked order from order_id_text (UUID) → orders row.
+  useEffect(() => {
+    const ref = selected?.order_id_text;
+    setLinkedOrder(null);
+    if (!ref) return;
+    const isUuid = /^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/i.test(ref);
+    if (!isUuid) return;
+    supabase
+      .from("orders")
+      .select("id, buyer_email, buyer_name, dog_name, status, payment_status, amount_paid_cents, currency, delivered_at, created_at")
+      .eq("id", ref)
+      .maybeSingle()
+      .then(({ data }) => setLinkedOrder(data));
+  }, [selected?.order_id_text]);
+
   const replyFn = useServerFn(replySupportMessage);
 
   const sendReply = async () => {
@@ -2929,6 +2989,22 @@ function SupportPanel() {
           <p className="mt-1 text-sm text-muted-foreground">
             Messages from the contact form. Replies email the customer directly.
           </p>
+          <label className="mt-2 inline-flex items-center gap-2 text-xs text-muted-foreground cursor-pointer">
+            <input
+              type="checkbox"
+              checked={autoReplyOn}
+              onChange={async (e) => {
+                const next = e.target.checked;
+                setAutoReplyOn(next);
+                try {
+                  await setAutoReplyFn({ data: { enabled: next } });
+                } catch {
+                  setAutoReplyOn(!next);
+                }
+              }}
+            />
+            🤖 Auto-reply to thank-you / praise messages
+          </label>
         </div>
         <div className="flex gap-2">
           {(["all", "new", "open", "closed", "spam"] as const).map((f) => (
@@ -3077,6 +3153,47 @@ function SupportPanel() {
                     </div>
                     {selected.spam_reason && <div className="mt-0.5">{selected.spam_reason}</div>}
                     {selected.ai_summary && <div className="mt-0.5 italic">"{selected.ai_summary}"</div>}
+                    {selected.ai_category && (
+                      <div className="mt-1 text-[10px] uppercase tracking-wider opacity-70">
+                        category: {selected.ai_category}
+                      </div>
+                    )}
+                  </div>
+                )}
+
+                {selected.auto_replied_at && (
+                  <div className="mt-3 rounded-lg border border-primary/40 bg-primary/10 px-3 py-2 text-xs text-primary">
+                    🤖 Auto-replied {new Date(selected.auto_replied_at).toLocaleString()} — thread closed.
+                  </div>
+                )}
+
+                {linkedOrder && (
+                  <div className="mt-3 block rounded-lg border border-border bg-muted/30 px-3 py-2 text-xs">
+                    <div className="font-semibold uppercase tracking-wider text-[10px] text-muted-foreground">
+                      Linked order
+                    </div>
+                    <div className="mt-1 flex items-center justify-between gap-2">
+                      <div className="min-w-0">
+                        <div className="truncate font-medium">
+                          {linkedOrder.dog_name} · {linkedOrder.buyer_name ?? linkedOrder.buyer_email}
+                        </div>
+                        <div className="truncate text-muted-foreground">
+                          {linkedOrder.buyer_email} · {new Date(linkedOrder.created_at).toLocaleDateString()}
+                        </div>
+                        <div className="truncate text-muted-foreground/70 font-mono text-[10px] mt-0.5">
+                          {linkedOrder.id}
+                        </div>
+                      </div>
+                      <div className="shrink-0 flex flex-col items-end gap-0.5">
+                        <Badge variant="outline" className="text-[10px]">{linkedOrder.status}</Badge>
+                        <span className="text-[10px] text-muted-foreground">
+                          {linkedOrder.payment_status}
+                          {linkedOrder.amount_paid_cents
+                            ? ` · ${(linkedOrder.amount_paid_cents / 100).toFixed(2)} ${linkedOrder.currency}`
+                            : ""}
+                        </span>
+                      </div>
+                    </div>
                   </div>
                 )}
               </div>
