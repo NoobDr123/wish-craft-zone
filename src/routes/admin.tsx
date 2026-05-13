@@ -1786,8 +1786,8 @@ function OrderRow({
             <Button size="sm" variant="outline" className="h-7 text-[11px]" disabled={busy === `${order.id}:deliver`} onClick={() => callFn("deliver-song", { orderId: order.id }, "deliver", order.id)}>
               Deliver now
             </Button>
-            <Button size="sm" variant="default" className="h-7 text-[11px]" disabled={busy === `${order.id}:force`} onClick={() => callFn("deliver-song", { orderId: order.id, force: true }, "force", order.id)}>
-              Force deliver
+            <Button size="sm" variant="default" className="h-7 text-[11px]" disabled={busy === `${order.id}:force`} onClick={() => callFn("deliver-song", { orderId: order.id, force: true, personal: true }, "force", order.id)}>
+              Force deliver (Emily email)
             </Button>
             {onOpenDrawer && (
               <Button size="sm" variant="ghost" className="h-7 text-[11px] ml-auto" onClick={() => onOpenDrawer(order.id)}>
@@ -2211,8 +2211,8 @@ function OrdersPanel() {
                     <Button size="sm" variant="outline" disabled={busy === `${o.id}:deliver`} onClick={() => callFn("deliver-song", { orderId: o.id }, "deliver", o.id)}>
                       Deliver now
                     </Button>
-                    <Button size="sm" variant="default" disabled={busy === `${o.id}:force`} onClick={() => callFn("deliver-song", { orderId: o.id, force: true }, "force", o.id)}>
-                      Force deliver (skip schedule)
+                    <Button size="sm" variant="default" disabled={busy === `${o.id}:force`} onClick={() => callFn("deliver-song", { orderId: o.id, force: true, personal: true }, "force", o.id)}>
+                      Force deliver (Emily email)
                     </Button>
                   </div>
                 </td>

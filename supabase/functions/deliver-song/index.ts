@@ -28,7 +28,7 @@ serve(async (req) => {
   if (unauthorized) return unauthorized;
 
   try {
-    const { orderId, force } = await req.json();
+    const { orderId, force, personal } = await req.json();
     if (!orderId) return json({ error: "Missing orderId" }, 400);
 
     const { data: order } = await supabase
@@ -55,7 +55,7 @@ serve(async (req) => {
 
     const slug = order.share_page_slug ?? order.id;
     const listenUrl = `${SITE_URL}/listen/${slug}`;
-    const portalUrl = "";
+    const portalUrl = `${SITE_URL}/portal/${order.id}`;
 
     // Auto-issue a 10%-off returning-customer promo (idempotent: skip if a
     // returning code already exists for this order).
@@ -104,7 +104,7 @@ serve(async (req) => {
             Authorization: `Bearer ${Deno.env.get("SUPABASE_SERVICE_ROLE_KEY")!}`,
           },
           body: JSON.stringify({
-            template: "song-delivered",
+            template: personal && t.role === "buyer" ? "song-delivered-personal" : "song-delivered",
             to: t.email,
             data: {
               recipient_name: order.dog_name,
