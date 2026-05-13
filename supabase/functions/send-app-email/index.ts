@@ -57,7 +57,7 @@ serve(async (req) => {
     const idemKey =
       (typeof idempotencyKey === "string" && idempotencyKey) ||
       `${template}:${to.toLowerCase()}:${data?.order_id ?? data?.orderId ?? ""}`;
-    const messageId = crypto.randomUUID();
+    const messageId = trackingMessageId;
 
     // Get-or-create one unsubscribe token per recipient email.
     const lowerTo = to.toLowerCase();
