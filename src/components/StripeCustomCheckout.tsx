@@ -16,7 +16,7 @@ import type {
 import { Loader2, Lock, ShieldCheck } from "lucide-react";
 import { getStripe, stripeEnvironment } from "@/lib/stripe";
 import { supabase } from "@/integrations/supabase/client";
-import { detectCountry } from "@/lib/currency";
+import { detectCountry, SUPPORTED_COUNTRIES, type SupportedCountry } from "@/lib/currency";
 
 interface Props {
   orderId: string;
@@ -28,6 +28,10 @@ interface Props {
   email: string;
   /** Buyer name — included in billing details. */
   name: string;
+  /** Buyer's billing country (controls currency + which fields render). */
+  country: SupportedCountry;
+  /** Called when the buyer changes their country in the card form. */
+  onCountryChange: (next: SupportedCountry) => void;
   quizPatch?: Record<string, unknown>;
   quizSnapshot?: Record<string, unknown>;
   onError?: (msg: string) => void;
