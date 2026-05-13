@@ -504,7 +504,7 @@ function ThankYouPage() {
                 <span className="font-semibold text-foreground">
                   Need to add or change something?
                 </span>{" "}
-                Just reply to your confirmation email. We read every one.
+                Use the contact form anytime. Every message goes into our staff inbox.
               </span>
             </li>
             <li className="flex gap-2.5">

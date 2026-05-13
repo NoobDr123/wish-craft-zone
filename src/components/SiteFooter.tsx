@@ -23,12 +23,12 @@ export function SiteFooter() {
             <p className="mt-4 text-[12.5px] leading-[1.6] text-[rgba(246,240,230,0.5)]">
               PawPrint Song · Delaware
               <br />
-              <a
-                href="mailto:hello@getpawprintsong.com"
+              <Link
+                to="/contact"
                 className="hover:text-[#F5E6D8]"
               >
-                hello@getpawprintsong.com
-              </a>
+                Contact support
+              </Link>
             </p>
           </div>
 

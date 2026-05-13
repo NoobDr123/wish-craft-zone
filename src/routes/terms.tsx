@@ -165,8 +165,8 @@ function TermsPage() {
             specifically for you, they are inherently non-returnable. Refunds
             are issued solely at our discretion and only in cases where the
             final product fails to meet our quality standards. To request a
-            refund or report a quality issue, you must contact us at{" "}
-            <a href="mailto:hello@getpawprintsong.com">hello@getpawprintsong.com</a>{" "}
+            refund or report a quality issue, you must contact us through our{" "}
+            <Link to="/contact">contact form</Link>{" "}
             within 30 days of delivery.
           </p>
           <h3>Dispute Policy</h3>
@@ -183,8 +183,8 @@ function TermsPage() {
             </li>
             <li>
               <strong>Contact Us First:</strong> You agree to contact
-              PawPrint Song directly at{" "}
-              <a href="mailto:hello@getpawprintsong.com">hello@getpawprintsong.com</a> to
+              PawPrint Song directly through our{" "}
+              <Link to="/contact">contact form</Link> to
               resolve any issues, request revisions, or seek a refund before
               initiating any dispute or chargeback with your bank or credit
               card issuer. We are committed to resolving any concerns promptly
@@ -294,8 +294,8 @@ function TermsPage() {
             FlowsCommerce Solutions, LLC<br />
             8 The Green STE D<br />
             Dover, DE 19901<br />
-            Email:{" "}
-            <a href="mailto:hello@getpawprintsong.com">hello@getpawprintsong.com</a>
+            Support:{" "}
+            <Link to="/contact">Contact form</Link>
           </p>
         </div>
       </main>

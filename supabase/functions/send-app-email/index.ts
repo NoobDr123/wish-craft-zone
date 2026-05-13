@@ -224,14 +224,14 @@ function supportReply(d: Record<string, any>) {
         <p style="font-size:12px;font-weight:500;letter-spacing:0.16em;text-transform:uppercase;color:#B5532A;margin:0 0 28px;">A reply from our team</p>
         <h1 style="font-family:'Fraunces',Georgia,serif;font-size:24px;font-weight:600;line-height:1.25;color:#1F1B16;margin:0 0 18px;">Hi ${name},</h1>
         <div style="font-size:16px;line-height:1.65;color:#1F1B16;margin:0 0 22px;">${body}</div>
-        <p style="font-size:14px;color:#5A5148;line-height:1.55;margin:0 0 8px;">Just hit reply if you need anything else — your reply lands straight in our inbox.</p>
+        <p style="font-size:14px;color:#5A5148;line-height:1.55;margin:0 0 8px;">Need anything else? Open the contact form and your message lands straight in our support inbox.</p>
         <div style="border-top:1px solid #D9CEB9;margin:24px 0 16px;"></div>
         <p style="font-size:12px;line-height:1.6;color:#5A5148;margin:0;">— The PawPrint Song team</p>
       </td></tr>
     </table>
   </td></tr></table>
 </body></html>`;
-  const text = `Hi ${name},\n\n${d.body}\n\nJust hit reply if you need anything else.\n\n— The PawPrint Song team`;
+  const text = `Hi ${name},\n\n${d.body}\n\nNeed anything else? Open the contact form and your message lands straight in our support inbox.\n\n— The PawPrint Song team`;
   return { subject, html, text };
 }
 
@@ -440,7 +440,7 @@ function orderConfirmation(d: Record<string, any>) {
         </ol>
 
         <p style="font-size:13px;color:#5A5148;line-height:1.55;margin:16px 0 0;">
-          Need to add or change something? Just reply to this email — we read every one. 30 day money back guarantee, no questions asked.
+          Need to add or change something? Use the contact form on our site — every message lands in our staff inbox. 30 day money back guarantee, no questions asked.
         </p>
         <p style="font-size:12px;line-height:1.6;color:#5A5148;margin:18px 0 0;">Sent from PawPrint Song — turning love into songs.</p>
       </td></tr>
