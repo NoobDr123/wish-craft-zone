@@ -176,6 +176,11 @@ export const Route = createFileRoute("/api/public/agentmail-webhook")({
           return new Response("DB error", { status: 500 });
         }
 
+        // Fire-and-forget AI classification of new inbound message
+        supabaseAdmin.functions
+          .invoke("classify-support-message", { body: { threadId } })
+          .catch((e) => console.error("[agentmail-webhook] classify failed", e));
+
         return new Response("ok", { status: 200 });
       },
 

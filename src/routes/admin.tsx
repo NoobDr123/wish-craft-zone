@@ -2224,20 +2224,26 @@ function SamplesPanel() {
 
 function SupportPanel() {
   const [threads, setThreads] = useState<any[]>([]);
-  const [filter, setFilter] = useState<"all" | "new" | "open" | "closed">("all");
+  const [filter, setFilter] = useState<"all" | "new" | "open" | "closed" | "spam">("all");
   const [selectedId, setSelectedId] = useState<string | null>(null);
   const [messages, setMessages] = useState<any[]>([]);
   const [reply, setReply] = useState("");
   const [sending, setSending] = useState(false);
   const [closeAfter, setCloseAfter] = useState(false);
+  const [reclassifying, setReclassifying] = useState(false);
 
   const loadThreads = async () => {
     let q = supabase
       .from("support_threads")
-      .select("id, sender_name, sender_email, subject, status, last_activity_at, order_id_text")
+      .select("id, sender_name, sender_email, subject, status, last_activity_at, order_id_text, spam_classification, spam_score, spam_reason, ai_summary, ai_suggested_reply, ai_classified_at")
       .order("last_activity_at", { ascending: false })
       .limit(200);
-    if (filter !== "all") q = q.eq("status", filter);
+    if (filter === "all") {
+      // hide spam from "all" by default
+      q = q.neq("status", "spam");
+    } else {
+      q = q.eq("status", filter);
+    }
     const { data } = await q;
     setThreads(data ?? []);
     if (!selectedId && data && data.length > 0) setSelectedId(data[0].id);
@@ -2256,6 +2262,20 @@ function SupportPanel() {
     loadThreads();
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [filter]);
+
+  // Auto-classify any threads that haven't been classified yet (backfill)
+  useEffect(() => {
+    const unclassified = threads.filter((t) => !t.ai_classified_at).slice(0, 5);
+    if (unclassified.length === 0) return;
+    Promise.all(
+      unclassified.map((t) =>
+        supabase.functions
+          .invoke("classify-support-message", { body: { threadId: t.id } })
+          .catch(() => null),
+      ),
+    ).then(() => loadThreads());
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [threads.length]);
 
   useRealtimeRefresh(["support_threads", "support_messages"], () => {
     loadThreads();
@@ -2312,7 +2332,7 @@ function SupportPanel() {
           </p>
         </div>
         <div className="flex gap-2">
-          {(["all", "new", "open", "closed"] as const).map((f) => (
+          {(["all", "new", "open", "closed", "spam"] as const).map((f) => (
             <button
               key={f}
               onClick={() => {
@@ -2357,7 +2377,13 @@ function SupportPanel() {
                   >
                     <div className="flex items-center justify-between gap-2">
                       <span className="truncate text-sm font-medium">{t.sender_name}</span>
-                      {t.status === "new" && (
+                      {t.spam_classification === "spam" && (
+                        <Badge variant="destructive" className="shrink-0 text-[10px]">spam</Badge>
+                      )}
+                      {t.spam_classification === "unsure" && (
+                        <Badge variant="outline" className="shrink-0 text-[10px] border-yellow-500/50 text-yellow-600">?</Badge>
+                      )}
+                      {t.status === "new" && t.spam_classification !== "spam" && (
                         <Badge className="shrink-0 text-[10px]">new</Badge>
                       )}
                       {t.status === "closed" && (
@@ -2367,7 +2393,7 @@ function SupportPanel() {
                       )}
                     </div>
                     <div className="mt-0.5 truncate text-xs text-muted-foreground">
-                      {t.subject}
+                      {t.ai_summary || t.subject}
                     </div>
                     <div className="mt-1 text-[11px] text-muted-foreground/70">
                       {new Date(t.last_activity_at).toLocaleString()}
@@ -2399,6 +2425,33 @@ function SupportPanel() {
                     </p>
                   </div>
                   <div className="flex shrink-0 gap-2">
+                    <Button
+                      size="sm"
+                      variant="outline"
+                      disabled={reclassifying}
+                      onClick={async () => {
+                        setReclassifying(true);
+                        try {
+                          await supabase.functions.invoke("classify-support-message", {
+                            body: { threadId: selectedId },
+                          });
+                          await loadThreads();
+                        } finally {
+                          setReclassifying(false);
+                        }
+                      }}
+                    >
+                      {reclassifying ? "AI…" : "Re-classify"}
+                    </Button>
+                    {selected.status === "spam" ? (
+                      <Button size="sm" variant="outline" onClick={() => setStatus("open")}>
+                        Not spam
+                      </Button>
+                    ) : (
+                      <Button size="sm" variant="outline" onClick={() => setStatus("spam")}>
+                        Mark spam
+                      </Button>
+                    )}
                     {selected.status !== "closed" ? (
                       <Button size="sm" variant="outline" onClick={() => setStatus("closed")}>
                         Mark closed
@@ -2410,6 +2463,23 @@ function SupportPanel() {
                     )}
                   </div>
                 </div>
+
+                {selected.ai_classified_at && (
+                  <div className={`mt-4 rounded-lg border px-3 py-2 text-xs ${
+                    selected.spam_classification === "spam"
+                      ? "border-destructive/40 bg-destructive/10 text-destructive"
+                      : selected.spam_classification === "unsure"
+                      ? "border-yellow-500/40 bg-yellow-500/10 text-yellow-700"
+                      : "border-emerald-500/40 bg-emerald-500/10 text-emerald-700"
+                  }`}>
+                    <div className="font-semibold uppercase tracking-wider text-[10px]">
+                      AI: {selected.spam_classification}
+                      {typeof selected.spam_score === "number" ? ` · ${Math.round(selected.spam_score * 100)}%` : ""}
+                    </div>
+                    {selected.spam_reason && <div className="mt-0.5">{selected.spam_reason}</div>}
+                    {selected.ai_summary && <div className="mt-0.5 italic">"{selected.ai_summary}"</div>}
+                  </div>
+                )}
               </div>
 
               <div className="flex-1 overflow-y-auto p-5 space-y-3">
@@ -2432,6 +2502,20 @@ function SupportPanel() {
               </div>
 
               <div className="border-t border-border p-4 space-y-3">
+                {selected.ai_suggested_reply && !reply && (
+                  <button
+                    type="button"
+                    onClick={() => setReply(selected.ai_suggested_reply)}
+                    className="w-full rounded-lg border border-primary/40 bg-primary/5 px-3 py-2 text-left text-xs hover:bg-primary/10 transition-colors"
+                  >
+                    <div className="font-semibold uppercase tracking-wider text-[10px] text-primary mb-1">
+                      ✨ AI suggested reply — click to use
+                    </div>
+                    <div className="text-foreground/80 line-clamp-3 whitespace-pre-wrap">
+                      {selected.ai_suggested_reply}
+                    </div>
+                  </button>
+                )}
                 <Textarea
                   rows={4}
                   placeholder={`Reply to ${selected.sender_name}…`}

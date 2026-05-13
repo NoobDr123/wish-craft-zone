@@ -82,6 +82,10 @@ serve(async (req) => {
       sendEmail("support-acknowledgment", email, {
         sender_name: name,
       }),
+      // Fire-and-forget AI spam classification (don't block response)
+      supabase.functions
+        .invoke("classify-support-message", { body: { threadId: thread.id } })
+        .catch((e) => console.error("classify failed", e)),
     ]);
 
     return json({ ok: true, threadId: thread.id });
