@@ -644,7 +644,7 @@ function CheckoutFooter({ currency }: { currency: ReturnType<typeof useBuyerCurr
           <Link to="/terms" className="hover:text-foreground hover:underline">Terms of Service</Link>
           <Link to="/privacy" className="hover:text-foreground hover:underline">Privacy Policy</Link>
           <Link to="/terms" hash="refunds" className="hover:text-foreground hover:underline">Refund Policy</Link>
-          <a href="mailto:hello@getpawprintsong.com" className="hover:text-foreground hover:underline">Contact Support</a>
+          <Link to="/contact" className="hover:text-foreground hover:underline">Contact Support</Link>
         </nav>
 
         {/* Compliance copy */}
@@ -665,10 +665,10 @@ function CheckoutFooter({ currency }: { currency: ReturnType<typeof useBuyerCurr
             PawPrint Song never stores your card details. All transactions are billed in {currency}.
           </p>
           <p>
-            Need help? Email{" "}
-            <a href="mailto:hello@getpawprintsong.com" className="underline hover:text-foreground">
-              hello@getpawprintsong.com
-            </a>{" "}
+            Need help? Use our{" "}
+            <Link to="/contact" className="underline hover:text-foreground">
+              contact form
+            </Link>{" "}
             and we'll respond within 24 hours.
           </p>
         </div>
