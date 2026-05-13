@@ -233,15 +233,19 @@ serve(async (req) => {
       customerId = customer.id;
     }
 
-    // Try to reuse existing PI if it's still mutable
+    // Try to reuse existing PI if it's still mutable AND in the same currency.
+    // Stripe doesn't allow changing PI currency on update — if buyer's locale
+    // changed, we must create a fresh PI in the new currency.
     let pi: any = null;
     if (order.stripe_payment_intent_id) {
       try {
         const existing = await stripe.paymentIntents.retrieve(order.stripe_payment_intent_id);
+        const sameCurrency = existing.currency?.toLowerCase() === currency;
         if (
-          existing.status === "requires_payment_method" ||
-          existing.status === "requires_confirmation" ||
-          existing.status === "requires_action"
+          sameCurrency &&
+          (existing.status === "requires_payment_method" ||
+            existing.status === "requires_confirmation" ||
+            existing.status === "requires_action")
         ) {
           // Update amount in case promo changed it
           if (existing.amount !== amountCents || existing.customer !== customerId) {
@@ -252,6 +256,8 @@ serve(async (req) => {
           } else {
             pi = existing;
           }
+        } else if (!sameCurrency) {
+          console.log(`[create-payment-intent] currency switched ${existing.currency} -> ${currency}, creating fresh PI`);
         }
       } catch (e: any) {
         console.warn("[create-payment-intent] could not reuse PI:", e?.message);
