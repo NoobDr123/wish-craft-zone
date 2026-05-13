@@ -5,6 +5,8 @@ import { useQuizStore } from "@/stores/quizStore";
 import { supabase } from "@/integrations/supabase/client";
 import { stripeEnvironment } from "@/lib/stripe";
 import { track } from "@/lib/tracking";
+import { useBuyerCurrency } from "@/hooks/useBuyerCurrency";
+import { formatProduct, getProductPrice } from "@/lib/currency";
 
 export const Route = createFileRoute("/upsell-2")({
   component: Upsell2,
