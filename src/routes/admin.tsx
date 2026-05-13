@@ -155,6 +155,31 @@ function StaffPage() {
     groups[item.group].push(item);
   }
 
+  // Live unread support count (new + non-spam) for sidebar badge.
+  const [supportUnread, setSupportUnread] = useState(0);
+  useEffect(() => {
+    const load = async () => {
+      const { count } = await supabase
+        .from("support_threads")
+        .select("id", { count: "exact", head: true })
+        .eq("status", "new")
+        .neq("spam_classification", "spam");
+      setSupportUnread(count ?? 0);
+    };
+    load();
+    const ch = supabase
+      .channel("admin-support-unread")
+      .on(
+        "postgres_changes",
+        { event: "*", schema: "public", table: "support_threads" },
+        () => load(),
+      )
+      .subscribe();
+    return () => {
+      supabase.removeChannel(ch);
+    };
+  }, []);
+
   return (
     <div className="min-h-screen bg-background flex">
       {/* Sidebar */}
