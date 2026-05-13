@@ -489,6 +489,7 @@ interface DashboardData {
     buyer_email: string;
     buyer_name: string | null;
     amount_paid_cents: number;
+    amount_paid_usd_cents: number | null;
     currency: string;
     payment_status: string;
     status: string;
