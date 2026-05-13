@@ -429,7 +429,7 @@ function CheckoutPage() {
                   <p className="text-muted-foreground">
                     {promoApplied.free
                       ? "Your order is free. Redirecting…"
-                      : `You saved $${(promoApplied.discount_cents / 100).toFixed(2)}.`}
+                      : `You saved ${formatMoney(promoApplied.discount_cents, currency)}.`}
                   </p>
                 </div>
                 <CheckCircle2 className="h-5 w-5 shrink-0 text-success" />
