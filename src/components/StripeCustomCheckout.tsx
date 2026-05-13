@@ -392,6 +392,7 @@ function PaymentForm({ amount, currency, email, name, country, onCountryChange, 
     e.preventDefault();
     if (!stripe || !elements) return;
     setError(null);
+    firePixelAddPaymentInfo("card");
     setSubmitting(true);
 
     if (postalRequired && !postalCode.trim()) {
