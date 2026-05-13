@@ -2862,11 +2862,22 @@ function SupportPanel() {
   const [sending, setSending] = useState(false);
   const [closeAfter, setCloseAfter] = useState(false);
   const [reclassifying, setReclassifying] = useState(false);
+  const [autoReplyOn, setAutoReplyOn] = useState(false);
+  const [linkedOrder, setLinkedOrder] = useState<any>(null);
+
+  const getAutoReplyFn = useServerFn(getSupportAutoReplyEnabled);
+  const setAutoReplyFn = useServerFn(setSupportAutoReplyEnabled);
+
+  useEffect(() => {
+    getAutoReplyFn({})
+      .then((r: any) => setAutoReplyOn(!!r?.enabled))
+      .catch(() => {});
+  }, [getAutoReplyFn]);
 
   const loadThreads = async () => {
     let q = supabase
       .from("support_threads")
-      .select("id, sender_name, sender_email, subject, status, last_activity_at, order_id_text, spam_classification, spam_score, spam_reason, ai_summary, ai_suggested_reply, ai_classified_at")
+      .select("id, sender_name, sender_email, subject, status, last_activity_at, order_id_text, spam_classification, spam_score, spam_reason, ai_summary, ai_suggested_reply, ai_classified_at, ai_category, auto_replied_at")
       .order("last_activity_at", { ascending: false })
       .limit(200);
     if (filter === "all") {
