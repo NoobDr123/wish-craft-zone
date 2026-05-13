@@ -1,4 +1,4 @@
-import { createFileRoute } from "@tanstack/react-router";
+import { createFileRoute, Link } from "@tanstack/react-router";
 import { useState } from "react";
 import { z } from "zod";
 import { SiteHeader } from "@/components/SiteHeader";
@@ -66,7 +66,7 @@ const FAQS = [
   },
   {
     q: "What if I don't love it?",
-    a: "We'll keep working with you until you do. If a revision doesn't get you there, reach out to hello@getpawprintsong.com and we'll regenerate the song or refund you — your call.",
+    a: "We'll keep working with you until you do. If a revision doesn't get you there, use the form on this page and we'll regenerate the song or refund you — your call.",
   },
   {
     q: "How does the \"Re-Found\" reaction reward work?",
@@ -86,7 +86,7 @@ const FAQS = [
   },
   {
     q: "Do you offer refunds?",
-    a: "Yes. If you're not happy after a revision, we'll refund you. Reach out within 30 days of delivery at hello@getpawprintsong.com.",
+    a: "Yes. If you're not happy after a revision, we'll refund you. Use the form on this page within 30 days of delivery.",
   },
 ];
 
@@ -130,7 +130,7 @@ function ContactPage() {
       toast.success("Message sent — we'll reply by email shortly.");
     } catch (err: any) {
       console.error("contact submit failed", err);
-      toast.error(err?.message ?? "Couldn't send. Try emailing hello@getpawprintsong.com instead.");
+      toast.error(err?.message ?? "Couldn't send. Please try again in a moment.");
     } finally {
       setSubmitting(false);
     }
@@ -170,11 +170,7 @@ function ContactPage() {
               <div className="mt-6 rounded-[14px] border border-[rgba(141,111,175,0.25)] bg-[rgba(141,111,175,0.06)] p-5 text-[14px] text-[#8D6FAF]">
                 Got it — your message is in our inbox. We'll reply to{" "}
                 <span className="font-semibold">{email}</span> within a few hours. If anything
-                urgent, you can also email us directly at{" "}
-                <a className="underline" href="mailto:hello@getpawprintsong.com">
-                  hello@getpawprintsong.com
-                </a>
-                .
+                urgent, submit another note here and it will stay attached to support.
               </div>
             ) : (
               <form onSubmit={handleSubmit} className="mt-6 space-y-4">
@@ -256,16 +252,16 @@ function ContactPage() {
           {/* Quick info card */}
           <div className="space-y-4">
             <div className="rounded-[20px] border border-[rgba(31,27,22,0.12)] bg-[#FBF6EC] p-6">
-              <h3 className="font-display text-[18px] font-semibold">Email</h3>
+              <h3 className="font-display text-[18px] font-semibold">Support inbox</h3>
               <p className="mt-1 text-[14px] text-[rgba(31,27,22,0.65)]">
-                Fastest way to reach us.
+                Fastest way to reach us. Messages submitted here go directly into our staff panel.
               </p>
-              <a
-                href="mailto:hello@getpawprintsong.com"
+              <Link
+                to="/contact"
                 className="mt-3 inline-block text-[15px] font-medium text-[#8D6FAF] hover:underline"
               >
-                hello@getpawprintsong.com
-              </a>
+                Use this form
+              </Link>
             </div>
 
             <div className="rounded-[20px] border border-[rgba(31,27,22,0.12)] bg-[#FBF6EC] p-6">
