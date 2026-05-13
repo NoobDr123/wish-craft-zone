@@ -503,7 +503,7 @@ function DashboardPanel() {
     // ---- Orders in range
     let ordersQ = supabase
       .from("orders")
-      .select("id, buyer_email, buyer_name, customer_name, amount_paid_cents, amount_cents, payment_status, status, has_3rd_verse, is_rush, has_unlimited_edits, delivery_tier, created_at")
+      .select("id, buyer_email, buyer_name, customer_name, amount_paid_cents, amount_cents, currency, payment_status, status, has_3rd_verse, is_rush, has_unlimited_edits, delivery_tier, created_at")
       .not("buyer_email", "like", "pending+%@getpawprintsong.com")
       .order("created_at", { ascending: false })
       .limit(2000);
