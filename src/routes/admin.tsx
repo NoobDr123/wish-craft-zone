@@ -435,7 +435,7 @@ interface DashboardData {
   pendingCount: number;
   failedCount: number;
   aovCents: number;
-  upsellCounts: { extra_verse: number; rush_delivery: number; unlimited_edits: number };
+  upsellCounts: { extra_verse: number; rush_24h: number; priority_90min: number; unlimited_edits: number };
   dailySales: { date: string; cents: number; orders: number }[];
   // Funnel/conversion (within selected range, production hosts only)
   uniqueVisitors: number;
