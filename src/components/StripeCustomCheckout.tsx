@@ -16,7 +16,8 @@ import type {
 import { Loader2, Lock, ShieldCheck } from "lucide-react";
 import { getStripe, stripeEnvironment } from "@/lib/stripe";
 import { supabase } from "@/integrations/supabase/client";
-import { detectCountry, SUPPORTED_COUNTRIES, isSupportedCountry } from "@/lib/currency";
+// (no currency helper imports needed here — country comes from props)
+import { COUNTRIES, findCountry, postalRequiredFor } from "@/lib/countries";
 
 interface Props {
   orderId: string;
@@ -298,9 +299,9 @@ function PaymentForm({ amount, currency, email, name, country, onCountryChange, 
   // so we can hide the "Or pay with card" divider when nothing is shown above.
   const [hasWallet, setHasWallet] = useState(false);
 
-  // Postal code is always required for our 5 supported markets.
-  const postalRequired = true;
-
+  // Postal code is required for most countries; some (Hong Kong, Ireland,
+  // UAE, etc.) don't have one — hide the field entirely there.
+  const postalRequired = postalRequiredFor(country);
   const postalLabel = country === "US" ? "ZIP code" : "Postal code";
   const postalPlaceholder = country === "US" ? "90210" : "Postal code";
 
@@ -310,10 +311,10 @@ function PaymentForm({ amount, currency, email, name, country, onCountryChange, 
       email: email?.trim() || undefined,
       address: {
         country,
-        postal_code: postalCode.trim() || undefined,
+        postal_code: postalRequired ? (postalCode.trim() || undefined) : undefined,
       },
     }),
-    [name, email, country, postalCode],
+    [name, email, country, postalCode, postalRequired],
   );
 
   const cardNumberOptions: StripeCardNumberElementOptions = useMemo(
@@ -520,25 +521,36 @@ function PaymentForm({ amount, currency, email, name, country, onCountryChange, 
         </div>
       </div>
 
-      {/* Country + Postal / ZIP. Country auto-detected from IP; collapsed to a
-          subtle "change" link for US (the vast majority of buyers) and shown
-          inline next to the postal field for everyone else. */}
+      {/* Billing country — auto-detected from IP, always visible & changeable.
+          Pricing is in local currency for the 5 supported markets, USD elsewhere. */}
       <div className="space-y-2">
-        <div className="flex items-end justify-between gap-2">
-          <label className="block text-[15px] font-semibold text-foreground">{postalLabel}</label>
-          <CountryPicker country={country} onCountryChange={onCountryChange} />
-        </div>
-        <input
-          type="text"
-          inputMode={country === "US" ? "numeric" : "text"}
-          autoComplete="postal-code"
-          value={postalCode}
-          onChange={(e) => setPostalCode(e.target.value)}
-          placeholder={postalPlaceholder}
-          maxLength={country === "US" ? 10 : 12}
-          className="w-full rounded-2xl border border-[#E5D9C8] bg-[#FBF6EC] px-4 py-[14px] text-[16px] text-foreground placeholder:text-[#A89E8F] transition-colors focus:border-primary focus:outline-none focus:ring-[3px] focus:ring-primary/15"
-        />
+        <label className="block text-[15px] font-semibold text-foreground">
+          Billing country
+        </label>
+        <CountryPicker country={country} onCountryChange={onCountryChange} />
+        {!findCountry(country)?.local && (
+          <p className="text-[12px] text-muted-foreground">
+            Charged in USD for your country.
+          </p>
+        )}
       </div>
+
+      {/* Postal / ZIP — hidden for countries that don't use postal codes. */}
+      {postalRequired && (
+        <div className="space-y-2">
+          <label className="block text-[15px] font-semibold text-foreground">{postalLabel}</label>
+          <input
+            type="text"
+            inputMode={country === "US" ? "numeric" : "text"}
+            autoComplete="postal-code"
+            value={postalCode}
+            onChange={(e) => setPostalCode(e.target.value)}
+            placeholder={postalPlaceholder}
+            maxLength={country === "US" ? 10 : 12}
+            className="w-full rounded-2xl border border-[#E5D9C8] bg-[#FBF6EC] px-4 py-[14px] text-[16px] text-foreground placeholder:text-[#A89E8F] transition-colors focus:border-primary focus:outline-none focus:ring-[3px] focus:ring-primary/15"
+          />
+        </div>
+      )}
 
       <p className="text-[12.5px] leading-snug text-muted-foreground">
         By providing your card information, you authorize PawPrint Song to charge your card for this
@@ -576,11 +588,9 @@ function PaymentForm({ amount, currency, email, name, country, onCountryChange, 
 }
 
 /**
- * Compact country picker that lives inline with the postal label.
- * Collapsed by default — shows just the current flag + country code as a
- * subtle "change" trigger. Expands into a native <select> on click. The
- * 5 currency-supported markets charge in their local currency; everything
- * else is grouped under "Other (USD)" and locks pricing to USD.
+ * Always-visible country picker — full-width native <select>. The 5
+ * currency-supported markets are pinned at the top with a "(local
+ * currency)" hint; everything else charges in USD.
  */
 function CountryPicker({
   country,
@@ -589,50 +599,48 @@ function CountryPicker({
   country: string;
   onCountryChange: (next: string) => void;
 }) {
-  const [open, setOpen] = useState(false);
-  const supported = isSupportedCountry(country);
-  const current = SUPPORTED_COUNTRIES.find((c) => c.code === country);
-  const displayLabel = supported ? current?.code ?? country : `${country} · USD`;
-  const displayFlag = current?.flag ?? "🌍";
-
-  if (!open) {
-    return (
-      <button
-        type="button"
-        onClick={() => setOpen(true)}
-        className="flex items-center gap-1 text-[12.5px] font-medium text-muted-foreground transition-colors hover:text-primary"
-        aria-label="Change billing country"
-      >
-        <span>{displayFlag}</span>
-        <span>{displayLabel}</span>
-        <span className="underline decoration-dotted underline-offset-2">change</span>
-      </button>
-    );
-  }
+  const current = findCountry(country);
+  const local = COUNTRIES.filter((c) => c.local);
+  const others = COUNTRIES.filter((c) => !c.local);
+  // If detection returned a country that's not in our list, surface it as
+  // a temporary entry so the value stays valid and the user sees their
+  // detected location immediately.
+  const detectedFallback =
+    !current && country && /^[A-Z]{2}$/.test(country)
+      ? { code: country, name: country, flag: "🌍" }
+      : null;
 
   return (
-    <select
-      autoFocus
-      value={supported ? country : "__OTHER__"}
-      onChange={(e) => {
-        const v = e.target.value;
-        if (v === "__OTHER__") {
-          // Keep detected country (or fall to "ZZ" sentinel) — pricing locks to USD.
-          onCountryChange(supported ? country : country || "ZZ");
-        } else {
-          onCountryChange(v);
-        }
-        setOpen(false);
-      }}
-      onBlur={() => setOpen(false)}
-      className="rounded-lg border border-[#E5D9C8] bg-[#FBF6EC] px-2 py-1 text-[12.5px] font-medium text-foreground focus:border-primary focus:outline-none focus:ring-2 focus:ring-primary/20"
-    >
-      {SUPPORTED_COUNTRIES.map((c) => (
-        <option key={c.code} value={c.code}>
-          {c.flag} {c.label}
-        </option>
-      ))}
-      <option value="__OTHER__">🌍 Other country (USD)</option>
-    </select>
+    <div className="relative">
+      <select
+        value={country}
+        onChange={(e) => onCountryChange(e.target.value)}
+        className="w-full appearance-none rounded-2xl border border-[#E5D9C8] bg-[#FBF6EC] px-4 py-[14px] pr-10 text-[16px] text-foreground focus:border-primary focus:outline-none focus:ring-[3px] focus:ring-primary/15"
+      >
+        {detectedFallback && (
+          <option value={detectedFallback.code}>
+            {detectedFallback.flag} {detectedFallback.name} · USD
+          </option>
+        )}
+        <optgroup label="Charged in local currency">
+          {local.map((c) => (
+            <option key={c.code} value={c.code}>
+              {c.flag} {c.name}
+            </option>
+          ))}
+        </optgroup>
+        <optgroup label="Charged in USD">
+          {others.map((c) => (
+            <option key={c.code} value={c.code}>
+              {c.flag} {c.name}
+            </option>
+          ))}
+        </optgroup>
+      </select>
+      <span className="pointer-events-none absolute right-4 top-1/2 -translate-y-1/2 text-foreground/50">
+        ▾
+      </span>
+    </div>
   );
 }
+
