@@ -152,8 +152,8 @@ function PrivacyPage() {
             Depending on where you live, you may have the right to access,
             correct, delete, or port your personal information, to opt out of
             certain processing, and to withdraw consent. To exercise any of
-            these rights email us at{" "}
-            <a href="mailto:hello@getpawprintsong.com">hello@getpawprintsong.com</a>. We
+            these rights contact us through our{" "}
+            <Link to="/contact">contact form</Link>. We
             will not discriminate against you for exercising these rights.
           </p>
 
@@ -190,8 +190,8 @@ function PrivacyPage() {
 
           <h2>13. Contact</h2>
           <p>
-            For privacy questions or to exercise your rights, email us at{" "}
-            <a href="mailto:hello@getpawprintsong.com">hello@getpawprintsong.com</a>.
+            For privacy questions or to exercise your rights, use our{" "}
+            <Link to="/contact">contact form</Link>.
           </p>
         </div>
       </main>
