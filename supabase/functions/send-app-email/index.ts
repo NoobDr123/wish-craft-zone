@@ -604,3 +604,23 @@ function json(body: unknown, status = 200) {
     headers: { ...corsHeaders, "Content-Type": "application/json" },
   });
 }
+
+// ---- tracking helpers ----
+function injectTracking(html: string, mid: string, trackBase: string): string {
+  if (!html) return html;
+  // Rewrite anchors: href="https://..." -> tracker
+  let out = html.replace(/href\s*=\s*"(https?:\/\/[^"]+)"/gi, (_m, url) => {
+    // Skip if it's already a tracker URL or unsubscribe / mailto
+    if (url.startsWith(trackBase) || /\/unsubscribe/i.test(url)) return `href="${url}"`;
+    const tracked = `${trackBase}?mid=${encodeURIComponent(mid)}&e=click&u=${encodeURIComponent(url)}`;
+    return `href="${tracked}"`;
+  });
+  // Inject 1x1 open pixel before </body>, or append at end
+  const pixel = `<img src="${trackBase}?mid=${encodeURIComponent(mid)}&e=open" width="1" height="1" alt="" style="display:none;border:0;outline:none;text-decoration:none;" />`;
+  if (/<\/body>/i.test(out)) {
+    out = out.replace(/<\/body>/i, `${pixel}</body>`);
+  } else {
+    out = out + pixel;
+  }
+  return out;
+}
