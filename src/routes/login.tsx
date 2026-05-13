@@ -139,13 +139,13 @@ function LoginPage() {
                     <p className="mt-1 text-xs leading-relaxed text-muted-foreground">
                       We have a 100% song delivery rate. If you can't find your
                       song, it's usually a typo in your email or a spam filter.
-                      Email us at{" "}
-                      <a
-                        href="mailto:hello@getpawprintsong.com"
+                      Message us through the{" "}
+                      <Link
+                        to="/contact"
                         className="font-semibold text-primary underline-offset-4 hover:underline"
                       >
-                        hello@getpawprintsong.com
-                      </a>{" "}
+                        contact form
+                      </Link>{" "}
                       and we'll resend your song. We reply within 1–3 days.
                     </p>
                   </div>
@@ -214,21 +214,21 @@ function LoginPage() {
                 </h2>
                 <p className="mt-1 text-sm leading-relaxed text-muted-foreground">
                   If you're having trouble finding your order or have any
-                  questions, email us at{" "}
-                  <a
-                    href="mailto:hello@getpawprintsong.com"
+                  questions, message us through the{" "}
+                  <Link
+                    to="/contact"
                     className="font-semibold text-primary underline-offset-4 hover:underline"
                   >
-                    hello@getpawprintsong.com
-                  </a>
+                    contact form
+                  </Link>
                   . We reply within 1–3 days.
                 </p>
-                <a
-                  href="mailto:hello@getpawprintsong.com"
+                <Link
+                  to="/contact"
                   className="mt-4 inline-flex items-center justify-center rounded-xl border border-primary/30 bg-background px-5 py-2.5 text-sm font-semibold text-primary transition-colors hover:bg-primary/5"
                 >
                   Contact us
-                </a>
+                </Link>
               </div>
             </div>
           </div>
