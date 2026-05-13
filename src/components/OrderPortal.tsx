@@ -196,7 +196,7 @@ export function OrderPortal({ orderId, userId }: { orderId: string; userId: stri
                 Gift
               </Badge>
             )}
-            {order.source_kind === "free_reward" && (
+            {order.source_reward_code_id && (
               <Badge className="bg-[#8D6FAF] text-[#FFF7EE]">Free song reward</Badge>
             )}
           </div>
