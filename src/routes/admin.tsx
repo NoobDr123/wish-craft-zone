@@ -704,7 +704,10 @@ function DashboardPanel() {
           <h1 className="font-display text-3xl font-semibold">Dashboard</h1>
           <p className="text-sm text-muted-foreground">Revenue, conversion, customers, and live activity. All times in Eastern Time (EST/EDT).</p>
         </div>
-        <RangeSelector value={range} onChange={setRange} />
+        <div className="flex items-center gap-2">
+          <BackfillUsdButton onDone={() => load()} />
+          <RangeSelector value={range} onChange={setRange} />
+        </div>
       </div>
 
       {/* Live + headline KPIs */}
