@@ -1,6 +1,7 @@
 import { serve } from "https://deno.land/std@0.168.0/http/server.ts";
 import { createClient } from "npm:@supabase/supabase-js@2";
 import { corsHeaders, createStripeClient, type StripeEnv } from "../_shared/stripe.ts";
+import { getProductPrice, normalizeCurrency } from "../_shared/pricing.ts";
 
 const supabase = createClient(
   Deno.env.get("SUPABASE_URL")!,
@@ -10,17 +11,18 @@ const supabase = createClient(
 // Upsell catalog. Server is the source of truth — never trust client amounts.
 // `tier` (when present) upgrades the order's delivery_tier. priority_90min
 // beats rush_24h beats standard; we never downgrade.
-const UPSELL_PRICES: Record<
+// Amounts are looked up from _shared/pricing.ts in the order's currency.
+const UPSELL_META: Record<
   string,
-  { amount: number; flagColumn: string | null; tier?: "rush_24h" | "priority_90min" }
+  { priceKey: "extra_verse" | "rush_delivery" | "express_90min" | "unlimited_edits"; flagColumn: string | null; tier?: "rush_24h" | "priority_90min" }
 > = {
-  extra_verse: { amount: 1999, flagColumn: "has_3rd_verse" },
+  extra_verse: { priceKey: "extra_verse", flagColumn: "has_3rd_verse" },
   // 24-hour rush downsell — promised 24h, actually delivered ~12h.
-  rush_delivery: { amount: 3999, flagColumn: "is_rush", tier: "rush_24h" },
-  unlimited_edits: { amount: 3299, flagColumn: "has_unlimited_edits" },
+  rush_delivery: { priceKey: "rush_delivery", flagColumn: "is_rush", tier: "rush_24h" },
+  unlimited_edits: { priceKey: "unlimited_edits", flagColumn: "has_unlimited_edits" },
   // Top-priority 90-minute express delivery — front of the entire queue.
   // Promised 90min, actually delivered ~60min.
-  express_90min: { amount: 5999, flagColumn: "is_rush", tier: "priority_90min" },
+  express_90min: { priceKey: "express_90min", flagColumn: "is_rush", tier: "priority_90min" },
 };
 
 const TIER_RANK: Record<string, number> = {
