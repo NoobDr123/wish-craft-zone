@@ -38,7 +38,7 @@ serve(async (req) => {
     const { orderId, upsellType, environment, sessionId } = await req.json();
     if (!orderId || !upsellType) return json({ success: false, reason: "missing_params" }, 400);
 
-    const upsell = UPSELL_PRICES[upsellType];
+    const upsell = UPSELL_META[upsellType];
     if (!upsell) return json({ success: false, reason: "unknown_upsell" }, 400);
 
     // ---- AuthZ: prove caller owns this order ----
