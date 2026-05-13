@@ -70,7 +70,7 @@ export function Rush24Downsell({
             className="font-display text-xl font-semibold leading-tight text-foreground sm:text-2xl"
           >
             Get the song in 24 hours for{" "}
-            <span className="text-primary">$39.99</span>
+            <span className="text-primary">{priceLabel}</span>
           </h2>
 
           <p className="mt-2.5 text-sm leading-relaxed text-muted-foreground">
