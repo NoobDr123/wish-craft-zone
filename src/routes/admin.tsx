@@ -40,6 +40,10 @@ import { supabase } from "@/integrations/supabase/client";
 import { useRealtimeRefresh } from "@/hooks/useRealtimeRefresh";
 import { useServerFn } from "@tanstack/react-start";
 import { replySupportMessage } from "@/lib/support.functions";
+import {
+  getSupportAutoReplyEnabled,
+  setSupportAutoReplyEnabled,
+} from "@/lib/support-settings.functions";
 
 // Hosts that count as "real" production traffic for admin analytics.
 // Sessions from preview/lovable.app domains are excluded so the admin
