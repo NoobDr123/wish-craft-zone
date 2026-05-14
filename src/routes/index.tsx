@@ -242,7 +242,7 @@ const fallbackSamples: Array<{
     for_text: "Written for Max, 12 years. Yellow Lab.",
     genre_label: "Acoustic Singer-Songwriter · Female Voice",
     cover_image_url: whoCaregiver,
-    audio_url: RACHEL_SONG_URL,
+    audio_url: "https://musicfile.kie.ai/N2ZjYjY4NDctYjhlNC00MGU4LWEzNTQtYzVmMTk3YTQ2MzFi",
   },
   {
     title: "Still on the Couch",
