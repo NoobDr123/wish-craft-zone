@@ -110,7 +110,7 @@ serve(async (req) => {
     }
 
     // Insert the play event
-    const { error: insertErr } = await supabase
+    const { data: inserted, error: insertErr } = await supabase
       .from("play_events")
       .insert({
         order_id: orderId,
@@ -119,9 +119,11 @@ serve(async (req) => {
         user_agent: userAgent,
         ip_hash: ipHash,
         source,
-      });
+      })
+      .select("id")
+      .single();
 
-    if (insertErr) {
+    if (insertErr || !inserted) {
       console.error("play_events insert failed:", insertErr);
       return json({ error: "Failed to record play" }, 500);
     }
@@ -141,7 +143,7 @@ serve(async (req) => {
       );
     }
 
-    return json({ ok: true, playCount });
+    return json({ ok: true, playCount, playEventId: inserted.id });
   } catch (e: any) {
     console.error("record-play error:", e);
     return json({ error: e.message ?? "Internal error" }, 500);
