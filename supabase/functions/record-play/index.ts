@@ -47,11 +47,30 @@ serve(async (req) => {
     const orderId = typeof body.orderId === "string" ? body.orderId : null;
     const variantId = typeof body.variantId === "string" ? body.variantId : null;
     const durationMs = typeof body.durationMs === "number" ? body.durationMs : null;
+    const playEventId = typeof body.playEventId === "number" ? body.playEventId : null;
     const source = typeof body.source === "string" ? body.source.slice(0, 50) : "listen_page";
     const kind = body.kind === "view" || body.kind === "share" || body.kind === "download" ? body.kind : "play";
 
     if (!orderId || !/^[0-9a-f-]{36}$/i.test(orderId)) {
       return json({ error: "Invalid orderId" }, 400);
+    }
+
+    // Duration update for an existing play row (sent on pause / ended / pagehide).
+    if (kind === "play" && playEventId !== null) {
+      if (durationMs === null || durationMs < 0) {
+        return json({ error: "Invalid durationMs" }, 400);
+      }
+      // Only ever grow the duration — late beacons can't shrink it.
+      const { data: existing } = await supabase
+        .from("play_events")
+        .select("id, order_id, duration_ms")
+        .eq("id", playEventId)
+        .eq("order_id", orderId)
+        .maybeSingle();
+      if (!existing) return json({ error: "play event not found" }, 404);
+      const newDur = Math.max(existing.duration_ms ?? 0, Math.floor(durationMs));
+      await supabase.from("play_events").update({ duration_ms: newDur }).eq("id", playEventId);
+      return json({ ok: true, playEventId, durationMs: newDur });
     }
 
     const userAgent = req.headers.get("user-agent")?.slice(0, 500) ?? null;
