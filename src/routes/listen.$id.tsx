@@ -210,7 +210,10 @@ function ListenPage() {
           )}
         </div>
 
-        <p className="mt-12 text-center text-xs text-muted-foreground">
+        <p className="mt-12 text-center font-display text-base italic text-muted-foreground">
+          Forever in our hearts, {order.dog_name ?? "sweet friend"}.
+        </p>
+        <p className="mt-3 text-center text-xs text-muted-foreground">
           Made with love via{" "}
           <Link to="/" className="font-medium text-foreground underline">
             PawPrint Song
