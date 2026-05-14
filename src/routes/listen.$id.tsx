@@ -162,19 +162,24 @@ function ListenPage() {
         <div className="text-center">
           <RibbonMark className="mx-auto h-12 w-12 text-primary" />
           <p className="mt-4 text-sm font-medium uppercase tracking-[0.2em] text-muted-foreground">
-            A song for {order.recipient_name}
+            A song for
           </p>
-          <h1 className="mt-4 font-display text-5xl font-semibold leading-tight text-foreground md:text-6xl">
-            {title ?? "From someone who loves you."}
+          <h1 className="mt-3 font-display text-5xl font-semibold leading-tight text-foreground md:text-6xl">
+            {order.dog_name ?? "your beloved dog"}
           </h1>
+          {title && (
+            <p className="mt-4 font-display text-xl italic text-muted-foreground md:text-2xl">
+              "{title}"
+            </p>
+          )}
         </div>
 
         <div className="mt-10">
           {variant?.audio_url ? (
             <AudioPlayer
               variant="full"
-              title={title ?? `A Song for ${order.recipient_name}`}
-              artist={`${order.genre ?? "Acoustic"} · ${order.tempo ?? "Mid-tempo"}`}
+              title={title ?? `A Song for ${order.dog_name ?? "you"}`}
+              artist={`${order.genre ?? "Acoustic"} · ${(order as any).voice ?? "Vocal"}`}
               src={variant.audio_url}
               lyrics={lyrics}
               onFirstPlay={handleFirstPlay}
