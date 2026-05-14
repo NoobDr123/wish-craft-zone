@@ -46,50 +46,62 @@ serve(async (req) => {
     // Load thread
     const { data: thread, error: threadErr } = await supabase
       .from("support_threads")
-      .select("id, sender_name, sender_email, subject, status")
+      .select("id, sender_name, sender_email, subject, status, agentmail_inbox_id")
       .eq("id", threadId)
       .maybeSingle();
     if (threadErr || !thread) return json({ error: "Thread not found" }, 404);
 
-    // Insert outbound message (trigger will bump activity + flip status to open)
+    const apiKey = Deno.env.get("AGENTMAIL_API_KEY");
+    if (!apiKey) return json({ error: "AgentMail not configured" }, 500);
+
+    const inboxId = thread.agentmail_inbox_id || "hello@getpawprintsong.com";
+    const { data: lastInbound } = await supabase
+      .from("support_messages")
+      .select("agentmail_message_id")
+      .eq("thread_id", thread.id)
+      .eq("direction", "inbound")
+      .not("agentmail_message_id", "is", null)
+      .order("created_at", { ascending: false })
+      .limit(1)
+      .maybeSingle();
+
+    const endpoint = lastInbound?.agentmail_message_id
+      ? `https://api.agentmail.to/v0/inboxes/${encodeURIComponent(inboxId)}/messages/${encodeURIComponent(lastInbound.agentmail_message_id)}/reply`
+      : `https://api.agentmail.to/v0/inboxes/${encodeURIComponent(inboxId)}/messages/send`;
+    const payload = lastInbound?.agentmail_message_id
+      ? { text }
+      : { to: [thread.sender_email], subject: thread.subject?.startsWith("Re:") ? thread.subject : `Re: ${thread.subject || "your message"}`, text };
+
+    const amRes = await fetch(endpoint, {
+      method: "POST",
+      headers: { Authorization: `Bearer ${apiKey}`, "Content-Type": "application/json" },
+      body: JSON.stringify(payload),
+    });
+    if (!amRes.ok) {
+      const errBody = await amRes.text().catch(() => "");
+      console.error("AgentMail reply failed", amRes.status, errBody);
+      return json({ error: `AgentMail reply failed: ${amRes.status}` }, 502);
+    }
+
+    const sent = await amRes.json().catch(() => ({}));
     const { error: msgErr } = await supabase.from("support_messages").insert({
       thread_id: thread.id,
       direction: "outbound",
       author_user_id: user.id,
       body: text,
+      agentmail_message_id: sent?.message_id ?? null,
     });
     if (msgErr) {
       console.error("insert outbound failed", msgErr);
       return json({ error: msgErr.message }, 500);
     }
 
-    // Optional: close after reply
-    if (closeThread) {
-      await supabase
-        .from("support_threads")
-        .update({ status: "closed" })
-        .eq("id", thread.id);
-    }
+    await supabase
+      .from("support_threads")
+      .update({ status: closeThread ? "closed" : "open", last_activity_at: new Date().toISOString(), agentmail_inbox_id: inboxId })
+      .eq("id", thread.id);
 
-    // Send reply email to customer
-    try {
-      await supabase.functions.invoke("send-app-email", {
-        body: {
-          template: "support-reply",
-          to: thread.sender_email,
-          data: {
-            sender_name: thread.sender_name,
-            original_subject: thread.subject,
-            body: text,
-          },
-          idempotencyKey: `support-reply:${thread.id}:${Date.now()}`,
-        },
-      });
-    } catch (e) {
-      console.error("reply email failed", e);
-    }
-
-    return json({ ok: true });
+    return json({ ok: true, messageId: sent?.message_id ?? null, from: inboxId });
   } catch (e: any) {
     console.error("reply-support-message error", e);
     return json({ error: e.message }, 500);
