@@ -43,9 +43,7 @@ export const replySupportMessage = createServerFn({ method: "POST" })
     if (threadErr || !thread) {
       throw new Response("Thread not found", { status: 404 });
     }
-    if (!thread.agentmail_inbox_id) {
-      throw new Response("Thread has no AgentMail inbox", { status: 400 });
-    }
+    const inboxId = thread.agentmail_inbox_id || "hello@getpawprintsong.com";
 
     const { data: lastInbound } = await supabaseAdmin
       .from("support_messages")
@@ -57,7 +55,6 @@ export const replySupportMessage = createServerFn({ method: "POST" })
       .limit(1)
       .maybeSingle();
 
-    const inboxId = thread.agentmail_inbox_id;
     let amResponse: Response;
 
     if (lastInbound?.agentmail_message_id) {

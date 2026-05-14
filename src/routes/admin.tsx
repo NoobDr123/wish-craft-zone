@@ -39,7 +39,6 @@ import { WebhookDebugPanel } from "@/components/admin/WebhookDebugPanel";
 import { supabase } from "@/integrations/supabase/client";
 import { useRealtimeRefresh } from "@/hooks/useRealtimeRefresh";
 import { useServerFn } from "@tanstack/react-start";
-import { replySupportMessage } from "@/lib/support.functions";
 import {
   getSupportAutoReplyEnabled,
   setSupportAutoReplyEnabled,
@@ -2860,6 +2859,7 @@ function SupportPanel() {
   const [reclassifying, setReclassifying] = useState(false);
   const [autoReplyOn, setAutoReplyOn] = useState(false);
   const [linkedOrder, setLinkedOrder] = useState<any>(null);
+  const SUPPORT_FROM = "hello@getpawprintsong.com";
 
   const getAutoReplyFn = useServerFn(getSupportAutoReplyEnabled);
   const setAutoReplyFn = useServerFn(setSupportAutoReplyEnabled);
@@ -3050,15 +3050,14 @@ function SupportPanel() {
       .then(({ data }) => setLinkedOrder(data));
   }, [selected?.order_id_text]);
 
-  const replyFn = useServerFn(replySupportMessage);
-
   const sendReply = async () => {
     if (!selectedId || !reply.trim() || sending) return;
     setSending(true);
     try {
-      await replyFn({
-        data: { threadId: selectedId, body: reply.trim(), closeThread: closeAfter },
+      const { error } = await supabase.functions.invoke("reply-support-message", {
+        body: { threadId: selectedId, body: reply.trim(), closeThread: closeAfter },
       });
+      if (error) throw error;
       setReply("");
       setCloseAfter(false);
       await loadMessages(selectedId);
@@ -3085,7 +3084,7 @@ function SupportPanel() {
         <div>
           <h1 className="font-display text-3xl font-semibold">Support inbox</h1>
           <p className="mt-1 text-sm text-muted-foreground">
-            Messages from the contact form. Replies email the customer directly.
+            Messages from the contact form. Replies send from {SUPPORT_FROM}.
           </p>
           <label className="mt-2 inline-flex items-center gap-2 text-xs text-muted-foreground cursor-pointer">
             <input
@@ -3373,7 +3372,7 @@ function SupportPanel() {
                   )}
                   <Textarea
                     rows={4}
-                    placeholder={`Reply to ${selected.sender_name}…`}
+                    placeholder={`Reply from ${SUPPORT_FROM} to ${selected.sender_name}…`}
                     value={reply}
                     onChange={(e) => setReply(e.target.value)}
                     maxLength={10000}
