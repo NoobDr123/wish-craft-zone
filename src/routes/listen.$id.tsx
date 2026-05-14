@@ -61,6 +61,8 @@ function ListenPage() {
   const [variant, setVariant] = useState<any>(null);
   const playRecorded = useRef(false);
   const viewRecorded = useRef(false);
+  const playEventIdRef = useRef<number | null>(null);
+  const pendingFirstPlayRef = useRef<Promise<void> | null>(null);
 
   useEffect(() => {
     const variants = (order.audio_variants as any[]) ?? [];
@@ -101,7 +103,7 @@ function ListenPage() {
   const handleFirstPlay = () => {
     if (playRecorded.current) return;
     playRecorded.current = true;
-    void supabase.functions
+    pendingFirstPlayRef.current = supabase.functions
       .invoke("record-play", {
         body: {
           orderId: order.id,
@@ -109,9 +111,49 @@ function ListenPage() {
           source: "listen_page",
         },
       })
+      .then(({ data }) => {
+        const id = (data as any)?.playEventId;
+        if (typeof id === "number") playEventIdRef.current = id;
+      })
       .catch(() => {
         // Silent — chargeback evidence is best-effort; never block playback.
       });
+  };
+
+  // Push cumulative listened-ms back to the same play_events row. Heartbeats
+  // every ~10s while playing + a final flush on pause/ended/pagehide.
+  const handleListenUpdate = (totalMs: number, opts: { final: boolean }) => {
+    const send = () => {
+      const id = playEventIdRef.current;
+      if (!id) return;
+      // Try sendBeacon on final flush (survives page unload), else regular fetch.
+      const body = JSON.stringify({
+        orderId: order.id,
+        playEventId: id,
+        durationMs: totalMs,
+      });
+      if (opts.final && typeof navigator !== "undefined" && navigator.sendBeacon) {
+        const url = `${import.meta.env.VITE_SUPABASE_URL}/functions/v1/record-play`;
+        const blob = new Blob([body], { type: "application/json" });
+        try {
+          navigator.sendBeacon(url, blob);
+          return;
+        } catch {
+          /* fall through to invoke */
+        }
+      }
+      void supabase.functions
+        .invoke("record-play", {
+          body: { orderId: order.id, playEventId: id, durationMs: totalMs },
+        })
+        .catch(() => {});
+    };
+    // If first-play insert is still in flight, wait for the id then send.
+    if (!playEventIdRef.current && pendingFirstPlayRef.current) {
+      pendingFirstPlayRef.current.then(send).catch(() => {});
+    } else {
+      send();
+    }
   };
 
   return (
@@ -136,6 +178,7 @@ function ListenPage() {
               src={variant.audio_url}
               lyrics={lyrics}
               onFirstPlay={handleFirstPlay}
+              onListenUpdate={handleListenUpdate}
             />
           ) : (
             <p className="text-center text-muted-foreground">
