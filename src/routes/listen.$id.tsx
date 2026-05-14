@@ -159,20 +159,38 @@ function ListenPage() {
   return (
     <div className="min-h-screen bg-gradient-warm">
       <main className="mx-auto max-w-2xl px-6 py-20">
-        <div className="text-center">
-          <RibbonMark className="mx-auto h-12 w-12 text-primary" />
-          <p className="mt-4 text-sm font-medium uppercase tracking-[0.2em] text-muted-foreground">
-            A song for
-          </p>
-          <h1 className="mt-3 font-display text-5xl font-semibold leading-tight text-foreground md:text-6xl">
-            {order.dog_name ?? "your beloved dog"}
-          </h1>
-          {title && (
-            <p className="mt-4 font-display text-xl italic text-muted-foreground md:text-2xl">
-              "{title}"
-            </p>
-          )}
-        </div>
+        {(() => {
+          const name = order.dog_name ?? "your beloved dog";
+          const gender = (order.dog_gender ?? "").toLowerCase();
+          const pronoun = gender === "female" ? "her" : gender === "male" ? "him" : "them";
+          const breed = order.dog_breed?.trim();
+          const tone = (order.brief as any)?.emotional_tone;
+          const meta = [breed, order.genre].filter(Boolean).join(" · ");
+          return (
+            <div className="text-center">
+              <RibbonMark className="mx-auto h-12 w-12 text-primary" />
+              <p className="mt-4 text-sm font-medium uppercase tracking-[0.2em] text-muted-foreground">
+                A song for {pronoun}
+              </p>
+              <h1 className="mt-3 font-display text-5xl font-semibold leading-tight text-foreground md:text-6xl">
+                {name}
+              </h1>
+              {meta && (
+                <p className="mt-3 text-sm text-muted-foreground">{meta}</p>
+              )}
+              {title && (
+                <p className="mt-5 font-display text-xl italic text-muted-foreground md:text-2xl">
+                  "{title}"
+                </p>
+              )}
+              {tone && (
+                <p className="mt-2 text-xs uppercase tracking-[0.18em] text-muted-foreground/70">
+                  {tone}
+                </p>
+              )}
+            </div>
+          );
+        })()}
 
         <div className="mt-10">
           {variant?.audio_url ? (
