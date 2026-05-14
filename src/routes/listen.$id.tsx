@@ -9,24 +9,24 @@ import { supabase } from "@/integrations/supabase/client";
 
 export const Route = createFileRoute("/listen/$id")({
   component: ListenPage,
-  head: ({ loaderData }: any) => ({
-    meta: [
-      {
-        title: loaderData?.title
-          ? `${loaderData.title} · A song for you · PawPrint Song`
-          : "A song for you · PawPrint Song",
-      },
-      {
-        name: "description",
-        content: "A personal song crafted with love, just for you.",
-      },
-      { property: "og:title", content: loaderData?.title ?? "A song for you" },
-      {
-        property: "og:description",
-        content: "A personal song crafted with love.",
-      },
-    ],
-  }),
+  head: ({ loaderData }: any) => {
+    const dog = loaderData?.order?.dog_name;
+    const songTitle = loaderData?.title;
+    const pageTitle = dog
+      ? `A song for ${dog}${songTitle ? ` — "${songTitle}"` : ""} · PawPrint Song`
+      : "A song for you · PawPrint Song";
+    const desc = dog
+      ? `A personal tribute song for ${dog}, crafted with love.`
+      : "A personal song crafted with love, just for you.";
+    return {
+      meta: [
+        { title: pageTitle },
+        { name: "description", content: desc },
+        { property: "og:title", content: dog ? `A song for ${dog}` : "A song for you" },
+        { property: "og:description", content: desc },
+      ],
+    };
+  },
   loader: async ({ params }) => {
     // Reads through a safe public RPC — no buyer email, no Stripe IDs,
     // no personal notes are exposed publicly, and no login is required.
@@ -162,19 +162,24 @@ function ListenPage() {
         <div className="text-center">
           <RibbonMark className="mx-auto h-12 w-12 text-primary" />
           <p className="mt-4 text-sm font-medium uppercase tracking-[0.2em] text-muted-foreground">
-            A song for {order.recipient_name}
+            A song for
           </p>
-          <h1 className="mt-4 font-display text-5xl font-semibold leading-tight text-foreground md:text-6xl">
-            {title ?? "From someone who loves you."}
+          <h1 className="mt-3 font-display text-5xl font-semibold leading-tight text-foreground md:text-6xl">
+            {order.dog_name ?? "your beloved dog"}
           </h1>
+          {title && (
+            <p className="mt-4 font-display text-xl italic text-muted-foreground md:text-2xl">
+              "{title}"
+            </p>
+          )}
         </div>
 
         <div className="mt-10">
           {variant?.audio_url ? (
             <AudioPlayer
               variant="full"
-              title={title ?? `A Song for ${order.recipient_name}`}
-              artist={`${order.genre ?? "Acoustic"} · ${order.tempo ?? "Mid-tempo"}`}
+              title={title ?? `A Song for ${order.dog_name ?? "you"}`}
+              artist={`${order.genre ?? "Acoustic"} · ${(order as any).voice ?? "Vocal"}`}
               src={variant.audio_url}
               lyrics={lyrics}
               onFirstPlay={handleFirstPlay}
