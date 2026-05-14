@@ -39,7 +39,6 @@ import { WebhookDebugPanel } from "@/components/admin/WebhookDebugPanel";
 import { supabase } from "@/integrations/supabase/client";
 import { useRealtimeRefresh } from "@/hooks/useRealtimeRefresh";
 import { useServerFn } from "@tanstack/react-start";
-import { replySupportMessage } from "@/lib/support.functions";
 import {
   getSupportAutoReplyEnabled,
   setSupportAutoReplyEnabled,
@@ -3051,15 +3050,14 @@ function SupportPanel() {
       .then(({ data }) => setLinkedOrder(data));
   }, [selected?.order_id_text]);
 
-  const replyFn = useServerFn(replySupportMessage);
-
   const sendReply = async () => {
     if (!selectedId || !reply.trim() || sending) return;
     setSending(true);
     try {
-      await replyFn({
-        data: { threadId: selectedId, body: reply.trim(), closeThread: closeAfter },
+      const { error } = await supabase.functions.invoke("reply-support-message", {
+        body: { threadId: selectedId, body: reply.trim(), closeThread: closeAfter },
       });
+      if (error) throw error;
       setReply("");
       setCloseAfter(false);
       await loadMessages(selectedId);
