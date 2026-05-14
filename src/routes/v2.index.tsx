@@ -268,7 +268,7 @@ const fallbackSamples: Array<{
     for_text: "Written for Charlie, 8 years. Border Collie.",
     genre_label: "Acoustic · Male Voice",
     cover_image_url: whoMemory,
-    audio_url: RACHEL_SONG_URL,
+    audio_url: "https://musicfile.kie.ai/MDA2OWIzMWQtMjhkOS00ZWMwLWExOWMtMGUwZGU2MzBkY2Zj",
   },
   {
     title: "The Front Door",
