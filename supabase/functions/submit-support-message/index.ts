@@ -39,7 +39,10 @@ serve(async (req) => {
       message.split("\n")[0].slice(0, 80) ||
       "Support message";
 
-    // Create thread
+    // Create thread — attach the AgentMail support inbox so admin replies
+    // (replySupportMessage) can send via AgentMail and Susan's reply lands
+    // back in our webhook → support_threads.
+    const SUPPORT_INBOX_ID = "hello@getpawprintsong.com";
     const { data: thread, error: threadErr } = await supabase
       .from("support_threads")
       .insert({
@@ -48,6 +51,7 @@ serve(async (req) => {
         order_id_text: orderId,
         subject,
         status: "new",
+        agentmail_inbox_id: SUPPORT_INBOX_ID,
       })
       .select("id")
       .single();
