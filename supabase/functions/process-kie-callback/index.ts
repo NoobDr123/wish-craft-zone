@@ -126,7 +126,11 @@ serve(async (req) => {
       priority_90min: 1,
     };
     const tier = (order.delivery_tier as string) || (order.is_rush ? "rush_24h" : "standard");
-    const delayHours = tierDelayHours[tier] ?? 72;
+    // Regeneration override: if this callback is for a re-generated song
+    // (regeneration_used_at set, or order was already delivered once),
+    // hold delivery for 3 hours so it doesn't feel instant to the customer.
+    const isRegeneration = !!order.regeneration_used_at || !!order.delivered_at;
+    const delayHours = isRegeneration ? 3 : (tierDelayHours[tier] ?? 72);
     const scheduled = new Date(now.getTime() + delayHours * 60 * 60 * 1000);
 
     const slug = order.share_page_slug ?? finalOrderId;
