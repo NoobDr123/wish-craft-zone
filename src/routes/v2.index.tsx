@@ -242,7 +242,7 @@ const fallbackSamples: Array<{
     for_text: "Written for Max, 12 years. Yellow Lab.",
     genre_label: "Acoustic Singer-Songwriter · Female Voice",
     cover_image_url: whoCaregiver,
-    audio_url: RACHEL_SONG_URL,
+    audio_url: "https://musicfile.kie.ai/N2ZjYjY4NDctYjhlNC00MGU4LWEzNTQtYzVmMTk3YTQ2MzFi",
   },
   {
     title: "Still on the Couch",
@@ -251,7 +251,7 @@ const fallbackSamples: Array<{
     for_text: "Written for Bella, 9 years. Goldendoodle.",
     genre_label: "Soft Folk · Male Voice",
     cover_image_url: whoNewlyDiagnosed,
-    audio_url: RACHEL_SONG_URL,
+    audio_url: "https://musicfile.kie.ai/MzhiMGI2Y2UtZTc0Yy00YjY3LTgyZTUtYzlkN2MyOGI3OWIy",
   },
   {
     title: "Good Girl, Always",
@@ -259,7 +259,7 @@ const fallbackSamples: Array<{
     for_text: "Written for Ruby, 15 years. German Shepherd.",
     genre_label: "Country · Female Voice",
     cover_image_url: whoSurvivor,
-    audio_url: RACHEL_SONG_URL,
+    audio_url: "https://musicfile.kie.ai/M2Y0YjA2ZmUtYWE3ZS00MjVjLTlmZGQtZmJjYTAxYjAzNGQ1",
   },
   {
     title: "My Shadow",
@@ -268,7 +268,7 @@ const fallbackSamples: Array<{
     for_text: "Written for Charlie, 8 years. Border Collie.",
     genre_label: "Acoustic · Male Voice",
     cover_image_url: whoMemory,
-    audio_url: RACHEL_SONG_URL,
+    audio_url: "https://musicfile.kie.ai/MDA2OWIzMWQtMjhkOS00ZWMwLWExOWMtMGUwZGU2MzBkY2Zj",
   },
   {
     title: "The Front Door",
@@ -276,7 +276,7 @@ const fallbackSamples: Array<{
     for_text: "Written for Buddy, 13 years. Beagle.",
     genre_label: "Cinematic · Strings",
     cover_image_url: whoChild,
-    audio_url: RACHEL_SONG_URL,
+    audio_url: "https://musicfile.kie.ai/NGJjZDU4ZjYtNWZkNC00YmI5LThmMGItNTNmMmZjYjYyNjQ3",
   },
   {
     title: "Where the Sunbeam Was",
@@ -285,7 +285,7 @@ const fallbackSamples: Array<{
     for_text: "Written for Rocky, 14 years. Mixed breed rescue.",
     genre_label: "Lullaby · Piano",
     cover_image_url: whoInTreatment,
-    audio_url: RACHEL_SONG_URL,
+    audio_url: "https://musicfile.kie.ai/MTcwMGIxNDEtN2I2ZC00NWJjLWEyZWItZGY1NjA2YTNkNWVj",
   },
 ];
 
