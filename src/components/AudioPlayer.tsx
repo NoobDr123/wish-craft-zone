@@ -8,6 +8,9 @@ interface AudioPlayerProps {
   variant?: "compact" | "full";
   lyrics?: string;
   onFirstPlay?: () => void;
+  /** Called with cumulative ms of actual playback whenever the user pauses,
+   *  the song ends, or the page is hidden/unloaded. Best-effort. */
+  onListenUpdate?: (totalMs: number, opts: { final: boolean }) => void;
 }
 
 function formatTime(time: number) {
@@ -24,6 +27,7 @@ export function AudioPlayer({
   variant = "compact",
   lyrics,
   onFirstPlay,
+  onListenUpdate,
 }: AudioPlayerProps) {
   const audioRef = useRef<HTMLAudioElement | null>(null);
   const [isPlaying, setIsPlaying] = useState(false);
@@ -31,20 +35,71 @@ export function AudioPlayer({
   const [duration, setDuration] = useState(0);
   const firstPlayFiredRef = useRef(false);
 
+  // Listen-time accounting: accumulate actual playback ms across play/pause
+  // sessions. We close the open session on pause / ended / pagehide and
+  // forward the running total to the parent.
+  const sessionStartRef = useRef<number | null>(null);
+  const accumulatedMsRef = useRef(0);
+  const lastReportedMsRef = useRef(0);
+
+  const closeSession = (final: boolean) => {
+    if (sessionStartRef.current !== null) {
+      accumulatedMsRef.current += Date.now() - sessionStartRef.current;
+      sessionStartRef.current = null;
+    }
+    const total = Math.floor(accumulatedMsRef.current);
+    if (onListenUpdate && (final || total - lastReportedMsRef.current >= 1000)) {
+      lastReportedMsRef.current = total;
+      onListenUpdate(total, { final });
+    }
+  };
+
   useEffect(() => {
     const audio = audioRef.current;
     if (!audio) return;
     const onTime = () => setCurrentTime(audio.currentTime);
     const onMeta = () => setDuration(audio.duration);
-    const onEnd = () => setIsPlaying(false);
+    const onEnd = () => {
+      setIsPlaying(false);
+      closeSession(true);
+    };
     audio.addEventListener("timeupdate", onTime);
     audio.addEventListener("loadedmetadata", onMeta);
     audio.addEventListener("ended", onEnd);
+
+    const onHide = () => {
+      if (document.visibilityState === "hidden") closeSession(true);
+    };
+    const onPageHide = () => closeSession(true);
+    document.addEventListener("visibilitychange", onHide);
+    window.addEventListener("pagehide", onPageHide);
+    window.addEventListener("beforeunload", onPageHide);
+
+    // Periodic flush every 10s while playing so we capture long listens even
+    // if the tab is killed without a clean unload event.
+    const heartbeat = window.setInterval(() => {
+      if (sessionStartRef.current !== null) {
+        const total = Math.floor(
+          accumulatedMsRef.current + (Date.now() - sessionStartRef.current),
+        );
+        if (onListenUpdate && total - lastReportedMsRef.current >= 5000) {
+          lastReportedMsRef.current = total;
+          onListenUpdate(total, { final: false });
+        }
+      }
+    }, 10_000);
+
     return () => {
       audio.removeEventListener("timeupdate", onTime);
       audio.removeEventListener("loadedmetadata", onMeta);
       audio.removeEventListener("ended", onEnd);
+      document.removeEventListener("visibilitychange", onHide);
+      window.removeEventListener("pagehide", onPageHide);
+      window.removeEventListener("beforeunload", onPageHide);
+      window.clearInterval(heartbeat);
+      closeSession(true);
     };
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
 
   const toggle = () => {
@@ -53,9 +108,11 @@ export function AudioPlayer({
     if (isPlaying) {
       audio.pause();
       setIsPlaying(false);
+      closeSession(true);
     } else {
       audio.play().catch(() => undefined);
       setIsPlaying(true);
+      sessionStartRef.current = Date.now();
       if (!firstPlayFiredRef.current) {
         firstPlayFiredRef.current = true;
         onFirstPlay?.();
