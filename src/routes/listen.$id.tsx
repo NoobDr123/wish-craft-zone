@@ -170,7 +170,7 @@ function ListenPage() {
             <div className="text-center">
               <RibbonMark className="mx-auto h-12 w-12 text-primary" />
               <p className="mt-4 text-sm font-medium uppercase tracking-[0.2em] text-muted-foreground">
-                A song for {pronoun}
+                A song about
               </p>
               <h1 className="mt-3 font-display text-5xl font-semibold leading-tight text-foreground md:text-6xl">
                 {name}
