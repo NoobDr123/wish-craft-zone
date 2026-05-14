@@ -259,7 +259,7 @@ const fallbackSamples: Array<{
     for_text: "Written for Ruby, 15 years. German Shepherd.",
     genre_label: "Country · Female Voice",
     cover_image_url: whoSurvivor,
-    audio_url: RACHEL_SONG_URL,
+    audio_url: "https://musicfile.kie.ai/M2Y0YjA2ZmUtYWE3ZS00MjVjLTlmZGQtZmJjYTAxYjAzNGQ1",
   },
   {
     title: "My Shadow",
