@@ -276,7 +276,7 @@ const fallbackSamples: Array<{
     for_text: "Written for Buddy, 13 years. Beagle.",
     genre_label: "Cinematic · Strings",
     cover_image_url: whoChild,
-    audio_url: RACHEL_SONG_URL,
+    audio_url: "https://musicfile.kie.ai/NGJjZDU4ZjYtNWZkNC00YmI5LThmMGItNTNmMmZjYjYyNjQ3",
   },
   {
     title: "Where the Sunbeam Was",
