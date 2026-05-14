@@ -9,24 +9,24 @@ import { supabase } from "@/integrations/supabase/client";
 
 export const Route = createFileRoute("/listen/$id")({
   component: ListenPage,
-  head: ({ loaderData }: any) => ({
-    meta: [
-      {
-        title: loaderData?.title
-          ? `${loaderData.title} · A song for you · PawPrint Song`
-          : "A song for you · PawPrint Song",
-      },
-      {
-        name: "description",
-        content: "A personal song crafted with love, just for you.",
-      },
-      { property: "og:title", content: loaderData?.title ?? "A song for you" },
-      {
-        property: "og:description",
-        content: "A personal song crafted with love.",
-      },
-    ],
-  }),
+  head: ({ loaderData }: any) => {
+    const dog = loaderData?.order?.dog_name;
+    const songTitle = loaderData?.title;
+    const pageTitle = dog
+      ? `A song for ${dog}${songTitle ? ` — "${songTitle}"` : ""} · PawPrint Song`
+      : "A song for you · PawPrint Song";
+    const desc = dog
+      ? `A personal tribute song for ${dog}, crafted with love.`
+      : "A personal song crafted with love, just for you.";
+    return {
+      meta: [
+        { title: pageTitle },
+        { name: "description", content: desc },
+        { property: "og:title", content: dog ? `A song for ${dog}` : "A song for you" },
+        { property: "og:description", content: desc },
+      ],
+    };
+  },
   loader: async ({ params }) => {
     // Reads through a safe public RPC — no buyer email, no Stripe IDs,
     // no personal notes are exposed publicly, and no login is required.
