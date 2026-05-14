@@ -285,7 +285,7 @@ const fallbackSamples: Array<{
     for_text: "Written for Rocky, 14 years. Mixed breed rescue.",
     genre_label: "Lullaby · Piano",
     cover_image_url: whoInTreatment,
-    audio_url: RACHEL_SONG_URL,
+    audio_url: "https://musicfile.kie.ai/MTcwMGIxNDEtN2I2ZC00NWJjLWEyZWItZGY1NjA2YTNkNWVj",
   },
 ];
 
