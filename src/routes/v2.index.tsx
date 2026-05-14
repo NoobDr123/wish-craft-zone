@@ -251,7 +251,7 @@ const fallbackSamples: Array<{
     for_text: "Written for Bella, 9 years. Goldendoodle.",
     genre_label: "Soft Folk · Male Voice",
     cover_image_url: whoNewlyDiagnosed,
-    audio_url: RACHEL_SONG_URL,
+    audio_url: "https://musicfile.kie.ai/MzhiMGI2Y2UtZTc0Yy00YjY3LTgyZTUtYzlkN2MyOGI3OWIy",
   },
   {
     title: "Good Girl, Always",
